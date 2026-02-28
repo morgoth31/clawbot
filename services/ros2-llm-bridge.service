@@ -1,0 +1,17 @@
+[Unit]
+Description=ROS 2 LLM Bridge Docker Service
+Requires=docker.service ros2-hardware-service.service
+After=docker.service network-online.target ros2-hardware-service.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/jetson/clawbot
+ExecStartPre=-/usr/bin/docker compose down
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose down
+Restart=always
+User=jetson
+Group=jetson
+
+[Install]
+WantedBy=multi-user.target

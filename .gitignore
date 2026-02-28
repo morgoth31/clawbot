@@ -23,3 +23,5 @@ site/
 # IDE
 .vscode/
 .idea/
+
+index-*.js
