@@ -1,0 +1,54 @@
+site_name: ROS2 LLM Bridge Documentation
+site_description: Documentation for the ROS 2 node and API that bridges LLM tools
+  with Yahboom Rosmaster X3 Plus hardware.
+theme:
+  name: material
+  palette:
+  - scheme: default
+    primary: indigo
+    accent: indigo
+    toggle:
+      icon: material/brightness-7
+      name: Switch to dark mode
+  - scheme: slate
+    primary: indigo
+    accent: indigo
+    toggle:
+      icon: material/brightness-4
+      name: Switch to light mode
+  features:
+  - navigation.tabs
+  - navigation.sections
+  - navigation.expand
+  - content.code.copy
+  - content.code.annotate
+plugins:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        paths:
+        - .
+        options:
+          docstring_style: google
+          show_source: true
+          show_root_heading: true
+nav:
+- Home: index.md
+- API Reference:
+  - clawbot_monitoring/app.py: api/clawbot_monitoring.app.md
+  - generate_docs.py: api/generate_docs.md
+  - ros2_llm_bridge/hardware_service.py: api/ros2_llm_bridge.hardware_service.md
+  - ros2_llm_bridge/ros2_llm_bridge/action_handler.py: api/ros2_llm_bridge.ros2_llm_bridge.action_handler.md
+  - ros2_llm_bridge/ros2_llm_bridge/api_server.py: api/ros2_llm_bridge.ros2_llm_bridge.api_server.md
+  - ros2_llm_bridge/ros2_llm_bridge/bridge_node.py: api/ros2_llm_bridge.ros2_llm_bridge.bridge_node.md
+  - ros2_llm_bridge/ros2_llm_bridge/schemas.py: api/ros2_llm_bridge.ros2_llm_bridge.schemas.md
+  - ros2_llm_bridge/setup.py: api/ros2_llm_bridge.setup.md
+  - ros2_llm_bridge/test/test_action_handler.py: api/ros2_llm_bridge.test.test_action_handler.md
+  - ros2_llm_bridge/test/test_copyright.py: api/ros2_llm_bridge.test.test_copyright.md
+  - ros2_llm_bridge/test/test_flake8.py: api/ros2_llm_bridge.test.test_flake8.md
+  - ros2_llm_bridge/test/test_integration.py: api/ros2_llm_bridge.test.test_integration.md
+  - ros2_llm_bridge/test/test_llm_handler.py: api/ros2_llm_bridge.test.test_llm_handler.md
+  - ros2_llm_bridge/test/test_pep257.py: api/ros2_llm_bridge.test.test_pep257.md
+  - ros2_llm_bridge/test/test_schemas.py: api/ros2_llm_bridge.test.test_schemas.md
+- Build & Update: build_and_update.md
