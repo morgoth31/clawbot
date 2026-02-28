@@ -51,4 +51,5 @@ nav:
   - ros2_llm_bridge/test/test_llm_handler.py: api/ros2_llm_bridge.test.test_llm_handler.md
   - ros2_llm_bridge/test/test_pep257.py: api/ros2_llm_bridge.test.test_pep257.md
   - ros2_llm_bridge/test/test_schemas.py: api/ros2_llm_bridge.test.test_schemas.md
+- Knowledge Base: knowledge.md
 - Build & Update: build_and_update.md
