@@ -17,6 +17,7 @@ This is the only way to have working odometry.
 import asyncio
 import base64
 import json
+import subprocess
 import logging
 import os
 import threading
@@ -45,8 +46,9 @@ MAX_LINEAR_MS  = float(os.getenv("MAX_LINEAR_MS",  "0.06"))
 MAX_ANGULAR_RS = float(os.getenv("MAX_ANGULAR_RS", "0.25"))
 MOTION_WATCHDOG_S = float(os.getenv("MOTION_WATCHDOG_S", "1.5"))
 
-SAFETY_FILE    = "/tmp/lidar_safety.json"
-SAFETY_MAX_AGE = 2.0
+SAFETY_FILE     = "/tmp/lidar_safety.json"
+SAFETY_MAX_AGE  = 2.0
+LIDAR_REQUIRED  = os.getenv("LIDAR_SAFETY_REQUIRED", "true").lower() != "false"
 
 # ── ROS 2 domain ────────────────────────────────────────────────────────────
 ROS_DOMAIN_ID = int(os.getenv("ROS_DOMAIN_ID", "28"))
@@ -136,6 +138,8 @@ def _clamp(v: float, lim: float) -> float:
 
 
 def _lidar_ok(vx: float, vy: float) -> tuple[bool, str]:
+    if not LIDAR_REQUIRED:
+        return True, "safety disabled (LIDAR_SAFETY_REQUIRED=false)"
     try:
         with open(SAFETY_FILE) as f:
             data = json.load(f)
@@ -375,6 +379,95 @@ async def get_battery() -> dict:
     v = ros_node.battery_volt
     pct = max(0, min(100, int((v - 9.6) / (12.6 - 9.6) * 100)))
     return {"voltage": round(v, 2), "unit": "V", "percentage": pct}
+
+
+# ── System Status ────────────────────────────────────────────────────────────
+
+def _run(cmd: list[str], timeout: float = 2.0) -> str:
+    """Run a subprocess and return stdout, empty string on failure."""
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        return r.stdout.strip()
+    except Exception:
+        return ""
+
+
+@app.get("/system/status")
+async def system_status() -> dict:
+    """Return full system status: services, ROS2 nodes/topics, LiDAR, battery.
+
+    Returns:
+        Aggregated status dict for the monitoring dashboard.
+    """
+    loop = asyncio.get_event_loop()
+
+    # ── Systemd services ──────────────────────────────────────────────────────
+    svc_names = ["ros2-hardware-service", "ros2-driver-node", "ros2-llm-bridge"]
+    def _svc_status(name: str) -> str:
+        return _run(["systemctl", "is-active", name]) or "unknown"
+
+    # ── Docker containers ─────────────────────────────────────────────────────
+    docker_containers = ["clawbot-llm_bridge-1", "clawbot-clawbot_monitoring-1"]
+    def _docker_status(name: str) -> str:
+        out = _run(["docker", "inspect", "--format", "{{.State.Status}}", name])
+        return out or "unknown"
+
+    # ── ROS2 nodes ────────────────────────────────────────────────────────────
+    def _ros2_nodes() -> list[str]:
+        out = _run([
+            "bash", "-c",
+            "source /opt/ros/humble/setup.bash && "
+            f"ROS_DOMAIN_ID={ROS_DOMAIN_ID} ros2 node list 2>/dev/null"
+        ], timeout=3.0)
+        return [n for n in out.splitlines() if n.startswith("/")]
+
+    # ── ROS2 topics ───────────────────────────────────────────────────────────
+    def _ros2_topics() -> list[str]:
+        out = _run([
+            "bash", "-c",
+            "source /opt/ros/humble/setup.bash && "
+            f"ROS_DOMAIN_ID={ROS_DOMAIN_ID} ros2 topic list 2>/dev/null"
+        ], timeout=3.0)
+        return [t for t in out.splitlines() if t.startswith("/")]
+
+    # ── Run all in thread pool to avoid blocking event loop ──────────────────
+    services = {}
+    for name in svc_names:
+        services[name] = await loop.run_in_executor(None, _svc_status, name)
+    for name in docker_containers:
+        services[name] = await loop.run_in_executor(None, _docker_status, name)
+
+    nodes  = await loop.run_in_executor(None, _ros2_nodes)
+    topics = await loop.run_in_executor(None, _ros2_topics)
+
+    # ── LiDAR ─────────────────────────────────────────────────────────────────
+    lidar: dict = {"enabled": LIDAR_REQUIRED, "safe_to_move": None,
+                   "distances": None, "age_s": None}
+    try:
+        with open(SAFETY_FILE) as f:
+            data = json.load(f)
+        age = round(time.time() - data.get("timestamp", 0), 1)
+        lidar.update({
+            "enabled":      LIDAR_REQUIRED,
+            "safe_to_move": data.get("safe_to_move"),
+            "distances":    data.get("distances"),
+            "age_s":        age,
+        })
+    except Exception:
+        pass
+
+    # ── Battery ───────────────────────────────────────────────────────────────
+    v = ros_node.battery_volt if ros_node else 0.0
+    pct = max(0, min(100, int((v - 9.6) / (12.6 - 9.6) * 100)))
+
+    return {
+        "timestamp": time.time(),
+        "services":  services,
+        "ros2_nodes": nodes,
+        "ros2_topics": topics,
+        "lidar":     lidar,
+        "battery":   {"voltage": round(v, 2), "percentage": pct},
+    }
 
 
 # ── Camera ────────────────────────────────────────────────────────────────────

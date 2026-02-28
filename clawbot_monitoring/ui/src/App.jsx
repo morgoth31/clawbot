@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Bot, Camera, Terminal, Navigation, Cpu, Activity, VideoOff, Loader, Send, ArrowUp, ArrowLeft, ArrowRight, ArrowDown, Octagon, RotateCcw, RotateCw, Scissors, Lock, Volume2 } from 'lucide-react';
+import { Bot, Camera, Terminal, Navigation, Cpu, Activity, VideoOff, Loader, Send, ArrowUp, ArrowLeft, ArrowRight, ArrowDown, Octagon, RotateCcw, RotateCw, Scissors, Lock, Volume2, Server, Radio } from 'lucide-react';
 
 const Button = ({ children, onClick, active, variant = 'primary', className = '', disabled = false, type = "button" }) => {
   const baseStyle = "relative overflow-hidden flex items-center justify-center gap-2 px-4 py-2 font-medium transition-all duration-300 rounded-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
@@ -39,6 +39,7 @@ const App = () => {
   const [loadingCmd, setLoadingCmd] = useState(false);
   const [hwStatus, setHwStatus] = useState("unknown");
   const [logs, setLogs] = useState([]);
+  const [sysStatus, setSysStatus] = useState(null);
 
   const addLog = (msg, type = "info") => {
     setLogs(prev => [...prev, { time: new Date().toLocaleTimeString(), msg, type }].slice(-50));
@@ -56,10 +57,19 @@ const App = () => {
     } catch (e) { }
   };
 
+  const fetchSysStatus = async () => {
+    try {
+      const res = await fetch('/api/hw/system/status');
+      if (res.ok) setSysStatus(await res.json());
+    } catch (e) { }
+  };
+
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, 5000);
-    return () => clearInterval(interval);
+    fetchSysStatus();
+    const i1 = setInterval(fetchStatus, 5000);
+    const i2 = setInterval(fetchSysStatus, 5000);
+    return () => { clearInterval(i1); clearInterval(i2); };
   }, []);
 
   const fetchCamera = useCallback(async () => {
@@ -213,19 +223,68 @@ const App = () => {
         </div>
 
         <div className="space-y-6">
+          <Card title="System Status" icon={<Server className="w-5 h-5" />}>
+            {sysStatus ? (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-widest mb-2 font-semibold">Services</p>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(sysStatus.services).map(([name, state]) => {
+                      const ok = state === 'active' || state === 'running';
+                      const short = name.replace('ros2-', '').replace('clawbot-', '').replace('-1', '').replace('_bridge', '-bridge');
+                      return (
+                        <span key={name} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-semibold border ${ok ? 'bg-emerald-900/40 border-emerald-700 text-emerald-300' : 'bg-rose-900/40 border-rose-700 text-rose-300'}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${ok ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`}></span>
+                          {short}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-widest mb-2 font-semibold flex items-center gap-1"><Radio className="w-3 h-3" /> ROS2 Nodes</p>
+                  <div className="flex flex-wrap gap-1">
+                    {sysStatus.ros2_nodes.filter((v, i, a) => a.indexOf(v) === i).map(node => (
+                      <span key={node} className="bg-brand-900/40 border border-brand-700/50 text-brand-300 px-2 py-0.5 rounded text-xs font-mono">{node}</span>
+                    ))}
+                    {sysStatus.ros2_nodes.length === 0 && <span className="text-gray-600 text-xs">No nodes</span>}
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-dark-border/40 flex items-center justify-between">
+                  <span className="text-xs text-gray-400 uppercase tracking-widest font-semibold">LiDAR Safety</span>
+                  <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${sysStatus.lidar.enabled ? 'bg-emerald-900/40 border-emerald-700 text-emerald-300' : 'bg-yellow-900/40 border-yellow-700 text-yellow-300'}`}>
+                    {sysStatus.lidar.enabled ? (sysStatus.lidar.age_s !== null ? `active · ${sysStatus.lidar.age_s}s` : 'waiting…') : 'DISABLED'}
+                  </span>
+                </div>
+                {sysStatus.lidar.enabled && sysStatus.lidar.safe_to_move && (
+                  <div className="grid grid-cols-4 gap-1 text-center text-xs font-mono">
+                    {Object.entries(sysStatus.lidar.safe_to_move).map(([dir, safe]) => (
+                      <div key={dir} className={`rounded py-1 ${safe ? 'bg-emerald-900/30 text-emerald-400' : 'bg-rose-900/30 text-rose-400'}`}>
+                        {dir.slice(0, 3).toUpperCase()}<br />
+                        <span className="text-[10px]">{sysStatus.lidar.distances?.[dir === 'forward' ? 'front' : dir === 'backward' ? 'back' : dir]?.toFixed(2)}m</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-gray-500 text-sm"><Loader className="animate-spin w-4 h-4" /> Loading…</div>
+            )}
+          </Card>
+
           <Card title="Chassis & Arm" icon={<Navigation />}>
             <div className="grid grid-cols-3 gap-2 max-w-[240px] mx-auto mb-6">
               <div />
-              <Button variant="secondary" onClick={() => moveRobot(0.1, 0, 0)} className="h-16"><ArrowUp className="w-6 h-6" /></Button>
+              <Button variant="secondary" onClick={() => moveRobot(0.06, 0, 0)} className="h-16"><ArrowUp className="w-6 h-6" /></Button>
               <div />
-              <Button variant="secondary" onClick={() => moveRobot(0, 0.1, 0)} className="h-16"><ArrowLeft className="w-6 h-6" /></Button>
+              <Button variant="secondary" onClick={() => moveRobot(0, 0.06, 0)} className="h-16"><ArrowLeft className="w-6 h-6" /></Button>
               <Button variant="danger" onClick={stopRobot} className="h-16 flex-col gap-0 text-xs shadow-rose-900/50 shadow-[inset_0px_2px_4px_rgba(255,255,255,0.2)]">
                 <Octagon className="w-6 h-6 mb-1" />
                 STOP
               </Button>
-              <Button variant="secondary" onClick={() => moveRobot(0, -0.1, 0)} className="h-16"><ArrowRight className="w-6 h-6" /></Button>
+              <Button variant="secondary" onClick={() => moveRobot(0, -0.06, 0)} className="h-16"><ArrowRight className="w-6 h-6" /></Button>
               <div />
-              <Button variant="secondary" onClick={() => moveRobot(-0.1, 0, 0)} className="h-16"><ArrowDown className="w-6 h-6" /></Button>
+              <Button variant="secondary" onClick={() => moveRobot(-0.06, 0, 0)} className="h-16"><ArrowDown className="w-6 h-6" /></Button>
               <div />
             </div>
             <div className="flex gap-2 justify-center mt-4 pt-4 border-t border-dark-border/50">
