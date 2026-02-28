@@ -1,0 +1,19 @@
+[Unit]
+Description=Clawbot YOLO Object Detection Node (port /detections + /camera/detection_image)
+After=network.target ros2-driver-node.service
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+WorkingDirectory=/home/jetson/clawbot
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
+  ROS_DOMAIN_ID=28 /home/jetson/yolov5_env/bin/python3 \
+  /home/jetson/clawbot/yolo_node/yolo_detector.py \
+  --ros-args -p model_path:=yolov5s -p confidence:=0.45 -p camera_index:=0 -p publish_rate_hz:=5.0"
+Restart=on-failure
+RestartSec=15
+Environment=ROS_DOMAIN_ID=28
+
+[Install]
+WantedBy=multi-user.target
