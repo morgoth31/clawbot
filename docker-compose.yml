@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  llm_bridge:
+    build: ./ros2_llm_bridge
+    network_mode: "host" # ROS 2 DDS + access to localhost:8001 hardware service
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-28}
+      - HARDWARE_SERVICE_URL=http://localhost:8001
+      - HARDWARE_SERVICE_TIMEOUT=10.0
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    ipc: host # Shared memory for certain DDS deployments
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
