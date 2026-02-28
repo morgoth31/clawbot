@@ -1,0 +1,25 @@
+# Environments
+.env
+
+# ROS 2 workspaces
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+
+# Pytest / CI
+.pytest_cache/
+.coverage
+
+# MkDocs
+site/
+
+# IDE
+.vscode/
+.idea/
