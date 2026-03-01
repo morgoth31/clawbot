@@ -25,3 +25,6 @@ site/
 .idea/
 
 index-*.js
+yahboomcar_visual/detection/frozen_inference_graph.pb
+yahboomcar_mediapipe/yahboomcar_mediapipe/file/shape_predictor_68_face_landmarks.dat
+yahboomcar_slam/params/ORBvoc.txt
