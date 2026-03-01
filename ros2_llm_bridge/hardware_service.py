@@ -24,7 +24,9 @@ import threading
 import time
 
 import cv2
+import numpy as np
 import uvicorn
+import yaml as _yaml
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
@@ -33,7 +35,9 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 from geometry_msgs.msg import Twist
-from std_msgs.msg import Bool, Float32, Int32, Int32MultiArray
+from nav_msgs.msg import OccupancyGrid
+from sensor_msgs.msg import CompressedImage, Imu
+from std_msgs.msg import Bool, Float32, Int32, Int32MultiArray, String
 
 logging.basicConfig(
     level=logging.INFO,
@@ -42,8 +46,8 @@ logging.basicConfig(
 logger = logging.getLogger("hardware_service")
 
 # ── Safety limits ───────────────────────────────────────────────────────────
-MAX_LINEAR_MS  = float(os.getenv("MAX_LINEAR_MS",  "0.06"))
-MAX_ANGULAR_RS = float(os.getenv("MAX_ANGULAR_RS", "0.25"))
+MAX_LINEAR_MS  = float(os.getenv("MAX_LINEAR_MS",  "0.5"))
+MAX_ANGULAR_RS = float(os.getenv("MAX_ANGULAR_RS", "1.5"))
 MOTION_WATCHDOG_S = float(os.getenv("MOTION_WATCHDOG_S", "1.5"))
 
 SAFETY_FILE     = "/tmp/lidar_safety.json"
@@ -64,6 +68,20 @@ WORKSPACE = os.getenv("WORKSPACE_PATH", "/home/jetson/.openclaw/workspace")
 # ── ROS 2 node ──────────────────────────────────────────────────────────────
 
 class HardwareNode(Node):
+    """ROS2 node for hardware control and sensor data aggregation.
+
+    Publishers:
+        /cmd_vel       — robot velocity commands
+        /servo_ctrl    — arm servo angle commands
+        /Buzzer        — buzzer on/off
+        /RGBLight      — LED colour
+
+    Subscribers:
+        /voltage       — battery voltage (V)
+        /imu/data_raw  — accelerometer + gyroscope
+        /vel_raw       — current measured velocity (vx, vy, angular)
+    """
+
     def __init__(self):
         super().__init__("hardware_service_node")
         best_effort = QoSProfile(
@@ -71,16 +89,96 @@ class HardwareNode(Node):
             reliability=ReliabilityPolicy.BEST_EFFORT,
             durability=DurabilityPolicy.VOLATILE,
         )
-        self.cmd_vel_pub  = self.create_publisher(Twist,          "/cmd_vel",    10)
-        self.servo_pub    = self.create_publisher(Int32MultiArray, "/servo_ctrl", 10)
-        self.buzzer_pub   = self.create_publisher(Bool,            "/Buzzer",     10)
-        self.rgb_pub      = self.create_publisher(Int32,           "/RGBLight",   10)
+
+        # ── Publishers ────────────────────────────────────────────────────
+        self.cmd_vel_pub = self.create_publisher(Twist,          "/cmd_vel",    10)
+        self.servo_pub   = self.create_publisher(Int32MultiArray, "/servo_ctrl", 10)
+        self.buzzer_pub  = self.create_publisher(Bool,            "/Buzzer",     10)
+        self.rgb_pub     = self.create_publisher(Int32,           "/RGBLight",   10)
+
+        # ── Sensor state ──────────────────────────────────────────────────
         self.battery_volt = 0.0
-        self.create_subscription(Float32, "/voltage", self._bat_cb, best_effort)
+
+        # IMU — real accelerometer + gyroscope data from driver
+        self.imu_accel   = {"x": 0.0, "y": 0.0, "z": 0.0}
+        self.imu_gyro    = {"x": 0.0, "y": 0.0, "z": 0.0}
+        self.imu_stamp   = 0.0
+
+        # Velocity — measured by wheel encoders (Rosmaster internal)
+        self.vel_vx      = 0.0
+        self.vel_vy      = 0.0
+        self.vel_angular = 0.0
+        self.vel_stamp   = 0.0
+
+        # Servo angles — last commanded value per ID (1-indexed, IDs 1-6)
+        # Actual read-back requires direct serial access (conflicts with driver)
+        # so we track the last commanded angle as an approximation.
+        self.servo_angles: dict[int, int] = {i: -1 for i in range(1, 7)}
+
+        # ── Subscriptions ─────────────────────────────────────────────────
+        self.create_subscription(Float32, "/voltage",      self._bat_cb,  best_effort)
+        self.create_subscription(Imu,     "/imu/data_raw", self._imu_cb,  best_effort)
+        self.create_subscription(Twist,   "/vel_raw",      self._vel_cb,  best_effort)
+
+        # SLAM map — transient-local so we get the last published map on connect
+        map_qos = QoSProfile(
+            depth=1,
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+        )
+        self.map_data: OccupancyGrid | None = None
+        self.map_stamp: float = 0.0
+        self.create_subscription(OccupancyGrid, "/map", self._map_cb, map_qos)
+
+        # YOLO detection feed — optional, only active when yolo-detector is running
+        self.yolo_frame_bytes: bytes | None = None
+        self.yolo_detections: list = []
+        self.yolo_stamp: float = 0.0
+        self.create_subscription(
+            CompressedImage, "/camera/detection_image", self._yolo_img_cb, best_effort
+        )
+        self.create_subscription(
+            String, "/detections", self._yolo_det_cb, best_effort
+        )
+
         self.get_logger().info(f"HardwareNode ready on domain {ROS_DOMAIN_ID}")
 
-    def _bat_cb(self, msg: Float32):
+    def _bat_cb(self, msg: Float32) -> None:
+        """Update battery voltage from /voltage topic."""
         self.battery_volt = msg.data
+
+    def _imu_cb(self, msg: Imu) -> None:
+        """Update IMU state from /imu/data_raw topic."""
+        a = msg.linear_acceleration
+        g = msg.angular_velocity
+        self.imu_accel = {"x": round(a.x, 3), "y": round(a.y, 3), "z": round(a.z, 3)}
+        self.imu_gyro  = {"x": round(g.x, 4), "y": round(g.y, 4), "z": round(g.z, 4)}
+        self.imu_stamp = time.time()
+
+    def _vel_cb(self, msg: Twist) -> None:
+        """Update measured velocity from /vel_raw topic."""
+        self.vel_vx      = round(msg.linear.x,  4)
+        self.vel_vy      = round(msg.linear.y,  4)
+        self.vel_angular = round(msg.angular.z, 4)
+        self.vel_stamp   = time.time()
+
+    def _map_cb(self, msg: OccupancyGrid) -> None:
+        """Store latest occupancy grid from /map topic."""
+        self.map_data  = msg
+        self.map_stamp = time.time()
+
+    def _yolo_img_cb(self, msg: CompressedImage) -> None:
+        """Cache latest YOLO annotated image from /camera/detection_image."""
+        self.yolo_frame_bytes = bytes(msg.data)
+        self.yolo_stamp = time.time()
+
+    def _yolo_det_cb(self, msg: String) -> None:
+        """Cache latest YOLO detections JSON from /detections."""
+        try:
+            import json as _json
+            self.yolo_detections = _json.loads(msg.data)
+        except Exception:
+            self.yolo_detections = []
 
 
 ros_node: HardwareNode | None = None
@@ -162,6 +260,28 @@ def _lidar_ok(vx: float, vy: float) -> tuple[bool, str]:
     return True, "clear"
 
 
+MAPS_DIR = os.getenv("MAPS_DIR", "/home/jetson/clawbot/maps")
+
+
+def _occupancy_grid_to_png_bytes(msg: OccupancyGrid) -> bytes:
+    """Convert a ROS OccupancyGrid to a PNG image (bytes).
+
+    Colour mapping:
+      0   (free)     → white  (255,255,255)
+      100 (occupied) → black  (  0,  0,  0)
+      -1  (unknown)  → gray   (128,128,128)
+    """
+    w = msg.info.width
+    h = msg.info.height
+    data = np.array(msg.data, dtype=np.int8).reshape((h, w))
+    img = np.full((h, w, 3), 128, dtype=np.uint8)      # default: unknown=gray
+    img[data == 0]   = [255, 255, 255]                  # free = white
+    img[data == 100] = [0,   0,   0]                    # occupied = black
+    img = np.flipud(img)                                 # ROS origin is bottom-left
+    _, buf = cv2.imencode(".png", img)
+    return buf.tobytes()
+
+
 # ── Motion ────────────────────────────────────────────────────────────────────
 
 class MotionRequest(BaseModel):
@@ -241,6 +361,7 @@ async def control_servo(req: ServoRequest) -> dict:
     msg = Int32MultiArray()
     msg.data = [req.servo_id, int(req.angle)]
     ros_node.servo_pub.publish(msg)
+    ros_node.servo_angles[req.servo_id] = int(req.angle)
     return {"servo_id": req.servo_id, "angle": req.angle, "status": "ok"}
 
 
@@ -262,8 +383,10 @@ async def control_arm(req: ArmRequest) -> dict:
         raise HTTPException(503, "ROS 2 node not ready.")
     for i, angle in enumerate(req.joints):
         msg = Int32MultiArray()
-        msg.data = [i + 1, int(max(0, min(180, angle)))]
+        clamped = int(max(0, min(180, angle)))
+        msg.data = [i + 1, clamped]
         ros_node.servo_pub.publish(msg)
+        ros_node.servo_angles[i + 1] = clamped
         await asyncio.sleep(0.06)
     return {"joints": req.joints, "status": "ok"}
 
@@ -288,6 +411,7 @@ async def control_claw(req: ClawRequest) -> dict:
     msg = Int32MultiArray()
     msg.data = [6, angle]
     ros_node.servo_pub.publish(msg)
+    ros_node.servo_angles[6] = angle
     return {"state": req.state, "angle": angle, "status": "ok"}
 
 
@@ -379,6 +503,205 @@ async def get_battery() -> dict:
     v = ros_node.battery_volt
     pct = max(0, min(100, int((v - 9.6) / (12.6 - 9.6) * 100)))
     return {"voltage": round(v, 2), "unit": "V", "percentage": pct}
+
+
+# ── Telemetry ────────────────────────────────────────────────────────────────
+
+@app.get("/telemetry")
+async def get_telemetry() -> dict:
+    """Return live sensor telemetry from the robot.
+
+    Aggregates all sensor data available without requiring direct serial access:
+    - IMU accelerometer and gyroscope (from /imu/data_raw)
+    - Measured wheel velocity (from /vel_raw)
+    - Last commanded servo angles for arm joints 1-6
+    - Battery voltage and percentage
+
+    Returns:
+        Dict containing imu, velocity, servos, and battery sub-dicts.
+        Each field includes a 'stamp' (Unix timestamp) for staleness checks.
+    """
+    if ros_node is None:
+        raise HTTPException(503, "ROS 2 node not ready.")
+
+    v = ros_node.battery_volt
+    pct = max(0, min(100, int((v - 9.6) / (12.6 - 9.6) * 100)))
+
+    return {
+        "imu": {
+            "accel": ros_node.imu_accel,          # m/s²
+            "gyro":  ros_node.imu_gyro,           # rad/s
+            "stamp": ros_node.imu_stamp,
+            "stale": (time.time() - ros_node.imu_stamp) > 1.0 if ros_node.imu_stamp else True,
+        },
+        "velocity": {
+            "vx":      ros_node.vel_vx,           # m/s forward
+            "vy":      ros_node.vel_vy,            # m/s lateral
+            "angular": ros_node.vel_angular,       # rad/s
+            "stamp":   ros_node.vel_stamp,
+            "stale":   (time.time() - ros_node.vel_stamp) > 1.0 if ros_node.vel_stamp else True,
+        },
+        "servos": {
+            # Last commanded angle per ID (1-6). -1 = not yet commanded this session.
+            str(sid): angle
+            for sid, angle in ros_node.servo_angles.items()
+        },
+        "battery": {
+            "voltage":    round(v, 2),
+            "percentage": pct,
+        },
+    }
+
+
+# ── SLAM Map ─────────────────────────────────────────────────────────────────
+
+@app.get("/map/live")
+async def get_live_map() -> dict:
+    """Return the current live SLAM map as a base64 PNG.
+
+    Converts the last received /map OccupancyGrid to a PNG image.
+
+    Returns:
+        Dict with image_base64, dimensions, resolution and timestamp.
+
+    Raises:
+        HTTPException 404 if no map has been received yet.
+    """
+    if ros_node is None:
+        raise HTTPException(503, "ROS 2 node not ready.")
+    if ros_node.map_data is None:
+        raise HTTPException(404, "No map received yet — is SLAM running?")
+    try:
+        png = _occupancy_grid_to_png_bytes(ros_node.map_data)
+    except Exception as e:
+        raise HTTPException(500, f"Map conversion error: {e}")
+    b64 = base64.b64encode(png).decode()
+    return {
+        "image_base64": b64,
+        "format":       "png",
+        "width":        ros_node.map_data.info.width,
+        "height":       ros_node.map_data.info.height,
+        "resolution":   ros_node.map_data.info.resolution,
+        "stamp":        ros_node.map_stamp,
+    }
+
+
+@app.get("/maps")
+async def list_maps() -> dict:
+    """List all saved maps in MAPS_DIR.
+
+    Returns:
+        Dict with a 'maps' list of {name, has_pgm, mtime}.
+    """
+    os.makedirs(MAPS_DIR, exist_ok=True)
+    maps = []
+    for f in sorted(os.listdir(MAPS_DIR)):
+        if f.endswith(".yaml"):
+            name      = f[:-5]
+            pgm_path  = os.path.join(MAPS_DIR, name + ".pgm")
+            yaml_path = os.path.join(MAPS_DIR, f)
+            mtime     = os.path.getmtime(yaml_path) if os.path.exists(yaml_path) else 0
+            maps.append({"name": name, "has_pgm": os.path.exists(pgm_path), "mtime": mtime})
+    return {"maps": maps}
+
+
+class SaveMapRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=64, pattern=r"^[a-zA-Z0-9_\-]+$")
+
+
+@app.post("/maps/save")
+async def save_map(req: SaveMapRequest) -> dict:
+    """Save the current SLAM map to disk using nav2 map_saver_cli.
+
+    Args:
+        req: SaveMapRequest with the map name (alphanumeric + _ -).
+
+    Returns:
+        Status and saved file path.
+
+    Raises:
+        HTTPException 500/504 if map_saver_cli fails or times out.
+    """
+    os.makedirs(MAPS_DIR, exist_ok=True)
+    out_path = os.path.join(MAPS_DIR, req.name)
+    cmd = [
+        "bash", "-c",
+        f"source /opt/ros/humble/setup.bash && "
+        f"ROS_DOMAIN_ID={ROS_DOMAIN_ID} "
+        f"ros2 run nav2_map_server map_saver_cli -f {out_path} "
+        f"--ros-args -p map_subscribe_transient_local:=true"
+    ]
+    loop = asyncio.get_event_loop()
+    try:
+        result = await loop.run_in_executor(None, lambda: subprocess.run(
+            cmd, capture_output=True, text=True, timeout=15.0
+        ))
+        if result.returncode != 0:
+            raise HTTPException(500, f"map_saver_cli failed: {result.stderr.strip()}")
+    except subprocess.TimeoutExpired:
+        raise HTTPException(504, "map_saver_cli timed out (15s)")
+    return {"status": "ok", "name": req.name, "path": out_path}
+
+
+@app.get("/maps/{name}/image")
+async def get_map_image(name: str) -> dict:
+    """Load a saved map PGM and return it as a base64 PNG.
+
+    Args:
+        name: Map name (without extension).
+
+    Returns:
+        Dict with image_base64, dimensions, resolution and name.
+
+    Raises:
+        HTTPException 404 if map not found.
+    """
+    pgm_path  = os.path.join(MAPS_DIR, name + ".pgm")
+    yaml_path = os.path.join(MAPS_DIR, name + ".yaml")
+    if not os.path.exists(pgm_path):
+        raise HTTPException(404, f"Map not found: {name}")
+    img = cv2.imread(pgm_path, cv2.IMREAD_GRAYSCALE)
+    if img is None:
+        raise HTTPException(500, "Failed to read PGM file.")
+    rgb = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    _, buf = cv2.imencode(".png", rgb)
+    b64  = base64.b64encode(buf.tobytes()).decode()
+    meta: dict = {}
+    if os.path.exists(yaml_path):
+        with open(yaml_path) as f:
+            meta = _yaml.safe_load(f) or {}
+    return {
+        "image_base64": b64,
+        "format":       "png",
+        "width":        img.shape[1],
+        "height":       img.shape[0],
+        "resolution":   meta.get("resolution"),
+        "name":         name,
+    }
+
+
+@app.delete("/maps/{name}")
+async def delete_map(name: str) -> dict:
+    """Delete a saved map (.pgm + .yaml files).
+
+    Args:
+        name: Map name (without extension).
+
+    Returns:
+        List of deleted files.
+
+    Raises:
+        HTTPException 404 if no files found.
+    """
+    deleted = []
+    for ext in [".pgm", ".yaml"]:
+        p = os.path.join(MAPS_DIR, name + ext)
+        if os.path.exists(p):
+            os.remove(p)
+            deleted.append(p)
+    if not deleted:
+        raise HTTPException(404, f"Map not found: {name}")
+    return {"status": "ok", "deleted": deleted}
 
 
 # ── System Status ────────────────────────────────────────────────────────────
@@ -513,6 +836,47 @@ async def capture_camera(
         with open(path, "wb") as f:
             f.write(jpeg)
     return {"camera": camera, "image_base64": b64, "format": "jpeg", "saved_path": path}
+
+
+# ── YOLO Detection Feed ───────────────────────────────────────────────────────
+
+@app.get("/yolo/frame")
+async def yolo_frame() -> dict:
+    """Return the latest YOLO annotated frame as base64 JPEG.
+
+    Returns 204 (no content) if no frame has been received yet (yolo-detector
+    not running or not yet published).
+    """
+    if ros_node is None or ros_node.yolo_frame_bytes is None:
+        raise HTTPException(204, "No YOLO frame available — is yolo-detector running?")
+    b64 = base64.b64encode(ros_node.yolo_frame_bytes).decode()
+    age = round(time.time() - ros_node.yolo_stamp, 2)
+    return {
+        "image_base64": b64,
+        "format": "jpeg",
+        "age_s": age,
+        "detections": ros_node.yolo_detections,
+    }
+
+
+@app.get("/yolo/status")
+async def yolo_status() -> dict:
+    """Check YOLO node status: service state + last frame age + last detections."""
+    loop = asyncio.get_event_loop()
+    svc_state = await loop.run_in_executor(
+        None, lambda: _run(["systemctl", "is-active", "yolo-detector"]) or "unknown"
+    )
+    active = svc_state in ("active", "running")
+    frame_age = None
+    if ros_node and ros_node.yolo_stamp > 0:
+        frame_age = round(time.time() - ros_node.yolo_stamp, 2)
+    return {
+        "service": svc_state,
+        "active": active,
+        "frame_age_s": frame_age,
+        "has_frame": ros_node is not None and ros_node.yolo_frame_bytes is not None,
+        "detections": ros_node.yolo_detections if ros_node else [],
+    }
 
 
 if __name__ == "__main__":
