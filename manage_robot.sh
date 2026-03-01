@@ -18,16 +18,30 @@ function start_robot() {
     fi
     
     # Create a new detached session
-    tmux new-session -d -s $SESSION_NAME
+    tmux new-session -d -s $SESSION_NAME -n "bringup"
     
-    # Send commands to the tmux session
-    # We delay slightly to ensure bash has started in tmux
-    tmux send-keys -t $SESSION_NAME "source /opt/ros/humble/setup.bash" C-m
-    tmux send-keys -t $SESSION_NAME "source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash" C-m
-    tmux send-keys -t $SESSION_NAME "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" C-m
+    # Bringup Window
+    tmux send-keys -t $SESSION_NAME:0 "source /opt/ros/humble/setup.bash" C-m
+    tmux send-keys -t $SESSION_NAME:0 "source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash" C-m
+    tmux send-keys -t $SESSION_NAME:0 "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" C-m
+    tmux send-keys -t $SESSION_NAME:0 "export FASTRTPS_DEFAULT_PROFILES_FILE=/home/jetson/clawbot/fastdds_profile.xml" C-m
+    tmux send-keys -t $SESSION_NAME:0 "ros2 launch yahboomcar_bringup yahboomcar_bringup_X3_launch.py" C-m
     
-    # Launch the bringup file for X3 model
-    tmux send-keys -t $SESSION_NAME "ros2 launch yahboomcar_bringup yahboomcar_bringup_X3_launch.py" C-m
+    # Camera Window
+    tmux new-window -t $SESSION_NAME -n "camera"
+    tmux send-keys -t $SESSION_NAME:1 "source /opt/ros/humble/setup.bash" C-m
+    tmux send-keys -t $SESSION_NAME:1 "source /home/jetson/clawbot/install/setup.bash" C-m
+    tmux send-keys -t $SESSION_NAME:1 "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" C-m
+    tmux send-keys -t $SESSION_NAME:1 "export FASTRTPS_DEFAULT_PROFILES_FILE=/home/jetson/clawbot/fastdds_profile.xml" C-m
+    tmux send-keys -t $SESSION_NAME:1 "ros2 launch astra_camera astro_pro_plus.launch.xml" C-m
+
+    # SLAM Window
+    tmux new-window -t $SESSION_NAME -n "slam"
+    tmux send-keys -t $SESSION_NAME:2 "source /opt/ros/humble/setup.bash" C-m
+    tmux send-keys -t $SESSION_NAME:2 "source /home/jetson/clawbot/install/setup.bash" C-m
+    tmux send-keys -t $SESSION_NAME:2 "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" C-m
+    tmux send-keys -t $SESSION_NAME:2 "export FASTRTPS_DEFAULT_PROFILES_FILE=/home/jetson/clawbot/fastdds_profile.xml" C-m
+    tmux send-keys -t $SESSION_NAME:2 "sleep 5 && ros2 launch /home/jetson/clawbot/slam_launch.py" C-m
     
     echo "Le robot a démarré avec succès en arrière-plan !"
     echo "Utilisez './manage_robot.sh attach' pour voir les logs."
