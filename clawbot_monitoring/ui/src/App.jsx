@@ -56,6 +56,8 @@ const App = () => {
   const [selectedMap, setSelectedMap] = useState('');
   const [mapNameInput, setMapNameInput] = useState('');
   const [savingMap, setSavingMap] = useState(false);
+  const [slamEngineStatus, setSlamEngineStatus] = useState({ active: false });
+  const [loadingSlamCmd, setLoadingSlamCmd] = useState(false);
 
   const addLog = (msg, type = "info") => {
     setLogs(prev => [...prev, { time: new Date().toLocaleTimeString(), msg, type }].slice(-50));
@@ -159,7 +161,7 @@ const App = () => {
     try {
       const res = await fetch('/api/hw/yolo/status');
       if (res.ok) setYoloStatus(await res.json());
-    } catch (e) {}
+    } catch (e) { }
   }, []);
 
   const fetchYoloFrame = useCallback(async () => {
@@ -170,7 +172,7 @@ const App = () => {
         setYoloFrame(`data:image/jpeg;base64,${data.image_base64}`);
         setYoloDetections(data.detections || []);
       }
-    } catch (e) {}
+    } catch (e) { }
   }, []);
 
   useEffect(() => {
@@ -196,7 +198,7 @@ const App = () => {
         if (data.maps.length > 0)
           setSelectedMap(prev => prev || data.maps[data.maps.length - 1].name);
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const fetchLiveMap = useCallback(async () => {
@@ -207,7 +209,7 @@ const App = () => {
         setSlamFrame(`data:image/png;base64,${data.image_base64}`);
         setSlamMeta({ width: data.width, height: data.height, resolution: data.resolution });
       }
-    } catch (e) {}
+    } catch (e) { }
   }, []);
 
   const loadSavedMap = async () => {
@@ -261,6 +263,50 @@ const App = () => {
     const interval = setInterval(fetchLiveMap, 2000);
     return () => clearInterval(interval);
   }, [slamLive, fetchLiveMap]);
+
+  const fetchSlamStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/hw/slam/status');
+      if (res.ok) {
+        const data = await res.json();
+        setSlamEngineStatus(data);
+        if (data.active && !slamLive) {
+          setSlamLive(true);
+        }
+      }
+    } catch (e) { }
+  }, [slamLive]);
+
+  useEffect(() => {
+    fetchSlamStatus();
+    const interval = setInterval(fetchSlamStatus, 3000);
+    return () => clearInterval(interval);
+  }, [fetchSlamStatus]);
+
+  const toggleSlamEngine = async () => {
+    setLoadingSlamCmd(true);
+    const endpoint = slamEngineStatus?.active ? '/api/hw/slam/stop' : '/api/hw/slam/start';
+    try {
+      const res = await fetch(endpoint, { method: 'POST' });
+      if (res.ok) {
+        addLog(`SLAM ${slamEngineStatus?.active ? 'stopped' : 'started'}`, 'success');
+        if (slamEngineStatus?.active) {
+          setSlamLive(false);
+          setSlamFrame(null);
+          setSlamMeta(null);
+        } else {
+          setSlamLive(true);
+        }
+        await fetchSlamStatus();
+      } else {
+        const err = await res.json();
+        addLog(`SLAM CMD error: ${err.detail || err.message}`, 'error');
+      }
+    } catch (e) {
+      addLog(`Failed to toggle SLAM: ${e.message}`, 'error');
+    }
+    setLoadingSlamCmd(false);
+  };
 
   const sendLLMCommand = async (e) => {
     e.preventDefault();
@@ -343,13 +389,26 @@ const App = () => {
             title="SLAM Map"
             icon={<Map className="w-5 h-5" />}
             action={
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
+                {slamEngineStatus && (
+                  <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${slamEngineStatus.active ? 'bg-emerald-900/40 border-emerald-700 text-emerald-300' : 'bg-gray-900/40 border-gray-700 text-gray-400'}`}>
+                    {slamEngineStatus.active ? '● SLAM active' : '○ SLAM off'}
+                  </span>
+                )}
+                <Button
+                  variant={slamEngineStatus?.active ? 'danger' : 'primary'}
+                  onClick={toggleSlamEngine}
+                  disabled={loadingSlamCmd}
+                  className="text-xs py-1 px-3"
+                >
+                  {loadingSlamCmd ? <Loader className="animate-spin w-3 h-3" /> : (slamEngineStatus?.active ? 'Stop SLAM' : 'Start SLAM')}
+                </Button>
                 <Button
                   variant={slamLive ? 'primary' : 'secondary'}
                   onClick={() => setSlamLive(v => !v)}
                   className="text-xs py-1 px-3"
                 >
-                  {slamLive ? '⏹ Live' : '▶ Live'}
+                  {slamLive ? '⏹ Live View' : '▶ Live View'}
                 </Button>
                 <Button variant="secondary" onClick={fetchLiveMap} className="text-xs py-1 px-3">Refresh</Button>
               </div>
@@ -541,46 +600,46 @@ const App = () => {
 
           <Card title="Telemetry" icon={<Gauge className="w-5 h-5" />}>
             {telemetry ? (() => {
-              const fmt = (v, d=3) => v === undefined ? '—' : v.toFixed(d);
+              const fmt = (v, d = 3) => v === undefined ? '—' : v.toFixed(d);
               const bar = (v, min, max, warn) => {
                 const pct = Math.min(100, Math.max(0, ((v - min) / (max - min)) * 100));
                 const color = Math.abs(v) > warn ? 'bg-rose-400' : 'bg-brand-400';
                 return (
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1.5 bg-dark-bg rounded-full overflow-hidden">
-                      <div className={`h-full transition-all duration-200 ${color}`} style={{width:`${pct}%`}}/>
+                      <div className={`h-full transition-all duration-200 ${color}`} style={{ width: `${pct}%` }} />
                     </div>
                   </div>
                 );
               };
               const servoEntries = Object.entries(telemetry.servos);
-              const SERVO_LABELS = {1:'J1',2:'J2',3:'J3',4:'J4',5:'J5',6:'🦾'};
+              const SERVO_LABELS = { 1: 'J1', 2: 'J2', 3: 'J3', 4: 'J4', 5: 'J5', 6: '🦾' };
               return (
                 <div className="space-y-4 text-xs font-mono">
                   {/* IMU */}
                   <div>
                     <p className="text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-1">
-                      <Waves className="w-3 h-3"/> IMU
+                      <Waves className="w-3 h-3" /> IMU
                       {telemetry.imu.stale && <span className="text-rose-400 ml-1">STALE</span>}
                     </p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                      {['x','y','z'].map(ax => (
+                      {['x', 'y', 'z'].map(ax => (
                         <React.Fragment key={ax}>
                           <div className="flex justify-between text-gray-300">
                             <span className="text-gray-500">Accel {ax.toUpperCase()}</span>
                             <span className={Math.abs(telemetry.imu.accel[ax]) > 2 && ax !== 'z' ? 'text-yellow-400' : ''}>
-                              {fmt(telemetry.imu.accel[ax],2)} m/s²
+                              {fmt(telemetry.imu.accel[ax], 2)} m/s²
                             </span>
                           </div>
                           <div>{bar(telemetry.imu.accel[ax], -12, 12, 2)}</div>
                         </React.Fragment>
                       ))}
-                      {['x','y','z'].map(ax => (
-                        <React.Fragment key={'g'+ax}>
+                      {['x', 'y', 'z'].map(ax => (
+                        <React.Fragment key={'g' + ax}>
                           <div className="flex justify-between text-gray-300">
                             <span className="text-gray-500">Gyro {ax.toUpperCase()}</span>
                             <span className={Math.abs(telemetry.imu.gyro[ax]) > 0.5 ? 'text-yellow-400' : ''}>
-                              {fmt(telemetry.imu.gyro[ax],3)} r/s
+                              {fmt(telemetry.imu.gyro[ax], 3)} r/s
                             </span>
                           </div>
                           <div>{bar(telemetry.imu.gyro[ax], -3, 3, 0.5)}</div>
@@ -592,11 +651,11 @@ const App = () => {
                   <div className="border-t border-dark-border/40 pt-3">
                     <p className="text-gray-400 uppercase tracking-widest mb-2">Wheels (vel_raw)</p>
                     <div className="grid grid-cols-3 gap-2 text-center">
-                      {[['Vx', telemetry.velocity.vx,'m/s'], ['Vy', telemetry.velocity.vy,'m/s'], ['ω', telemetry.velocity.angular,'r/s']].map(([l,v,u]) => (
+                      {[['Vx', telemetry.velocity.vx, 'm/s'], ['Vy', telemetry.velocity.vy, 'm/s'], ['ω', telemetry.velocity.angular, 'r/s']].map(([l, v, u]) => (
                         <div key={l} className="bg-dark-bg/50 rounded-lg py-2 px-1">
                           <div className="text-gray-500 text-[10px]">{l}</div>
                           <div className={`text-sm font-bold ${Math.abs(v) > 0.01 ? 'text-brand-300' : 'text-gray-500'}`}>
-                            {fmt(v,3)}
+                            {fmt(v, 3)}
                           </div>
                           <div className="text-[10px] text-gray-600">{u}</div>
                         </div>
@@ -616,7 +675,7 @@ const App = () => {
                           </div>
                           {angle >= 0 && (
                             <div className="mt-1 h-1 bg-dark-bg rounded-full overflow-hidden">
-                              <div className="h-full bg-brand-500 transition-all duration-300" style={{width:`${(angle/180)*100}%`}}/>
+                              <div className="h-full bg-brand-500 transition-all duration-300" style={{ width: `${(angle / 180) * 100}%` }} />
                             </div>
                           )}
                         </div>
@@ -625,7 +684,7 @@ const App = () => {
                   </div>
                 </div>
               );
-            })() : <div className="flex items-center gap-2 text-gray-500 text-sm"><Loader className="animate-spin w-4 h-4"/>Loading…</div>}
+            })() : <div className="flex items-center gap-2 text-gray-500 text-sm"><Loader className="animate-spin w-4 h-4" />Loading…</div>}
           </Card>
 
           <Card title="Chassis & Arm" icon={<Navigation />}>

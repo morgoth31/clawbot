@@ -218,4 +218,166 @@
         <parent link="base_link"/>
         <child link="camera_link"/>
     </joint>
+    <!-- Robotic Arm (6-DOF) Placeholder -->
+    <!-- Joint 1: Base Rotation -->
+    <link name="arm_base_link">
+        <visual>
+            <geometry>
+                <cylinder length="0.05" radius="0.03"/>
+            </geometry>
+            <material name="black">
+                <color rgba="0 0 0 1"/>
+            </material>
+        </visual>
+    </link>
+    <joint name="joint1" type="revolute">
+        <parent link="base_link"/>
+        <child link="arm_base_link"/>
+        <origin xyz="0.0 0.0 0.1" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+    </joint>
+
+    <!-- Joint 2: Shoulder -->
+    <link name="arm_link2">
+        <visual>
+            <geometry>
+                <box size="0.02 0.02 0.1"/>
+            </geometry>
+            <material name="blue">
+                <color rgba="0 0 1 1"/>
+            </material>
+        </visual>
+    </link>
+    <joint name="joint2" type="revolute">
+        <parent link="arm_base_link"/>
+        <child link="arm_link2"/>
+        <origin xyz="0 0 0.05" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+    </joint>
+
+    <!-- Joint 3: Elbow -->
+    <link name="arm_link3">
+        <visual>
+            <geometry>
+                <box size="0.02 0.02 0.1"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+    </link>
+    <joint name="joint3" type="revolute">
+        <parent link="arm_link2"/>
+        <child link="arm_link3"/>
+        <origin xyz="0 0 0.1" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+    </joint>
+
+    <!-- Joint 4: Wrist V -->
+    <link name="arm_link4">
+        <visual>
+            <geometry>
+                <box size="0.02 0.02 0.08"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+    </link>
+    <joint name="joint4" type="revolute">
+        <parent link="arm_link3"/>
+        <child link="arm_link4"/>
+        <origin xyz="0 0 0.1" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+    </joint>
+
+    <!-- Joint 5: Wrist H -->
+    <link name="arm_link5">
+        <visual>
+            <geometry>
+                <box size="0.02 0.02 0.05"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+    </link>
+    <joint name="joint5" type="revolute">
+        <parent link="arm_link4"/>
+        <child link="arm_link5"/>
+        <origin xyz="0 0 0.08" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
+    </joint>
+
+    <!-- Joint 6: Claw -->
+    <link name="claw_link">
+        <visual>
+            <geometry>
+                <box size="0.05 0.05 0.02"/>
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 1"/>
+            </material>
+        </visual>
+    </link>
+    <joint name="joint6" type="revolute">
+        <parent link="arm_link5"/>
+        <child link="claw_link"/>
+        <origin xyz="0 0 0.05" rpy="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-0.5" upper="0.5" effort="10" velocity="1"/>
+    </joint>
+
+    <ros2_control name="ClawbotSystem" type="system">
+        <hardware>
+            <plugin>clawbot_hardware_interface/ClawbotSystemHardware</plugin>
+        </hardware>
+        <joint name="joint1">
+            <command_interface name="position">
+                <param name="min">-1.57</param>
+                <param name="max">1.57</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="joint2">
+            <command_interface name="position">
+                <param name="min">-1.57</param>
+                <param name="max">1.57</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="joint3">
+            <command_interface name="position">
+                <param name="min">-1.57</param>
+                <param name="max">1.57</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="joint4">
+            <command_interface name="position">
+                <param name="min">-1.57</param>
+                <param name="max">1.57</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="joint5">
+            <command_interface name="position">
+                <param name="min">-1.57</param>
+                <param name="max">1.57</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="joint6">
+            <command_interface name="position">
+                <param name="min">-0.5</param>
+                <param name="max">0.5</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+    </ros2_control>
 </robot>

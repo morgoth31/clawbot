@@ -20,6 +20,7 @@ import json
 import subprocess
 import logging
 import os
+import signal
 import threading
 import time
 
@@ -183,6 +184,7 @@ class HardwareNode(Node):
 
 ros_node: HardwareNode | None = None
 _last_motion_t: float = 0.0
+_slam_process: subprocess.Popen | None = None
 
 
 def _watchdog_thread():
@@ -554,6 +556,98 @@ async def get_telemetry() -> dict:
 
 
 # ── SLAM Map ─────────────────────────────────────────────────────────────────
+
+def _is_slam_running() -> bool:
+    try:
+        # Check if slam_launch.py is in the process list
+        out = subprocess.check_output(["pgrep", "-f", "slam_launch.py"])
+        return len(out.strip()) > 0
+    except subprocess.CalledProcessError:
+        return False
+
+@app.post("/slam/start")
+async def start_slam() -> dict:
+    """Start the SLAM background process using slam_launch.py.
+    
+    Returns:
+        Status indicating whether SLAM was started or already running.
+    """
+    global _slam_process
+    if _is_slam_running():
+        return {"status": "ok", "message": "SLAM is already running."}
+    
+    import shlex
+    cmd = shlex.split(f"bash -c 'source /opt/ros/humble/setup.bash && ROS_DOMAIN_ID={ROS_DOMAIN_ID} ros2 launch /home/jetson/clawbot/slam_launch.py'")
+    
+    try:
+        _slam_process = subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception as e:
+        raise HTTPException(500, f"Failed to start SLAM: {e}")
+    
+    return {"status": "ok", "message": "SLAM started."}
+
+
+@app.post("/slam/stop")
+async def stop_slam() -> dict:
+    """Stop the SLAM background process and its children.
+    
+    Returns:
+        Status indicating whether SLAM was stopped or not running.
+    """
+    global _slam_process
+    
+    try:
+        # Find the PID of the slam_launch.py script
+        pid_bytes = subprocess.check_output(["pgrep", "-f", "slam_launch.py"])
+        pids = pid_bytes.decode().strip().split('\n')
+        
+        for pid_str in pids:
+            if pid_str:
+                pid = int(pid_str)
+                try:
+                    # Get the process group ID
+                    pgid_bytes = subprocess.check_output(["ps", "-o", "pgid=", "-p", str(pid)])
+                    pgid = int(pgid_bytes.decode().strip())
+                    # Kill the entire process group
+                    os.killpg(pgid, signal.SIGTERM)
+                except Exception:
+                    # Fallback to killing just the process if pgid fails
+                    os.kill(pid, signal.SIGTERM)
+    except subprocess.CalledProcessError:
+        pass  # pgrep found nothing, slam_launch.py is not running
+        
+    try:
+        # Give cartographer nodes a moment to cleanly shutdown, then force kill if needed
+        await asyncio.sleep(1.0)
+        nodes_to_kill = [
+            "slam_launch.py",
+            "cartographer_node", 
+            "cartographer_occupancy_grid_node",
+            "ydlidar_ros2_driver_node",
+            "static_transform_publisher"
+        ]
+        for node in nodes_to_kill:
+            subprocess.run(["pkill", "-9", "-f", node], timeout=2.0)
+    except Exception as e:
+        raise HTTPException(500, f"Error stopping SLAM processes: {e}")
+    finally:
+        _slam_process = None
+        if ros_node:
+            ros_node.map_data = None  # Clear the stale map data
+            
+    return {"status": "ok", "message": "SLAM stopped."}
+
+
+@app.get("/slam/status")
+async def slam_status() -> dict:
+    """Check the status of the SLAM process.
+    
+    Returns:
+        Dict with 'active' indicating if SLAM is currently running.
+    """
+    active = _is_slam_running()
+    return {"active": active}
+
 
 @app.get("/map/live")
 async def get_live_map() -> dict:
