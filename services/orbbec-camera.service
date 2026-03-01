@@ -1,17 +1,21 @@
 [Unit]
-Description=Clawbot Orbbec Astra Pro Camera (depth + RGB → ROS2 topics)
+Description=Clawbot Orbbec Astra Pro+ Camera (depth + RGB → ROS2 topics)
 After=network.target ros2-driver-node.service
+# Ne pas bloquer le boot si la caméra n'est pas branchée
+StartLimitIntervalSec=60
+StartLimitBurst=3
 
 [Service]
 Type=simple
 User=jetson
 Group=jetson
+Environment=ROS_DOMAIN_ID=28
+Environment=FASTRTPS_DEFAULT_PROFILES_FILE=/home/jetson/clawbot/fastdds_profile.xml
 ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
   source /home/jetson/yahboomcar_ros2_ws/software/library_ws/install/setup.bash && \
-  ROS_DOMAIN_ID=28 ros2 launch astra_camera astra_pro.launch.xml"
+  ROS_DOMAIN_ID=28 ros2 launch astra_camera astro_pro_plus.launch.xml"
 Restart=on-failure
-RestartSec=5
-Environment=ROS_DOMAIN_ID=28
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
