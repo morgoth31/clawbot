@@ -1,0 +1,9 @@
+<library path="clawbot_hardware_interface">
+  <class name="clawbot_hardware_interface/ClawbotSystemHardware"
+         type="clawbot_hardware_interface::ClawbotSystemHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Clawbot Hardware Interface for Rosmaster X3 Plus 5-DOF Arm.
+    </description>
+  </class>
+</library>
