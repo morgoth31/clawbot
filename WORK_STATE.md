@@ -2,7 +2,7 @@
 <!-- Auto-maintenu par Clawbot. Ne pas éditer manuellement. -->
 
 ## Dernière mise à jour
-2026-03-01
+2026-03-01 16:20
 
 ## Priorité des tâches (cf. todo.md)
 
@@ -34,12 +34,16 @@
   - Topics: /detections (JSON), /camera/detection_image (CompressedImage)
   - Tests OK: import + caméra 640x480
   - service: services/yolo-detector.service (non auto-start)
+- [x] **TÂCHE 4.2** Dashboard étendu ✅ — Carte YOLO Detection Feed dans monitoring UI
+  - Endpoint: GET /yolo/frame (image base64 + detections) + /yolo/status (service state)
+  - HardwareNode subscrit à /camera/detection_image + /detections
+  - UI: carte "Watch" toggle polling 2Hz, badges détections, état service live
+  - Ne lance pas yolo-detector automatiquement (safe)
 
 ### 📋 À faire (priorité décroissante)
 
 #### Moyen (1-4h)
 - [ ] **TÂCHE 2.1** Calibration Mecanum — test sol + facteur correction glissement
-- [ ] **TÂCHE 4.2** Dashboard étendu — Foxglove layout (LaserScan, IMU, arm, YOLO feed)
 
 #### Large (> 4h)
 - [ ] **TÂCHE 2.2** MoveIt2 config bras 5-DOF (SRDF, kinematics.yaml, move_group)

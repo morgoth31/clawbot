@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Bot, Camera, Terminal, Navigation, Cpu, Activity, VideoOff, Loader, Send, ArrowUp, ArrowLeft, ArrowRight, ArrowDown, Octagon, RotateCcw, RotateCw, Scissors, Lock, Volume2, Server, Radio } from 'lucide-react';
+import { Bot, Camera, Terminal, Navigation, Cpu, Activity, VideoOff, Loader, Send, ArrowUp, ArrowLeft, ArrowRight, ArrowDown, Octagon, RotateCcw, RotateCw, Scissors, Lock, Volume2, Server, Radio, Gauge, Waves, Map, Eye, EyeOff } from 'lucide-react';
 
 const Button = ({ children, onClick, active, variant = 'primary', className = '', disabled = false, type = "button" }) => {
   const baseStyle = "relative overflow-hidden flex items-center justify-center gap-2 px-4 py-2 font-medium transition-all duration-300 rounded-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
@@ -40,6 +40,22 @@ const App = () => {
   const [hwStatus, setHwStatus] = useState("unknown");
   const [logs, setLogs] = useState([]);
   const [sysStatus, setSysStatus] = useState(null);
+  const [telemetry, setTelemetry] = useState(null);
+
+  // YOLO detection feed
+  const [yoloStatus, setYoloStatus] = useState(null);
+  const [yoloFrame, setYoloFrame] = useState(null);
+  const [yoloDetections, setYoloDetections] = useState([]);
+  const [yoloPolling, setYoloPolling] = useState(false);
+
+  // SLAM map
+  const [slamLive, setSlamLive] = useState(false);
+  const [slamFrame, setSlamFrame] = useState(null);
+  const [slamMeta, setSlamMeta] = useState(null);
+  const [savedMaps, setSavedMaps] = useState([]);
+  const [selectedMap, setSelectedMap] = useState('');
+  const [mapNameInput, setMapNameInput] = useState('');
+  const [savingMap, setSavingMap] = useState(false);
 
   const addLog = (msg, type = "info") => {
     setLogs(prev => [...prev, { time: new Date().toLocaleTimeString(), msg, type }].slice(-50));
@@ -64,12 +80,22 @@ const App = () => {
     } catch (e) { }
   };
 
+  const fetchTelemetry = async () => {
+    try {
+      const res = await fetch('/api/hw/telemetry');
+      if (res.ok) setTelemetry(await res.json());
+    } catch (e) { }
+  };
+
   useEffect(() => {
     fetchStatus();
     fetchSysStatus();
+    fetchTelemetry();
+    fetchSavedMaps();
     const i1 = setInterval(fetchStatus, 5000);
     const i2 = setInterval(fetchSysStatus, 5000);
-    return () => { clearInterval(i1); clearInterval(i2); };
+    const i3 = setInterval(fetchTelemetry, 500); // 2Hz — IMU moves fast
+    return () => { clearInterval(i1); clearInterval(i2); clearInterval(i3); };
   }, []);
 
   const fetchCamera = useCallback(async () => {
@@ -127,6 +153,114 @@ const App = () => {
       addLog(`Claw: ${state}`);
     } catch (e) { }
   };
+
+  // ── YOLO Detection Feed ───────────────────────────────────────────────────
+  const fetchYoloStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/hw/yolo/status');
+      if (res.ok) setYoloStatus(await res.json());
+    } catch (e) {}
+  }, []);
+
+  const fetchYoloFrame = useCallback(async () => {
+    try {
+      const res = await fetch('/api/hw/yolo/frame');
+      if (res.ok) {
+        const data = await res.json();
+        setYoloFrame(`data:image/jpeg;base64,${data.image_base64}`);
+        setYoloDetections(data.detections || []);
+      }
+    } catch (e) {}
+  }, []);
+
+  useEffect(() => {
+    fetchYoloStatus();
+    const interval = setInterval(fetchYoloStatus, 5000);
+    return () => clearInterval(interval);
+  }, [fetchYoloStatus]);
+
+  useEffect(() => {
+    if (!yoloPolling) return;
+    fetchYoloFrame();
+    const interval = setInterval(fetchYoloFrame, 500);
+    return () => clearInterval(interval);
+  }, [yoloPolling, fetchYoloFrame]);
+
+  // ── SLAM Map ──────────────────────────────────────────────────────────────
+  const fetchSavedMaps = async () => {
+    try {
+      const res = await fetch('/api/hw/maps');
+      if (res.ok) {
+        const data = await res.json();
+        setSavedMaps(data.maps || []);
+        if (data.maps.length > 0)
+          setSelectedMap(prev => prev || data.maps[data.maps.length - 1].name);
+      }
+    } catch (e) {}
+  };
+
+  const fetchLiveMap = useCallback(async () => {
+    try {
+      const res = await fetch('/api/hw/map/live');
+      if (res.ok) {
+        const data = await res.json();
+        setSlamFrame(`data:image/png;base64,${data.image_base64}`);
+        setSlamMeta({ width: data.width, height: data.height, resolution: data.resolution });
+      }
+    } catch (e) {}
+  }, []);
+
+  const loadSavedMap = async () => {
+    if (!selectedMap) return;
+    try {
+      const res = await fetch(`/api/hw/maps/${selectedMap}/image`);
+      if (res.ok) {
+        const data = await res.json();
+        setSlamFrame(`data:image/png;base64,${data.image_base64}`);
+        setSlamMeta({ width: data.width, height: data.height, resolution: data.resolution });
+        addLog(`Map loaded: ${selectedMap}`, 'success');
+      }
+    } catch (e) { addLog(`Load map error: ${e.message}`, 'error'); }
+  };
+
+  const saveCurrentMap = async () => {
+    if (!mapNameInput.trim()) return;
+    setSavingMap(true);
+    try {
+      const res = await fetch('/api/hw/maps/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: mapNameInput.trim() })
+      });
+      if (res.ok) {
+        addLog(`Map saved: ${mapNameInput}`, 'success');
+        setMapNameInput('');
+        await fetchSavedMaps();
+      } else {
+        const err = await res.json();
+        addLog(`Save failed: ${err.detail}`, 'error');
+      }
+    } catch (e) { addLog(`Save error: ${e.message}`, 'error'); }
+    setSavingMap(false);
+  };
+
+  const deleteMap = async (name) => {
+    try {
+      const res = await fetch(`/api/hw/maps/${name}`, { method: 'DELETE' });
+      if (res.ok) {
+        addLog(`Map deleted: ${name}`, 'info');
+        setSlamFrame(null); setSlamMeta(null); setSelectedMap('');
+        await fetchSavedMaps();
+      }
+    } catch (e) { addLog(`Delete error: ${e.message}`, 'error'); }
+  };
+
+  useEffect(() => {
+    if (!slamLive) return;
+    fetchLiveMap();
+    const interval = setInterval(fetchLiveMap, 2000);
+    return () => clearInterval(interval);
+  }, [slamLive, fetchLiveMap]);
 
   const sendLLMCommand = async (e) => {
     e.preventDefault();
@@ -205,6 +339,139 @@ const App = () => {
             </div>
           </Card>
 
+          <Card
+            title="SLAM Map"
+            icon={<Map className="w-5 h-5" />}
+            action={
+              <div className="flex gap-2">
+                <Button
+                  variant={slamLive ? 'primary' : 'secondary'}
+                  onClick={() => setSlamLive(v => !v)}
+                  className="text-xs py-1 px-3"
+                >
+                  {slamLive ? '⏹ Live' : '▶ Live'}
+                </Button>
+                <Button variant="secondary" onClick={fetchLiveMap} className="text-xs py-1 px-3">Refresh</Button>
+              </div>
+            }
+          >
+            <div className="flex flex-col gap-4">
+              {/* Map display */}
+              <div className="w-full h-64 rounded-xl overflow-hidden bg-black/60 border border-dark-border/50 relative flex items-center justify-center">
+                {slamFrame ? (
+                  <img src={slamFrame} alt="SLAM Map" className="object-contain w-full h-full" />
+                ) : (
+                  <div className="flex flex-col items-center text-gray-500 gap-2">
+                    <Map className="w-10 h-10 opacity-30" />
+                    <p className="text-sm">No map — start SLAM or load a saved map</p>
+                  </div>
+                )}
+                {slamLive && (
+                  <span className="absolute top-2 left-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded text-xs font-mono border border-white/10 text-brand-400">
+                    LIVE 🗺
+                  </span>
+                )}
+              </div>
+              {slamMeta && (
+                <p className="text-xs font-mono text-gray-400 text-center">
+                  {slamMeta.width}×{slamMeta.height}px
+                  {slamMeta.resolution ? ` · ${slamMeta.resolution}m/px` : ''}
+                </p>
+              )}
+
+              {/* Saved maps */}
+              <div className="border-t border-dark-border/40 pt-3 space-y-3">
+                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Saved Maps</p>
+                <div className="flex gap-2">
+                  <select
+                    value={selectedMap}
+                    onChange={e => setSelectedMap(e.target.value)}
+                    className="flex-1 bg-dark-bg/80 border border-dark-border rounded-lg px-3 py-2 text-white text-sm font-mono outline-none focus:ring-2 focus:ring-brand-500/50"
+                  >
+                    <option value="">— select a map —</option>
+                    {savedMaps.map(m => (
+                      <option key={m.name} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
+                  <Button variant="secondary" onClick={loadSavedMap} disabled={!selectedMap} className="text-sm">Load</Button>
+                  <Button variant="danger" onClick={() => selectedMap && deleteMap(selectedMap)} disabled={!selectedMap} className="text-sm">Del</Button>
+                </div>
+
+                {/* Save current */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={mapNameInput}
+                    onChange={e => setMapNameInput(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))}
+                    placeholder="map-name (a-z, 0-9, _, -)"
+                    className="flex-1 bg-dark-bg/80 border border-dark-border rounded-lg px-3 py-2 text-white text-sm font-mono outline-none focus:ring-2 focus:ring-brand-500/50 placeholder:text-gray-500"
+                  />
+                  <Button onClick={saveCurrentMap} disabled={!mapNameInput.trim() || savingMap} className="text-sm">
+                    {savingMap ? <Loader className="animate-spin w-4 h-4" /> : null}
+                    Save
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card
+            title="YOLO Detection Feed"
+            icon={<Eye className="w-5 h-5" />}
+            action={
+              <div className="flex items-center gap-2">
+                {yoloStatus && (
+                  <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${yoloStatus.active ? 'bg-emerald-900/40 border-emerald-700 text-emerald-300' : 'bg-gray-900/40 border-gray-700 text-gray-400'}`}>
+                    {yoloStatus.active ? '● active' : '○ inactive'}
+                  </span>
+                )}
+                <Button
+                  variant={yoloPolling ? 'primary' : 'secondary'}
+                  onClick={() => setYoloPolling(v => !v)}
+                  className="text-xs py-1 px-3"
+                  disabled={yoloStatus && !yoloStatus.active && !yoloStatus.has_frame}
+                >
+                  {yoloPolling ? <><EyeOff className="w-3 h-3" /> Stop</> : <><Eye className="w-3 h-3" /> Watch</>}
+                </Button>
+              </div>
+            }
+          >
+            <div className="flex flex-col gap-3">
+              <div className="w-full h-56 rounded-xl overflow-hidden bg-black/60 border border-dark-border/50 relative flex items-center justify-center">
+                {yoloFrame ? (
+                  <img src={yoloFrame} alt="YOLO Detection" className="object-contain w-full h-full" />
+                ) : (
+                  <div className="flex flex-col items-center text-gray-500 gap-2">
+                    <Eye className="w-10 h-10 opacity-30" />
+                    <p className="text-sm text-center px-4">
+                      {yoloStatus && !yoloStatus.active
+                        ? 'yolo-detector service not running'
+                        : yoloPolling ? 'Waiting for frame…' : 'Click Watch to start'}
+                    </p>
+                  </div>
+                )}
+                {yoloPolling && yoloFrame && (
+                  <span className="absolute top-2 left-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded text-xs font-mono border border-white/10 text-emerald-400">
+                    YOLO 🔍
+                  </span>
+                )}
+              </div>
+              {/* Detections list */}
+              {yoloDetections.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {yoloDetections.map((d, i) => (
+                    <span key={i} className="bg-emerald-900/30 border border-emerald-700/50 text-emerald-300 px-2 py-0.5 rounded-full text-xs font-mono">
+                      {d.label} {Math.round(d.confidence * 100)}%
+                    </span>
+                  ))}
+                </div>
+              )}
+              {yoloDetections.length === 0 && yoloFrame && (
+                <p className="text-xs text-gray-500 text-center font-mono">No objects detected</p>
+              )}
+            </div>
+          </Card>
+
           <Card title="LLM Command Bridge" icon={<Terminal />}>
             <form onSubmit={sendLLMCommand} className="flex gap-3 mb-4">
               <input type="text" value={llmCommand} onChange={e => setLlmCommand(e.target.value)} placeholder="Ex: Turn around and look for a red object..." className="flex-grow bg-dark-bg/80 border border-dark-border rounded-lg px-4 py-2 text-white outline-none focus:ring-2 focus:ring-brand-500/50 transition-all font-mono text-sm placeholder:text-gray-500" />
@@ -270,6 +537,95 @@ const App = () => {
             ) : (
               <div className="flex items-center gap-2 text-gray-500 text-sm"><Loader className="animate-spin w-4 h-4" /> Loading…</div>
             )}
+          </Card>
+
+          <Card title="Telemetry" icon={<Gauge className="w-5 h-5" />}>
+            {telemetry ? (() => {
+              const fmt = (v, d=3) => v === undefined ? '—' : v.toFixed(d);
+              const bar = (v, min, max, warn) => {
+                const pct = Math.min(100, Math.max(0, ((v - min) / (max - min)) * 100));
+                const color = Math.abs(v) > warn ? 'bg-rose-400' : 'bg-brand-400';
+                return (
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-1.5 bg-dark-bg rounded-full overflow-hidden">
+                      <div className={`h-full transition-all duration-200 ${color}`} style={{width:`${pct}%`}}/>
+                    </div>
+                  </div>
+                );
+              };
+              const servoEntries = Object.entries(telemetry.servos);
+              const SERVO_LABELS = {1:'J1',2:'J2',3:'J3',4:'J4',5:'J5',6:'🦾'};
+              return (
+                <div className="space-y-4 text-xs font-mono">
+                  {/* IMU */}
+                  <div>
+                    <p className="text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                      <Waves className="w-3 h-3"/> IMU
+                      {telemetry.imu.stale && <span className="text-rose-400 ml-1">STALE</span>}
+                    </p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                      {['x','y','z'].map(ax => (
+                        <React.Fragment key={ax}>
+                          <div className="flex justify-between text-gray-300">
+                            <span className="text-gray-500">Accel {ax.toUpperCase()}</span>
+                            <span className={Math.abs(telemetry.imu.accel[ax]) > 2 && ax !== 'z' ? 'text-yellow-400' : ''}>
+                              {fmt(telemetry.imu.accel[ax],2)} m/s²
+                            </span>
+                          </div>
+                          <div>{bar(telemetry.imu.accel[ax], -12, 12, 2)}</div>
+                        </React.Fragment>
+                      ))}
+                      {['x','y','z'].map(ax => (
+                        <React.Fragment key={'g'+ax}>
+                          <div className="flex justify-between text-gray-300">
+                            <span className="text-gray-500">Gyro {ax.toUpperCase()}</span>
+                            <span className={Math.abs(telemetry.imu.gyro[ax]) > 0.5 ? 'text-yellow-400' : ''}>
+                              {fmt(telemetry.imu.gyro[ax],3)} r/s
+                            </span>
+                          </div>
+                          <div>{bar(telemetry.imu.gyro[ax], -3, 3, 0.5)}</div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Velocity */}
+                  <div className="border-t border-dark-border/40 pt-3">
+                    <p className="text-gray-400 uppercase tracking-widest mb-2">Wheels (vel_raw)</p>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      {[['Vx', telemetry.velocity.vx,'m/s'], ['Vy', telemetry.velocity.vy,'m/s'], ['ω', telemetry.velocity.angular,'r/s']].map(([l,v,u]) => (
+                        <div key={l} className="bg-dark-bg/50 rounded-lg py-2 px-1">
+                          <div className="text-gray-500 text-[10px]">{l}</div>
+                          <div className={`text-sm font-bold ${Math.abs(v) > 0.01 ? 'text-brand-300' : 'text-gray-500'}`}>
+                            {fmt(v,3)}
+                          </div>
+                          <div className="text-[10px] text-gray-600">{u}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {telemetry.velocity.stale && <p className="text-gray-600 text-center mt-1">vel_raw stale — odom issue</p>}
+                  </div>
+                  {/* Servo angles */}
+                  <div className="border-t border-dark-border/40 pt-3">
+                    <p className="text-gray-400 uppercase tracking-widest mb-2">Arm Servos (last cmd)</p>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {servoEntries.map(([id, angle]) => (
+                        <div key={id} className="bg-dark-bg/50 rounded-lg py-1.5 px-2 text-center">
+                          <div className="text-gray-500 text-[10px]">{SERVO_LABELS[id]}</div>
+                          <div className={`font-bold ${angle < 0 ? 'text-gray-600' : 'text-brand-300'}`}>
+                            {angle < 0 ? '—' : `${angle}°`}
+                          </div>
+                          {angle >= 0 && (
+                            <div className="mt-1 h-1 bg-dark-bg rounded-full overflow-hidden">
+                              <div className="h-full bg-brand-500 transition-all duration-300" style={{width:`${(angle/180)*100}%`}}/>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })() : <div className="flex items-center gap-2 text-gray-500 text-sm"><Loader className="animate-spin w-4 h-4"/>Loading…</div>}
           </Card>
 
           <Card title="Chassis & Arm" icon={<Navigation />}>
