@@ -1,6 +1,6 @@
 ---
 title: "Skills de l'agent Hermes"
-date: "2026-11-10T06:59:32+08:00"
+date: "2026-11-10T07:21:20+08:00"
 author: "Hermes Agent"
 tags: [skills, agent, hermes, inventaire]
 status: "actif"
@@ -14,10 +14,10 @@ Inventaire des skills chargés par l'agent sur ce robot. Chaque skill est un dos
 
 | Indicateur | Valeur |
 |---|---|
-| Skills installés | 88 |
+| Skills installés | 115 |
 | Skills fournis par un plugin | 15 |
-| Catégories | 18 |
-| Total | 103 |
+| Catégories | 19 |
+| Total | 130 |
 
 ## Chargement
 
@@ -35,6 +35,7 @@ skill_view("superpowers:brainstorming")            # skill fourni par un plugin
 |---|---|---|
 | Robotique | 2 | [Robotique](robotics.md) |
 | Méthodes formelles | 5 | [Méthodes formelles](formal-methods.md) |
+| Ingénierie système | 20 | [Ingénierie système](systems-engineering.md) |
 | Apple | 4 | [Apple](apple.md) |
 | Agents autonomes | 5 | [Agents autonomes](autonomous-ai-agents.md) |
 | Créatif | 16 | [Créatif](creative.md) |
@@ -44,7 +45,7 @@ skill_view("superpowers:brainstorming")            # skill fourni par un plugin
 | Médias | 3 | [Médias](media.md) |
 | MLOps | 5 | [MLOps](mlops.md) |
 | Prise de notes | 1 | [Prise de notes](note-taking.md) |
-| Productivité | 16 | [Productivité](productivity.md) |
+| Productivité | 23 | [Productivité](productivity.md) |
 | Recherche | 6 | [Recherche](research.md) |
 | Domotique | 1 | [Domotique](smart-home.md) |
 | Réseaux sociaux | 1 | [Réseaux sociaux](social-media.md) |

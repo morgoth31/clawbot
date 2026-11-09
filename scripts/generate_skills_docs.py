@@ -47,12 +47,14 @@ LABELS = {
     "software-development": "Développement logiciel",
     "web": "Web",
     "superpowers": "Superpowers (plugin)",
+    "systems-engineering": "Ingénierie système",
 }
 
 INTRO = {
     "robotics": "Skills propres au robot : documentation OKF et ingénierie ROS 2.",
     "software-development": "Méthodes de développement : plans, revues, débogage, tests.",
     "formal-methods": "Vérification déductive du C : ACSL, Frama-C/WP, Why3, Coq.",
+    "systems-engineering": "Flux d'ingénierie logicielle : cadrage, spec, tickets, implémentation, revue, triage.",
     "autonomous-ai-agents": "Délégation à des agents externes (Claude Code, Codex, OpenCode).",
     "superpowers": "Skills fournis par le plugin superpowers, chargés sous le préfixe `superpowers:`.",
 }
@@ -152,7 +154,7 @@ def write_if_changed(path: Path, text: str) -> None:
 
 def PRIORITY(category: str) -> tuple:
     """Robotique puis méthodes formelles en tête, le reste par ordre alphabétique."""
-    rank = {"robotics": 0, "formal-methods": 1}.get(category, 2)
+    rank = {"robotics": 0, "formal-methods": 1, "systems-engineering": 2}.get(category, 3)
     return (rank, category)
 
 
