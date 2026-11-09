@@ -43,6 +43,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── llm2ros_bridge_specification.md
 │   ├── llm2ros_bridge_coherence_et_approche.md
 │   ├── llm2ros_mcp_specification.md
+│   ├── llm2ros_mcp_test_plan.md
 │   ├── ros2_engineering_skills.md
 │   ├── acsl_frama_c_skills.md
 │   └── mattpocock_engineering_skills.md
@@ -76,3 +77,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 07:00 | Installation des 5 skills ACSL / Frama-C (`acsl-verify`, `acsl-spec`, `frama-c-wp`, `verifiable-c`, `wp-coq`) | [[acsl_frama_c_skills]] |
 | 2026-11-10 07:24 | Installation des 27 skills `mattpocock/skills` (20 ingénierie système + 7 productivité) | [[mattpocock_engineering_skills]] |
 | 2026-11-10 07:35 | Étape 1 du projet MCP : spécification des exigences S1/S2 (interface, déclencheurs, contexte) | [[llm2ros_mcp_specification]] |
+| 2026-11-10 07:45 | Étape 2 du projet MCP : architecture de la suite de tests, isolation, traçabilité | [[llm2ros_mcp_test_plan]] |
