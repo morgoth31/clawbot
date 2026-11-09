@@ -140,6 +140,16 @@ def shorten(text: str, limit: int = 150) -> str:
     return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
 
 
+def write_if_changed(path: Path, text: str) -> None:
+    """N'écrit que si le contenu change, hors ligne `date` (évite le bruit Git)."""
+    if path.exists():
+        old = path.read_text(encoding="utf-8")
+        strip = lambda s: re.sub(r"^date: .*$", "", s, flags=re.M)
+        if strip(old) == strip(text):
+            return
+    path.write_text(text, encoding="utf-8")
+
+
 def PRIORITY(category: str) -> tuple:
     """Robotique puis méthodes formelles en tête, le reste par ordre alphabétique."""
     rank = {"robotics": 0, "formal-methods": 1}.get(category, 2)
@@ -187,7 +197,7 @@ def write_category_page(category: str, skills: list[dict]) -> str:
         "Chargement par l'agent : `skill_view(\"<nom>\")`, puis lecture d'une référence précise "
         "avec `skill_view(\"<nom>\", \"references/<fichier>.md\")`.\n"
     )
-    (OUT / f"{slug}.md").write_text("\n".join(body), encoding="utf-8")
+    write_if_changed(OUT / f"{slug}.md", "\n".join(body))
     return slug
 
 
@@ -243,7 +253,7 @@ def write_index(skills: list[dict], slugs: dict[str, str]) -> None:
         ]
     )
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "index.md").write_text("\n".join(body), encoding="utf-8")
+    write_if_changed(OUT / "index.md", "\n".join(body))
 
 
 def update_nav(slugs: dict[str, str]) -> None:
