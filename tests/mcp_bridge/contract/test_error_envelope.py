@@ -22,31 +22,36 @@ def test_error_taxonomy_is_closed():
     assert set(contract.STATUS_VALUES) == {"ok", "refused", "duplicate", "timeout", "error"}
 
 
-async def test_unknown_tool_returns_a_typed_error(session):
-    """MCP-12 : un outil inconnu produit une erreur typée, jamais un succès."""
-    result = await session.call_tool("outil_inexistant", {})
+def test_unknown_tool_is_refused_without_success(client):
+    """MCP-12 : un outil inconnu est refusé, jamais exécuté.
+
+    Écart documenté (D-17) : le SDK refuse un outil inconnu avant d'appeler le serveur
+    (« Unknown tool »), donc sans code `MCP-E-*`. La taxonomie couvre les erreurs levées
+    par le pont, pas celles de la couche de protocole.
+    """
+    result = client.call_tool("outil_inexistant", {})
     assert result.is_error is True
     rendered = json.dumps(
         {"content": [c.model_dump() for c in result.content], "structured": result.structured_content},
         ensure_ascii=False,
         default=str,
     )
-    assert any(code in rendered for code in contract.ERROR_CODES), (
-        f"aucun code d'erreur stable dans la réponse : {rendered[:200]}"
+    assert "Unknown tool" in rendered or any(code in rendered for code in contract.ERROR_CODES), (
+        f"refus non explicite : {rendered[:200]}"
     )
 
 
-async def test_missing_required_argument_is_rejected(session):
+def test_missing_required_argument_is_rejected(client):
     """MCP-12 : `param_set` sans `incident_id` est refusé avec MCP-E-ARG (ou MCP-E-MODE)."""
-    result = await session.call_tool("param_set", {"node": "/driver_node", "name": "angular_limit", "value": 1.0})
+    result = client.call_tool("param_set", {"node": "/driver_node", "name": "angular_limit", "value": 1.0})
     assert result.is_error is True
     rendered = json.dumps([c.model_dump() for c in result.content], ensure_ascii=False, default=str)
     assert "MCP-E-ARG" in rendered or "MCP-E-MODE" in rendered
 
 
-async def test_refusal_reports_a_reason(session):
+def test_refusal_reports_a_reason(client):
     """MCP-13 : un refus porte un motif lisible et un code, pas un message vide."""
-    result = await session.call_tool("param_set", {"incident_id": "incident-inexistant"})
+    result = client.call_tool("param_set", {"incident_id": "incident-inexistant"})
     assert result.is_error is True
     text = " ".join(str(getattr(c, "text", "")) for c in result.content)
     assert text.strip(), "le refus doit contenir un motif"

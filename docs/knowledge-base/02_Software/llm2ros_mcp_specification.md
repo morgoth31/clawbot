@@ -124,7 +124,7 @@ et nombre maximal d'incidents par heure.
 | ID | Exigence | Critère d'acceptation |
 |---|---|---|
 | MCP-01 | Le serveur MCP expose le protocole JSON-RPC 2.0 conforme à la révision MCP retenue (D-01), transport HTTP streaming sur `127.0.0.1:8090`, chemin `/mcp`, ou transport stdio si D-02 le retient | Un client MCP de référence initialise la session et liste les outils sans erreur |
-| MCP-02 | Le serveur déclare ses capacités : `tools` et `resources` uniquement ; `prompts`, `sampling` et `logging` non annoncés | La réponse `initialize` liste exactement ces capacités |
+| MCP-02 | Le serveur sert `tools` et `resources` ; aucun prompt n'est enregistré ni servi ; `sampling` et `logging` non annoncés. *(Amendée le 2026-11-10 : le SDK `mcp` 2.3.0 déclare toujours la capacité `prompts`, même vide — le contrat porte donc sur les prompts réellement servis, vérifiés vides.)* | `initialize` annonce `tools` et `resources` ; `list_prompts` retourne une liste vide ; `sampling` et `logging` absents |
 | MCP-03 | Le serveur est authentifié par jeton porteur ; toute requête sans jeton ou avec un jeton erroné reçoit `401` et aucune exécution | Appel sans jeton → 401, compteur d'audit incrémenté, aucune action |
 | MCP-04 | Le serveur n'écoute que sur l'interface de boucle locale | `ss -ltnp` montre `127.0.0.1:8090`, jamais `0.0.0.0` |
 | MCP-05 | Le nom et la version du serveur sont exposés et journalisés à la connexion | `initialize` retourne `serverInfo.name = "clawbot-bridge"` et la version du paquet |
@@ -168,7 +168,7 @@ et nombre maximal d'incidents par heure.
 |---|---|---|
 | MCP-10 | Tout appel de mutation porte un `incident_id` ouvert et un identifiant d'action unique ; le rejeu du même identifiant est sans effet supplémentaire | Deux appels identiques produisent une seule mutation, la seconde retourne `status = "duplicate"` |
 | MCP-11 | Toute réponse est un objet JSON `{status, data?, error?}` avec `status ∈ {ok, refused, duplicate, timeout, error}` | Aucune réponse en texte libre |
-| MCP-12 | Toute erreur porte un code stable : `MCP-E-AUTH`, `MCP-E-ARG`, `MCP-E-MODE`, `MCP-E-BOUNDS`, `MCP-E-PREREQ`, `MCP-E-BUSY`, `MCP-E-TIMEOUT`, `MCP-E-INTERNAL` | Un test par code |
+| MCP-12 | Toute erreur **levée par le pont** porte un code stable : `MCP-E-AUTH`, `MCP-E-ARG`, `MCP-E-MODE`, `MCP-E-BOUNDS`, `MCP-E-PREREQ`, `MCP-E-BUSY`, `MCP-E-TIMEOUT`, `MCP-E-INTERNAL`. *(Précision du 2026-11-10 : les refus produits par la couche de protocole — outil inconnu, argument non sérialisable — sont émis par le SDK avant l'appel du pont et ne portent pas de code `MCP-E-*` ; ils restent des refus, jamais des succès.)* | Un test par code, plus un test de refus d'outil inconnu |
 | MCP-13 | Un outil refusé par la politique de sûreté retourne `status = "refused"` avec le motif, sans effet de bord | Compteur d'effets de bord à zéro après refus |
 | MCP-14 | Les mutations sont sérialisées par l'arbitre d'actionneurs de S1 : au plus une mutation active à la fois | Test de concurrence à 4 clients : aucune mutation concurrente, ordre déterministe |
 | MCP-15 | `safety_stop` et `escalate` sont prioritaires sur toute mutation en cours et ne peuvent pas être bloqués par la file | Injection en cours de mouvement : arrêt effectif < 100 ms |

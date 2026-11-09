@@ -79,3 +79,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 07:35 | Étape 1 du projet MCP : spécification des exigences S1/S2 (interface, déclencheurs, contexte) | [[llm2ros_mcp_specification]] |
 | 2026-11-10 07:45 | Étape 2 du projet MCP : architecture de la suite de tests, isolation, traçabilité | [[llm2ros_mcp_test_plan]] |
 | 2026-11-10 07:52 | Étape 3 du projet MCP : squelettes de tests MCP livrés, 1 vert / 22 rouges attendus | [[llm2ros_mcp_test_plan]] |
+| 2026-11-10 08:15 | Étape 4 du projet MCP : serveur MCP implémenté, 23/23 tests de contrat verts | [[llm2ros_mcp_test_plan]] |
