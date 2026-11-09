@@ -102,13 +102,63 @@ Relevé du 2026-11-10 07:44 CST, Python 3.10.12 (`/usr/bin/python3`) :
 | `pytest-mock`, `pytest-httpserver` | présents | doublures d'HTTP et de temps |
 | `uvicorn`, `fastapi`, `httpx`, `aiohttp` | présents | faux service matériel, client HTTP |
 | `rclpy`, `launch_testing`, `rcl_interfaces`, `action_msgs` | présents après `source /opt/ros/humble/setup.bash` | tests d'intégration ROS 2 |
-| `mcp` (SDK) 2.3.0 | présent dans le venv Hermes uniquement | test de fumée SDK ; **absent** en Python système |
-| `pytest-timeout` | **absent** | à ajouter : borne dure par test |
-| `hypothesis` | **absent** | à ajouter : tests de propriétés |
-| `mutmut` | **absent** | optionnel : score de mutation |
+| `mcp` (SDK) | **installé le 2026-11-10 : 2.3.0** dans le Python système (`~/.local`) et dans le venv Hermes | serveur, client, tests de contrat |
+| `pytest-timeout` | **installé le 2026-11-10 : 2.4.0** | borne dure par test (ENV-06) |
+| `hypothesis` | **installé le 2026-11-10 : 6.168.5** | tests de propriétés |
+| `mutmut` | absent | optionnel : score de mutation |
 
-Trois dépendances doivent donc être ajoutées à l'environnement de test avant l'étape 3 :
-`pytest-timeout`, `hypothesis`, `mcp` (dans le venv de test, pas dans le venv Hermes).
+Installation effectuée sur le Python système (`/usr/bin/python3 -m pip install --user`) ; les imports `rclpy`, `fastapi`, `uvicorn` et `starlette` ont été revérifiés après installation (voir §4.1). `pytest-cov` reste en 3.0.0 et n'a pas été touché ; `anyio` a été porté en 4.16.0 par la dépendance de `mcp`, sans rupture constatée.
+
+### 4.1 API du SDK MCP vérifiée sur ce poste
+
+Le SDK 2.x a renommé FastMCP en `MCPServer` et utilise des champs en `snake_case`. Les deux transports
+requis par D-02 ont été exercés le 2026-11-10 07:37 CST, avec les résultats suivants.
+
+| Vérification | Résultat mesuré |
+|---|---|
+| Serveur stdio minimal, 2 outils | `probe 0.1.0`, outils `['echo', 'add']`, appel `echo` → `bonjour du client`, `is_error = False` |
+| Serveur HTTP streaming | écoute **`127.0.0.1:18090`** uniquement (`ss -ltn` : aucune entrée `0.0.0.0`), chemin `/mcp` |
+| Session HTTP complète | `POST /mcp` 200 (initialize), `GET /mcp` 200 (flux), appels d'outils 200, `DELETE /mcp` 200 |
+| Version de protocole négociée | **`2025-11-25`** avec le SDK 2.3.0 — voir D-15, écart avec D-01 |
+
+Forme vérifiée côté serveur (à réutiliser à l'étape 3) :
+
+```python
+import asyncio
+from mcp.server.mcpserver import MCPServer
+from mcp.server.transport_security import TransportSecuritySettings
+
+mcp = MCPServer(name="clawbot-bridge", version="0.1.0")
+
+@mcp.tool(description="Renvoie le texte fourni.")
+def echo(text: str) -> str:
+    return text
+
+# HTTP streaming, boucle locale, protection contre le rebinding DNS
+asyncio.run(mcp.run_streamable_http_async(
+    host="127.0.0.1", port=8090, streamable_http_path="/mcp",
+    transport_security=TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=["127.0.0.1:8090", "localhost:8090"],
+    ),
+))
+```
+
+Forme vérifiée côté client de test :
+
+```python
+from mcp import ClientSession
+from mcp.client.streamable_http import streamable_http_client
+
+async with streamable_http_client("http://127.0.0.1:8090/mcp") as streams:
+    read_stream, write_stream = streams[0], streams[1]
+    async with ClientSession(read_stream, write_stream) as session:
+        init = await session.initialize()          # init.server_info, init.protocol_version
+        tools = await session.list_tools()
+        result = await session.call_tool("echo", {"text": "..."})  # result.content, result.is_error
+```
+
+Points d'API à ne pas confondre : `server_info` et `protocol_version` (et non `serverInfo`), `run_streamable_http_async` est une **coroutine** (à envelopper dans `asyncio.run`), et `mcp.server.fastmcp` n'existe plus.
 
 ## 5. Doubles de test
 
