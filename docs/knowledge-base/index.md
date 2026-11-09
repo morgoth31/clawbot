@@ -42,7 +42,8 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── llm2ros_bridge_architecture.md
 │   ├── llm2ros_bridge_specification.md
 │   ├── llm2ros_bridge_coherence_et_approche.md
-│   └── ros2_engineering_skills.md
+│   ├── ros2_engineering_skills.md
+│   └── acsl_frama_c_skills.md
 └── 03_Operations/
     ├── 2026-11-10_bootstrap_knowledge_base.md
     └── errors_traces/
@@ -70,3 +71,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 06:14 | Anomalie ouverte : arbre TF sans `base_link`, sans `odom`, sans `map` | [[ERR-2026-11-10-003_arbre_tf_incomplet]] |
 | 2026-11-10 06:21 | Anomalie critique ouverte : exécution de commande arbitraire sans authentification sur le pont LLM | [[ERR-2026-11-10-004_execution_de_commande_non_authentifiee]] |
 | 2026-11-10 06:53 | Installation du skill `ros2-engineering-skills` (28 références, 15 validateurs) et ajout du menu Skills au site | [[ros2_engineering_skills]] |
+| 2026-11-10 07:00 | Installation des 5 skills ACSL / Frama-C (`acsl-verify`, `acsl-spec`, `frama-c-wp`, `verifiable-c`, `wp-coq`) | [[acsl_frama_c_skills]] |

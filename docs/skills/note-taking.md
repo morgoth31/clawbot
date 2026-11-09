@@ -1,6 +1,6 @@
 ---
 title: "Skills — Prise de notes"
-date: "2026-11-10T06:52:45+08:00"
+date: "2026-11-10T06:59:32+08:00"
 author: "Hermes Agent"
 tags: [skills, agent, hermes, note-taking]
 status: "actif"

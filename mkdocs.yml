@@ -112,6 +112,7 @@ nav:
           - Pont LLM — cahier des charges: knowledge-base/02_Software/llm2ros_bridge_specification.md
           - Pont LLM — cohérence et approche: knowledge-base/02_Software/llm2ros_bridge_coherence_et_approche.md
           - Skill et validateurs ROS 2: knowledge-base/02_Software/ros2_engineering_skills.md
+          - Skills Frama-C / ACSL: knowledge-base/02_Software/acsl_frama_c_skills.md
       - Opérations:
           - Journal de capture initiale: knowledge-base/03_Operations/2026-11-10_bootstrap_knowledge_base.md
           - Traces d'erreurs:
@@ -140,6 +141,7 @@ nav:
   - Skills:
       - Vue d'ensemble: skills/index.md
       - Robotique: skills/robotics.md
+      - Méthodes formelles: skills/formal-methods.md
       - Apple: skills/apple.md
       - Agents autonomes: skills/autonomous-ai-agents.md
       - Créatif: skills/creative.md

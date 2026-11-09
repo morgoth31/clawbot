@@ -1,6 +1,6 @@
 ---
 title: "Skills de l'agent Hermes"
-date: "2026-11-10T06:52:45+08:00"
+date: "2026-11-10T06:59:32+08:00"
 author: "Hermes Agent"
 tags: [skills, agent, hermes, inventaire]
 status: "actif"
@@ -14,10 +14,10 @@ Inventaire des skills chargés par l'agent sur ce robot. Chaque skill est un dos
 
 | Indicateur | Valeur |
 |---|---|
-| Skills installés | 83 |
+| Skills installés | 88 |
 | Skills fournis par un plugin | 15 |
-| Catégories | 17 |
-| Total | 98 |
+| Catégories | 18 |
+| Total | 103 |
 
 ## Chargement
 
@@ -34,6 +34,7 @@ skill_view("superpowers:brainstorming")            # skill fourni par un plugin
 | Catégorie | Skills | Page |
 |---|---|---|
 | Robotique | 2 | [Robotique](robotics.md) |
+| Méthodes formelles | 5 | [Méthodes formelles](formal-methods.md) |
 | Apple | 4 | [Apple](apple.md) |
 | Agents autonomes | 5 | [Agents autonomes](autonomous-ai-agents.md) |
 | Créatif | 16 | [Créatif](creative.md) |

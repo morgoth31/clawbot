@@ -34,6 +34,7 @@ LABELS = {
     "creative": "Créatif",
     "devops": "DevOps",
     "email": "Courriel",
+    "formal-methods": "Méthodes formelles",
     "github": "GitHub",
     "media": "Médias",
     "mlops": "MLOps",
@@ -51,6 +52,7 @@ LABELS = {
 INTRO = {
     "robotics": "Skills propres au robot : documentation OKF et ingénierie ROS 2.",
     "software-development": "Méthodes de développement : plans, revues, débogage, tests.",
+    "formal-methods": "Vérification déductive du C : ACSL, Frama-C/WP, Why3, Coq.",
     "autonomous-ai-agents": "Délégation à des agents externes (Claude Code, Codex, OpenCode).",
     "superpowers": "Skills fournis par le plugin superpowers, chargés sous le préfixe `superpowers:`.",
 }
@@ -138,6 +140,12 @@ def shorten(text: str, limit: int = 150) -> str:
     return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
 
 
+def PRIORITY(category: str) -> tuple:
+    """Robotique puis méthodes formelles en tête, le reste par ordre alphabétique."""
+    rank = {"robotics": 0, "formal-methods": 1}.get(category, 2)
+    return (rank, category)
+
+
 def category_slug(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
@@ -212,7 +220,7 @@ def write_index(skills: list[dict], slugs: dict[str, str]) -> None:
         "| Catégorie | Skills | Page |",
         "|---|---|---|",
     ]
-    for category in sorted(by_cat, key=lambda c: (c != "robotics", c)):
+    for category in sorted(by_cat, key=PRIORITY):
         label = LABELS.get(category, category.replace("-", " ").capitalize())
         body.append(f"| {label} | {len(by_cat[category])} | [{label}]({slugs[category]}.md) |")
     body.extend(
@@ -243,7 +251,7 @@ def update_nav(slugs: dict[str, str]) -> None:
     start = next(i for i, l in enumerate(lines) if l.strip() == "# skills-nav:start")
     end = next(i for i, l in enumerate(lines) if l.strip() == "# skills-nav:end")
     block = ["  - Skills:", "      - Vue d'ensemble: skills/index.md"]
-    for category in sorted(slugs, key=lambda c: (c != "robotics", c)):
+    for category in sorted(slugs, key=PRIORITY):
         label = LABELS.get(category, category.replace("-", " ").capitalize())
         block.append(f"      - {label}: skills/{slugs[category]}.md")
     lines[start + 1 : end] = block
