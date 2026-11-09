@@ -204,9 +204,9 @@ environ 230 Mo et doit être supprimé après usage : la partition racine dispos
 |---|---|---|
 | Accueil | Synthèse du robot, état au 2026-11-10, anomalies ouvertes | `docs/index.md` |
 | Poste de documentation | Cette page | `docs/site-documentation.md` |
-| Base de connaissances | 19 pages OKF, groupées Matériel / Logiciel / Opérations | `docs/knowledge-base/` |
+| Base de connaissances | 20 pages OKF, groupées Matériel / Logiciel / Opérations | `docs/knowledge-base/` |
 | Référence API | 15 pages extraites des docstrings Python | `docs/api/` |
-| Skills | Inventaire des 98 skills de l'agent : vue d'ensemble + une page par catégorie | `docs/skills/`, généré par `scripts/generate_skills_docs.py` |
+| Skills | Inventaire des 103 skills de l'agent : vue d'ensemble + une page par catégorie | `docs/skills/`, généré par `scripts/generate_skills_docs.py` |
 | Héritage | Ancienne page d'accueil, notes d'exploitation, guide de build | `docs/legacy/` |
 
 ## 9. Dépannage
