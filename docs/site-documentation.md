@@ -114,6 +114,28 @@ Le rendu est assuré par `pymdownx.superfences` (fence personnalisée de classe 
 `mermaid.min.js` (10.9.1) est versionnée dans `docs/assets/javascripts/` : le site fonctionne sans
 accès Internet.
 
+### 4.4 Pages Skills (générées)
+
+Le menu **Skills** publie l'inventaire réel des skills de l'agent, sans saisie manuelle :
+
+```bash
+python3 scripts/generate_skills_docs.py     # HERMES_HOME par défaut : ~/.hermes
+sudo systemctl restart clawbot-docs.service
+```
+
+| Point | Règle appliquée |
+|---|---|
+| Sources | `~/.hermes/skills/<catégorie>/<nom>/SKILL.md` et `~/.hermes/plugins/<plugin>/skills/<nom>/SKILL.md` |
+| Nom affiché | `name` du frontmatter ; les skills de plugin sont préfixés `<plugin>:` |
+| Description | `description` du frontmatter, tronquée à 150 caractères dans le tableau |
+| Entrées liées | Compte des fichiers dans `references/` et `scripts/` du skill |
+| Dossiers ignorés | Tout chemin contenant un segment commençant par `.` (archives, sauvegardes) |
+| Navigation | Le script réécrit le bloc encadré par `# skills-nav:start` / `# skills-nav:end` dans `mkdocs.yml` |
+| Pages produites | `docs/skills/index.md` (vue d'ensemble) + un fichier par catégorie |
+
+Les pages générées portent `generated: true` dans leur frontmatter ; elles sont réécrites à chaque
+exécution et ne doivent pas être éditées à la main.
+
 ## 5. Publication sur le port 8080
 
 | Élément | Valeur |
@@ -182,8 +204,9 @@ environ 230 Mo et doit être supprimé après usage : la partition racine dispos
 |---|---|---|
 | Accueil | Synthèse du robot, état au 2026-11-10, anomalies ouvertes | `docs/index.md` |
 | Poste de documentation | Cette page | `docs/site-documentation.md` |
-| Base de connaissances | 18 pages OKF, groupées Matériel / Logiciel / Opérations | `docs/knowledge-base/` |
+| Base de connaissances | 19 pages OKF, groupées Matériel / Logiciel / Opérations | `docs/knowledge-base/` |
 | Référence API | 15 pages extraites des docstrings Python | `docs/api/` |
+| Skills | Inventaire des 98 skills de l'agent : vue d'ensemble + une page par catégorie | `docs/skills/`, généré par `scripts/generate_skills_docs.py` |
 | Héritage | Ancienne page d'accueil, notes d'exploitation, guide de build | `docs/legacy/` |
 
 ## 9. Dépannage

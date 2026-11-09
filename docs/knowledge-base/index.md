@@ -41,7 +41,8 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── llm2ros_bridge.md
 │   ├── llm2ros_bridge_architecture.md
 │   ├── llm2ros_bridge_specification.md
-│   └── llm2ros_bridge_coherence_et_approche.md
+│   ├── llm2ros_bridge_coherence_et_approche.md
+│   └── ros2_engineering_skills.md
 └── 03_Operations/
     ├── 2026-11-10_bootstrap_knowledge_base.md
     └── errors_traces/
@@ -68,4 +69,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 06:12 | Anomalie ouverte : partition racine à 97 % d'occupation (4,3 Go libres) | [[ERR-2026-11-10-002_espace_disque_critique]] |
 | 2026-11-10 06:14 | Anomalie ouverte : arbre TF sans `base_link`, sans `odom`, sans `map` | [[ERR-2026-11-10-003_arbre_tf_incomplet]] |
 | 2026-11-10 06:21 | Anomalie critique ouverte : exécution de commande arbitraire sans authentification sur le pont LLM | [[ERR-2026-11-10-004_execution_de_commande_non_authentifiee]] |
-| 2026-11-10 06:38 | Analyse du pont LLM → ROS 2 : état constaté, architecture, cahier des charges, cohérence et approche cible | [[llm2ros_bridge]], [[llm2ros_bridge_architecture]], [[llm2ros_bridge_specification]], [[llm2ros_bridge_coherence_et_approche]] |
+| 2026-11-10 06:53 | Installation du skill `ros2-engineering-skills` (28 références, 15 validateurs) et ajout du menu Skills au site | [[ros2_engineering_skills]] |
