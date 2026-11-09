@@ -321,7 +321,7 @@ d'ingénierie, pas une hypothèse retenue : sans votre réponse, l'étape 2 ne p
 
 | ID | Question | Proposition (à valider ou remplacer) |
 |---|---|---|
-| D-01 | Quelle révision du protocole MCP doit être cible ? (révisions connues : 2024-11-05, 2025-03-26, 2025-06-18, 2025-11-25) | 2025-06-18, la plus largement implémentée |
+| D-01 | Quelle révision du protocole MCP doit être cible ? (révisions connues : 2024-11-05, 2025-03-26, 2025-06-18, 2025-11-25) | **Amendée le 2026-11-10 : 2025-11-25**, révision effectivement négociée par le SDK `mcp` 2.3.0 (voir D-15) |
 | D-02 | Transport du serveur MCP : HTTP streaming en boucle locale, ou stdio lancé par Hermes ? | HTTP streaming sur `127.0.0.1:8090` (survit aux redémarrages de S2, journalisation centralisée) |
 | D-03 | Seuil `S2_MIN` : à partir de quelle sévérité S2 est-il sollicité ? | Sévérité ≥ 2 (degrés 3 et 4 traités aussi, 1 seule observé) |
 | D-04 | Budget d'intervention par incident : nombre d'outils et durée | 8 appels, 120 s |
@@ -335,7 +335,7 @@ d'ingénierie, pas une hypothèse retenue : sans votre réponse, l'étape 2 ne p
 | D-12 | Le pont C++ actuel (port 8000) est-il conservé comme base de S1, ou la fusion Python déjà recommandée est-elle préalable ? | Fusion Python préalable (voir [[llm2ros_bridge_coherence_et_approche]]) |
 | D-13 | Les déclencheurs TRG-01 à TRG-14 sont-ils le jeu complet, ou faut-il en ajouter (perte de liaison série, erreur de checksum moteur, dérive d'IMU) ? | Jeu complet tel que proposé ; ajouts possibles |
 | D-14 | L'opérateur peut-il refuser une proposition de S2 sans clore l'incident ? | Oui : état `refused_by_operator`, incident clos en `abandoned` |
-| D-15 | **Écart constaté le 2026-11-10** : le SDK `mcp` 2.3.0 négocie la révision **2025-11-25**, pas 2025-06-18 (D-01). Amender D-01 ou épingler `mcp<2` ? | Amender D-01 vers 2025-11-25 : Hermes embarque déjà le SDK 2.3.0, donc serveur et client parlent la même révision. Épingler `mcp<2` maintiendrait 2025-06-18 au prix d'un SDK ancien côté serveur, avec une interopérabilité non vérifiée avec le client Hermes 2.x |
+| D-15 | Écart entre la révision écrite (D-01) et la révision négociée par le SDK | **Tranchée le 2026-11-10 : amendement de D-01 vers 2025-11-25.** Le serveur et le client Hermes utilisent le même SDK 2.3.0 ; la révision est donc cohérente des deux côtés. Les tests de contrat figent `protocol_version == "2025-11-25"` |
 
 Mesure à l'origine de D-15 : session réelle entre un serveur `MCPServer` local et un client du même
 poste, `initialize` retournant `protocol_version = "2025-11-25"` (détail et formes d'API vérifiées

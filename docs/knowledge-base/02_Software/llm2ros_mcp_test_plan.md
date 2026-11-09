@@ -371,7 +371,39 @@ S'applique à TRG-01 à TRG-14. Les règles TRG-20 à TRG-24 ont chacune un test
 - Elle ne prouve pas la qualité des décisions du modèle de langage : seul le contrat d'outils et les garde-fous sont testés.
 - Elle ne teste pas le binaire C++ actuel, hors périmètre après D-12.
 
-## 13. Voir aussi
+## 14. Étape 3 — squelettes de tests livrés (état rouge)
+
+Les squelettes sont écrits, exécutables et **rouges pour la bonne raison** : le serveur n'existe pas
+encore (étape 4). Aucune logique n'a été écrite, seule la signature de l'interface est figée.
+
+| Élément livré | Rôle |
+|---|---|
+| `bridge_mcp/contract.py` | Données de spécification : 22 outils, 13 lectures et 9 mutations, 8 codes d'erreur, 5 statuts, 3 ressources, 4 topics d'actionneurs interdits, révision `2025-11-25` |
+| `bridge_mcp/server.py` | Interface publique : `create_server(*, token, host, port)` et `streamable_http_app(server)` — lèvent `NotImplementedError` |
+| `tests/mcp_bridge/pytest.ini` | `asyncio_mode = auto`, `--timeout=60`, marqueurs `contract`, `ros`, `degraded`, `safety`, `hardware`, `slow`, `pythonpath = ../..` |
+| `tests/mcp_bridge/conftest.py` | Refus du domaine DDS 28, jeton de test unique, fixture `connected` (session MCP initialisée une seule fois) |
+| `tests/mcp_bridge/support/harness.py` | Démarrage du serveur sur port éphémère en boucle locale, mesure de joignabilité LAN |
+| `contract/test_initialize.py` | MCP-02, MCP-05, D-15 |
+| `contract/test_catalogue.py` | 22 outils, schémas JSON Schema 2020-12, annotations lecture/mutation, aucun topic d'actionneur |
+| `contract/test_auth_transport.py` | 401 sans jeton et jeton erroné, écoute boucle locale, injoignabilité LAN, en-tête `Host` étranger refusé, pas de fuite de jeton |
+| `contract/test_error_envelope.py` | Taxonomie fermée, outil inconnu typé, argument manquant, refus motivé |
+| `contract/test_resources.py` | Ressources statiques, modèle d'incident, contenu du bloc de limites |
+
+Exécution du 2026-11-10 07:52 CST :
+
+```
+$ cd tests/mcp_bridge && python3 -m pytest
+1 passed, 22 errors in 1.42s
+
+E   NotImplementedError: étape 4 : implémentation du serveur MCP (catalogue, authentification, contexte)
+../../bridge_mcp/server.py:33: NotImplementedError
+```
+
+Le seul test vert (`test_error_taxonomy_is_closed`) porte sur les constantes de spécification, pas sur
+le serveur. Les 22 autres échouent sur `NotImplementedError`, jamais sur une erreur de collecte :
+l'environnement de test est donc valide, seul le code manque.
+
+## 15. Voir aussi
 
 - Spécification des exigences : [[llm2ros_mcp_specification]]
 - État constaté du pont : [[llm2ros_bridge]]
