@@ -335,6 +335,12 @@ d'ingénierie, pas une hypothèse retenue : sans votre réponse, l'étape 2 ne p
 | D-12 | Le pont C++ actuel (port 8000) est-il conservé comme base de S1, ou la fusion Python déjà recommandée est-elle préalable ? | Fusion Python préalable (voir [[llm2ros_bridge_coherence_et_approche]]) |
 | D-13 | Les déclencheurs TRG-01 à TRG-14 sont-ils le jeu complet, ou faut-il en ajouter (perte de liaison série, erreur de checksum moteur, dérive d'IMU) ? | Jeu complet tel que proposé ; ajouts possibles |
 | D-14 | L'opérateur peut-il refuser une proposition de S2 sans clore l'incident ? | Oui : état `refused_by_operator`, incident clos en `abandoned` |
+| D-15 | **Écart constaté le 2026-11-10** : le SDK `mcp` 2.3.0 négocie la révision **2025-11-25**, pas 2025-06-18 (D-01). Amender D-01 ou épingler `mcp<2` ? | Amender D-01 vers 2025-11-25 : Hermes embarque déjà le SDK 2.3.0, donc serveur et client parlent la même révision. Épingler `mcp<2` maintiendrait 2025-06-18 au prix d'un SDK ancien côté serveur, avec une interopérabilité non vérifiée avec le client Hermes 2.x |
+
+Mesure à l'origine de D-15 : session réelle entre un serveur `MCPServer` local et un client du même
+poste, `initialize` retournant `protocol_version = "2025-11-25"` (détail et formes d'API vérifiées
+dans [[llm2ros_mcp_test_plan]] §4.1). La révision n'est pas un choix documentaire : elle est négociée
+par le SDK au démarrage de la session, donc D-01 ne peut être tenu qu'en épinglant la bibliothèque.
 
 ## 11. Voir aussi
 
