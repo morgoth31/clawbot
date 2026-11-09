@@ -1,55 +1,141 @@
-site_name: ROS2 LLM Bridge Documentation
-site_description: Documentation for the ROS 2 node and API that bridges LLM tools
-  with Yahboom Rosmaster X3 Plus hardware.
+site_name: Clawbot X3 — Documentation
+site_description: >-
+  Documentation du robot mobile Clawbot X3 : matériel, logiciel ROS 2, opérations,
+  pont LLM vers ROS 2, base de connaissances OKF.
+site_author: Clawbot
+docs_dir: docs
+site_dir: site
+use_directory_urls: true
+
 theme:
   name: material
+  language: fr
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
   palette:
-  - scheme: default
-    primary: indigo
-    accent: indigo
-    toggle:
-      icon: material/brightness-7
-      name: Switch to dark mode
-  - scheme: slate
-    primary: indigo
-    accent: indigo
-    toggle:
-      icon: material/brightness-4
-      name: Switch to light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Passer en thème sombre
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Passer en thème clair
   features:
-  - navigation.tabs
-  - navigation.sections
-  - navigation.expand
-  - content.code.copy
-  - content.code.annotate
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
 plugins:
-- search
-- mkdocstrings:
-    handlers:
-      python:
-        paths:
-        - .
-        options:
-          docstring_style: google
-          show_source: true
-          show_root_heading: true
+  - search:
+      lang: fr
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - .
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+
+hooks:
+  - hooks/wikilinks.py
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - def_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: "#"
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_css:
+  - assets/stylesheets/okf.css
+
+extra_javascript:
+  - assets/javascripts/mermaid.min.js
+  - assets/javascripts/mermaid-init.js
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/morgoth31/clawbot
+      name: Dépôt clawbot
+
 nav:
-- Home: index.md
-- API Reference:
-  - clawbot_monitoring/app.py: api/clawbot_monitoring.app.md
-  - generate_docs.py: api/generate_docs.md
-  - ros2_llm_bridge/hardware_service.py: api/ros2_llm_bridge.hardware_service.md
-  - ros2_llm_bridge/ros2_llm_bridge/action_handler.py: api/ros2_llm_bridge.ros2_llm_bridge.action_handler.md
-  - ros2_llm_bridge/ros2_llm_bridge/api_server.py: api/ros2_llm_bridge.ros2_llm_bridge.api_server.md
-  - ros2_llm_bridge/ros2_llm_bridge/bridge_node.py: api/ros2_llm_bridge.ros2_llm_bridge.bridge_node.md
-  - ros2_llm_bridge/ros2_llm_bridge/schemas.py: api/ros2_llm_bridge.ros2_llm_bridge.schemas.md
-  - ros2_llm_bridge/setup.py: api/ros2_llm_bridge.setup.md
-  - ros2_llm_bridge/test/test_action_handler.py: api/ros2_llm_bridge.test.test_action_handler.md
-  - ros2_llm_bridge/test/test_copyright.py: api/ros2_llm_bridge.test.test_copyright.md
-  - ros2_llm_bridge/test/test_flake8.py: api/ros2_llm_bridge.test.test_flake8.md
-  - ros2_llm_bridge/test/test_integration.py: api/ros2_llm_bridge.test.test_integration.md
-  - ros2_llm_bridge/test/test_llm_handler.py: api/ros2_llm_bridge.test.test_llm_handler.md
-  - ros2_llm_bridge/test/test_pep257.py: api/ros2_llm_bridge.test.test_pep257.md
-  - ros2_llm_bridge/test/test_schemas.py: api/ros2_llm_bridge.test.test_schemas.md
-- Knowledge Base: knowledge.md
-- Build & Update: build_and_update.md
+  - Accueil: index.md
+  - Poste de documentation: site-documentation.md
+  - Base de connaissances:
+      - Vue d'ensemble: knowledge-base/index.md
+      - Matériel:
+          - Jetson Orin NX: knowledge-base/01_Hardware/jetson_orin_nx.md
+          - Carte Rosmaster X3: knowledge-base/01_Hardware/rosmaster_x3_mcu.md
+          - Caméra Astra Pro+: knowledge-base/01_Hardware/orbbec_astra_pro_plus.md
+          - Batterie principale: knowledge-base/01_Hardware/batterie_principale.md
+      - Logiciel:
+          - Graphe ROS 2: knowledge-base/02_Software/ros2_graph_clawbot.md
+          - Nœud de conduite: knowledge-base/02_Software/yahboomcar_bringup_driver_node.md
+          - Services systemd: knowledge-base/02_Software/systemd_robot_services.md
+          - Chaîne de navigation: knowledge-base/02_Software/ros2_nav_stack.md
+          - Pont LLM — état constaté: knowledge-base/02_Software/llm2ros_bridge.md
+          - Pont LLM — architecture: knowledge-base/02_Software/llm2ros_bridge_architecture.md
+          - Pont LLM — cahier des charges: knowledge-base/02_Software/llm2ros_bridge_specification.md
+          - Pont LLM — cohérence et approche: knowledge-base/02_Software/llm2ros_bridge_coherence_et_approche.md
+      - Opérations:
+          - Journal de capture initiale: knowledge-base/03_Operations/2026-11-10_bootstrap_knowledge_base.md
+          - Traces d'erreurs:
+              - ERR-001 absence de scan laser: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-001_absence_topic_scan.md
+              - ERR-002 espace disque critique: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-002_espace_disque_critique.md
+              - ERR-003 arbre TF incomplet: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-003_arbre_tf_incomplet.md
+              - ERR-004 exécution non authentifiée: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-004_execution_de_commande_non_authentifiee.md
+  - Référence API:
+      - clawbot_monitoring/app.py: api/clawbot_monitoring.app.md
+      - generate_docs.py: api/generate_docs.md
+      - ros2_llm_bridge/hardware_service.py: api/ros2_llm_bridge.hardware_service.md
+      - ros2_llm_bridge/ros2_llm_bridge/action_handler.py: api/ros2_llm_bridge.ros2_llm_bridge.action_handler.md
+      - ros2_llm_bridge/ros2_llm_bridge/api_server.py: api/ros2_llm_bridge.ros2_llm_bridge.api_server.md
+      - ros2_llm_bridge/ros2_llm_bridge/bridge_node.py: api/ros2_llm_bridge.ros2_llm_bridge.bridge_node.md
+      - ros2_llm_bridge/ros2_llm_bridge/schemas.py: api/ros2_llm_bridge.ros2_llm_bridge.schemas.md
+      - ros2_llm_bridge/setup.py: api/ros2_llm_bridge.setup.md
+      - Tests:
+          - test_action_handler.py: api/ros2_llm_bridge.test.test_action_handler.md
+          - test_schemas.py: api/ros2_llm_bridge.test.test_schemas.md
+          - test_integration.py: api/ros2_llm_bridge.test.test_integration.md
+          - test_llm_handler.py: api/ros2_llm_bridge.test.test_llm_handler.md
+          - test_copyright.py: api/ros2_llm_bridge.test.test_copyright.md
+          - test_flake8.py: api/ros2_llm_bridge.test.test_flake8.md
+          - test_pep257.py: api/ros2_llm_bridge.test.test_pep257.md
+  - Héritage:
+      - Ancienne page d'accueil: legacy/index-old.md
+      - Notes d'exploitation: legacy/knowledge.md
+      - Construction et mise à jour: legacy/build_and_update.md
