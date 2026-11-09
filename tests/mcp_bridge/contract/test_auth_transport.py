@@ -36,26 +36,26 @@ def _post(url: str, token: str | None) -> httpx.Response:
     return httpx.post(url, headers=headers, json=INITIALIZE_REQUEST, timeout=10.0)
 
 
-async def test_request_without_token_is_rejected(running, token):
+def test_request_without_token_is_rejected(running, token):
     """MCP-03 : sans jeton, la requête est refusée (401) et rien n'est exécuté."""
     response = _post(running.url, token=None)
     assert response.status_code == 401
 
 
-async def test_request_with_wrong_token_is_rejected(running, token):
+def test_request_with_wrong_token_is_rejected(running, token):
     """MCP-03 : un jeton erroné est refusé de la même manière qu'une absence de jeton."""
     response = _post(running.url, token="mauvais-jeton")
     assert response.status_code == 401
     assert response.json().get("detail", "") != "", "le refus doit être explicite"
 
 
-async def test_request_with_valid_token_is_accepted(running, token):
+def test_request_with_valid_token_is_accepted(running, token):
     """MCP-03 : le jeton attendu ouvre la session."""
     response = _post(running.url, token=token)
     assert response.status_code in (200, 202)
 
 
-async def test_listen_address_is_loopback_only(running):
+def test_listen_address_is_loopback_only(running):
     """MCP-04 : le port est lié à la boucle locale, jamais à toutes les interfaces."""
     host, port = running.bound_address
     assert host == "127.0.0.1"
@@ -65,7 +65,7 @@ async def test_listen_address_is_loopback_only(running):
 @pytest.mark.skipif(
     os.environ.get("SKIP_LAN_CHECK") == "1", reason="contrôle réseau désactivé par l'exploitant"
 )
-async def test_port_is_not_reachable_from_lan_address(running):
+def test_port_is_not_reachable_from_lan_address(running):
     """MCP-04 : la connexion depuis l'adresse LAN du robot doit échouer."""
     from support.harness import lan_address, port_is_reachable
 
@@ -76,7 +76,7 @@ async def test_port_is_not_reachable_from_lan_address(running):
     assert not port_is_reachable(address, port), f"le port {port} répond sur {address}"
 
 
-async def test_host_header_outside_allowlist_is_refused(running, token):
+def test_host_header_outside_allowlist_is_refused(running, token):
     """MCP-04 : protection contre le rebinding DNS (en-tête Host non déclaré)."""
     headers = dict(MCP_HEADERS)
     headers["Authorization"] = f"Bearer {token}"
@@ -87,7 +87,7 @@ async def test_host_header_outside_allowlist_is_refused(running, token):
     )
 
 
-async def test_error_body_never_leaks_the_expected_token(running):
+def test_error_body_never_leaks_the_expected_token(running):
     """SAF-04 : le refus ne divulgue pas le jeton attendu."""
     response = _post(running.url, token=None)
     body = json.dumps(response.json(), ensure_ascii=False)

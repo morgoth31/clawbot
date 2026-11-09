@@ -403,7 +403,46 @@ Le seul test vert (`test_error_taxonomy_is_closed`) porte sur les constantes de 
 le serveur. Les 22 autres échouent sur `NotImplementedError`, jamais sur une erreur de collecte :
 l'environnement de test est donc valide, seul le code manque.
 
-## 15. Voir aussi
+## 16. Étape 4 — implémentation et passage au vert
+
+Le contrat MCP est implémenté. Aucune logique de sûreté n'est simulée : les outils qui exigent la
+couche ROS 2 ou l'arbitre refusent en `MCP-E-PREREQ` plutôt que de renvoyer une valeur inventée.
+
+| Module | Contenu |
+|---|---|
+| `bridge_mcp/server.py` | `create_server` (refus d'un jeton vide et d'une écoute hors boucle locale), `streamable_http_app` (intergiciel de garde), `run` |
+| `bridge_mcp/auth.py` | `McpGuardMiddleware` : jeton porteur en comparaison à temps constant, liste blanche d'en-têtes `Host`, refus 401/421 sans fuite du jeton |
+| `bridge_mcp/tools.py` | 22 outils annotés (`read_only_hint`, `destructive_hint`), enveloppes typées, ressources `spec://exigences`, `robot://limites`, `incident://{id}` |
+| `bridge_mcp/envelope.py` | Enveloppes `{status, data|error}` ; un outil ne lève jamais, il retourne un code |
+| `bridge_mcp/state.py` | Incidents, journal d'audit, verrou d'arrêt (alimentés par le superviseur à l'étape suivante) |
+| `bridge_mcp/limits.py` | Limites effectives issues de l'état constaté (`MAX_LINEAR_MS=0.06`, watchdog 1,5 s, liste blanche de paramètres, indisponibilités) |
+| `tests/mcp_bridge/support/session_worker.py` | Session MCP persistante dans une seule tâche asyncio |
+
+Résultat d'exécution :
+
+```
+$ cd tests/mcp_bridge && python3 -m pytest
+23 passed in 8.08s          # 2e exécution : 23 passed in 8.05s
+```
+
+Contrôles ciblés : les trois tests de transport (boucle locale, injoignabilité depuis l'adresse LAN,
+en-tête `Host` étranger) passent réellement, sans `skip`.
+
+### 16.1 Écarts constatés et traités
+
+| Écart | Cause | Traitement |
+|---|---|---|
+| D-16 : le SDK annonce toujours la capacité `prompts` | `MCPServer` 2.3.0 la déclare même sans prompt enregistré | Exigence MCP-02 amendée : le contrat porte sur les prompts **servis** (liste vide vérifiée) |
+| D-17 : un outil inconnu est refusé par le SDK, sans code `MCP-E-*` | La validation du nom précède l'appel du pont | Exigence MCP-12 précisée : la taxonomie couvre les erreurs levées par le pont ; le refus d'outil inconnu reste un refus explicite |
+| Harnais : sortie de session « cancel scope in a different task » | Les groupes de tâches anyio du SDK ne supportent pas d'être fermés dans une autre tâche que celle qui les a ouverts (fixtures asynchrones pytest) | `SessionWorker` : une tâche unique pour toute la durée de vie de la session, commandes par file thread-safe |
+
+### 16.2 Ce que cette étape ne couvre pas encore
+
+Le contexte d'incident réel, les 14 déclencheurs, l'arbitre d'actionneurs, la priorité mesurée de
+`safety_stop` et les mutations effectives (`param_set`, `goal_send`) restent hors de cet incrément :
+leurs tests sont écrits à l'étape suivante, avant leur code, conformément à la méthode.
+
+## 17. Voir aussi
 
 - Spécification des exigences : [[llm2ros_mcp_specification]]
 - État constaté du pont : [[llm2ros_bridge]]
