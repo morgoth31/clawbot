@@ -1,0 +1,19 @@
+[Unit]
+Description=Clawbot documentation site (MkDocs Material, port 8080)
+Documentation=http://localhost:8080/
+After=network.target
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+WorkingDirectory=/home/jetson/clawbot
+Environment=PATH=/home/jetson/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/jetson/.local/bin/mkdocs serve --dev-addr 0.0.0.0:8080
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

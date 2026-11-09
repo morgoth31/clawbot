@@ -1,0 +1,57 @@
+/* Bandeau de métadonnées OKF affiché sous le titre des pages de la base de connaissances. */
+
+.okf-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: -0.2rem 0 1.4rem 0;
+  padding: 0.45rem 0.7rem;
+  border-left: 3px solid var(--md-primary-fg-color);
+  background: var(--md-code-bg-color);
+  border-radius: 0.15rem;
+  font-size: 0.72rem;
+}
+
+.okf-badge {
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.12rem 0.5rem;
+  border-radius: 0.6rem;
+  text-transform: uppercase;
+}
+
+.okf-date,
+.okf-tags {
+  opacity: 0.85;
+}
+
+.okf-tags code {
+  font-size: 0.68rem;
+  padding: 0.05rem 0.35rem;
+}
+
+/* Diagrammes Mermaid : largeur utile et défilement horizontal si nécessaire. */
+
+.mermaid {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0 1.6rem 0;
+  overflow-x: auto;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Les tableaux techniques du pont LLM comportent beaucoup de colonnes. */
+
+.md-typeset table:not([class]) {
+  font-size: 0.72rem;
+}
+
+.md-typeset code {
+  word-break: break-word;
+}
