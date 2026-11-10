@@ -17,6 +17,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | Calcul embarqué | NVIDIA Jetson Orin NX 16 Go, L4T R36.4.7, Ubuntu 22.04.5 | [[jetson_orin_nx]] |
 | Carte de commande bas niveau | Carte Rosmaster (Yahboom), lien série UART 115 200 Bd | [[rosmaster_x3_mcu]] |
 | Perception RGB-D | Orbbec Astra Pro+ (USB `2bc5:060f`) | [[orbbec_astra_pro_plus]] |
+| Perception laser | YDLIDAR TG30, TOF 360°, firmware 1.71, `/scan` à 10,05 Hz | [[ydlidar_tg30]] |
 | Énergie | Batterie principale, tension télémétrée 11,9 V | [[batterie_principale]] |
 | Middleware | ROS 2 Humble, `ROS_DOMAIN_ID=28` | [[ros2_graph_clawbot]] |
 | Nœud de conduite | `Mcnamu_driver_X3` (`yahboomcar_bringup`) | [[yahboomcar_bringup_driver_node]] |
@@ -31,29 +32,39 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 ├── 01_Hardware/
 │   ├── jetson_orin_nx.md
 │   ├── rosmaster_x3_mcu.md
+│   ├── ydlidar_tg30.md
 │   ├── orbbec_astra_pro_plus.md
 │   └── batterie_principale.md
 ├── 02_Software/
+│   ├── documentation_constructeur_yahboom.md
 │   ├── ros2_graph_clawbot.md
 │   ├── yahboomcar_bringup_driver_node.md
 │   ├── systemd_robot_services.md
 │   ├── ros2_nav_stack.md
+│   ├── bom_logiciel.md
 │   ├── llm2ros_bridge.md
 │   ├── llm2ros_bridge_architecture.md
 │   ├── llm2ros_bridge_specification.md
 │   ├── llm2ros_bridge_coherence_et_approche.md
+│   ├── llm2ros_bridge_design.md
 │   ├── llm2ros_mcp_specification.md
 │   ├── llm2ros_mcp_test_plan.md
+│   ├── llm2ros_traceabilite.md
+│   ├── llm2ros_health_test_specification.md
 │   ├── ros2_engineering_skills.md
 │   ├── acsl_frama_c_skills.md
 │   └── mattpocock_engineering_skills.md
 └── 03_Operations/
     ├── 2026-11-10_bootstrap_knowledge_base.md
+    ├── etat_noeuds_et_services.md
+    ├── mise_a_jour_firmware_carte_rosmaster.md
     └── errors_traces/
         ├── ERR-2026-11-10-001_absence_topic_scan.md
         ├── ERR-2026-11-10-002_espace_disque_critique.md
         ├── ERR-2026-11-10-003_arbre_tf_incomplet.md
-        └── ERR-2026-11-10-004_execution_de_commande_non_authentifiee.md
+        ├── ERR-2026-11-10-004_execution_de_commande_non_authentifiee.md
+        ├── ERR-2026-11-10-005_pytest_plugins_launch_testing.md
+        └── ERR-2026-11-10-006_horloge_fuseau_et_ntp.md
 ```
 
 ## 3. Conventions d'écriture
@@ -87,3 +98,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 13:40 | Documentation réorganisée en cinq sections ; pages générées de traçabilité, d'état des nœuds et de BOM ; conception détaillée du pont | [[llm2ros_bridge_design]], [[llm2ros_traceabilite]], [[etat_noeuds_et_services]], [[bom_logiciel]] |
 | 2026-11-10 13:55 | Lidar : ERR-001 corrigée — YDLIDAR TG30 présent, pilote jamais lancé ; `clawbot-lidar.service` déployé, `/scan` à 10,15 Hz | [[ERR-2026-11-10-001_absence_topic_scan]], [[etat_noeuds_et_services]] |
 | 2026-11-10 06:55 | Horloge : fuseau passé de `Asia/Shanghai` à `Europe/Paris`, RTC en UTC, NTP français ; UTC était déjà exact | [[ERR-2026-11-10-006_horloge_fuseau_et_ntp]] |
+| 2026-11-10 18:16 | Lidar TG30 documenté sur le poste : identification, paramètres, QoS `BEST_EFFORT`, écart avec la référence `TG.launch` | [[ydlidar_tg30]] |
+| 2026-11-10 18:25 | Carte Rosmaster : inventaire de la V3.0 et protocole série bas niveau extraits de la documentation constructeur, procédure de flashage transcrite | [[rosmaster_x3_mcu]], [[mise_a_jour_firmware_carte_rosmaster]] |
+| 2026-11-10 18:33 | Dépôt constructeur `ROSMASTERX3-PLUS` référencé : structure, applicabilité à ROS 2 Humble, règles de citation | [[documentation_constructeur_yahboom]] |
+| 2026-11-10 18:35 | Caméra Astra : modes UVC mesurés, état d'étalonnage, conflit de port 8080 avec `web_video_server`, rattachement TF `base_link` corrigé | [[orbbec_astra_pro_plus]] |

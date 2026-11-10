@@ -134,6 +134,7 @@ nav:
           - Jetson Orin NX: knowledge-base/01_Hardware/jetson_orin_nx.md
           - Carte Rosmaster X3: knowledge-base/01_Hardware/rosmaster_x3_mcu.md
           - Caméra Astra Pro+: knowledge-base/01_Hardware/orbbec_astra_pro_plus.md
+          - Lidar YDLIDAR TG30: knowledge-base/01_Hardware/ydlidar_tg30.md
           - Batterie principale: knowledge-base/01_Hardware/batterie_principale.md
       - Logiciel embarqué:
           - Graphe ROS 2: knowledge-base/02_Software/ros2_graph_clawbot.md
@@ -144,6 +145,7 @@ nav:
       - État des nœuds et services: knowledge-base/03_Operations/etat_noeuds_et_services.md
       - Santé des périphériques: knowledge-base/02_Software/llm2ros_health_test_specification.md
       - Journal de capture initiale: knowledge-base/03_Operations/2026-11-10_bootstrap_knowledge_base.md
+      - Procédure firmware carte Rosmaster: knowledge-base/03_Operations/mise_a_jour_firmware_carte_rosmaster.md
       - Traces d'erreurs:
           - ERR-001 absence de scan laser: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-001_absence_topic_scan.md
           - ERR-002 espace disque critique: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-002_espace_disque_critique.md
@@ -153,6 +155,7 @@ nav:
           - ERR-006 horloge, fuseau et NTP: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-006_horloge_fuseau_et_ntp.md
   - Référence:
       - BOM logiciel: knowledge-base/02_Software/bom_logiciel.md
+      - Documentation constructeur Yahboom: knowledge-base/02_Software/documentation_constructeur_yahboom.md
       - Base de connaissances (vue OKF): knowledge-base/index.md
       - Référence API:
           - clawbot_monitoring/app.py: api/clawbot_monitoring.app.md

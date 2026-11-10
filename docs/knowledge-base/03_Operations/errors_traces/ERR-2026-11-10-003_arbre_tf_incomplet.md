@@ -59,6 +59,24 @@ $ ros2 node list
 
 Aucun nœud `robot_state_publisher`, `joint_state_publisher`, `static_transform_publisher` ni `slam_toolbox` n'apparaît dans la liste.
 
+### 2.1 État au 2026-11-10 11:22 CET
+
+Le graphe contient désormais les éditeurs de cadres, sans intervention sur la pile : `robot_state_publisher`, `joint_state_publisher`, `ydlidar_ros2_driver_node`, plus un lanceur `/launch_ros_1598014` dont l'origine (script de démarrage ou unité systemd) n'a pas été tracée. `ros2 node list` retourne alors :
+
+```
+/camera/camera
+/driver_node
+/hardware_service_node
+/joint_state_publisher
+/launch_ros_1598014
+/llm_bridge_node
+/robot_state_publisher
+/rosapi
+/rosapi_params
+/rosbridge_websocket
+/ydlidar_ros2_driver_node
+```
+
 ## 3. Cadres présents et absents
 
 | Cadre | Présent dans TF | Émetteur |
@@ -68,17 +86,18 @@ Aucun nœud `robot_state_publisher`, `joint_state_publisher`, `static_transform_
 | `camera_depth_frame` | oui | `/camera/camera` |
 | `camera_color_optical_frame` | oui | `/camera/camera` |
 | `camera_depth_optical_frame` | oui | `/camera/camera` |
-| `base_link` | non | Donnée non disponible — aucun éditeur |
-| `base_footprint` | non | Donnée non disponible — aucun éditeur |
+| `base_link` | oui depuis le 2026-11-10 11:22 CET | `robot_state_publisher` — `base_footprint` → `base_link` (z = 0,076 m) |
+| `base_footprint` | oui, idem | `robot_state_publisher` |
 | `odom` | non | Donnée non disponible — aucun éditeur ; `/odom` absent du graphe |
 | `map` | non | Donnée non disponible — aucun éditeur ; `/map` sans éditeur |
-| `imu_link` | non (cité comme `frame_id` de `/imu/data_raw`) | [[yahboomcar_bringup_driver_node]] publie le message mais aucune transformation correspondante n'est présente |
+| `imu_link` | oui depuis le 2026-11-10 11:22 CET | `robot_state_publisher` — `base_link` → `imu_link`, translation `(0,001 m, 0,017 m, 0,0322 m)` |
 
 ## 4. Actions de mitigation
 
 | Horodatage | Action | Résultat mesuré |
 |---|---|---|
 | 2026-11-10T06:14:48+08:00 | Consignation ; aucun `robot_state_publisher` lancé pour ne pas modifier la pile en production | Arbre TF inchangé |
+| 2026-11-10T11:22:00+01:00 | Constat, sans action : `robot_state_publisher` et `joint_state_publisher` actifs, cadres `base_footprint`, `base_link`, `imu_link`, `camera_link`, `laser_link` publiés | `ros2 run tf2_ros tf2_echo base_link laser_link` retourne une transformation valide (`x = 0,105 m`, `z = 0,047 m`) ; `odom` et `map` toujours absents |
 
 ## 5. Conditions de clôture
 
