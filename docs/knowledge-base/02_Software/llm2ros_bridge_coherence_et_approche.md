@@ -76,11 +76,12 @@ Analyse des écarts entre ce que le pont fait, ce qu'il annonce et ce dont le ro
 | ID | Constat | Preuve | Effet |
 |---|---|---|---|
 | FON-01 | Trois jeux de bornes de vitesse coexistent | 0,06 (schéma) / 0,05 (navigation) / 0,5 (défaut du service) et 0,06 via l'environnement | Comportement dépendant du mode de démarrage |
-| FON-02 | La caméra `claw` est annoncée et configurée sur l'index 2, absent du système | `tool_schemas.cpp:80,85` ; `CAMERA_CLAW_INDEX=2` ; `ls /dev/video*` → `video0`, `video1` | Outil annoncé non fonctionnel |
+| FON-02 | La caméra `claw` est annoncée et configurée sur l'index 2, absent du système, alors que la caméra physique est sur l'index 0 | `tool_schemas.cpp:80,85` ; `CAMERA_CLAW_INDEX=2` ; `ls /dev/video*` → `video0`, `video1` ; `GET /detect_raw?camera=claw` → HTTP 500 `Cannot open camera claw (index 2)` ; `?camera=front` → HTTP 200 (relevé 2026-11-10T19:12+01:00) | Outil annoncé non fonctionnel ; l'outil `front` ouvre la caméra du bras ([[camera_usb_bras]]) |
 | FON-03 | Douze routes du service matériel ne sont pas exposées au LLM | Comparaison `/openapi.json` (8001, 23 routes) et `/tools` (8000, 18 outils) | Télémétrie, cartes et SLAM inaccessibles à l'agent |
 | FON-04 | L'état de charge est une interpolation linéaire présentée comme une courbe LiPo | `hardware_service.py:506` ; `tool_schemas.cpp:211-212` | Erreur de mesure non quantifiée, présentée comme une courbe |
 | FON-05 | `NavigateTo` promet un référentiel `map` que le robot ne publie pas | `tool_schemas.cpp:67-70` ; `/map` sans éditeur | Contrat impossible à satisfaire |
 | FON-06 | Le mode `evolution` restreint les outils mais laisse ouvertes les routes de compilation | `mode_manager.cpp:42-45` contre `api_server.cpp:381-418` | Le mode ne protège pas ce qu'il est censé protéger |
+| FON-07 | La sonde de santé PER-01 associe au topic couleur le couple `0c45:6340` et `/dev/video0`, qui appartiennent à la caméra du bras, alors que `/camera/color/image_raw` est publié par la fonction `2bc5:050f` de l'Astra | `bridge_mcp/health.py:119` ; `lsusb -t` (`Dev 15` = `usbfs`, `Dev 16` = `uvcvideo`) ; `/proc/6287/fd` | La sonde valide une caméra et un topic sans lien de causalité : la panne de l'une ne serait pas vue |
 
 ## 7. Incohérences d'ingénierie
 

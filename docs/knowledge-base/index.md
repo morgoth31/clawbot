@@ -16,7 +16,8 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 |---|---|---|
 | Calcul embarqué | NVIDIA Jetson Orin NX 16 Go, L4T R36.4.7, Ubuntu 22.04.5 | [[jetson_orin_nx]] |
 | Carte de commande bas niveau | Carte Rosmaster (Yahboom), lien série UART 115 200 Bd | [[rosmaster_x3_mcu]] |
-| Perception RGB-D | Orbbec Astra Pro+ (USB `2bc5:060f`) | [[orbbec_astra_pro_plus]] |
+| Perception RGB-D | Orbbec Astra Pro+ (USB `2bc5:060f` profondeur, `2bc5:050f` couleur, hors V4L) | [[orbbec_astra_pro_plus]] |
+| Caméra du bras | Module UVC `0c45:6340` sur le port `1-2.2.1`, aucun topic ROS publié | [[camera_usb_bras]] |
 | Perception laser | YDLIDAR TG30, TOF 360°, firmware 1.71, `/scan` à 10,05 Hz | [[ydlidar_tg30]] |
 | Bras manipulateur | 5 axes + pince, 6 servos bus série sur le MCU, présence confirmée le 2026-11-10 | [[bras_6dof]] |
 | Description géométrique | `clawbot_x3plus.urdf`, 21 liens, `clawbot-description.service` | [[modele_urdf_clawbot]] |
@@ -37,6 +38,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── ydlidar_tg30.md
 │   ├── orbbec_astra_pro_plus.md
 │   ├── bras_6dof.md
+│   ├── camera_usb_bras.md
 │   └── batterie_principale.md
 ├── 02_Software/
 │   ├── documentation_constructeur_yahboom.md
@@ -62,6 +64,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 └── 03_Operations/
     ├── 2026-11-10_bootstrap_knowledge_base.md
     ├── 2026-11-10_tests_cartographie.md
+    ├── 2026-11-10_rebranchement_camera_bras.md
     ├── etat_noeuds_et_services.md
     ├── mise_a_jour_firmware_carte_rosmaster.md
     └── errors_traces/
@@ -86,7 +89,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 
 ## 4. Journal des opérations
 
-| Date (CST) | Événement | Document |
+| Date (fuseau du poste, `+01:00` depuis le 2026-11-10 06:55) | Événement | Document |
 |---|---|---|
 | 2026-11-10 06:11 | Création de la base et capture de l'état initial des sous-systèmes | [[2026-11-10_bootstrap_knowledge_base]] |
 | 2026-11-10 06:12 | Anomalie ouverte : aucune source de scan laser publiée sur le domaine 28 | [[ERR-2026-11-10-001_absence_topic_scan]] |
@@ -119,3 +122,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 19:25 | SLAM : `yahboomcar_slam` recompile contre OpenCV 4.5.4 (préfixe `/opt/opencv-4.5.4-dev`), paquet NVIDIA 4.8 incomplet tracé, état des prérequis de navigation remis à jour | [[ERR-2026-11-10-008_paquet_opencv_incomplet]], [[ros2_nav_stack]] |
 | 2026-11-10 20:35 | Cartographie : deux essais sur le robot (statique puis roues en l'air), cartes sauvegardées dans `maps/`, `/map` à 1 Hz | [[2026-11-10_tests_cartographie]] |
 | 2026-11-10 20:40 | Anomalie critique : boucle de vitesse saturée (~0,82 m/s) et signe inversé quelle que soit la consigne ; cartographie réelle impossible sur cales | [[ERR-2026-11-10-009_commande_vitesse_non_proportionnelle]] |
+| 2026-11-10 19:16 | Caméra du bras débranchée puis rebranchée : reprise UVC sur `video0` (device 6 → 16), capture V4L2 et inférence OpenCV OK ; index « claw » toujours sur 2, outil non fonctionnel ; identification de la caméra du bras séparée de l'Astra | [[2026-11-10_rebranchement_camera_bras]], [[camera_usb_bras]] |
