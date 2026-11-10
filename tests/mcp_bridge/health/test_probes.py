@@ -193,3 +193,21 @@ def test_http_endpoint_failure_is_reported(endpoint):
     detection = _peripheral(report, "PER-08")
     assert detection["verdict"] == "failed"
     assert detection["probes"][0]["error_code"] == "HLT-E-UNAVAILABLE"
+
+
+def test_peripheral_declared_not_installed_is_unavailable():
+    """HLT-08 : un périphérique volontairement déclaré absent est `unavailable`, pas `failed`."""
+    device, graph = healthy_robot()
+    inventory = tuple(
+        dataclasses.replace(item, not_installed=True, levels=("device",))
+        if item.id == "PER-07" else item
+        for item in health.INVENTORY
+    )
+    report = health.HealthChecker(
+        device_view=device, graph_view=graph, now=lambda: 1000.0, inventory=inventory
+    ).run()
+
+    joystick = _peripheral(report, "PER-07")
+    assert joystick["verdict"] == "unavailable"
+    assert joystick["probes"][0]["error_code"] == "HLT-E-NOT-INSTALLED"
+    assert any("PER-07" in entry for entry in report["unavailable"])

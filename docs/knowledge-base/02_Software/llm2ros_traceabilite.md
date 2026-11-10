@@ -1,6 +1,6 @@
 ---
 title: "Matrice de traçabilité — exigence vers test"
-date: "2026-11-10T13:27:48+08:00"
+date: "2026-11-10T06:51:08+01:00"
 author: "Hermes Agent"
 tags: [software, tracabilite, tests, exigences, qualite]
 status: actif
@@ -9,7 +9,7 @@ generated: true
 
 # Matrice de traçabilité — exigence vers test
 
-Page régénérée par `scripts/generate_traceability.py` le 2026-11-10T13:27:48+08:00. Elle ne se modifie pas à la main : toute évolution vient des spécifications ou des tests.
+Page régénérée par `scripts/generate_traceability.py` le 2026-11-10T06:51:08+01:00. Elle ne se modifie pas à la main : toute évolution vient des spécifications ou des tests.
 
 ## 1. Synthèse
 
@@ -82,7 +82,7 @@ Page régénérée par `scripts/generate_traceability.py` le 2026-11-10T13:27:48
 | `HLT-05` | Toute sonde a un délai borné ; le rapport complet est produit en moins de 10 s, aucune sonde ne dépasse 2 s | `test_notify::test_http_failure_is_reported_without_retry_loop`, `test_report::test_measured_window_is_shared_between_topics` |
 | `HLT-06` | Le test n'écrit rien : aucun fichier hors --report <chemin>, aucune publication, aucun param_set, aucun redémarrage d… | `test_probes::test_serial_device_held_by_two_processes_is_reported` |
 | `HLT-07` | Le rapport est un JSON stable et versionné (health_version) ; deux exécutions sans changement donnent les mêmes verdi… | `test_report::test_peripherals_follow_inventory_order`, `test_report::test_report_is_bounded_and_free_of_secrets`, `test_report::test_two_runs_without_change_give_the_same_verdicts` |
-| `HLT-08` | Un périphérique déclaré non installé (lidar) est unavailable avec HLT-E-NOT-INSTALLED, jamais failed ni ignoré | `test_inventory::test_lidar_is_declared_not_installed_not_missing`, `test_inventory::test_report_marks_lidar_unavailable` |
+| `HLT-08` | Un périphérique **déclaré non installé** est unavailable avec HLT-E-NOT-INSTALLED, jamais failed ni ignoré. *(Amendée… | `test_probes::test_peripheral_declared_not_installed_is_unavailable` |
 | `HLT-09` | Un failed sur un périphérique requis: false n'abaisse pas le verdict global, mais figure dans le rapport et le journal | `test_probes::test_optional_peripheral_failure_does_not_degrade_global_verdict` |
 | `HLT-10` | Un service systemd actif ne vaut pas preuve de présence : le verdict repose sur le périphérique et les données, jamai… | `test_probes::test_optional_peripheral_failure_does_not_degrade_global_verdict` |
 | `HLT-11` | La sonde ros initialise un contexte rclpy en lecture seule dans le domaine courant, ne crée aucun éditeur, et le détr… | — **non couverte** |
@@ -92,7 +92,7 @@ Page régénérée par `scripts/generate_traceability.py` le 2026-11-10T13:27:48
 | `HLT-15` | Exécution au démarrage par unité oneshot, et à chaque anomalie émise par S1 ; aucune exécution périodique, aucune act… | `test_report::test_service_mode_returns_zero_even_when_verdict_is_failed` |
 | `HLT-16` | Chaque verdict cite l'exigence et l'inventaire qui le justifient (spec_refs) | — **non couverte** |
 | `HLT-17` | Aucun secret, aucun jeton, aucun chemin de credentials dans le rapport | `test_notify::test_token_never_appears_in_the_report_or_the_message`, `test_report::test_report_is_bounded_and_free_of_secrets` |
-| `HLT-18` | Aucune donnée inventée : une mesure impossible est null avec code, jamais 0 ni false implicite | `test_diagnostics::test_diagnostics_refuses_when_no_report_exists`, `test_notify::test_absent_token_file_is_reported_not_invented`, `test_probes::test_http_endpoint_failure_is_reported`, `test_probes::test_missing_measurement_is_null_with_a_code_never_zero` |
+| `HLT-18` | Aucune donnée inventée : une mesure impossible est null avec code, jamais 0 ni false implicite | `test_diagnostics::test_diagnostics_refuses_when_no_report_exists`, `test_inventory::test_report_marks_lidar_failed_when_adapter_disappears`, `test_notify::test_absent_token_file_is_reported_not_invented`, `test_probes::test_http_endpoint_failure_is_reported`, `test_probes::test_missing_measurement_is_null_with_a_code_never_zero` |
 
 ### llm2ros_mcp_specification.md — 30/57 exigences citées par un test
 

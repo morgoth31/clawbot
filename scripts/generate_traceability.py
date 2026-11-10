@@ -21,7 +21,7 @@ from pathlib import Path
 
 
 def _iso8601(moment: time.struct_time | None = None) -> str:
-    """ISO 8601 avec décalage horaire à deux points (+08:00), format exigé par le validateur OKF."""
+    """ISO 8601 avec décalage horaire à deux points (+HH:MM), format exigé par le validateur OKF."""
     text = time.strftime("%Y-%m-%dT%H:%M:%S%z") if moment is None else time.strftime("%Y-%m-%dT%H:%M:%S%z", moment)
     return f"{text[:-2]}:{text[-2:]}" if len(text) >= 5 and text[-5] in "+-" else text
 ROOT = Path(__file__).resolve().parent.parent
