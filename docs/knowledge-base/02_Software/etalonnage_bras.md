@@ -121,6 +121,29 @@ Le contact est détecté avec `mono_link`, un petit lien fixe porté par `arm_li
 pièce qui touchait le support, ce qui explique qu'aucun maillage de collision n'ait été signalé au
 départ.
 
+### 5.1 Objection examinée : le servo 4 était en défaut, donc son q4 était inconnu
+
+Objection légitime : la pose de référence 76/156/54/0/90 a été testée avec un `q4` arbitraire
+(servo 4 = 0°), alors que le servo 4 renvoyait justement une valeur invalide. Le verdict « valide »
+du 23:15 ne prouvait donc rien à lui seul.
+
+Expérience refaite le 2026-11-10 à 23:38, en balayant `q4` de 0 à 180° par pas de 15° avec les
+autres axes figés à 76/156/54/90, objet retiré puis remis :
+
+| Scène | Valeurs de `q4` en collision |
+|---|---|
+| objet `camera_support` **retiré** | **aucune** (13 valeurs testées, toutes valides) |
+| objet `camera_support` **présent** | **les 13** (contact `camera_support` ↔ `mono_link`) |
+
+Conclusion : quel que soit `q4`, le modèle ne disposait d'aucune géométrie pour arrêter le bras
+contre le support. Le défaut du servo 4 n'explique donc pas le silence du planificateur ; l'absence
+du volume vertical du mât, oui. Le défaut du servo, lui, expliquait l'impossibilité de *savoir* où
+était l'axe 4 — deux problèmes distincts, tous deux corrigés (rebranchement du servo, objet de
+collision).
+
+Recette finale après remise de l'objet : pose zéro **valide**, pose 76/156/54/90/90 **EN
+COLLISION**.
+
 Deux points de méthode :
 
 1. **La tolérance d'objectif compte.** Avec ±0,05 rad, la planification vers la pose qui touche
