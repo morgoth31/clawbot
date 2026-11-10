@@ -26,9 +26,6 @@ theme:
         icon: material/brightness-4
         name: Passer en thème clair
   features:
-    - navigation.tabs
-    - navigation.sections
-    - navigation.expand
     - navigation.indexes
     - navigation.top
     - navigation.footer
@@ -126,10 +123,11 @@ nav:
       - Conception détaillée: knowledge-base/02_Software/llm2ros_bridge_design.md
       - Plan de tests: knowledge-base/02_Software/llm2ros_mcp_test_plan.md
       - Matrice de traçabilité: knowledge-base/02_Software/llm2ros_traceabilite.md
-      - Spécification du test de santé: knowledge-base/02_Software/llm2ros_health_test_specification.md
-      - Pont historique — état constaté: knowledge-base/02_Software/llm2ros_bridge.md
-      - Pont historique — architecture: knowledge-base/02_Software/llm2ros_bridge_architecture.md
-      - Pont historique — cohérence et approche: knowledge-base/02_Software/llm2ros_bridge_coherence_et_approche.md
+      - "Test de santé (spécification)": knowledge-base/02_Software/llm2ros_health_test_specification.md
+      - "Pont historique (C++, en service)":
+          - État constaté: knowledge-base/02_Software/llm2ros_bridge.md
+          - Architecture: knowledge-base/02_Software/llm2ros_bridge_architecture.md
+          - Cohérence et approche: knowledge-base/02_Software/llm2ros_bridge_coherence_et_approche.md
   - Robot (architecture):
       - Vue d'ensemble: robot/index.md
       - Matériel:

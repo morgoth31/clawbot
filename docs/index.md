@@ -31,7 +31,7 @@ Le site s'organise en cinq sections. Chacune a sa page d'entrée, qui dit où tr
 |---|---|
 | Adresse | `http://<adresse-du-robot>:8080` — servi par `clawbot-docs.service` |
 | Recherche | `Ctrl+K` ou `/` |
-| Diagrammes | Mermaid rendu côté navigateur, bibliothèque embarquée (hors ligne) |
+| Diagrammes | Mermaid rendus côté navigateur, bibliothèque embarquée (hors ligne) |
 | Sources | `/Robot_Knowledge_Base` (lien vers `~/clawbot/docs/knowledge-base`) |
 
 ## État synthétique au 2026-11-10
