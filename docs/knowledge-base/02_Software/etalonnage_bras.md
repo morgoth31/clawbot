@@ -153,6 +153,41 @@ Deux points de méthode :
    L'enveloppe actuelle reprend l'empreinte de la plaque élargie de 2 cm ; resserrer la boîte
    demanderait de mesurer la section réelle du support, ce qui n'a pas été fait.
 
+### 5.2 Reproduction physique du contact et seuil du modèle (23:45-23:55)
+
+But : savoir ce qui se passe réellement quand on s'approche du mât, et à quelle distance le modèle
+intervient.
+
+Approche depuis la pose zéro, par paliers de 5° (axe 1) puis 10° (axe 2), opérateur présent :
+
+| Étape | Consigne | Angle relu | Observation |
+|---|---|---|---|
+| axe 1 | 90 → 76° | 77° | rien |
+| axe 2 | 90 → 100 → 110 → 120° | **114°** (6° sous la consigne) | **contact** au niveau de la caméra USB (`mono_link`) — le servo est en butée |
+| relâchement | 120 → 110 → 104 → 100 → 96° | 97° | libre |
+
+Seuil du modèle sur la même famille de poses (balayage de `q2`, autres axes figés) :
+
+| Configuration testée | Premier refus du modèle | Contact physique |
+|---|---|---|
+| servo 1/3/4/5 = 77/89/89/90 | `servo2 = 106°` (valide à 104°) | ~114° |
+| servo 1/3/4/5 = 76/90/90/90 | `servo2 = 105°` (valide à 96°) | ~114° |
+
+Conséquences mesurées :
+
+- Le modèle refuse **8 à 9° avant** le contact réel : c'est l'effet de la marge de 2 cm. Une
+  trajectoire planifiée par MoveIt s'arrête donc avant que la caméra USB ne touche le support.
+- La paire en collision annoncée par MoveIt (`camera_support` ↔ `mono_link`) correspond exactement
+  à ce que l'opérateur voit : le contact se fait par la caméra USB montée sur `arm_link4`.
+- Planification vers `servo2 = 120°` (la pose qui a touché), tolérance 0,005 rad : **refusée**
+  (`error_code 99999`). Vers `servo2 = 95°`, zone libre : **acceptée** (`error_code 1`).
+- La pose `76/156/54` enregistrée le 2026-11-10 n'était pas le premier contact mais l'**état final
+  après poussée** du servo dans le support : le premier contact se produit vers 114°. C'est le seuil,
+  pas cette pose, qui sert de référence.
+
+État laissé : servos `[76, 97, 90, 90, 90, 149]`, déclaré **valide** par le modèle, pose
+resynchronisée dans la configuration du contrôleur.
+
 Cas où un objet dédié resterait nécessaire même après étalonnage : support démonté ou déplacé (le
 maillage du châssis ne suivrait pas).
 
