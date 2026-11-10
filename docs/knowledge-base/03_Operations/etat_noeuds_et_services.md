@@ -1,6 +1,6 @@
 ---
 title: "État des nœuds ROS 2 et des services systemd"
-date: "2026-11-10T13:43:59+08:00"
+date: "2026-11-10T06:50:44+01:00"
 author: "Hermes Agent"
 tags: [operations, etat, ros2, systemd, services, noeuds]
 status: actif
@@ -9,22 +9,22 @@ generated: true
 
 # État des nœuds ROS 2 et des services systemd
 
-Instantané relevé le 2026-11-10T13:43:59+08:00 sur le poste, domaine ROS 2 `28`. Cette page est un relevé, pas un engagement : elle est régénérée par `scripts/generate_status.py` et ne se modifie pas à la main.
+Instantané relevé le 2026-11-10T06:50:44+01:00 sur le poste, domaine ROS 2 `28`. Cette page est un relevé, pas un engagement : elle est régénérée par `scripts/generate_status.py` et ne se modifie pas à la main.
 
 ## 1. Services systemd
 
 | Unité | Rôle | État | Actif depuis |
 |---|---|---|---|
-| `ros2-driver-node.service` | Nœud de conduite (cmd_vel → série) | active (running) | Mon 2026-11-09 18:20:54 CST |
-| `ros2-hardware-service.service` | Service matériel du pont C++ | active (running) | Mon 2026-11-09 18:20:54 CST |
-| `ros2-llm-bridge-cpp.service` | Pont LLM historique (port 8000) | active (running) | Tue 2026-11-10 06:33:33 CST |
-| `orbbec-camera.service` | Caméra Orbbec Astra Pro+ | active (running) | Mon 2026-11-09 18:20:54 CST |
-| `clawbot-lidar.service` | Lidar YDLIDAR TG30 (/scan) | active (running) | Tue 2026-11-10 13:40:41 CST |
-| `rosbridge.service` | Passerelle WebSocket (port 9090) | active (running) | Mon 2026-11-09 18:20:54 CST |
-| `yolo-inference.service` | Inférence YOLO (port 8003) | active (running) | Mon 2026-11-09 18:20:54 CST |
-| `clawbot-joy-teleop.service` | Téléopération manette | active (running) | Tue 2026-11-10 13:42:05 CST |
+| `ros2-driver-node.service` | Nœud de conduite (cmd_vel → série) | active (running) | Mon 2026-11-09 11:20:54 CET |
+| `ros2-hardware-service.service` | Service matériel du pont C++ | active (running) | Mon 2026-11-09 11:20:54 CET |
+| `ros2-llm-bridge-cpp.service` | Pont LLM historique (port 8000) | active (running) | Mon 2026-11-09 23:33:33 CET |
+| `orbbec-camera.service` | Caméra Orbbec Astra Pro+ | active (running) | Mon 2026-11-09 11:20:54 CET |
+| `clawbot-lidar.service` | Lidar YDLIDAR TG30 (/scan) | active (running) | Tue 2026-11-10 06:40:41 CET |
+| `rosbridge.service` | Passerelle WebSocket (port 9090) | active (running) | Mon 2026-11-09 11:20:54 CET |
+| `yolo-inference.service` | Inférence YOLO (port 8003) | active (running) | Mon 2026-11-09 11:20:54 CET |
+| `clawbot-joy-teleop.service` | Téléopération manette | active (running) | Tue 2026-11-10 06:50:14 CET |
 | `clawbot-health.service` | Test de santé des périphériques | inactive (dead) | n/a |
-| `clawbot-docs.service` | Site de documentation (port 8080) | active (running) | Tue 2026-11-10 13:31:55 CST |
+| `clawbot-docs.service` | Site de documentation (port 8080) | active (running) | Tue 2026-11-10 06:44:08 CET |
 
 ## 2. Graphe ROS 2
 
@@ -44,7 +44,7 @@ Nœuds visibles : **9** — topics : **29**.
 
 ## 3. Santé des périphériques
 
-Verdict **failed** en 7183 ms ([[llm2ros_health_test_specification]]).
+Verdict **failed** en 7556 ms ([[llm2ros_health_test_specification]]).
 
 | Périphérique | Requis | Verdict | Détail |
 |---|---|---|---|
@@ -62,11 +62,11 @@ Verdict **failed** en 7183 ms ([[llm2ros_health_test_specification]]).
 
 | Mesure | Valeur |
 |---|---|
-| Charge (1 / 5 / 15 min) | 2.49 / 1.97 / 1.76 |
-| Mémoire disponible | 10287 Mo sur 15655 Mo |
-| Disque libre | 12.4 Go |
-| Températures | cpu-thermal 53 °C, gpu-thermal 51 °C, cv0-thermal 49 °C, cv1-thermal 48 °C, cv2-thermal 45 °C, soc0-thermal 48 °C, soc1-thermal 47 °C, soc2-thermal 46 °C, tj-thermal 53 °C |
-| Disponibilité du poste | 8 h 49 min |
+| Charge (1 / 5 / 15 min) | 3.76 / 2.24 / 1.89 |
+| Mémoire disponible | 10202 Mo sur 15655 Mo |
+| Disque libre | 12.2 Go |
+| Températures | cpu-thermal 56 °C, gpu-thermal 52 °C, cv0-thermal 51 °C, cv1-thermal 50 °C, cv2-thermal 47 °C, soc0-thermal 50 °C, soc1-thermal 49 °C, soc2-thermal 48 °C, tj-thermal 56 °C |
+| Disponibilité du poste | 8 h 56 min |
 
 ## 5. Ce que cette page ne prouve pas
 

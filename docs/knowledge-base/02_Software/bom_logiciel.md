@@ -1,6 +1,6 @@
 ---
 title: "Nomenclature logicielle (BOM) du robot"
-date: "2026-11-10T13:27:22+08:00"
+date: "2026-11-10T06:50:44+01:00"
 author: "Hermes Agent"
 tags: [software, bom, inventaire, dependances, versions]
 status: actif
@@ -9,7 +9,7 @@ generated: true
 
 # Nomenclature logicielle (BOM)
 
-Relevé le 2026-11-10T13:27:22+08:00 par `scripts/generate_bom.py`. Toute ligne absente du poste est écrite `absent` : une nomenclature qui ne liste que l'installé ne dit pas ce qui manque.
+Relevé le 2026-11-10T06:50:44+01:00 par `scripts/generate_bom.py`. Toute ligne absente du poste est écrite `absent` : une nomenclature qui ne liste que l'installé ne dit pas ce qui manque.
 
 ## 1. Socle système
 

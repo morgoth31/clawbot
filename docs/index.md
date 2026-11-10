@@ -61,6 +61,7 @@ régénéré par `scripts/generate_status.py`.
 | [ERR-2026-11-10-003](knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-003_arbre_tf_incomplet.md) | Arbre TF sans `base_link`, `odom`, `map` | Blocage de la localisation |
 | [ERR-2026-11-10-004](knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-004_execution_de_commande_non_authentifiee.md) | Exécution de commande non authentifiée sur le pont LLM | Critique |
 | [ERR-2026-11-10-005](knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-005_pytest_plugins_launch_testing.md) | pytest interrompu dans un shell ROS 2 | Contourné |
+| [ERR-2026-11-10-006](knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-006_horloge_fuseau_et_ntp.md) | Fuseau `Asia/Shanghai` et RTC à 1970 — **clos** : `Europe/Paris`, RTC en UTC, NTP français | Résolu |
 
 ## Conventions
 
