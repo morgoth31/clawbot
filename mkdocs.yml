@@ -156,6 +156,7 @@ nav:
           - ERR-005 pytest et plugins launch_testing: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-005_pytest_plugins_launch_testing.md
           - ERR-006 horloge, fuseau et NTP: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-006_horloge_fuseau_et_ntp.md
           - ERR-007 retour d'angle servo 4: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-007_retour_angle_servo_bras.md
+          - ERR-008 paquet OpenCV et compilation SLAM: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-008_paquet_opencv_incomplet.md
   - Référence:
       - BOM logiciel: knowledge-base/02_Software/bom_logiciel.md
       - Ports réseau: knowledge-base/02_Software/ports_reseau.md
