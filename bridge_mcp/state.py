@@ -47,6 +47,7 @@ class BridgeState:
         self.audit: list[dict[str, Any]] = []
         self.stop_latched: bool = False
         self.last_observation: Any | None = None
+        self.last_health: dict[str, Any] | None = None
 
     def open_incident(
         self,

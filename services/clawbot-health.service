@@ -1,0 +1,30 @@
+# Clawbot — test de santé des périphériques
+#
+# Exigences : HLT-12 (interface), HLT-15 (exécution), D-20/D-22/D-23 (statut vers l'humain
+# par Telegram, au démarrage et sur anomalie, aucune action locale).
+#
+# Le service est un « oneshot » déclenché au démarrage : il mesure, il publie le statut,
+# il sort. Aucune relance automatique, aucun redémarrage d'un autre service.
+# Si /etc/clawbot/telegram-token ou telegram-chat manque, la livraison est déclarée
+# `not_configured` au journal : le rapport reste produit et vérifiable à la main.
+
+[Unit]
+Description=Clawbot Health Check (etat des peripheriques vers Telegram)
+Documentation=file:///home/jetson/clawbot/docs/knowledge-base/02_Software/llm2ros_health_test_specification.md
+After=network-online.target ros2-driver-node.service orbbec-camera.service
+Wants=network-online.target
+Requires=ros2-driver-node.service
+
+[Service]
+Type=oneshot
+User=jetson
+Group=jetson
+WorkingDirectory=/home/jetson/clawbot
+Environment=ROS_DOMAIN_ID=28
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec /usr/bin/python3 -m bridge_mcp.health --notify --reason demarrage --service-mode"
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=60
+
+[Install]
+WantedBy=multi-user.target
