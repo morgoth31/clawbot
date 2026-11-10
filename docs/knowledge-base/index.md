@@ -117,5 +117,5 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 19:10 | Stockage : partition ramenée de 97 % à 85 % (22 Go libres), ERR-002 clôturée | [[ERR-2026-11-10-002_espace_disque_critique]] |
 | 2026-11-10 19:15 | Ports réseau : allocation consignée, `web_video_server` déplacé sur 8082, site conservé sur 8080 | [[ports_reseau]] |
 | 2026-11-10 19:25 | SLAM : `yahboomcar_slam` recompile contre OpenCV 4.5.4 (préfixe `/opt/opencv-4.5.4-dev`), paquet NVIDIA 4.8 incomplet tracé, état des prérequis de navigation remis à jour | [[ERR-2026-11-10-008_paquet_opencv_incomplet]], [[ros2_nav_stack]] |
-| 2026-11-10 20:35 | Cartographie : deux essais sur le robot (statique puis déplacement de 1,6 m), cartes sauvegardées dans `maps/`, `/map` à 1 Hz | [[2026-11-10_tests_cartographie]] |
-| 2026-11-10 20:40 | Anomalie critique : consigne `0,10 m/s` → `1,079 m/s` rapportée, signe inversé ; essais de déplacement suspendus, robot à l'arrêt | [[ERR-2026-11-10-009_commande_vitesse_non_proportionnelle]] |
+| 2026-11-10 20:35 | Cartographie : deux essais sur le robot (statique puis roues en l'air), cartes sauvegardées dans `maps/`, `/map` à 1 Hz | [[2026-11-10_tests_cartographie]] |
+| 2026-11-10 20:40 | Anomalie critique : boucle de vitesse saturée (~0,82 m/s) et signe inversé quelle que soit la consigne ; cartographie réelle impossible sur cales | [[ERR-2026-11-10-009_commande_vitesse_non_proportionnelle]] |
