@@ -89,7 +89,7 @@
         </collision>
     </link>
     <joint name="laser_joint" type="fixed">
-        <origin xyz="0.10478 0 0.0471" rpy="0 0 0" />
+        <origin xyz="0.10478 0 0.03190" rpy="0 0 0" />
         <parent link="base_link" />
         <child link="laser_link" />
     </joint>
@@ -449,7 +449,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/mecanum/front_left_wheel_X3.STL" />
+                <mesh filename="package://yahboomcar_description/meshes/mecanum/front_left_wheel_X3.STL"  scale="1.230769 1.230769 1.230769" />
             </geometry>
             <material name="">
                 <color rgba="0.7 0.7 0.7 1" />
@@ -458,12 +458,12 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/mecanum/front_left_wheel_X3.STL" />
+                <mesh filename="package://yahboomcar_description/meshes/mecanum/front_left_wheel_X3.STL"  scale="1.230769 1.230769 1.230769" />
             </geometry>
         </collision>
     </link>
     <joint name="front_left_joint" type="continuous">
-        <origin xyz="0.08 0.084492 -0.0389" rpy="1.5703 0 0" />
+        <origin xyz="0.11250 0.10500 -0.03600" rpy="1.5703 0 0" />
         <parent link="base_link" />
         <child link="front_left_wheel" />
         <axis xyz="0 0 1" rpy="0 0 0" />
@@ -478,7 +478,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/mecanum/front_right_wheel_X3.STL" />
+                <mesh filename="package://yahboomcar_description/meshes/mecanum/front_right_wheel_X3.STL"  scale="1.230769 1.230769 1.230769" />
             </geometry>
             <material name="">
                 <color rgba="0.7 0.7 0.7 1" />
@@ -487,12 +487,12 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/mecanum/front_right_wheel_X3.STL" />
+                <mesh filename="package://yahboomcar_description/meshes/mecanum/front_right_wheel_X3.STL"  scale="1.230769 1.230769 1.230769" />
             </geometry>
         </collision>
     </link>
     <joint name="front_right_joint" type="continuous">
-        <origin xyz="0.08 -0.0845 -0.0389" rpy="-1.5703 0 3.14159" />
+        <origin xyz="0.11250 -0.10500 -0.03600" rpy="-1.5703 0 3.14159" />
         <parent link="base_link" />
         <child link="front_right_wheel" />
         <axis xyz="0 0 1" rpy="0 0 0" />
@@ -507,7 +507,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/mecanum/back_left_wheel_X3.STL" />
+                <mesh filename="package://yahboomcar_description/meshes/mecanum/back_left_wheel_X3.STL"  scale="1.230769 1.230769 1.230769" />
             </geometry>
             <material name="">
                 <color rgba="0.7 0.7 0.7 1" />
@@ -516,12 +516,12 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/mecanum/back_left_wheel_X3.STL" />
+                <mesh filename="package://yahboomcar_description/meshes/mecanum/back_left_wheel_X3.STL"  scale="1.230769 1.230769 1.230769" />
             </geometry>
         </collision>
     </link>
     <joint name="back_left_joint" type="continuous">
-        <origin xyz="-0.08 0.084492 -0.03954" rpy="1.5703 0 0" />
+        <origin xyz="-0.11250 0.10500 -0.03600" rpy="1.5703 0 0" />
         <parent link="base_link" />
         <child link="back_left_wheel" />
         <axis xyz="0 0 1" rpy="0 0 0" />
@@ -536,7 +536,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/mecanum/back_right_wheel_X3.STL" />
+                <mesh filename="package://yahboomcar_description/meshes/mecanum/back_right_wheel_X3.STL"  scale="1.230769 1.230769 1.230769" />
             </geometry>
             <material name="">
                 <color rgba="0.7 0.7 0.7 1" />
@@ -545,12 +545,12 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/mecanum/back_right_wheel_X3.STL" />
+                <mesh filename="package://yahboomcar_description/meshes/mecanum/back_right_wheel_X3.STL"  scale="1.230769 1.230769 1.230769" />
             </geometry>
         </collision>
     </link>
     <joint name="back_right_joint" type="continuous">
-        <origin xyz="-0.08 -0.0845 -0.03946" rpy="-1.57 0 3.14159" />
+        <origin xyz="-0.11250 -0.10500 -0.03600" rpy="-1.57 0 3.14159" />
         <parent link="base_link" />
         <child link="back_right_wheel" />
         <axis xyz="0 0 1" rpy="0 0 0" />
