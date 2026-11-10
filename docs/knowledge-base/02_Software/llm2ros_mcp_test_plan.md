@@ -480,6 +480,23 @@ d'horloge où la condition persiste depuis `debounce` ; avec un pas de 100 ms, l
 maximal observé reste sous les 200 ms autorisés, et aucune émission n'est anticipée avant le
 `debounce`.
 
+### 17.4 Environnement d'exécution
+
+La suite ne se lance pas à l'identique selon le shell : dans un shell où `/opt/ros/humble/setup.bash`
+est chargé, les plugins `pytest11` de ROS 2 Humble (`launch_testing`, `launch_ros`) déclarent des hooks
+supprimés depuis pytest 8 et interrompent l'exécution avant la collecte
+([[ERR-2026-11-10-005_pytest_plugins_launch_testing]]). `tests/mcp_bridge/pytest.ini` les exclut donc
+explicitement. Vérifié dans les deux environnements :
+
+```
+$ pytest                                          # shell nu
+70 passed in 11.35s
+$ bash -lc 'source /opt/ros/humble/setup.bash && ROS_DOMAIN_ID=99 pytest'
+70 passed in 11.41s
+$ ROS_DOMAIN_ID=28 pytest
+Exit: ROS_DOMAIN_ID=28 interdit pendant les tests : pollution du graphe réel (ENV-01)   (exit=2)
+```
+
 ### 17.3 Valeurs provisoires, marquées comme telles
 
 Deux seuils viennent de décisions **non validées** (§10) :
