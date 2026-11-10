@@ -16,8 +16,8 @@ status: ouvert
 | Topics concernés | Aucun — la lecture se fait sur le lien série `/dev/myserial`, hors ROS |
 | Composant lié | [[bras_6dof]], [[rosmaster_x3_mcu]] |
 | Gravité d'exploitation | Contrôle du bras en position, pas de blocage du châssis |
-| Statut | ouvert |
-| Mitigation appliquée | Aucune ; aucun retour d'angle n'étant publié par le nœud de conduite, la valeur fautive n'atteint pas encore la pile ROS |
+| Statut | ouvert — contourné dans la pile de manipulation |
+| Mitigation appliquée | Articulation `arm_joint4` déclarée **passive** dans `clawbot_arm_controller` : sa position est publiée dans `/arm/joint_states` mais aucune consigne n'est envoyée au servo 4 (voir §3) |
 
 ## 1. Nature de l'échec
 
@@ -43,6 +43,9 @@ Chaîne de conversion concernée (`Rosmaster_Lib.py:290-320`) : impulsion `s_val
 |---|---|---|
 | 2026-11-10T11:44:00+01:00 | Consignation ; aucun réglage de zéro ni écriture Flash | Aucune modification ; deux lectures reproductibles |
 | 2026-11-10T11:44:05+01:00 | Redémarrage de `ros2-driver-node.service` | Service actif, `/voltage` à 10 Hz |
+| 2026-11-10T22:41:00+01:00 | Nouvelle lecture avant essais physiques (3 appels, pilote arrêté) | `[71, 156, 55, -5, 90, 149]` trois fois de suite : le servo 4 renvoie toujours `-5` |
+| 2026-11-10T22:48:00+01:00 | Trajectoire MoveIt exécutée sur l'axe 1 avec `passive_joints: [arm_joint4]` | servo 4 relu à `-5` avant et après : aucune consigne ne lui a été envoyée, aucun saut |
+| 2026-11-10T22:54:00+01:00 | `scripts/sync_arm_pose.py` | détecte l'angle invalide, écrit `initial_positions[3] = 0.0` et ajoute l'articulation à `passive_joints` automatiquement |
 
 ## 4. Conditions de clôture
 

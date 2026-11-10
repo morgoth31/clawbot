@@ -90,19 +90,47 @@ Domaine 28, 2026-11-10 entre 19:47 et 19:52 CET.
 | Fusion dans `/joint_states` | valeurs de test `arm_joint1=0,11` et `arm_joint2=0,22` publiées sur `/arm/joint_states` retrouvées telles quelles dans `/joint_states` | sonde `rclpy`, contrôleur arrêté pour isoler la source |
 | Planification (service) | `error_code 1`, 30 points, 2,85 s de trajectoire, 0,013 s de calcul, écart final ≤ 0,05 rad | `tools/plan_demo.py demo` |
 | Chaîne complète planification + exécution | domaine isolé 99 : `error_code 1`, 41 consignes servo émises, écart final 0,029 rad pour une tolérance de 0,05 | `tools/execute_demo.py ready` |
-| Exécution physique réelle | **non réalisée** — voir §6 | — |
+| Exécution physique réelle | **réalisée le 2026-11-10 à 22:39-22:55 CET**, voir §4.1 | `tools/move_joint_step.py`, `ros2 action send_goal` |
+
+### 4.1 Essais physiques du 2026-11-10 (opérateur présent, 40 cm dégagés, batterie à portée)
+
+Pose de départ lue sur la carte : servos `[71, 156, 55, -5, 90, 149]`, firmware 3.5, 11,90 V.
+
+| Essai | Consigne | Résultat mesuré sur la carte |
+|---|---|---|
+| Axe 1 en direct | 71 → 76 → 81 → 91° | 71 → 73 → 76 → **75** : axe bloqué par le support de la caméra Orbbec |
+| Axe 1 en direct, sens inverse | 91 → 66° | **66°** exactement : la chaîne est exacte quand rien ne bloque |
+| Axe 2 en direct | 156 → 150° | 151° (1° d'écart, servo en charge) |
+| Pince en direct | 149 → 139° | **139°** |
+| MoveIt plan seul | `arm_joint1` −5° | 14 points, `error_code 1`, départ = pose mesurée, aucun mouvement |
+| MoveIt plan + exécution | `arm_joint1` −5° | 17 points, `error_code 1`, servo 1 : 66 → **61°** |
+| MoveIt retour | `arm_joint1` +5° | servo 1 : 61 → **66°** |
+| Pince par le serveur d'action | 139 → 129 → 139° | 129° puis **139°**, `SUCCEEDED` deux fois |
+| Axe 4 pendant les trajectoires | — | **-5° inchangé** : l'articulation passive n'a reçu aucune consigne |
+| Dégagement du support caméra | servo 2 : 156 → 146 → 137 → 127° | **127°** (demande de l'opérateur : 156° touchait le support) |
+
+Conclusion mesurée : la chaîne MoveIt → action → conversion → `/servo_ctrl` → MCU → servo
+fonctionne, avec une précision de **±1°** entre la consigne articulaire et l'angle relu (arrondi
+au degré et bande morte du servo). Le mouvement est réversible (aller-retour à l'identique).
+
+Incident d'essai : un script de lecture a ouvert `/dev/myserial` alors que le pilote tournait ; le
+pilote a levé `device reports readiness to read but returned no data (multiple access on port?)`
+et systemd l'a relancé. Les scripts `scripts/read_arm_angles.py` et `scripts/sync_arm_pose.py`
+refusent désormais de s'exécuter si `ros2-driver-node.service` est actif (option `--force` pour
+outrepasser, déconseillée).
 
 Tests du paquet contrôleur, hors matériel (`ROS_DOMAIN_ID=99`, aucun abonné à `/servo_ctrl`) :
 
 ```bash
 $ cd ~/clawbot/clawbot_arm_controller
 $ ROS_DOMAIN_ID=99 python3 -m pytest test -q -p no:launch_testing -p no:launch_ros
-22 passed, 1 warning in 7.77s
+23 passed, 1 warning in 9.55s
 ```
 
 18 tests portent sur les fonctions pures (conversion, bornes, interpolation, refus de paramètres
 incohérents), 4 sur le contrat d'action (trajectoire du bras, articulations refusées, pince,
-annulation qui arrête la publication).
+annulation qui arrête la publication), 1 sur le mode « articulation passive » (aucune consigne ne
+part vers le servo, la position reste suivie).
 
 ## 5. Défauts corrigés pendant la mise en service
 
@@ -116,15 +144,27 @@ annulation qui arrête la publication).
 ## 6. Limites constatées
 
 - **Aucune rétroaction** : le MCU ne publie pas la position du bras. `/arm/joint_states` contient des
-  consignes, pas des mesures ; après redémarrage le contrôleur suppose `initial_positions` (zéros) et
-  ignore où se trouve réellement le bras. Conséquence : amener le bras en pose de référence avant de
-  démarrer le service, ou renseigner `initial_positions`.
+  consignes, pas des mesures ; au démarrage le contrôleur suppose `initial_positions`. Procédure
+  après toute coupure d'alimentation ou déplacement à la main :
+  `sudo systemctl stop ros2-driver-node` → `python3 scripts/sync_arm_pose.py` →
+  `sudo systemctl start ros2-driver-node` → `sudo systemctl restart clawbot-arm-controller`.
+  Le fichier `config/arm_controller.yaml` porte l'instantané du 2026-11-10 22:54.
+- **Servo 4 non commandable** : son retour d'angle est invalide (`-5°` à chaque lecture, voir
+  [[ERR-2026-11-10-007_retour_angle_servo_bras]]). L'articulation est déclarée `passive_joints`
+  par défaut : elle est publiée dans `/arm/joint_states` pour que le modèle reste cohérent, mais
+  aucune consigne ne part vers le servo. Conséquence : MoveIt peut planifier l'axe 4 sans que le
+  bras le suive — ne pas s'appuyer sur cet axe tant que la lecture n'est pas réparée.
+- **Obstacle dans l'espace de travail** : à servo 2 = 156°, l'axe 1 est bloqué par le support de la
+  caméra Orbbec dès 75-76° (servo en butée, position non atteinte). Position retenue après essai :
+  servo 2 = 127°. Tout retour vers 156° doit être considéré comme collision avec ce support.
+- **Port série exclusif** : les scripts de lecture (`read_arm_angles.py`, `sync_arm_pose.py`)
+  refusent de s'exécuter tant que `ros2-driver-node.service` tourne ; deux lecteurs se volent les
+  octets et font tomber le pilote (`multiple access on port?`).
 - **Pas de `ros2_control`** : la planification passe par `moveit_simple_controller_manager` et un
   serveur d'action écrit pour l'occasion. Aucun asservissement, aucune limite de couple, aucun
   contrôleur de position matériel.
-- **Exécution physique non testée** : seuls les domaines isolés ont exécuté des trajectoires ; aucun
-  essai n'a envoyé de consigne aux servos. Un essai réel demande un opérateur, un dégagement mesuré
-  autour du bras et une pose de départ connue.
+- **Précision atteinte** : ±1° entre la consigne articulaire et l'angle relu (arrondi au degré,
+  bande morte du servo). Un axe chargé peut rester à 1° de sa consigne.
 - **Bras 5 axes** : une pose 6D arbitraire n'est pas atteignable ; `pick_ik` échoue souvent sur des
   objectifs de pose. La planification en espace articulaire fonctionne.
 - **Caméra du bras sur le même index que « front »** : le seul périphérique UVC (`0c45:6340`) sert
