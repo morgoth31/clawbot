@@ -123,6 +123,7 @@ nav:
               - ERR-002 espace disque critique: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-002_espace_disque_critique.md
               - ERR-003 arbre TF incomplet: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-003_arbre_tf_incomplet.md
               - ERR-004 exécution non authentifiée: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-004_execution_de_commande_non_authentifiee.md
+              - ERR-005 pytest et plugins launch_testing: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-005_pytest_plugins_launch_testing.md
   - Référence API:
       - clawbot_monitoring/app.py: api/clawbot_monitoring.app.md
       - generate_docs.py: api/generate_docs.md
