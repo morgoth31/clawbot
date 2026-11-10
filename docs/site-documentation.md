@@ -21,15 +21,19 @@ clawbot/
 ├── hooks/
 │   └── wikilinks.py               # conversion [[lien]] -> lien Markdown + bandeau OKF
 ├── services/
-│   └── clawbot-docs.service       # unité systemd de publication (port 8080)
+│   ├── clawbot-docs.service       # unité systemd de publication (port 8080)
+│   └── clawbot-health.service     # test de santé des périphériques (oneshot, démarrage)
 ├── docs/
 │   ├── index.md                   # accueil du site
 │   ├── site-documentation.md      # cette page
+│   ├── hermes/                    # section agent : rôle, skills, configuration
+│   ├── bridge/                    # section pont LLM2ROS : page d'entrée
+│   ├── robot/                     # section architecture du robot
 │   ├── knowledge-base/            # base de connaissances OKF (source unique)
 │   │   ├── index.md
 │   │   ├── 01_Hardware/           # 4 pages matériel
-│   │   ├── 02_Software/           # 8 pages logiciel, dont 4 sur le pont LLM
-│   │   └── 03_Operations/         # journal + 4 traces d'erreurs
+│   │   ├── 02_Software/           # 14 pages logiciel (pont, santé, BOM, traçabilité)
+│   │   └── 03_Operations/         # journal, état des nœuds, 5 traces d'erreurs
 │   ├── api/                       # référence API générée par mkdocstrings (15 pages)
 │   ├── legacy/                    # documentation historique du dépôt
 │   │   ├── index-old.md
@@ -200,14 +204,25 @@ environ 230 Mo et doit être supprimé après usage : la partition racine dispos
 
 ## 8. Organisation de la navigation
 
+Cinq sections, chacune avec sa page d'entrée qui indique où trouver quoi.
+
 | Section | Contenu | Source |
 |---|---|---|
-| Accueil | Synthèse du robot, état au 2026-11-10, anomalies ouvertes | `docs/index.md` |
-| Poste de documentation | Cette page | `docs/site-documentation.md` |
-| Base de connaissances | 21 pages OKF, groupées Matériel / Logiciel / Opérations | `docs/knowledge-base/` |
-| Référence API | 15 pages extraites des docstrings Python | `docs/api/` |
-| Skills | Inventaire des 130 skills de l'agent : vue d'ensemble + une page par catégorie | `docs/skills/`, généré par `scripts/generate_skills_docs.py` |
-| Héritage | Ancienne page d'accueil, notes d'exploitation, guide de build | `docs/legacy/` |
+| Accueil | Synthèse du robot, état au 2026-11-10, anomalies ouvertes, conventions | `docs/index.md` |
+| **Hermes (agent)** | Rôle côté Système 2, skills (130, 19 catégories), configuration, règles de conduite | `docs/hermes/index.md`, `docs/skills/` |
+| **Bridge LLM2ROS** | Cahier des charges, spécification MCP, conception détaillée, plan de tests, matrice de traçabilité, spécification du test de santé, documents du pont historique | `docs/bridge/index.md`, `docs/knowledge-base/02_Software/` |
+| **Robot (architecture)** | Vue d'ensemble, matériel (4 fiches), logiciel embarqué (graphe ROS 2, nœud de conduite, navigation, systemd) | `docs/robot/index.md`, `docs/knowledge-base/01_Hardware/` |
+| **Exploitation** | État des nœuds et services (généré), santé des périphériques, journal de capture, 5 traces d'erreurs | `docs/knowledge-base/03_Operations/` |
+| **Référence** | BOM logiciel (généré), base OKF complète, référence API (15 pages), poste de documentation, héritage | `docs/knowledge-base/02_Software/bom_logiciel.md`, `docs/api/`, `docs/legacy/` |
+
+Pages générées, jamais éditées à la main :
+
+| Page | Générateur | Contenu |
+|---|---|---|
+| `03_Operations/etat_noeuds_et_services.md` | `scripts/generate_status.py` | services systemd, graphe ROS 2, verdict de santé, ressources |
+| `02_Software/bom_logiciel.md` | `scripts/generate_bom.py` | socle, bibliothèques Python, paquets ROS 2, outils, absences |
+| `02_Software/llm2ros_traceabilite.md` | `scripts/generate_traceability.py` | matrice exigence → test, exigences non couvertes |
+| `docs/skills/*.md` | `scripts/generate_skills_docs.py` | catalogue des skills et bloc de navigation |
 
 ## 9. Dépannage
 
@@ -225,9 +240,10 @@ environ 230 Mo et doit être supprimé après usage : la partition racine dispos
 |---|---|
 | Branche | `docs/site-okf-merge` |
 | Base | `main` du dépôt `morgoth31/clawbot` |
-| Contenu ajouté | `mkdocs.yml` réécrit, `hooks/wikilinks.py`, `docs/knowledge-base/` (18 pages), `docs/index.md`, cette page, `docs/assets/`, `services/clawbot-docs.service` |
+| Contenu ajouté | `mkdocs.yml` réécrit, `hooks/wikilinks.py`, `docs/knowledge-base/`, `docs/hermes/`, `docs/bridge/`, `docs/robot/`, cette page, `docs/assets/`, `services/clawbot-docs.service` |
 | Contenu déplacé | `docs/index.md` → `docs/legacy/index-old.md`, `docs/knowledge.md` → `docs/legacy/knowledge.md`, `docs/build_and_update.md` → `docs/legacy/build_and_update.md` |
 | Liens wiki | Résolus à la compilation ; aucune modification des sources OKF |
+| Réorganisation du 2026-11-10 | Navigation refondue en cinq sections (Hermes, Bridge, Robot, Exploitation, Référence) ; ajout des pages générées de traçabilité, d'état des nœuds et de BOM ; conception détaillée du pont |
 
 ## Voir aussi
 

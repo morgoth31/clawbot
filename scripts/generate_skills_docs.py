@@ -262,10 +262,14 @@ def update_nav(slugs: dict[str, str]) -> None:
     lines = MKDOCS.read_text(encoding="utf-8").splitlines()
     start = next(i for i, l in enumerate(lines) if l.strip() == "# skills-nav:start")
     end = next(i for i, l in enumerate(lines) if l.strip() == "# skills-nav:end")
-    block = ["  - Skills:", "      - Vue d'ensemble: skills/index.md"]
+    indent = "      "  # sous-section de « Hermes (agent) » : 6 espaces
+    block = [
+        f'{indent}- "Skills — catalogue complet":',
+        f"{indent}    - Vue d'ensemble: skills/index.md",
+    ]
     for category in sorted(slugs, key=PRIORITY):
         label = LABELS.get(category, category.replace("-", " ").capitalize())
-        block.append(f"      - {label}: skills/{slugs[category]}.md")
+        block.append(f"{indent}    - {label}: skills/{slugs[category]}.md")
     lines[start + 1 : end] = block
     MKDOCS.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
