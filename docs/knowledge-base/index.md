@@ -49,6 +49,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── ros2_nav_stack.md
 │   ├── modele_urdf_clawbot.md
 │   ├── manipulation_moveit.md
+│   ├── etalonnage_bras.md
 │   ├── ports_reseau.md
 │   ├── bom_logiciel.md
 │   ├── llm2ros_bridge.md
@@ -128,3 +129,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 19:16 | Caméra du bras débranchée puis rebranchée : reprise UVC sur `video0` (device 6 → 16), capture V4L2 et inférence OpenCV OK ; index « claw » toujours sur 2, outil non fonctionnel ; identification de la caméra du bras séparée de l'Astra | [[2026-11-10_rebranchement_camera_bras]], [[camera_usb_bras]] |
 | 2026-11-10 19:55 | Manipulation : MoveIt 2 planifie et exécute jusqu'aux servos — paquets `clawbot_moveit_config` et `clawbot_arm_controller`, 22 tests verts, plan à 30 points, chaîne complète validée sur domaine isolé ; index caméra « claw » ramené à 0 (HTTP 200) | [[2026-11-10_mise_en_service_manipulation]], [[manipulation_moveit]] |
 | 2026-11-10 23:05 | Essais physiques du bras : les six servos commandés et relus (±1°), servo 4 réparé par rebranchement (ERR-007 close), axe 4 réintégré ; cascade systemd et instantané de pose documentés | [[manipulation_moveit]], [[ERR-2026-11-10-007_retour_angle_servo_bras]] |
+| 2026-11-10 23:20 | Collisions du bras avec le mât : MoveIt déclare valide la configuration qui a bloqué le bras — les zéros servo sont une convention ; procédure d'étalonnage et outil de contrôle livrés | [[etalonnage_bras]], [[manipulation_moveit]] |
