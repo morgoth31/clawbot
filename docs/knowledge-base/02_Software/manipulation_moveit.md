@@ -109,6 +109,29 @@ Pose de départ lue sur la carte : servos `[71, 156, 55, -5, 90, 149]`, firmware
 | Axe 4 pendant les trajectoires | — | **-5° inchangé** : l'articulation passive n'a reçu aucune consigne |
 | Dégagement du support caméra | servo 2 : 156 → 146 → 137 → 127° | **127°** (demande de l'opérateur : 156° touchait le support) |
 
+### 4.2 Deuxième série : axes 3, 4 et 5 (23:00-23:05 CET)
+
+Le servo 4 étant rebranché et son retour d'angle redevenu valide ([[ERR-2026-11-10-007_retour_angle_servo_bras]],
+clos), l'axe 4 est réintégré au groupe : `passive_joints: []`.
+
+| Essai | Consigne | Résultat mesuré |
+|---|---|---|
+| Axe 4 en direct | 55 → 60° | **59°** |
+| Axe 3 en direct | 55 → 50° | **50°** |
+| Axe 5 en direct | 90 → 95° | **95°** |
+| MoveIt, axe 3 | −5° | servo 3 : 54 → **49°**, autres axes inchangés |
+| MoveIt, axe 4 | −5° | servo 4 : 55 → **49°** (consigne 50°) |
+| Axe 4, `passive_joints: []` | — | la trajectoire ne le laisse plus de côté : il est commandé comme les autres |
+
+Les six servos sont donc commandables et mesurables : axes 1, 3, 5 et pince suivent la consigne au
+degré près, axes 2 et 4 accusent 1° d'écart (servos chargés).
+
+**Piège confirmé par la mesure** : entre deux essais, le contrôleur a été redémarré avec un
+instantané de pose devenu périmé (axe 3 à 54° alors que le servo était à 49°). La trajectoire
+suivante, qui ne visait que l'axe 4, a ramené l'axe 3 à 53° : la position supposée fait loi pour
+tous les axes portés par la trajectoire. Toute modification physique hors MoveIt doit donc être
+suivie de `scripts/sync_arm_pose.py` **et** du redémarrage du contrôleur.
+
 Conclusion mesurée : la chaîne MoveIt → action → conversion → `/servo_ctrl` → MCU → servo
 fonctionne, avec une précision de **±1°** entre la consigne articulaire et l'angle relu (arrondi
 au degré et bande morte du servo). Le mouvement est réversible (aller-retour à l'identique).
@@ -148,12 +171,18 @@ part vers le servo, la position reste suivie).
   après toute coupure d'alimentation ou déplacement à la main :
   `sudo systemctl stop ros2-driver-node` → `python3 scripts/sync_arm_pose.py` →
   `sudo systemctl start ros2-driver-node` → `sudo systemctl restart clawbot-arm-controller`.
-  Le fichier `config/arm_controller.yaml` porte l'instantané du 2026-11-10 22:54.
-- **Servo 4 non commandable** : son retour d'angle est invalide (`-5°` à chaque lecture, voir
-  [[ERR-2026-11-10-007_retour_angle_servo_bras]]). L'articulation est déclarée `passive_joints`
-  par défaut : elle est publiée dans `/arm/joint_states` pour que le modèle reste cohérent, mais
-  aucune consigne ne part vers le servo. Conséquence : MoveIt peut planifier l'axe 4 sans que le
-  bras le suive — ne pas s'appuyer sur cet axe tant que la lecture n'est pas réparée.
+  Le fichier `config/arm_controller.yaml` porte l'instantané du 2026-11-10 23:05.
+- **Servo 4 réparé, mais surveillé** : son retour d'angle était invalide (`-5°` constant) jusqu'au
+  rebranchement du 2026-11-10 23:00 ([[ERR-2026-11-10-007_retour_angle_servo_bras]], clos). Le mode
+  `passive_joints` existe toujours et reste la parade si le défaut revient : l'articulation est
+  alors publiée dans `/arm/joint_states` sans qu'aucune consigne ne parte vers le servo.
+- **L'instantané de pose fait loi** : la première trajectoire ramène chaque axe porté à la position
+  supposée au démarrage du contrôleur. Un instantané périmé déplace donc des axes qu'on ne visait
+  pas — constaté : axe 3 ramené de 49° à 53° par une trajectoire sur l'axe 4. Toute modification
+  physique hors MoveIt exige `scripts/sync_arm_pose.py` **puis** un redémarrage du contrôleur.
+- **Arrêt du pilote = cascade** : `clawbot-arm-controller.service` et `clawbot-move-group.service`
+  déclarent `Requires=ros2-driver-node.service`. Relire les angles (ce qui impose d'arrêter le
+  pilote) arrête donc aussi le contrôleur et move_group : les relancer après chaque lecture.
 - **Obstacle dans l'espace de travail** : à servo 2 = 156°, l'axe 1 est bloqué par le support de la
   caméra Orbbec dès 75-76° (servo en butée, position non atteinte). Position retenue après essai :
   servo 2 = 127°. Tout retour vers 156° doit être considéré comme collision avec ce support.

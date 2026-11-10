@@ -30,13 +30,13 @@ arm_trajectory_server:
     # Position supposee au demarrage (radians) : le MCU ne publie pas la position du
     # bras, ce noeud ne peut donc pas la lire. Mettre le bras en pose de reference
     # avant de demarrer le service, ou ajuster ici.
-    initial_positions: [-0.331613, 0.645772, -0.610865, 0.000000, 0.000000]
+    initial_positions: [-0.331613, 0.645772, -0.645772, -0.628319, 0.000000]
     initial_grip_position: -0.265222
 
     # Articulations dont le servo n'est jamais commande (mais qui restent publiées dans
     # /arm/joint_states). Servo 4 de ce bras : retour d'angle invalide (-5° constant),
     # donc impossible de savoir où il est — le commander risquerait un saut.
-    passive_joints: [arm_joint4]
+    passive_joints: []
 
     servo_topic: /servo_ctrl
     joint_states_topic: /arm/joint_states
