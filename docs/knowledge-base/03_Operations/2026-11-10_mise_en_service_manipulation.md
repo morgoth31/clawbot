@@ -43,7 +43,32 @@ Chaîne complète exécutée sur le domaine isolé 99 (aucun abonné à `/servo_
 mouvement) : `error_code 1`, 41 consignes servo, écart final 0,029 rad pour une tolérance de
 0,05 rad.
 
-## 3. Preuves brutes
+## 3. Essais physiques (22:39-22:55 CET, opérateur présent)
+
+Prérequis confirmés par l'opérateur avant la première consigne : 40 cm libres autour du bras,
+interrupteur batterie à portée, pince vide.
+
+| Heure | Essai | Résultat mesuré |
+|---|---|---|
+| 22:39 | photo de l'espace de travail (caméra Astra) | scène trop sombre pour juger un mouvement : vérification faite par relecture des angles |
+| 22:41 | pose lue sur la carte | `[71, 156, 55, -5, 90, 149]`, firmware 3.5, 11,90 V |
+| 22:43 | axe 1 en direct : 71 → 76 → 81 → 91° | 71 → 73 → 76 → **75** : bloqué par le support de la caméra Orbbec |
+| 22:44 | axe 1 sens inverse : 66° | **66°** exactement |
+| 22:45 | axe 2 : 150° puis pince : 139° | 151° et **139°** |
+| 22:47 | MoveIt, plan seul, axe 1 −5° | 14 points, `error_code 1`, aucun mouvement |
+| 22:48 | MoveIt, plan + exécution, axe 1 −5° | servo 1 : 66 → **61°**, autres axes inchangés |
+| 22:49 | MoveIt, retour axe 1 +5° | servo 1 : 61 → **66°** |
+| 22:50 | pince par le serveur d'action : 129° puis 139° | 129° puis **139°**, `SUCCEEDED` |
+| 22:51 | axe 1 restauré à 71°, axe 2 à 156°, pince à 149° | pose initiale retrouvée (servo 3 à 55° au lieu de 54°) |
+| 22:52 | servo 2 : 146° puis 137° puis 127° | **127°** — dégage le support caméra (demande de l'opérateur) |
+| 22:54 | pose synchronisée dans la configuration, contrôleur redémarré | `/arm/joint_states` = `[-0,3316, +0,6458, -0,6109, 0, 0, -0,2652]` |
+
+Incident : à 22:52:55, un script de lecture a ouvert le port série alors que le pilote tournait ; le
+pilote a levé `device reports readiness to read but returned no data (multiple access on port?)` et
+systemd l'a relancé. `/voltage` est revenu à 10,000 Hz et 11,90 V. Les deux scripts de lecture
+refusent maintenant de s'exécuter si l'unité est active.
+
+## 4. Preuves brutes
 
 ```text
 $ ROS_DOMAIN_ID=99 python3 clawbot_moveit_config/tools/execute_demo.py ready
@@ -66,7 +91,7 @@ $ ROS_DOMAIN_ID=28 python3 -m pytest test -q   (paquet clawbot_arm_controller)
 22 passed, 1 warning in 7.77s
 ```
 
-## 4. Effets de bord traités
+## 5. Effets de bord traités
 
 | Effet | Traitement | Vérification |
 |---|---|---|
@@ -75,16 +100,16 @@ $ ROS_DOMAIN_ID=28 python3 -m pytest test -q   (paquet clawbot_arm_controller)
 | `/capture?camera=claw` répondait 500 | index passé de 2 à 0 dans l'unité déployée **et** dans la copie du dépôt | 200 confirmé sur 8001 et 8003 |
 | Dérive dépôt/unité déployée (`WORKSPACE_PATH`) | copie du dépôt alignée sur l'unité déployée | `diff -u` vide hors commentaires |
 
-## 5. Ce qui n'a pas été fait, et pourquoi
+## 6. Ce qui n'a pas été fait, et pourquoi
 
 | Point | Raison |
 |---|---|
-| Exécution réelle sur les servos | demande un opérateur, un dégagement mesuré autour du bras et une pose de départ connue ; aucune autorisation d'essai physique n'a été donnée dans cette session |
+| Axes 3, 4 et 5 | seuls les axes 1, 2 et la pince ont été commandés ; l'axe 4 est passif (retour invalide) et les axes 3 et 5 n'ont pas été essayés |
 | Étalonnage des zéros servo | exige une mesure mécanique par servo ; la conversion actuelle est une convention documentée, pas une calibration |
 | Vue avant (`front`) servie depuis l'Astra | demande une modification des deux services et du schéma d'outils C++ ; laissé ouvert, écart signalé dans les unités |
 | `ros2_control` | chemin long (plugin matériel, relais vers le service 8001) ; le chemin court fonctionne et est mesuré |
 
-## 6. Conditions de clôture vérifiables
+## 7. Conditions de clôture vérifiables
 
 1. `ros2 action list | grep controller` liste `arm_controller` et `grip_controller`.
 2. `ros2 topic hz /arm/joint_states` donne 20 Hz et `/joint_states` suit ces valeurs.
@@ -94,7 +119,7 @@ $ ROS_DOMAIN_ID=28 python3 -m pytest test -q   (paquet clawbot_arm_controller)
 5. `cd clawbot_arm_controller && ROS_DOMAIN_ID=99 pytest test -q` : 22 tests verts.
 6. `python3 scripts/validate_okf.py` : 0 erreur.
 
-## 7. Voir aussi
+## 8. Voir aussi
 
 - Description technique : [[manipulation_moveit]]
 - Bras et servos : [[bras_6dof]]

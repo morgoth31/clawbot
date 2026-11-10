@@ -89,6 +89,14 @@ class ArmTrajectoryServer(Node):
         self.declare_parameter('servo_stagger_s', 0.005)
         self.declare_parameter('max_duration_s', 30.0)
         self.declare_parameter('initial_positions', [0.0] * len(arm_defaults))
+        self.declare_parameter('initial_grip_position', 0.0)
+        # Articulations dont la consigne n'est PAS publiee sur /servo_ctrl : elles restent
+        # dans /arm/joint_states (donc dans le modele MoveIt) mais le servo n'est pas
+        # touche. Usage : un axe dont le retour d'angle est invalide (servo 4 de ce bras,
+        # qui renvoie -5 deg) ne peut pas etre commande sans risquer un saut.
+        # Type declare par une valeur sentinelle : rclpy deduit BYTE_ARRAY d'une liste
+        # vide et refuse alors une surcharge STRING_ARRAY. La chaine vide est filtree.
+        self.declare_parameter('passive_joints', [''])
         self.declare_parameter('servo_topic', '/servo_ctrl')
         self.declare_parameter('joint_states_topic', '/arm/joint_states')
 
@@ -119,9 +127,20 @@ class ArmTrajectoryServer(Node):
         if len(initial) != len(self.arm_specs):
             raise ValueError('initial_positions doit avoir une valeur par articulation du bras')
 
+        known = {spec.joint for spec in self.arm_specs + self.grip_specs}
+        self._passive = {j for j in self.get_parameter('passive_joints').value if j}
+        inconnues = self._passive - known
+        if inconnues:
+            raise ValueError('passive_joints inconnues : %s' % sorted(inconnues))
+        if self._passive:
+            self.get_logger().warning(
+                'articulations non commandees (servo jamais pilote) : %s'
+                % ', '.join(sorted(self._passive)))
+
         # consigne courante de chaque articulation (radians)
         self._q = {spec.joint: q for spec, q in zip(self.arm_specs, initial)}
-        self._q[self.grip_specs[0].joint] = 0.0
+        self._q[self.grip_specs[0].joint] = float(
+            self.get_parameter('initial_grip_position').value)
         self._last_sent_deg = {}
         self._lock = threading.Lock()
         self._active = {'arm': None, 'grip': None}
@@ -253,9 +272,15 @@ class ArmTrajectoryServer(Node):
         return waypoints
 
     def _publish_servos(self, specs, positions):
-        """Publie une consigne par servo dont l'angle arrondi a change."""
+        """Publie une consigne par servo actif dont l'angle arrondi a change.
+
+        Les articulations listees dans `passive_joints` sont sautees : leur position est
+        suivie dans /arm/joint_states mais aucun ordre n'est envoye au servo.
+        """
         count = 0
         for spec, q in zip(specs, positions):
+            if spec.joint in self._passive:
+                continue
             degrees = int(round(spec.to_servo_deg(q)))
             if self._last_sent_deg.get(spec.joint) == degrees:
                 continue
@@ -287,10 +312,17 @@ def main(args=None):
     executor.add_node(node)
     try:
         executor.spin()
+    except KeyboardInterrupt:
+        pass
     finally:
         executor.shutdown()
         node.destroy_node()
-        rclpy.shutdown()
+        # SIGTERM (systemctl stop) declenche deja rcl_shutdown : un second appel leve
+        # RCLError et laisse une trace alors que l arret est normal.
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':
