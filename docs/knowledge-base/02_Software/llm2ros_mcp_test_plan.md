@@ -442,7 +442,57 @@ Le contexte d'incident réel, les 14 déclencheurs, l'arbitre d'actionneurs, la 
 `safety_stop` et les mutations effectives (`param_set`, `goal_send`) restent hors de cet incrément :
 leurs tests sont écrits à l'étape suivante, avant leur code, conformément à la méthode.
 
-## 17. Voir aussi
+## 17. Étape 5 — déclencheurs et contexte transmis
+
+Les exigences étaient déjà écrites (§3.1 pour les 14 règles, §6 pour le contexte) : les tests ont
+donc été écrits avant tout code, et ont échoué par `ImportError` sur `bridge_mcp.triggers` avant
+l'implémentation.
+
+| Module | Contenu |
+|---|---|
+| `bridge_mcp/observations.py` | Structures passives de mesure (`NodeObs`, `TopicObs`, `EndpointObs`, `ResourceObs`, `Observation`) — l'adaptateur ROS 2 les remplira |
+| `bridge_mcp/triggers.py` | `TRIGGERS` (14 déclencheurs, jeu clos), `TriggerEngine` : temporisation, déduplication, cooldown, débit, politiques de reprise |
+| `bridge_mcp/context.py` | `build_context` : blocs du §6.1, bornes CTX-04, absences déclarées CTX-02 |
+| `tests/mcp_bridge/triggers/` | 4 modules, 45 tests : émission, non-émission, invariants, latence, contexte |
+| `tests/mcp_bridge/contract/test_incident_context.py` | `incident_get` sert réellement le contexte du §6 |
+
+### 17.1 Matrice de traçabilité
+
+| Exigence | Test |
+|---|---|
+| TRG-A1 (chaque déclencheur émet) | `test_trigger_fires_with_expected_severity_and_tools`, 14 paramètres |
+| TRG-A2 (aucune émission sous le seuil) | `test_no_trigger_below_threshold`, 14 paramètres |
+| TRG-A3 (invariants) | `test_dedup_*`, `test_cooldown_*`, `test_recovery_policy_*`, `test_rate_limit_*`, `test_undeclared_trigger_is_refused` |
+| TRG-A4 (latence < debounce + 200 ms) | `test_latency_stays_within_debounce_plus_200ms`, 100 répétitions sur 4 déclencheurs |
+| TRG-20 / TRG-21 / TRG-22 / TRG-23 / TRG-24 | déduplication, cooldown, reprise, sévérité 4, jeu clos |
+| CTX-01 … CTX-06 | `triggers/test_context.py`, 6 tests |
+| MCP-10 + CTX-01 | `contract/test_incident_context.py`, 2 tests |
+
+### 17.2 Résultat d'exécution
+
+```
+$ cd tests/mcp_bridge && python3 -m pytest
+70 passed in 11.35s
+```
+
+Détail de la latence mesurée (TRG-A4, 100 occurrences) : l'émission survient au premier pas
+d'horloge où la condition persiste depuis `debounce` ; avec un pas de 100 ms, le dépassement
+maximal observé reste sous les 200 ms autorisés, et aucune émission n'est anticipée avant le
+`debounce`.
+
+### 17.3 Valeurs provisoires, marquées comme telles
+
+Deux seuils viennent de décisions **non validées** (§10) :
+
+| Seuil | Valeur utilisée | Décision |
+|---|---|---|
+| Tension basse (`TRG-08`) | 11,0 V | D-06 — proposition, non validée |
+| Disque libre minimal (`TRG-09`) | 5 Go | D-07 — proposition, non validée |
+
+Ces valeurs ne sont pas présentées comme acquises : `PROVISIONAL_THRESHOLDS` les marque
+`decision_ref`, et le contexte transmis les expose dans `limits.provisional`.
+
+## 18. Voir aussi
 
 - Spécification des exigences : [[llm2ros_mcp_specification]]
 - État constaté du pont : [[llm2ros_bridge]]

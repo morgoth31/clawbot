@@ -16,7 +16,7 @@ from typing import Any
 import mcp.types as types
 from mcp.server.mcpserver import MCPServer
 
-from bridge_mcp import contract, limits
+from bridge_mcp import context, contract, limits
 from bridge_mcp.envelope import error_result, not_wired, ok_result
 from bridge_mcp.state import BridgeState
 
@@ -77,7 +77,7 @@ def register_tools(mcp: MCPServer, state: BridgeState) -> None:
     @mcp.tool(name="incident_list", description="Liste les incidents connus du pont.", annotations=READ_ONLY)
     def incident_list(state_filter: str = "open", limit: int = 20) -> dict:
         items = [
-            {k: v for k, v in incident.as_dict().items() if k != "context"}
+            {k: v for k, v in incident.as_dict().items() if k != "trigger_snapshot"}
             for incident in state.incidents.values()
             if state_filter == "all" or incident.state == state_filter
         ]
@@ -88,7 +88,16 @@ def register_tools(mcp: MCPServer, state: BridgeState) -> None:
         incident = state.get(incident_id)
         if incident is None:
             return error_result("MCP-E-ARG", f"incident inconnu : {incident_id}")
-        return ok_result(incident.as_dict())
+        if state.last_observation is None:
+            return ok_result(
+                {
+                    **incident.as_dict(),
+                    "context_unavailable": "CTX-01: aucune mesure disponible pour cet incident",
+                }
+            )
+        return ok_result(
+            {**incident.as_dict(), "context": context.build_context(incident, state.last_observation, state)}
+        )
 
     @mcp.tool(name="graph_snapshot", description="Instantané du graphe ROS 2 : nœuds, topics, types, QoS.", annotations=READ_ONLY)
     def graph_snapshot(include_qos: bool = True) -> Any:

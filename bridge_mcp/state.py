@@ -21,6 +21,9 @@ class Incident:
     state: str
     created_at: float
     payload: dict[str, Any] = field(default_factory=dict)
+    subject: str = ""
+    allowed_tools: tuple[str, ...] = ()
+    occurrences: int = 1
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -28,8 +31,11 @@ class Incident:
             "trigger_id": self.trigger_id,
             "severity": self.severity,
             "state": self.state,
+            "subject": self.subject,
+            "allowed_tools": list(self.allowed_tools),
+            "occurrences": self.occurrences,
             "created_at": time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(self.created_at)),
-            "context": self.payload,
+            "trigger_snapshot": self.payload,
         }
 
 
@@ -40,8 +46,17 @@ class BridgeState:
         self.incidents: dict[str, Incident] = {}
         self.audit: list[dict[str, Any]] = []
         self.stop_latched: bool = False
+        self.last_observation: Any | None = None
 
-    def open_incident(self, trigger_id: str, severity: int, payload: dict[str, Any]) -> Incident:
+    def open_incident(
+        self,
+        trigger_id: str,
+        severity: int,
+        payload: dict[str, Any],
+        *,
+        subject: str = "",
+        allowed_tools: tuple[str, ...] = (),
+    ) -> Incident:
         incident = Incident(
             incident_id=uuid.uuid4().hex,
             trigger_id=trigger_id,
@@ -49,6 +64,8 @@ class BridgeState:
             state="open",
             created_at=time.time(),
             payload=payload,
+            subject=subject,
+            allowed_tools=allowed_tools,
         )
         self.incidents[incident.incident_id] = incident
         self.record("incident_open", {"incident_id": incident.incident_id, "trigger": trigger_id})

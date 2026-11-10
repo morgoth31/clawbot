@@ -326,8 +326,8 @@ d'ingénierie, pas une hypothèse retenue : sans votre réponse, l'étape 2 ne p
 | D-03 | Seuil `S2_MIN` : à partir de quelle sévérité S2 est-il sollicité ? | Sévérité ≥ 2 (degrés 3 et 4 traités aussi, 1 seule observé) |
 | D-04 | Budget d'intervention par incident : nombre d'outils et durée | 8 appels, 120 s |
 | D-05 | Valeurs de `debounce`, cooldown et débit d'incidents par déclencheur | `debounce` tel que §3.1 ; cooldown 60 s ; 6 incidents/h/déclencheur |
-| D-06 | Seuil de tension basse batterie, et tension de coupure | 11,0 V alerte, 10,5 V arrêt (à confirmer selon la batterie réelle : 3S ou autre) |
-| D-07 | Seuils de ressources : disque libre minimal, mémoire libre minimale, température maximale | 5 Go libres, 1 Go libre, 80 °C |
+| D-06 | Seuil de tension basse batterie, et tension de coupure | 11,0 V alerte, 10,5 V arrêt (à confirmer selon la batterie réelle : 3S ou autre). **État au 2026-11-10 : non validée ; 11,0 V utilisée comme valeur provisoire, marquée `limits.provisional` dans le contexte et `decision_ref` dans `bridge_mcp/triggers.py`.** |
+| D-07 | Seuils de ressources : disque libre minimal, mémoire libre minimale, température maximale | 5 Go libres, 1 Go libre, 80 °C. **État au 2026-11-10 : non validée ; les 5 Go de `TRG-09` sont provisoires et marqués comme tels.** |
 | D-08 | Canal d'escalade humaine : notification Hermes, courriel, message sur un bot, ou journal uniquement ? | Message Hermes + entrée d'audit ; à préciser |
 | D-09 | Périmètre d'écriture de S2 dans le dépôt : branche dédiée uniquement, ou arbre de travail ? | Branche dédiée `s2/incident-<id>`, jamais la branche courante |
 | D-10 | `test_run` : quelles suites sont autorisées (pytest Python, `colcon test` C++, les deux) et dans quel environnement (hôte ou conteneur) ? | Les deux, dans un conteneur dédié, sans accès aux actionneurs |
