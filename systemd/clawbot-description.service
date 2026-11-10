@@ -1,0 +1,20 @@
+[Unit]
+Description=Clawbot X3 Plus - modele geometrique (/robot_description, /tf, /tf_static)
+Documentation=file:///home/jetson/clawbot/urdf/clawbot_x3plus.urdf
+After=network.target
+# Ne commande aucun actionneur : publie uniquement la description et les transformations.
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+WorkingDirectory=/home/jetson/clawbot
+Environment=ROS_DOMAIN_ID=28
+Environment=CLAWBOT_URDF=/home/jetson/clawbot/urdf/clawbot_x3plus.urdf
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec ros2 launch /home/jetson/clawbot/launch/robot_description.launch.py"
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target
