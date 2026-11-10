@@ -82,3 +82,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 08:15 | Étape 4 du projet MCP : serveur MCP implémenté, 23/23 tests de contrat verts | [[llm2ros_mcp_test_plan]] |
 | 2026-11-10 08:32 | Étape 5 du projet MCP : 14 déclencheurs et contexte §6 implémentés, 70/70 tests verts | [[llm2ros_mcp_test_plan]] |
 | 2026-11-10 08:44 | pytest interrompu par les plugins `launch_testing` de ROS 2 Humble : contournement et trace | [[ERR-2026-11-10-005_pytest_plugins_launch_testing]] |
+| 2026-11-10 08:12 | Test de santé des périphériques : spécification HLT proposée (18 exigences, 4 décisions ouvertes) | [[llm2ros_health_test_specification]] |
