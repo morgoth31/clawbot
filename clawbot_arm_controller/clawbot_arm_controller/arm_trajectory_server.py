@@ -27,6 +27,7 @@ import rclpy
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
+from rclpy.exceptions import ParameterUninitializedException
 from rclpy.node import Node
 
 from control_msgs.action import FollowJointTrajectory
@@ -128,7 +129,13 @@ class ArmTrajectoryServer(Node):
             raise ValueError('initial_positions doit avoir une valeur par articulation du bras')
 
         known = {spec.joint for spec in self.arm_specs + self.grip_specs}
-        self._passive = {j for j in self.get_parameter('passive_joints').value if j}
+        # Une liste vide dans le YAML (`passive_joints: []`) arrive comme parametre non
+        # initialise — rclpy n en deduit pas le type. On la traite comme « aucun axe passif ».
+        try:
+            declaree = self.get_parameter('passive_joints').value
+        except ParameterUninitializedException:
+            declaree = []
+        self._passive = {j for j in (declaree or []) if j}
         inconnues = self._passive - known
         if inconnues:
             raise ValueError('passive_joints inconnues : %s' % sorted(inconnues))
@@ -144,6 +151,14 @@ class ArmTrajectoryServer(Node):
         self._last_sent_deg = {}
         self._lock = threading.Lock()
         self._active = {'arm': None, 'grip': None}
+
+        # Le MCU ne publie pas la position du bras : tout ce qui suit est une hypothese.
+        # Si elle est fausse, la premiere trajectoire ramene les axes concernes a la
+        # position supposee — d ou l avertissement, visible dans journalctl.
+        self.get_logger().warning(
+            'position initiale supposee (instantane de configuration) : %s — '
+            'resynchroniser avec scripts/sync_arm_pose.py si le bras a bouge depuis'
+            % ', '.join('%s=%+.3f' % (nom, valeur) for nom, valeur in self._q.items()))
 
         self._servo_pub = self.create_publisher(
             Int32MultiArray, self.get_parameter('servo_topic').value, 10)

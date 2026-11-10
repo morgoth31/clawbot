@@ -68,6 +68,34 @@ pilote a levé `device reports readiness to read but returned no data (multiple 
 systemd l'a relancé. `/voltage` est revenu à 10,000 Hz et 11,90 V. Les deux scripts de lecture
 refusent maintenant de s'exécuter si l'unité est active.
 
+## 3.1 Deuxième série : axes 3, 4 et 5 (23:00-23:05 CET)
+
+Après rebranchement du servo 4 par l'opérateur, `get_uart_servo_angle_array()` renvoie
+`[71, 127, 55, 55, 90, 149]` trois fois : le retour d'angle est valide, ERR-007 est close et l'axe 4
+sort du mode passif (`passive_joints: []`).
+
+| Heure | Essai | Résultat mesuré |
+|---|---|---|
+| 23:01 | axe 4 en direct : 55 → 60° | **59°** |
+| 23:01 | axe 3 en direct : 55 → 50° | **50°** |
+| 23:02 | axe 5 en direct : 90 → 95° | **95°** |
+| 23:02 | retour des trois axes | `[71, 127, 54, 55, 90, 149]` |
+| 23:03 | MoveIt, axe 3 −5° | servo 3 : 54 → **49°**, autres axes inchangés |
+| 23:03 | MoveIt, axe 4 −5° | servo 4 : 55 → **49°** (consigne 50°) |
+| 23:05 | pose resynchronisée, contrôleur redémarré | `/arm/joint_states` = `[-0,332, +0,646, -0,646, -0,628, 0, -0,265]` |
+
+Deux incidents de méthode, tous deux expliqués et traités :
+
+1. **Cascade systemd** : arrêter `ros2-driver-node.service` pour relire les angles arrête aussi
+   `clawbot-arm-controller` puis `clawbot-move-group` (`Requires=`). La tentative d'essai sur l'axe 4
+   a échoué avec `/move_action absent` avant que la cause soit identifiée ; les deux unités sont à
+   relancer après chaque lecture.
+2. **Instantané de pose périmé** : le contrôleur redémarré portait encore l'axe 3 à 54° alors que le
+   servo était à 49°. La trajectoire suivante, visant l'axe 4 seulement, a ramené l'axe 3 à 53°.
+   Aucune casse, mais c'est un mouvement non demandé : la resynchronisation systématique est
+   désormais dans la procédure, et le contrôleur journalise un avertissement au démarrage avec la
+   pose supposée.
+
 ## 4. Preuves brutes
 
 ```text

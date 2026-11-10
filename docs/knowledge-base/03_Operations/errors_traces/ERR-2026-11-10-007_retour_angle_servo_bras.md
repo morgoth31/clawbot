@@ -3,7 +3,7 @@ title: "ERR-2026-11-10-007 — retour d'angle invalide du servo 4 du bras"
 date: "2026-11-10T11:58:00+01:00"
 author: "Hermes Agent"
 tags: [operations, erreur, trace, bras, servo, bus-serie, rosmaster]
-status: ouvert
+status: validé
 ---
 
 # ERR-2026-11-10-007 — retour d'angle invalide du servo 4 du bras
@@ -16,8 +16,8 @@ status: ouvert
 | Topics concernés | Aucun — la lecture se fait sur le lien série `/dev/myserial`, hors ROS |
 | Composant lié | [[bras_6dof]], [[rosmaster_x3_mcu]] |
 | Gravité d'exploitation | Contrôle du bras en position, pas de blocage du châssis |
-| Statut | ouvert — contourné dans la pile de manipulation |
-| Mitigation appliquée | Articulation `arm_joint4` déclarée **passive** dans `clawbot_arm_controller` : sa position est publiée dans `/arm/joint_states` mais aucune consigne n'est envoyée au servo 4 (voir §3) |
+| Statut | **clos le 2026-11-10 à 23:00** — retour d'angle valide après rebranchement du servo par l'opérateur |
+| Mitigation appliquée | Rebranchement physique du servo 4 (opérateur), puis lecture revalidée ; la parade logicielle (`passive_joints`) reste disponible mais n'est plus nécessaire sur ce bras |
 
 ## 1. Nature de l'échec
 
@@ -46,6 +46,22 @@ Chaîne de conversion concernée (`Rosmaster_Lib.py:290-320`) : impulsion `s_val
 | 2026-11-10T22:41:00+01:00 | Nouvelle lecture avant essais physiques (3 appels, pilote arrêté) | `[71, 156, 55, -5, 90, 149]` trois fois de suite : le servo 4 renvoie toujours `-5` |
 | 2026-11-10T22:48:00+01:00 | Trajectoire MoveIt exécutée sur l'axe 1 avec `passive_joints: [arm_joint4]` | servo 4 relu à `-5` avant et après : aucune consigne ne lui a été envoyée, aucun saut |
 | 2026-11-10T22:54:00+01:00 | `scripts/sync_arm_pose.py` | détecte l'angle invalide, écrit `initial_positions[3] = 0.0` et ajoute l'articulation à `passive_joints` automatiquement |
+| 2026-11-10T23:00:00+01:00 | Débranchement puis rebranchement du servo 4 par l'opérateur (connecteur du bus série) | `get_uart_servo_angle_array()` renvoie `[71, 127, 55, **55**, 90, 149]` trois fois de suite : angle valide et stable |
+| 2026-11-10T23:01:00+01:00 | Consigne unitaire `[4, 60]` sur `/servo_ctrl` | servo 4 relu à **59°** : l'axe répond à la commande |
+| 2026-11-10T23:03:00+01:00 | Trajectoire MoveIt sur `arm_joint4` (−5°) | servo 4 relu à **49°** (consigne 50°) ; axe 4 réintégré au groupe, `passive_joints: []` |
+
+## 3.1 Cause et clôture
+
+La cause n'est pas établie par la mesure : aucun réglage d'offset n'a été écrit, seul le
+rebranchement du servo a changé quelque chose. L'hypothèse la plus simple est un contact défaillant
+sur le connecteur du bus (la trame d'angle du servo 4 n'arrivait plus, la bibliothèque retombait sur
+`−1` et une valeur résiduelle `−5`). Elle reste une hypothèse : elle n'a pas été vérifiée au
+multimètre.
+
+Les deux premières conditions de clôture sont satisfaites (trois appels consécutifs valides, six
+valeurs positives et stables à 0° près) ; la troisième (réglage d'offset ou remplacement) est sans
+objet. Si le défaut revient, le premier geste est le rebranchement, le second le remplacement du
+servo.
 
 ## 4. Conditions de clôture
 
