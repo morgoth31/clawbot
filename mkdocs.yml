@@ -113,6 +113,7 @@ nav:
           - Pont LLM — cohérence et approche: knowledge-base/02_Software/llm2ros_bridge_coherence_et_approche.md
           - Pont LLM — spécification MCP S1/S2: knowledge-base/02_Software/llm2ros_mcp_specification.md
           - Pont LLM — plan de tests: knowledge-base/02_Software/llm2ros_mcp_test_plan.md
+          - Test de santé des périphériques — spécification: knowledge-base/02_Software/llm2ros_health_test_specification.md
           - Skill et validateurs ROS 2: knowledge-base/02_Software/ros2_engineering_skills.md
           - Skills Frama-C / ACSL: knowledge-base/02_Software/acsl_frama_c_skills.md
           - Skills d'ingénierie système: knowledge-base/02_Software/mattpocock_engineering_skills.md
