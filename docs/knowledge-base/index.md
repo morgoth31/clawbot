@@ -85,3 +85,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 08:12 | Test de santé des périphériques : spécification HLT proposée (18 exigences, 4 décisions ouvertes) | [[llm2ros_health_test_specification]] |
 | 2026-11-10 08:26 | Test de santé implémenté : 33 tests, rapport réel sur le robot, service systemd au démarrage | [[llm2ros_health_test_specification]] |
 | 2026-11-10 13:40 | Documentation réorganisée en cinq sections ; pages générées de traçabilité, d'état des nœuds et de BOM ; conception détaillée du pont | [[llm2ros_bridge_design]], [[llm2ros_traceabilite]], [[etat_noeuds_et_services]], [[bom_logiciel]] |
+| 2026-11-10 13:55 | Lidar : ERR-001 corrigée — YDLIDAR TG30 présent, pilote jamais lancé ; `clawbot-lidar.service` déployé, `/scan` à 10,15 Hz | [[ERR-2026-11-10-001_absence_topic_scan]], [[etat_noeuds_et_services]] |

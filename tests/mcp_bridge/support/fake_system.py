@@ -67,11 +67,16 @@ def healthy_robot() -> tuple[FakeDeviceView, FakeGraphView]:
             DeviceInfo(vid_pid="0c45:6340", product="USB 2.0 Camera", devpath="usb1/1-2.2.1"),
             DeviceInfo(vid_pid="2bc5:060f", product="ORBBEC Depth Sensor", devpath="usb1/1-2.2"),
             DeviceInfo(vid_pid="1a86:7523", product="CH340 serial converter", devpath="usb1/1-2.1"),
+            DeviceInfo(vid_pid="10c4:ea60", product="CP2102 USB to UART Bridge Controller",
+                       devpath="usb1/1-2.4.1"),
         ],
         video={"/dev/video0": "0c45:6340", "/dev/video1": "0c45:6340"},
-        by_id={"usb-1a86_USB_Serial-if00-port0": "/dev/ttyUSB1"},
-        present={"/dev/video0", "/dev/ttyUSB1", "/dev/myserial"},
-        holders={"/dev/ttyUSB1": [5976]},
+        by_id={
+            "usb-1a86_USB_Serial-if00-port0": "/dev/ttyUSB1",
+            "usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0": "/dev/ttyUSB0",
+        },
+        present={"/dev/video0", "/dev/ttyUSB1", "/dev/ttyUSB0", "/dev/myserial"},
+        holders={"/dev/ttyUSB1": [5976], "/dev/ttyUSB0": [4123]},
     )
     graph = FakeGraphView(
         nodes=["/camera/camera", "/driver_node", "/hardware_service_node"],
@@ -84,6 +89,8 @@ def healthy_robot() -> tuple[FakeDeviceView, FakeGraphView]:
             "/voltage": measurement(rate_hz=9.999, age_s=0.04, width=None, height=None,
                                     encoding=None, frame_id=None, sample={"voltage_v": 11.9}),
             "/camera/detection_image": measurement(rate_hz=5.0, age_s=0.2),
+            "/scan": measurement(rate_hz=10.154, age_s=0.05, width=None, height=None,
+                                 encoding=None, frame_id="laser"),
         },
         tf_frames={"camera_link", "camera_color_frame", "base_link", "odom", "map"},
     )

@@ -140,7 +140,11 @@ INVENTORY: tuple[Peripheral, ...] = (
         node="/driver_node", topic="/voltage", nominal_rate_hz=10.0,
     ),
     Peripheral(
-        "PER-06", "lidar", False, ("device",), topic="/scan", not_installed=True,
+        "PER-06", "lidar", True, ("device", "ros"),
+        usb=("10c4:ea60",),
+        by_id="usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
+        devices=("/dev/ydlidar", "/dev/ttyUSB0"),
+        topic="/scan", nominal_rate_hz=10.0,
     ),
     Peripheral(
         "PER-07", "manette", False, ("device",), input_class="joystick",
@@ -288,7 +292,7 @@ class RosGraphView:
         import rclpy
         from rclpy.node import Node
         from rclpy.qos import qos_profile_sensor_data
-        from sensor_msgs.msg import Image, Imu
+        from sensor_msgs.msg import Image, Imu, LaserScan
         from std_msgs.msg import Float32
 
         created = not rclpy.ok()
@@ -310,6 +314,8 @@ class RosGraphView:
                     node.create_subscription(Imu, name, callback, qos_profile_sensor_data)
                 elif name == "/voltage":
                     node.create_subscription(Float32, name, callback, qos_profile_sensor_data)
+                elif name == "/scan":
+                    node.create_subscription(LaserScan, name, callback, qos_profile_sensor_data)
 
             from tf2_msgs.msg import TFMessage
 

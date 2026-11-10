@@ -1,0 +1,18 @@
+[Unit]
+Description=Clawbot YOLO Inference Service (port 8003, CUDA)
+After=network.target
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+ExecStart=/home/jetson/yolov5_env/bin/python3 /home/jetson/clawbot/yolo_service.py --port 8003
+Restart=on-failure
+RestartSec=5
+Environment=CAMERA_FRONT_INDEX=0
+Environment=CAMERA_CLAW_INDEX=2
+Environment=YOLO_MODEL_PATH=/home/jetson/software/yolov5-7.0/yolov5s.pt
+Environment=WORKSPACE_PATH=/home/jetson/clawbot/workspace
+
+[Install]
+WantedBy=multi-user.target

@@ -12,6 +12,7 @@ flowchart TB
     end
     subgraph Sensors["Capteurs"]
         Cam["Caméra Astra Pro+<br/>couleur 20 Hz, profondeur 30 Hz"]
+        Lid["Lidar YDLIDAR TG30<br/>/scan 10 Hz"]
         Imu["Centrale inertielle<br/>10 Hz"]
         Volt["Mesure de tension<br/>10 Hz"]
     end
@@ -20,6 +21,7 @@ flowchart TB
         Wheels["4 roues mecanum"]
     end
     Cam --> Ros
+    Lid --> Ros
     Imu --> Ros
     Volt --> Ros
     Ros --> Mcu --> Wheels
@@ -46,7 +48,7 @@ flowchart TB
 | Carte de commande | Rosmaster X3, CH340 `1a86:7523`, `/dev/myserial` → `ttyUSB1`, 115 200 Bd | [[rosmaster_x3_mcu]] |
 | Caméra | Orbbec Astra Pro+, fonctions USB `0c45:6340` (UVC) et `2bc5:060f` (profondeur) | [[orbbec_astra_pro_plus]] |
 | Alimentation | Batterie principale, tension seule (aucune jauge d'énergie) | [[batterie_principale]] |
-| Lidar | **Aucun** adaptateur, aucun paquet installé | [[ERR-2026-11-10-001_absence_topic_scan]] |
+| Lidar | YDLIDAR TG30, CP2102 `10c4:ea60`, `/dev/ydlidar`, 512 000 Bd, `/scan` 10 Hz | [[ERR-2026-11-10-001_absence_topic_scan]] |
 
 ## Logiciel embarqué
 
@@ -62,7 +64,7 @@ flowchart TB
 
 | Trace | Sujet | Statut |
 |---|---|---|
-| [[ERR-2026-11-10-001_absence_topic_scan]] | `/scan` absent, aucun lidar | ouvert |
+| [[ERR-2026-11-10-001_absence_topic_scan]] | `/scan` absent — lidar présent, pilote non lancé | clos |
 | [[ERR-2026-11-10-002_espace_disque_critique]] | partition racine à 92 % | ouvert |
 | [[ERR-2026-11-10-003_arbre_tf_incomplet]] | `base_link`, `odom`, `map` absents | ouvert |
 | [[ERR-2026-11-10-004_execution_de_commande_non_authentifiee]] | injection de commande via `Speak` | ouvert |
@@ -70,8 +72,8 @@ flowchart TB
 
 ## Ce que ce robot ne fait pas
 
-- **Pas de navigation autonome** : aucun lidar, aucun cadre TF `map`/`odom`, pile `nav2` installée
-  mais non déployée.
+- **Pas de navigation autonome** : le lidar fonctionne (`/scan` à 10 Hz) mais les cadres TF `map` et
+  `odom` sont absents, `base_link` n'existe pas, et la pile `nav2` n'est pas déployée.
 - **Pas de jauge d'énergie** : seule la tension est mesurée (11,9 V au dernier relevé).
 - **Pas de manette branchée** : le service de téléopération tourne, aucun périphérique d'entrée
   n'est présent (constaté par le test de santé).
