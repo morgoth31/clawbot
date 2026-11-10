@@ -32,6 +32,7 @@ UNITS = [
     ("ros2-hardware-service.service", "Service matériel du pont C++"),
     ("ros2-llm-bridge-cpp.service", "Pont LLM historique (port 8000)"),
     ("orbbec-camera.service", "Caméra Orbbec Astra Pro+"),
+    ("clawbot-lidar.service", "Lidar YDLIDAR TG30 (/scan)"),
     ("rosbridge.service", "Passerelle WebSocket (port 9090)"),
     ("yolo-inference.service", "Inférence YOLO (port 8003)"),
     ("clawbot-joy-teleop.service", "Téléopération manette"),

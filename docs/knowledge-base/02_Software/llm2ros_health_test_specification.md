@@ -41,7 +41,7 @@ Mesures relevées avant d'écrire cette spécification, domaine ROS 2 = 28.
 | IMU | intégrée à la carte de commande | `/driver_node` | `/imu/data_raw` 9,999 Hz (nominal 10) | ok |
 | Carte de commande | `/dev/myserial` → `ttyUSB1`, `1a86:7523 CH340`, tenue ouverte par le PID 5976 | `/driver_node` | — (liaison série ouverte) | ok |
 | Batterie | tension seule (aucune jauge) | `/driver_node` | `/voltage` 9,999 Hz, **11,899 999 V** | ok |
-| Lidar | aucun adaptateur USB, aucun paquet installé | — | `/scan` absent | unavailable (structurel) |
+| Lidar | YDLIDAR TG30, CP2102 `10c4:ea60` | `ydlidar_ros2_driver` | `/scan` 10,154 Hz | ok |
 | Manette | **aucun `/dev/input/js*`** | `clawbot-joy-teleop.service` actif | — | failed |
 | Disque racine | `/dev/nvme0n1p1` | — | 12 Go libres sur 147 Go (92 %) | degraded (D-07) |
 | Températures | `cpu` 54, `gpu` 50, `cv0` 49, `cv1` 48, `cv2` 45, `soc0` 48 °C | — | — | ok |
@@ -56,8 +56,9 @@ Trois constats qui commandent la conception :
 2. **Un service actif ne prouve pas qu'un périphérique est là.** `clawbot-joy-teleop.service` est
    `active (running)` alors qu'aucun périphérique d'entrée manette n'existe. Vérifier l'unité systemd
    est un indice, jamais une preuve.
-3. **Le lidar n'est pas en panne : il n'est pas installé** ([[ERR-2026-11-10-001_absence_topic_scan]]).
-   Le distinguer d'une panne évite de traiter une absence structurelle comme un incident permanent.
+3. **Le lidar était présent alors que `/scan` manquait** ([[ERR-2026-11-10-001_absence_topic_scan]]).
+   Le capteur est un YDLIDAR TG30 sain : seule l'unité qui lance le pilote manquait. Un topic absent ne
+   prouve pas un matériel absent — le test de santé sonde désormais l'adaptateur **et** le topic.
 
 ## 3. Inventaire déclaré
 
@@ -71,7 +72,7 @@ absent de l'inventaire n'est pas testé, et son absence n'est pas un défaut.
 | PER-03 | IMU | oui | carte de commande présente | `/imu/data_raw` | quaternion normalisé (norme 1 ± 0,05) |
 | PER-04 | Carte de commande | oui | `/dev/myserial` résolu vers le bon `by-id`, `1a86:7523` | `/driver_node` dans le graphe | port ouvert par un seul processus |
 | PER-05 | Batterie | oui | — | `/voltage` | tension dans une plage physique 8–13 V |
-| PER-06 | Lidar | non | aucun | `/scan` | — (déclaré non installé) |
+| PER-06 | Lidar YDLIDAR TG30 | oui | CP2102 `10c4:ea60`, `/dev/ydlidar` | `/scan` | 10 Hz, `frame_id: laser` |
 | PER-07 | Manette | non | `/dev/input/js*` avec couple propriétaire | — | au moins un bouton lu |
 | PER-08 | Chaîne de détection YOLO | non | — | point d'entrée `http://127.0.0.1:8003/health` | `200` — le service publie en HTTP, aucun éditeur sur `/camera/detection_image` |
 | PER-09 | Arbre TF | oui | — | `/tf` | `base_link`, `odom`, `map` présents (aujourd'hui absents : [[ERR-2026-11-10-003_arbre_tf_incomplet]]) |

@@ -87,7 +87,7 @@ def test_rate_below_half_is_failed_and_between_half_and_eighty_is_degraded():
 def test_optional_peripheral_failure_does_not_degrade_global_verdict():
     """HLT-09 + HLT-10 : manette absente malgré un service actif → visible, verdict global inchangé."""
     device, graph = healthy_robot()
-    device.present = {"/dev/video0", "/dev/ttyUSB1", "/dev/myserial"}  # aucun /dev/input/js0
+    device.inputs = {}  # aucun /dev/input/js0 : la manette est optionnelle
     report = _check(device, graph)
 
     joystick = _peripheral(report, "PER-07")

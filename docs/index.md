@@ -43,8 +43,8 @@ Le site s'organise en cinq sections. Chacune a sa page d'entrée, qui dit où tr
 | Perception RGB-D | Orbbec Astra Pro+ | Opérationnel — couleur 20,1 Hz, profondeur 30,2 Hz |
 | Centrale inertielle | `/imu/data_raw` | Opérationnel — 10,4 Hz, quaternion normalisé |
 | Énergie | Batterie, tension seule | 11,9 V — état de charge indisponible |
-| Arbre TF | `/tf` | `base_link`, `odom`, `map` absents |
-| Lidar | — | Non installé |
+| Arbre TF | `/tf` | `base_link`, `odom`, `map` absents ; `laser` non rattaché |
+| Lidar | YDLIDAR TG30, `/scan` 10,15 Hz | Opérationnel depuis `clawbot-lidar.service` |
 | Manette | `/dev/input/js0` | Absente alors que le service de téléopération tourne |
 | Pont LLM | C++ historique (8000/8001), MCP en construction | Historique actif et non authentifié ; MCP : contrat, déclencheurs, santé livrés |
 | Stockage | `/dev/nvme0n1p1` | 92 % occupé, 12 Go libres |
@@ -56,7 +56,7 @@ régénéré par `scripts/generate_status.py`.
 
 | Référence | Objet | Gravité |
 |---|---|---|
-| [ERR-2026-11-10-001](knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-001_absence_topic_scan.md) | Aucune source de scan laser publiée | Blocage de la navigation |
+| [ERR-2026-11-10-001](knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-001_absence_topic_scan.md) | `/scan` absent — **clos** : YDLIDAR TG30 présent, pilote jamais lancé | Résolu |
 | [ERR-2026-11-10-002](knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-002_espace_disque_critique.md) | Occupation critique de la partition racine | Risque d'écriture |
 | [ERR-2026-11-10-003](knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-003_arbre_tf_incomplet.md) | Arbre TF sans `base_link`, `odom`, `map` | Blocage de la localisation |
 | [ERR-2026-11-10-004](knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-004_execution_de_commande_non_authentifiee.md) | Exécution de commande non authentifiée sur le pont LLM | Critique |
