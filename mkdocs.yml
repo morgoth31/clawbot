@@ -135,9 +135,11 @@ nav:
           - Carte Rosmaster X3: knowledge-base/01_Hardware/rosmaster_x3_mcu.md
           - Caméra Astra Pro+: knowledge-base/01_Hardware/orbbec_astra_pro_plus.md
           - Lidar YDLIDAR TG30: knowledge-base/01_Hardware/ydlidar_tg30.md
+          - Bras 6 axes: knowledge-base/01_Hardware/bras_6dof.md
           - Batterie principale: knowledge-base/01_Hardware/batterie_principale.md
       - Logiciel embarqué:
           - Graphe ROS 2: knowledge-base/02_Software/ros2_graph_clawbot.md
+          - Modèle URDF: knowledge-base/02_Software/modele_urdf_clawbot.md
           - Nœud de conduite: knowledge-base/02_Software/yahboomcar_bringup_driver_node.md
           - Chaîne de navigation: knowledge-base/02_Software/ros2_nav_stack.md
           - Services systemd: knowledge-base/02_Software/systemd_robot_services.md
@@ -153,8 +155,10 @@ nav:
           - ERR-004 exécution non authentifiée: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-004_execution_de_commande_non_authentifiee.md
           - ERR-005 pytest et plugins launch_testing: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-005_pytest_plugins_launch_testing.md
           - ERR-006 horloge, fuseau et NTP: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-006_horloge_fuseau_et_ntp.md
+          - ERR-007 retour d'angle servo 4: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-007_retour_angle_servo_bras.md
   - Référence:
       - BOM logiciel: knowledge-base/02_Software/bom_logiciel.md
+      - Ports réseau: knowledge-base/02_Software/ports_reseau.md
       - Documentation constructeur Yahboom: knowledge-base/02_Software/documentation_constructeur_yahboom.md
       - Base de connaissances (vue OKF): knowledge-base/index.md
       - Référence API:
