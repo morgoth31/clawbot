@@ -147,6 +147,7 @@ nav:
       - État des nœuds et services: knowledge-base/03_Operations/etat_noeuds_et_services.md
       - Santé des périphériques: knowledge-base/02_Software/llm2ros_health_test_specification.md
       - Journal de capture initiale: knowledge-base/03_Operations/2026-11-10_bootstrap_knowledge_base.md
+      - Tests de cartographie: knowledge-base/03_Operations/2026-11-10_tests_cartographie.md
       - Procédure firmware carte Rosmaster: knowledge-base/03_Operations/mise_a_jour_firmware_carte_rosmaster.md
       - Traces d'erreurs:
           - ERR-001 absence de scan laser: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-001_absence_topic_scan.md
@@ -157,6 +158,7 @@ nav:
           - ERR-006 horloge, fuseau et NTP: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-006_horloge_fuseau_et_ntp.md
           - ERR-007 retour d'angle servo 4: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-007_retour_angle_servo_bras.md
           - ERR-008 paquet OpenCV et compilation SLAM: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-008_paquet_opencv_incomplet.md
+          - ERR-009 commande de vitesse non proportionnelle: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-009_commande_vitesse_non_proportionnelle.md
   - Référence:
       - BOM logiciel: knowledge-base/02_Software/bom_logiciel.md
       - Ports réseau: knowledge-base/02_Software/ports_reseau.md
