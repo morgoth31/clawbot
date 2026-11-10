@@ -18,6 +18,8 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | Carte de commande bas niveau | Carte Rosmaster (Yahboom), lien série UART 115 200 Bd | [[rosmaster_x3_mcu]] |
 | Perception RGB-D | Orbbec Astra Pro+ (USB `2bc5:060f`) | [[orbbec_astra_pro_plus]] |
 | Perception laser | YDLIDAR TG30, TOF 360°, firmware 1.71, `/scan` à 10,05 Hz | [[ydlidar_tg30]] |
+| Bras manipulateur | 5 axes + pince, 6 servos bus série sur le MCU, présence confirmée le 2026-11-10 | [[bras_6dof]] |
+| Description géométrique | `clawbot_x3plus.urdf`, 21 liens, `clawbot-description.service` | [[modele_urdf_clawbot]] |
 | Énergie | Batterie principale, tension télémétrée 11,9 V | [[batterie_principale]] |
 | Middleware | ROS 2 Humble, `ROS_DOMAIN_ID=28` | [[ros2_graph_clawbot]] |
 | Nœud de conduite | `Mcnamu_driver_X3` (`yahboomcar_bringup`) | [[yahboomcar_bringup_driver_node]] |
@@ -34,6 +36,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── rosmaster_x3_mcu.md
 │   ├── ydlidar_tg30.md
 │   ├── orbbec_astra_pro_plus.md
+│   ├── bras_6dof.md
 │   └── batterie_principale.md
 ├── 02_Software/
 │   ├── documentation_constructeur_yahboom.md
@@ -41,6 +44,8 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── yahboomcar_bringup_driver_node.md
 │   ├── systemd_robot_services.md
 │   ├── ros2_nav_stack.md
+│   ├── modele_urdf_clawbot.md
+│   ├── ports_reseau.md
 │   ├── bom_logiciel.md
 │   ├── llm2ros_bridge.md
 │   ├── llm2ros_bridge_architecture.md
@@ -64,7 +69,8 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
         ├── ERR-2026-11-10-003_arbre_tf_incomplet.md
         ├── ERR-2026-11-10-004_execution_de_commande_non_authentifiee.md
         ├── ERR-2026-11-10-005_pytest_plugins_launch_testing.md
-        └── ERR-2026-11-10-006_horloge_fuseau_et_ntp.md
+        ├── ERR-2026-11-10-006_horloge_fuseau_et_ntp.md
+        └── ERR-2026-11-10-007_retour_angle_servo_bras.md
 ```
 
 ## 3. Conventions d'écriture
@@ -102,3 +108,8 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 18:25 | Carte Rosmaster : inventaire de la V3.0 et protocole série bas niveau extraits de la documentation constructeur, procédure de flashage transcrite | [[rosmaster_x3_mcu]], [[mise_a_jour_firmware_carte_rosmaster]] |
 | 2026-11-10 18:33 | Dépôt constructeur `ROSMASTERX3-PLUS` référencé : structure, applicabilité à ROS 2 Humble, règles de citation | [[documentation_constructeur_yahboom]] |
 | 2026-11-10 18:35 | Caméra Astra : modes UVC mesurés, état d'étalonnage, conflit de port 8080 avec `web_video_server`, rattachement TF `base_link` corrigé | [[orbbec_astra_pro_plus]] |
+| 2026-11-10 19:00 | Bras 6 axes : présence confirmée, angles lus sur la carte, servo 4 au retour invalide, double éditeur de `/joint_states` | [[bras_6dof]], [[ERR-2026-11-10-007_retour_angle_servo_bras]] |
+| 2026-11-10 19:05 | URDF : `laser_link` remplacé par un cylindre TG30 (Ø 75,8 × 34,7 mm, 214 g), modèle revalidé, TF inchangé | [[modele_urdf_clawbot]] |
+| 2026-11-10 19:07 | Acquisition IMU corrigée : attitude de la trame `0x0C` publiée en quaternion ; reconstruction propre du workspace, 19 paquets verts | [[yahboomcar_bringup_driver_node]] |
+| 2026-11-10 19:10 | Stockage : partition ramenée de 97 % à 85 % (22 Go libres), ERR-002 clôturée | [[ERR-2026-11-10-002_espace_disque_critique]] |
+| 2026-11-10 19:15 | Ports réseau : allocation consignée, `web_video_server` déplacé sur 8082, site conservé sur 8080 | [[ports_reseau]] |

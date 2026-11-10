@@ -127,7 +127,20 @@ Codes fonction reconnus par la bibliothèque :
 
 Cadence de report automatique : `set_auto_report_state(True)` fait émettre **quatre trames différentes toutes les 10 ms**, donc chaque trame est rafraîchie toutes les 40 ms (documentation de l'API dans `05.Basic course/3. Install the Rosmaster driver library`). Le nœud ROS 2 échantillonne ce cache toutes les 100 ms : une valeur ne peut donc pas être plus fraîche que 40 ms, et la période de 100 ms constatée sur les topics est un choix du nœud, pas une limite du MCU.
 
-Preuve de trame : non capturée sur ce robot — le port `/dev/ttyUSB1` est ouvert en permanence par `driver_node`, et une écoute concurrente produirait des trames corrompues. L'exécution de `Rosmaster_Lib` avec `debug=True` exige l'arrêt de `ros2-driver-node.service`.
+Trame capturée : le 2026-11-10 à 11:43 CET, `ros2-driver-node.service` arrêté 1,2 s, `Rosmaster_Lib` ouvert sur `/dev/myserial` et instrumentation de `__parse_data`. Sur 1,2 s : `0x0A` ×30, `0x0C` ×31, `0x0D` ×31, `0x0E` ×30, soit 100 trames/s (10 ms par trame) et 25 Hz par type, donc 40 ms de rafraîchissement par grandeur. Le service a été redémarré immédiatement après et `/voltage` republie à 10 Hz.
+
+| Grandeur lue à cette capture | Valeur |
+|---|---|
+| Version du firmware MCU (`get_version()`, aussi publiée sur `/edition`) | `3.5` |
+| PID de déplacement (`get_motion_pid()`) | `kp = 0,8` / `ki = 0,06` / `kd = 0,5` |
+| Type de châssis lu sur la carte (`get_car_type_from_machine()`) | `1` (X3 mecanum) |
+| Attitude fusionnée (`get_imu_attitude_data()`) | roll `0,418°`, pitch `0,458°`, yaw `−5,460°` |
+| Accéléromètre / gyroscope | `(−0,073 ; 0,048 ; −9,871)`, `(0,01 ; 0,005 ; 0,005)` |
+| Magnétomètre | `(−15,9 ; −18,749 ; −12,736)` |
+| Encodeurs M1–M4 (robot immobile) | `0, 0, 0, 0` |
+| Tension | `11,9 V` |
+
+L'attitude de la trame `0x0C` est désormais convertie en quaternion dans `/imu/data_raw` (voir [[yahboomcar_bringup_driver_node]]) ; auparavant le nœud publiait l'identité `(0, 0, 0, 1)` en ignorant cette trame.
 
 ## 5. Bus CAN
 
@@ -152,11 +165,15 @@ La carte expose un connecteur CAN et le microcontrôleur le gère (cours `7. CAN
 
 ## 7. Firmware du microcontrôleur
 
-| Élément | Valeur |
-|---|---|
-| Version lue par `get_version()` | Donnée non disponible — port série occupé par `driver_node`, fonction non exécutable sans arrêt du service |
-| Fichier de firmware constructeur | `Rosmaster_XXX.hex` fourni avec les cours `05.Basic course/1. Update the firmware` |
-| Procédure de mise à jour | [[mise_a_jour_firmware_carte_rosmaster]] |
+| Élément | Valeur | Source |
+|---|---|---|
+| Version du firmware | `3.5` | `get_version()` sur `/dev/myserial`, 2026-11-10 11:43 CET ; publiée aussi sur `/edition` (`3.5`) |
+| PID de déplacement en mémoire | `0,8 / 0,06 / 0,5` | `get_motion_pid()` |
+| Type de châssis en mémoire | `1` (X3) | `get_car_type_from_machine()` |
+| Fichier de firmware constructeur | `Rosmaster_XXX.hex` fourni avec les cours `05.Basic course/1. Update the firmware` | dépôt constructeur |
+| Procédure de mise à jour | non exécutée sur ce robot | [[mise_a_jour_firmware_carte_rosmaster]] |
+
+La version 3.5 est cohérente avec une carte V3.0 et une bibliothèque 3.3.1 (exigence constructeur : ≥ 3.3.x pour la V3.0). Aucun test de persistance Flash n'a été réalisé : écrire avec `forever=True` puis couper l'alimentation reste à faire, `Donnée non disponible`.
 
 ## 8. Voir aussi
 

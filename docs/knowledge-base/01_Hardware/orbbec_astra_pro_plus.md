@@ -100,7 +100,7 @@ Le cadre `camera_link` est désormais rattaché à `base_link` par `robot_state_
 
 ## 8. Conflit de port à connaître
 
-Le cours constructeur `01.How to use the Astra camera` §1.4 fait démarrer `web_video_server` sur `http://<robot>:8080/` pour visualiser le flux dans un navigateur. **Le port 8080 est déjà occupé sur ce robot par le site de documentation** (`clawbot-docs.service`, `mkdocs serve`). Lancer `web_video_server` sans changer de port échoue ou masque la documentation ; utiliser `web_video_server` avec un autre port (`port:=8081`) et vérifier `ss -ltnp | grep 808`.
+Le cours constructeur `01.How to use the Astra camera` §1.4 fait démarrer `web_video_server` sur `http://<robot>:8080/` pour visualiser le flux dans un navigateur. **Le port 8080 est occupé par le site de documentation** (`clawbot-docs.service`) et 8081 par le tableau de bord `charles_dashboard`. Solution retenue : flux vidéo sur **8082**, port libre au relevé ; le site garde 8080. Détail de l'allocation et commandes : [[ports_reseau]].
 
 ## 9. Limites constatées
 

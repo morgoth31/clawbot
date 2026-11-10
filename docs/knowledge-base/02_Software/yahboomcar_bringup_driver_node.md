@@ -62,13 +62,13 @@ Cadences mesurées sur le graphe : `/voltage` = 10,000 Hz ; `/imu/data_raw` = 9,
 | `/vel_raw` linéaire x | 0,000 m/s | `ros2 topic echo --once /vel_raw` | 2026-11-10 06:12:58 CST |
 | `/vel_raw` angulaire z | 0,000 rad/s | idem | idem |
 | `/imu/data_raw` accélération | x = −0,011 ; y = −0,028 ; z = −9,852 m/s² | `ros2 topic echo --once --field linear_acceleration` | 2026-11-10 06:13:20 CST |
-| `/imu/data_raw` orientation | w = 1,0 ; x = y = z = 0,0 (quaternion identité) | `ros2 topic echo --once` | 2026-11-10 06:13:20 CST |
+| `/imu/data_raw` orientation | quaternion issu de l'attitude MCU : `x = 0,00377 ; y = 0,00352 ; z = −0,04769 ; w = 0,99885`, soit un lacet de `−5,47°` | `ros2 topic echo --once` | 2026-11-10 12:02 CET |
 | `/imu/data_raw` vitesse angulaire x | 0,003 rad/s | idem | idem |
 | `/imu/data_raw` `frame_id` | `imu_link` | idem | idem |
 | `/cmd_vel` | Aucun message reçu en 12 s (timeout) ; 2 éditeurs déclarés, 1 abonné | `ros2 topic info /cmd_vel` | 2026-11-10 06:14:10 CST |
-| `/joint_states` | Aucun message capté en 8 s ; `ros2 topic hz` : « does not appear to be published yet » | `ros2 topic hz /joint_states` | 2026-11-10 06:14:40 CST |
+| `/joint_states` | Publié à 10 Hz par ce nœud (6 articulations de roues) et par `joint_state_publisher` (15 articulations à zéro) | `ros2 topic echo --once /joint_states` | 2026-11-10 11:26 CET |
 
-L'orientation du quaternion IMU est l'identité et la covariance d'orientation est nulle : la fusion d'attitude n'est pas effectuée dans ce nœud. Le champ `orientation_covariance` retourne neuf valeurs `0.0` (`ros2 topic echo --once /imu/data_raw`).
+**Correction du 2026-11-10 (acquisition IMU).** Le nœud publiait l'identité `(0, 0, 0, 1)` alors que la carte envoie l'attitude fusionnée dans la trame `0x0C` : la fonction `get_imu_attitude_data()` était ignorée. `pub_data()` convertit désormais roll/pitch/yaw en quaternion (`Mcnamu_driver_X3.py:164-176`). Reconstruit sans édition incrémentale (`rm -rf build install`, `colcon build`), service redémarré, vérifié sur `/imu/data_raw` : lacet `−5,47°` contre `−5,460°` lus directement sur la carte. Les covariances restent à `0` : aucun étalonnage de bruit n'a été fait, `0` signifiant « inconnu » (REP-145).
 
 ## 6. Voir aussi
 

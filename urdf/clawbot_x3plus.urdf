@@ -62,24 +62,29 @@
         <child link="camera_link" />
     </joint>
     <link name="laser_link">
+        <!-- YDLIDAR TG30 : le STL generique (meshes/sensor/laser_link.STL, bbox 97,5 x 71,8 x 57 mm)
+             ne correspond pas au capteur monte. Geometrie remplacee par un cylindre issu de la
+             datasheet TG30 (DOC# 01.13.000007) : Ø 75,8 mm hors tout, hauteur 34,7 mm, plan de
+             scan a 27,9 mm au-dessus de la face d'appui, masse 214 g.
+             laser_link est place sur le plan de scan, donc le corps s'etend de -27,9 mm a +6,8 mm. -->
         <inertial>
-            <origin xyz="-0.0193193958962378 0.000338302570666659 -0.01482422577972" rpy="0 0 0" />
-            <mass value="0.0433399617554554" />
-            <inertia ixx="2.03361882296905E-05" ixy="-3.29493708697467E-07" ixz="-9.00810512916648E-06" iyy="4.37540022779682E-05" iyz="-2.16320544253691E-07" izz="4.81888233320734E-05" />
+            <origin xyz="0 0 -0.01055" rpy="0 0 0" />
+            <mass value="0.214" />
+            <inertia ixx="9.832087e-05" ixy="0" ixz="0" iyy="9.832087e-05" iyz="0" izz="1.536959e-04" />
         </inertial>
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
+            <origin xyz="0 0 -0.01055" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/sensor/laser_link.STL" />
+                <cylinder radius="0.0379" length="0.0347" />
             </geometry>
             <material name="">
-                <color rgba="0.7 0.7 0.7 1" />
+                <color rgba="0.2 0.2 0.2 1" />
             </material>
         </visual>
         <collision>
-            <origin xyz="0 0 0" rpy="0 0 0" />
+            <origin xyz="0 0 -0.01055" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/sensor/laser_link.STL" />
+                <cylinder radius="0.0379" length="0.0347" />
             </geometry>
         </collision>
     </link>
