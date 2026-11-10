@@ -39,6 +39,7 @@ def generate_launch_description():
     limits = _load(os.path.join(share, 'config', 'joint_limits.yaml'))
     ompl = _load(os.path.join(share, 'config', 'ompl_planning.yaml'))
     controllers = _load(os.path.join(share, 'config', 'moveit_controllers.yaml'))
+    mast = _load(os.path.join(share, 'config', 'mast.yaml'))['mast_collision']['ros__parameters']
 
     parameters = [{
         'robot_description': robot_description,
@@ -70,5 +71,14 @@ def generate_launch_description():
             name='move_group',
             output='screen',
             parameters=parameters,
+        ),
+        # Le support camera n'est pas dans le maillage de collision : on le publie comme
+        # objet de collision des le demarrage, sinon le planificateur l'ignore.
+        Node(
+            package='clawbot_moveit_config',
+            executable='apply_mast',
+            name='mast_collision',
+            output='screen',
+            parameters=[mast],
         ),
     ])

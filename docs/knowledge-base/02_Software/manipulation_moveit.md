@@ -186,11 +186,11 @@ part vers le servo, la position reste suivie).
 - **Arrêt du pilote = cascade** : `clawbot-arm-controller.service` et `clawbot-move-group.service`
   déclarent `Requires=ros2-driver-node.service`. Relire les angles (ce qui impose d'arrêter le
   pilote) arrête donc aussi le contrôleur et move_group : les relancer après chaque lecture.
-- **Le modèle ne protège pas encore** : la configuration qui a bloqué le bras (servos `76, 156, …`)
-  est déclarée **valide** par MoveIt, et `compute_fk` y place le bout de chaîne à `x = +0,130` alors
-  que le contact réel était sur le mât à `x = −0,044`. Les zéros servo sont une convention non
-  mesurée : étalonner avant de faire confiance à la détection de collision
-  ([[etalonnage_bras]]).
+- **Le mât protège maintenant, avec une marge** : le support caméra est absent du maillage de
+  collision de `base_link` (seule la plaque haute y figure), il est donc publié comme objet de
+  collision `camera_support` au démarrage de `move_group`, avec une marge de 2 cm. Recette du
+  2026-11-10 23:32 : pose zéro valide, pose 76/156/54 refusée, plan vers cette pose refusé à
+  0,005 rad de tolérance ([[etalonnage_bras]]).
 - **Obstacle dans l'espace de travail** : à servo 2 = 156°, l'axe 1 est bloqué par le support de la
   caméra Orbbec dès 75-76° (servo en butée, position non atteinte). Position retenue après essai :
   servo 2 = 127°. Tout retour vers 156° doit être considéré comme collision avec ce support.
