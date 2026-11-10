@@ -36,7 +36,8 @@ Mesures relevées avant d'écrire cette spécification, domaine ROS 2 = 28.
 
 | Périphérique | Identité constatée | Nœud | Cadence mesurée | Verdict attendu |
 |---|---|---|---|---|
-| Caméra couleur | `/dev/video0`, `0c45:6340 Sonix USB_2.0_Camera` | `/camera/camera` | `/camera/color/image_raw` 20,077 Hz (nominal 20) | ok |
+| Caméra couleur (Astra) | fonction USB `2bc5:050f`, tenue ouverte par le nœud via `usbfs` — **aucun** nœud V4L | `/camera/camera` | `/camera/color/image_raw` 20,06 Hz (nominal 20), âge du message 0,10 s | ok |
+| Caméra du bras (UVC) | `/dev/video0`, `0c45:6340 Microdia`, port `1-2.2.1` | **aucun nœud ROS** | Donnée non disponible — `ROS2-TOPIC-ABSENT` | non testée (hors inventaire) |
 | Caméra profondeur | fonction USB `2bc5:060f ORBBEC Depth Sensor` | `/camera/camera` | `/camera/depth/image_raw` 30,007 Hz (nominal 30) | ok |
 | IMU | intégrée à la carte de commande | `/driver_node` | `/imu/data_raw` 9,999 Hz (nominal 10) | ok |
 | Carte de commande | `/dev/myserial` → `ttyUSB1`, `1a86:7523 CH340`, tenue ouverte par le PID 5976 | `/driver_node` | — (liaison série ouverte) | ok |
@@ -49,8 +50,9 @@ Mesures relevées avant d'écrire cette spécification, domaine ROS 2 = 28.
 Trois constats qui commandent la conception :
 
 1. **L'identité matérielle ne se déduit ni du nom ni de l'index.** Les deux nœuds V4L (`/dev/video0`,
-   `/dev/video1`) appartiennent au même couple `0c45:6340`, alors que `lsusb` expose par ailleurs
-   `2bc5:050f` et `2bc5:060f` pour les fonctions Orbbec. Deux adaptateurs série coexistent
+   `/dev/video1`) appartiennent au couple `0c45:6340` : c'est la caméra du bras, distincte de l'Astra,
+   dont les fonctions `2bc5:050f` et `2bc5:060f` ne sont **pas** exposées en V4L (tenues par `usbfs`,
+   relevé du 2026-11-10T19:12+01:00, `lsusb -t` + `/proc/6287/fd`). Deux adaptateurs série coexistent
    (`1a86:7523` = carte de commande, `Silicon_Labs_CP2102` = autre). Un test qui vérifie « un
    `/dev/video*` existe » ou « un `ttyUSB*` existe » valide le mauvais périphérique sans le dire.
 2. **Un service actif ne prouve pas qu'un périphérique est là.** `clawbot-joy-teleop.service` est
@@ -67,7 +69,7 @@ absent de l'inventaire n'est pas testé, et son absence n'est pas un défaut.
 
 | ID | Périphérique | Requis | Sonde physique | Sonde ROS | Sonde fonctionnelle |
 |---|---|---|---|---|---|
-| PER-01 | Caméra couleur | oui | couple `0c45:6340` + nœud V4L résolu par udev | `/camera/color/image_raw` | 640×480, `rgb8`/`yuyv`, `frame_id` non vide |
+| PER-01 | Caméra couleur (Astra) | oui | fonction USB `2bc5:050f` tenue ouverte par le nœud (`usbfs`) — l'implémentation sonde encore `0c45:6340` + `/dev/video0`, écart FON-07 | `/camera/color/image_raw` | 640×480, `rgb8`/`yuyv`, `frame_id` non vide |
 | PER-02 | Caméra profondeur | oui | fonction USB `2bc5:060f` | `/camera/depth/image_raw` | 640×480, 16 bits, `frame_id` non vide |
 | PER-03 | IMU | oui | carte de commande présente | `/imu/data_raw` | quaternion normalisé (norme 1 ± 0,05) |
 | PER-04 | Carte de commande | oui | `/dev/myserial` résolu vers le bon `by-id`, `1a86:7523` | `/driver_node` dans le graphe | port ouvert par un seul processus |

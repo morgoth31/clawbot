@@ -18,23 +18,33 @@ L'identité s'écrit avec le couple `VID:PID` et le nom `by-id`, jamais avec `/d
 |---|---|---|
 | Capteur de profondeur | `ORBBEC Depth Sensor`, USB `2bc5:060f`, bus 001, device 013 | `lsusb` |
 | Flux couleur (UVC) | `Orbbec 3D Technology International USB 2.0 Camera`, USB `2bc5:050f`, bus 001, device 015 | `lsusb` |
-| Nom `by-id` du flux couleur | `usb-Sonix_Technology_Co.__Ltd._USB_2.0_Camera-video-index0` → `video0` | `ls -l /dev/v4l/by-id/` |
-| Second nœud du flux couleur | `usb-Sonix_Technology_Co.__Ltd._USB_2.0_Camera-video-index1` → `video1` (métadonnées, aucun format de capture) | `ls -l /dev/v4l/by-id/`, `v4l2-ctl -d /dev/video1 --list-formats-ext` |
-| Nœuds de périphérique | `/dev/video0`, `/dev/video1`, `/dev/media1` | `v4l2-ctl --list-devices` |
-| Nom V4L2 du flux couleur | `USB 2.0 Camera: USB Camera (usb-3610000.usb-2.2.1)` | `v4l2-ctl --list-devices` |
-| Interface du contrôleur | USB 2.0 (hub VIA Labs), lien `usb-3610000.usb` | `v4l2-ctl --list-devices` |
+| Pilote du flux couleur | fonctions Video d'`usbfs`, **pas** `uvcvideo` : le nœud ouvre le périphérique USB en direct | `lsusb -t` (`Dev 15` → `Driver=usbfs`) |
+| Fichiers tenus ouverts par le nœud | `/dev/bus/usb/001/013` et `/dev/bus/usb/001/015` | `ls -l /proc/6287/fd`, `fuser /dev/bus/usb/001/*` |
+| Nœuds V4L associés | **aucun** : `/dev/video0`, `/dev/video1` et `/dev/media1` appartiennent à une autre caméra, `0c45:6340`, décrite dans [[camera_usb_bras]] | `v4l2-ctl --list-devices`, `lsusb -t` |
+| Interface du contrôleur | bus 001, hub VIA Labs `2109:2817`, high-speed 480 Mbit/s | `lsusb -t` |
 
-Le nom `by-id` annonce un pont UVC **Sonix** alors que `lsusb` annonce Orbbec : les deux fonctions (couleur UVC et profondeur propriétaire) n'ont pas le même couple `VID:PID`, ce qui interdit d'identifier la caméra par un seul des deux.
+Deux couples coexistent donc sur le même capteur, et **aucun des deux n'est exposé en V4L** :
+`2bc5:060f` pour la profondeur, `2bc5:050f` pour la couleur. Une page ou une sonde qui associe
+`/dev/video0` ou le couple `0c45:6340` à cette caméra désigne en réalité la caméra du bras
+([[camera_usb_bras]]). Le lien entre périphérique et topic se vérifie par les descripteurs ouverts
+du nœud, jamais par le nom V4L2.
 
-## 2. Modes exposés par le flux couleur
+## 2. Mode négocié et cadence publiée
 
-`v4l2-ctl -d /dev/video0 --list-formats-ext`, 2026-11-10 11:35 CET :
+Le flux couleur n'étant pas exposé en V4L, `v4l2-ctl --list-formats-ext` ne peut pas l'énumérer :
+la configuration se lit dans le journal du pilote et dans les messages publiés.
 
-| Format | Résolutions | Cadences |
+| Élément | Valeur | Source |
 |---|---|---|
-| `YUYV` 4:2:2 (seul format exposé) | 640 × 480, 352 × 288, 320 × 240, 176 × 144, 160 × 120 | 640 × 480, 352 × 288 et 320 × 240 à 30 / 25 / 20 / 15 / 10 / 5 i/s ; autres tailles `Donnée non disponible — non détaillées` |
+| Mode UVC négocié par le pilote | 640 × 480 à 30 i/s, `UVC_FRAME_FORMAT_MJPEG` | journal de `orbbec-camera.service` : `set uvc mode 640x480@30 format UVC_FRAME_FORMAT_MJPEG` |
+| Encodage publié | `rgb8`, 640 × 480 | `/camera/color/image_raw` |
+| Cadence publiée | 20,06 Hz (fenêtres de 22 et 43 messages) | `ros2 topic hz`, 2026-11-10T19:12+01:00 |
+| Modes V4L2 énumérables | Donnée non disponible — `VIDIOC_ENUM_FMT` impossible sur un périphérique tenu par `usbfs` | `lsusb -t` |
+| Débit occupé sur le lien USB | Donnée non disponible — non mesuré | — |
 
-Aucun format compressé (`MJPG`) n'est exposé sur ce nœud : le flux couleur occupe donc 640 × 480 × 2 octets × 20 i/s ≈ 12,3 Mo/s sur un lien USB 2.0 partagé avec la profondeur, ce qui explique que la cadence couleur mesurée (20,1 Hz) soit inférieure à la profondeur (30,0 Hz).
+Le pilote négocie 30 i/s en MJPEG alors que le topic est publié à 20,06 Hz : l'écart est constaté,
+son origine n'est pas établie (`Donnée non disponible`). Aucune mesure de débit ne permet d'attribuer
+cet écart à la bande passante du lien USB 2.0.
 
 ## 3. Flux ROS 2 publiés
 

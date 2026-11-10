@@ -134,6 +134,7 @@ nav:
           - Jetson Orin NX: knowledge-base/01_Hardware/jetson_orin_nx.md
           - Carte Rosmaster X3: knowledge-base/01_Hardware/rosmaster_x3_mcu.md
           - Caméra Astra Pro+: knowledge-base/01_Hardware/orbbec_astra_pro_plus.md
+          - Caméra du bras (UVC): knowledge-base/01_Hardware/camera_usb_bras.md
           - Lidar YDLIDAR TG30: knowledge-base/01_Hardware/ydlidar_tg30.md
           - Bras 6 axes: knowledge-base/01_Hardware/bras_6dof.md
           - Batterie principale: knowledge-base/01_Hardware/batterie_principale.md
@@ -148,6 +149,7 @@ nav:
       - Santé des périphériques: knowledge-base/02_Software/llm2ros_health_test_specification.md
       - Journal de capture initiale: knowledge-base/03_Operations/2026-11-10_bootstrap_knowledge_base.md
       - Tests de cartographie: knowledge-base/03_Operations/2026-11-10_tests_cartographie.md
+      - Rebranchement caméra du bras: knowledge-base/03_Operations/2026-11-10_rebranchement_camera_bras.md
       - Procédure firmware carte Rosmaster: knowledge-base/03_Operations/mise_a_jour_firmware_carte_rosmaster.md
       - Traces d'erreurs:
           - ERR-001 absence de scan laser: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-001_absence_topic_scan.md
