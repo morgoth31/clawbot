@@ -28,11 +28,14 @@ OUTPUT = ROOT / "docs" / "knowledge-base" / "03_Operations" / "etat_noeuds_et_se
 ROS_DOMAIN_ID = "28"
 
 UNITS = [
+    ("clawbot-description.service", "Description du robot (/robot_description, TF)"),
     ("ros2-driver-node.service", "Nœud de conduite (cmd_vel → série)"),
     ("ros2-hardware-service.service", "Service matériel du pont C++"),
     ("ros2-llm-bridge-cpp.service", "Pont LLM historique (port 8000)"),
     ("orbbec-camera.service", "Caméra Orbbec Astra Pro+"),
     ("clawbot-lidar.service", "Lidar YDLIDAR TG30 (/scan)"),
+    ("clawbot-arm-controller.service", "Contrôleur de trajectoire du bras (→ /servo_ctrl)"),
+    ("clawbot-move-group.service", "MoveIt 2 move_group (démarré à la demande)"),
     ("rosbridge.service", "Passerelle WebSocket (port 9090)"),
     ("yolo-inference.service", "Inférence YOLO (port 8003)"),
     ("clawbot-joy-teleop.service", "Téléopération manette"),
