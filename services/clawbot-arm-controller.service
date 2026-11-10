@@ -13,7 +13,8 @@ Group=jetson
 WorkingDirectory=/home/jetson/clawbot
 ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
   source /home/jetson/clawbot/install/setup.bash && \
-  ros2 launch clawbot_arm_controller arm_controller.launch.py"
+  ros2 launch clawbot_arm_controller arm_controller.launch.py \
+    params_file:=/home/jetson/clawbot/clawbot_arm_controller/config/arm_controller.yaml"
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=10

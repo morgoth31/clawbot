@@ -171,6 +171,9 @@ part vers le servo, la position reste suivie).
   après toute coupure d'alimentation ou déplacement à la main :
   `sudo systemctl stop ros2-driver-node` → `python3 scripts/sync_arm_pose.py` →
   `sudo systemctl start ros2-driver-node` → `sudo systemctl restart clawbot-arm-controller`.
+  Depuis le 2026-11-10 23:23, l'unité lit directement
+  `clawbot_arm_controller/config/arm_controller.yaml` (`params_file:=…`) : la synchro ne
+  demande plus de recompilation, un simple redémarrage du service suffit.
   Le fichier `config/arm_controller.yaml` porte l'instantané du 2026-11-10 23:05.
 - **Servo 4 réparé, mais surveillé** : son retour d'angle était invalide (`-5°` constant) jusqu'au
   rebranchement du 2026-11-10 23:00 ([[ERR-2026-11-10-007_retour_angle_servo_bras]], clos). Le mode
