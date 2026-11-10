@@ -10,7 +10,11 @@ ExecStart=/home/jetson/yolov5_env/bin/python3 /home/jetson/clawbot/yolo_service.
 Restart=on-failure
 RestartSec=5
 Environment=CAMERA_FRONT_INDEX=0
-Environment=CAMERA_CLAW_INDEX=2
+# La caméra du bras est le seul périphérique UVC du bus : elle produit /dev/video0
+# (0c45:6340, port 1-2.2.1). L'index 2 n'existe pas — c'est pourquoi l'outil « claw »
+# répondait 500. « front » pointe encore sur le même périphérique : la vue avant du
+# robot est la caméra RGB-D Astra, publiée en ROS (/camera/color/image_raw), pas en V4L.
+Environment=CAMERA_CLAW_INDEX=0
 Environment=YOLO_MODEL_PATH=/home/jetson/software/yolov5-7.0/yolov5s.pt
 Environment=WORKSPACE_PATH=/home/jetson/clawbot/workspace
 

@@ -1,0 +1,14 @@
+# Solveur de cinematique inverse du bras.
+#
+# pick_ik est retenu : il gere mieux les singularites et les chaines courtes que KDL sur
+# ce bras 5 axes. Attention : 5 axes ne permettent pas d'atteindre une pose 6D
+# arbitraire ; les objectifs de pose sont donc souvent irrealisables, alors que la
+# planification en espace articulaire (objectifs de joints, etats nommes) fonctionne.
+arm:
+  kinematics_solver: pick_ik/PickIkPlugin
+  kinematics_solver_timeout: 0.05
+  kinematics_solver_attempts: 8
+  mode: global
+  stop_optimization_on_valid_solution: true
+  position_threshold: 0.001
+  orientation_threshold: 0.01

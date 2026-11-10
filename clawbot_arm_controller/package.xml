@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>clawbot_arm_controller</name>
+  <version>0.1.0</version>
+  <description>
+    Serveur d'action FollowJointTrajectory pour le bras 5 axes + pince du Clawbot X3 Plus.
+    Recoit une trajectoire de MoveIt, l'echantillonne et publie les consignes servo sur
+    /servo_ctrl ; publie les consignes courantes en radians sur /arm/joint_states.
+  </description>
+  <maintainer email="jetson@clawbot.local">Clawbot</maintainer>
+  <license>MIT</license>
+
+  <depend>rclpy</depend>
+  <depend>control_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>builtin_interfaces</depend>
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

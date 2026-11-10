@@ -1,0 +1,43 @@
+# Limites de mouvement appliquees par MoveIt (elles ne reprogramment pas les servos).
+#
+# Les servos du bras sont des servos de modelisme a bus serie : compter environ 1 rad/s
+# en pointe. On planifie a 0,5 rad/s et 1,0 rad/s^2 pour laisser de la marge a
+# l'echantillonneur du controleur (10 Hz) et eviter les a-coups sur la mecanique.
+# Les positions limites restent celles de l'URDF.
+joint_limits:
+  arm_joint1:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+    has_position_limits: false
+  arm_joint2:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+    has_position_limits: false
+  arm_joint3:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+    has_position_limits: false
+  arm_joint4:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+    has_position_limits: false
+  arm_joint5:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+    has_position_limits: false
+  grip_joint:
+    has_velocity_limits: true
+    max_velocity: 0.3
+    has_acceleration_limits: true
+    max_acceleration: 0.6
+    has_position_limits: false

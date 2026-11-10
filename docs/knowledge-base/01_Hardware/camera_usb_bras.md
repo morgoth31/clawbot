@@ -64,17 +64,23 @@ la caméra RGB-D.
 Conséquence : elle est invisible pour le graphe ROS 2, pour la supervision (`etat_noeuds_et_services`)
 et pour tout outil qui ne passe pas par OpenCV. La seule voie d'accès est l'index brut d'OpenCV.
 
-## 5. Accès applicatif et écart d'index
+## 5. Accès applicatif
 
-| Consommateur | Configuration | Ce que la mesure donne | Source |
+Depuis le 2026-11-10 19:49 CET, les deux services interrogent l'index 0 pour la pince : l'index 2
+n'existe pas et provoquait un HTTP 500.
+
+| Consommateur | Configuration | Mesure après correction | Source |
 |---|---|---|---|
-| `yolo-inference.service` | `CAMERA_FRONT_INDEX=0`, `CAMERA_CLAW_INDEX=2` | index 0 → HTTP 200, inférence 656 ms ; index 2 → HTTP 500 `Cannot open camera claw (index 2)` | `services/yolo-inference.service`, `GET /detect_raw?camera=…` |
-| `ros2-hardware-service.service` | `CAMERA_CLAW_INDEX=2` | idem, même table `CAMERA_DEVICES` dans `hardware_service.py:64` | `services/ros2-hardware-service.service` |
-| Schéma d'outil du pont C++ | `'front' (/dev/video0)`, `'claw' (/dev/video2)` | `/dev/video2` **absent** : une seule caméra UVC est branchée, sur `video0` | `ros2_llm_bridge_cpp/src/tool_schemas.cpp:80` |
+| `yolo-inference.service` | `CAMERA_FRONT_INDEX=0`, `CAMERA_CLAW_INDEX=0` | `GET /detect_raw?camera=claw` → HTTP 200, inférence 279 ms | `curl http://127.0.0.1:8003/detect_raw?camera=claw` |
+| `ros2-hardware-service.service` | idem (unités déployée et dépôt) | `GET /capture?camera=claw` → HTTP 200 | `curl http://127.0.0.1:8001/capture?camera=claw` |
+| Schéma d'outil du pont C++ | annonce encore `'claw' (/dev/video2)` | `/dev/video2` reste absent : le schéma est faux, l'index réel est 0 | `tool_schemas.cpp:80` |
 
-La caméra physique existe et fonctionne sur l'index 0 ; c'est l'index configuré pour « claw » (2)
-qui ne correspond à aucun périphérique. Écart consigné en FON-02 et FON-07 de
-[[llm2ros_bridge_coherence_et_approche]].
+Conséquence assumée : `front` et `claw` désignent maintenant le **même** périphérique. La vue avant
+du robot est la caméra RGB-D Astra ; elle n'est pas exposée en V4L et n'a donc pas d'index OpenCV.
+Tant que les services ne lisent pas le topic `/camera/color/image_raw`, l'outil « front » renvoie
+l'image de la caméra du bras — c'est inscrit en commentaire dans les deux unités systemd.
+
+Écart consigné en FON-02 et FON-07 de [[llm2ros_bridge_coherence_et_approche]].
 
 ## 6. Preuves de fonctionnement
 

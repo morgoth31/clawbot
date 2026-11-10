@@ -1,0 +1,36 @@
+# Correspondance articulation URDF -> servo bus serie du bras Clawbot X3 Plus.
+#
+# ATTENTION : le zero mecanique de chaque servo n'est pas identifie sur ce robot.
+# Les valeurs ci-dessous appliquent la convention documentee (voir la base de
+# connaissances, 01_Hardware/bras_6dof.md) : elles rendent la commande coherente,
+# pas physiquement calibree. A ajuster servo par servo apres une mesure.
+arm_trajectory_server:
+  ros__parameters:
+    arm_joints: [arm_joint1, arm_joint2, arm_joint3, arm_joint4, arm_joint5]
+    arm_servo_ids: [1, 2, 3, 4, 5]
+    arm_zero_deg: [90.0, 90.0, 90.0, 90.0, 90.0]
+    arm_scale_deg_per_rad: [57.29577951, 57.29577951, 57.29577951, 57.29577951, 57.29577951]
+    arm_min_deg: [0.0, 0.0, 0.0, 0.0, 0.0]
+    arm_max_deg: [180.0, 180.0, 180.0, 180.0, 270.0]
+
+    grip_joints: [grip_joint]
+    grip_servo_ids: [6]
+    grip_zero_deg: [180.0]
+    grip_scale_deg_per_rad: [116.88311688]
+    grip_min_deg: [0.0]
+    grip_max_deg: [180.0]
+
+    # 10 Hz : une consigne par servo et par periode, espacee de 5 ms sur la liaison
+    # serie du MCU. Les servos du bras n'ont pas besoin de plus.
+    publish_rate_hz: 10.0
+    joint_state_rate_hz: 20.0
+    servo_stagger_s: 0.005
+    max_duration_s: 30.0
+
+    # Position supposee au demarrage (radians) : le MCU ne publie pas la position du
+    # bras, ce noeud ne peut donc pas la lire. Mettre le bras en pose de reference
+    # avant de demarrer le service, ou ajuster ici.
+    initial_positions: [0.0, 0.0, 0.0, 0.0, 0.0]
+
+    servo_topic: /servo_ctrl
+    joint_states_topic: /arm/joint_states

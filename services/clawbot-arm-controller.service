@@ -1,0 +1,23 @@
+[Unit]
+Description=Clawbot arm trajectory controller (FollowJointTrajectory -> /servo_ctrl)
+Documentation=file:///home/jetson/clawbot/clawbot_arm_controller
+After=network.target ros2-driver-node.service
+# Ne demarre rien tout seul : les trajectoires viennent de MoveIt (move_group).
+# Le pilote du bras (ros2-driver-node) doit tourner pour que /servo_ctrl ait un abonne.
+Requires=ros2-driver-node.service
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+WorkingDirectory=/home/jetson/clawbot
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
+  source /home/jetson/clawbot/install/setup.bash && \
+  ros2 launch clawbot_arm_controller arm_controller.launch.py"
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+Environment=ROS_DOMAIN_ID=28
+
+[Install]
+WantedBy=multi-user.target
