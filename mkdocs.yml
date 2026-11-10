@@ -143,6 +143,7 @@ nav:
           - Modèle URDF: knowledge-base/02_Software/modele_urdf_clawbot.md
           - Nœud de conduite: knowledge-base/02_Software/yahboomcar_bringup_driver_node.md
           - Manipulation (MoveIt 2): knowledge-base/02_Software/manipulation_moveit.md
+          - Étalonnage du bras: knowledge-base/02_Software/etalonnage_bras.md
           - Chaîne de navigation: knowledge-base/02_Software/ros2_nav_stack.md
           - Services systemd: knowledge-base/02_Software/systemd_robot_services.md
   - Exploitation:

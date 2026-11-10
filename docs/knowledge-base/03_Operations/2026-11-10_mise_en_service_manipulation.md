@@ -150,6 +150,7 @@ $ ROS_DOMAIN_ID=28 python3 -m pytest test -q   (paquet clawbot_arm_controller)
 ## 8. Voir aussi
 
 - Description technique : [[manipulation_moveit]]
+- Étalonnage des zéros et collisions : [[etalonnage_bras]]
 - Bras et servos : [[bras_6dof]]
 - Caméra du bras : [[camera_usb_bras]]
 - Caméra RGB-D du châssis : [[orbbec_astra_pro_plus]]
