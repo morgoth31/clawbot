@@ -70,7 +70,8 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
         ├── ERR-2026-11-10-004_execution_de_commande_non_authentifiee.md
         ├── ERR-2026-11-10-005_pytest_plugins_launch_testing.md
         ├── ERR-2026-11-10-006_horloge_fuseau_et_ntp.md
-        └── ERR-2026-11-10-007_retour_angle_servo_bras.md
+        ├── ERR-2026-11-10-007_retour_angle_servo_bras.md
+        └── ERR-2026-11-10-008_paquet_opencv_incomplet.md
 ```
 
 ## 3. Conventions d'écriture
@@ -113,3 +114,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 19:07 | Acquisition IMU corrigée : attitude de la trame `0x0C` publiée en quaternion ; reconstruction propre du workspace, 19 paquets verts | [[yahboomcar_bringup_driver_node]] |
 | 2026-11-10 19:10 | Stockage : partition ramenée de 97 % à 85 % (22 Go libres), ERR-002 clôturée | [[ERR-2026-11-10-002_espace_disque_critique]] |
 | 2026-11-10 19:15 | Ports réseau : allocation consignée, `web_video_server` déplacé sur 8082, site conservé sur 8080 | [[ports_reseau]] |
+| 2026-11-10 19:25 | SLAM : `yahboomcar_slam` recompile contre OpenCV 4.5.4 (préfixe `/opt/opencv-4.5.4-dev`), paquet NVIDIA 4.8 incomplet tracé, état des prérequis de navigation remis à jour | [[ERR-2026-11-10-008_paquet_opencv_incomplet]], [[ros2_nav_stack]] |
