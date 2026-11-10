@@ -40,6 +40,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── orbbec_astra_pro_plus.md
 │   ├── bras_6dof.md
 │   ├── camera_usb_bras.md
+│   ├── inventaire_materiel.md
 │   └── batterie_principale.md
 ├── 02_Software/
 │   ├── documentation_constructeur_yahboom.md
@@ -49,6 +50,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── ros2_nav_stack.md
 │   ├── modele_urdf_clawbot.md
 │   ├── manipulation_moveit.md
+│   ├── mcp_hermes.md
 │   ├── etalonnage_bras.md
 │   ├── ports_reseau.md
 │   ├── bom_logiciel.md
@@ -132,3 +134,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 23:20 | Collisions du bras avec le mât : MoveIt déclare valide la configuration qui a bloqué le bras — les zéros servo sont une convention ; procédure d'étalonnage et outil de contrôle livrés | [[etalonnage_bras]], [[manipulation_moveit]] |
 | 2026-11-10 23:38 | Support caméra ajouté au modèle de collision (boîte + marge 2 cm) : la pose qui bloquait est refusée ; balayage de `q4` sans l'objet → aucune collision, avec l'objet → toutes, ce qui écarte l'hypothèse du seul défaut du servo 4 | [[etalonnage_bras]] |
 | 2026-11-10 23:55 | Approche physique du mât : premier contact à servo2 ≈ 114° (caméra USB, `mono_link`), refus du modèle dès 105-106° — soit 8-9° de marge ; plan vers la zone de contact refusé | [[etalonnage_bras]] |
+| 2026-11-11 00:18 | Inventaire matériel mesuré (14 lignes : présence, fonction, nœud ROS 2) et serveur MCP câblé sur ROS 2 puis enregistré dans Hermes en stdio (22 outils, graph_snapshot et topic_stats vérifiés) | [[inventaire_materiel]], [[mcp_hermes]] |

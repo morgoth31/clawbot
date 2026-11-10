@@ -22,7 +22,12 @@ LIMITS: dict[str, Any] = {
         "xlinear_limit",
         "ylinear_limit",
     ],
-    "allowed_actions": [],
+    # Action deplacements autorises pour goal_send : les deux controleurs du bras.
+    # Les bornes articulaires sont verifiees dans ros_layer.ACTION_SPECS.
+    "allowed_actions": [
+        "/arm_controller/follow_joint_trajectory",
+        "/grip_controller/follow_joint_trajectory",
+    ],
     "s2_min_severity": 2,
     "budget": {"tool_calls": 8, "duration_s": 120},
     "protocol_version": "2025-11-25",
