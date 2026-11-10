@@ -9,13 +9,18 @@ status: actif
 # Étalonnage du bras — zéros servo, modèle et collisions avec le mât
 
 Question posée : peut-on valider ou calibrer le bras pour que MoveIt évite les collisions avec le
-mât qui porte la caméra Orbbec ? Réponse mesurée : **oui, mais pas dans cet ordre**. Tant que la
-conversion servo → articulation n'est pas calée sur la mécanique, un objet de collision
-supplémentaire rendrait le planificateur faux dans les deux sens.
+mât qui porte la caméra Orbbec ?
+
+Réponse retenue le 2026-11-10 : **la conversion servo → articulation était bonne, c'est le volume du
+mât qui manquait au modèle de collision.** La position publiée a été validée à l'œil dans RViz par
+l'opérateur (modèle et robot superposés, pose zéro comme pose courante), puis le support a été
+ajouté comme objet de collision avec une marge de 2 cm. Les quatre critères de recette sont
+satisfaits (§5). La procédure d'étalonnage des zéros (§3) reste en réserve : elle redeviendra
+nécessaire après un remplacement de servo ou si le modèle cesse de coller à la réalité.
 
 Retour à l'[[index]] ; chaîne concernée : [[manipulation_moveit]].
 
-## 1. Ce que la mesure dit du modèle actuel
+## 1. Ce que la mesure disait du modèle (constat du 2026-11-10 23:15, avant correction)
 
 Configuration qui a physiquement bloqué le bras le 2026-11-10 à 22:43 (servos `76, 156, 54, …`) :
 
@@ -23,20 +28,12 @@ Configuration qui a physiquement bloqué le bras le 2026-11-10 à 22:43 (servos 
 |---|---|---|
 | Validité au sens de MoveIt | **valide** — aucune collision détectée | `tools/check_state.py --servos 76 156 54 0 90` |
 | Position du bout de chaîne dans le modèle | `arm_link5` en `x = +0,130, y = +0,008, z = +0,337` | `/compute_fk`, repère `base_link` |
-| Position réelle du support heurté | caméra Astra en `x = −0,0436, z = +0,4196` ([[orbbec_astra_pro_plus]]) | `astra_joint` de l'URDF |
-| Interprétation | le modèle place le bras **devant**, la réalité l'a posé **derrière**, contre le mât | — |
+| Position du support heurté | caméra Astra en `x = −0,0436, z = +0,4196` | `astra_joint` de l'URDF |
+| Contenu réel du maillage `base_link` au-dessus de `z = 0,15` | **18 points, tous à `z = 0,382`** : la seule plaque haute, aucune structure verticale | lecture binaire du STL de collision |
 
-Autrement dit : à cette configuration, le modèle croit le bras à 13 cm devant la base, alors que le
-bras réel était en appui sur un support situé 4 cm derrière l'axe. La cause n'est pas le maillage —
-le mât est bien dans le modèle : le maillage de collision de `base_link` monte jusqu'à `z = 0,382`
-(`x ∈ [−0,155 ; +0,145]`, `y ∈ [−0,120 ; +0,120]`). La cause est la **correspondance servo →
-articulation** : elle applique la convention `q = (angle_servo − 90) / 57,2958` sans preuve
-mécanique. Un décalage de zéro ou un signe inversé sur un seul axe suffit à poser le modèle du
-mauvais côté.
-
-Conséquence pratique : MoveIt accepte aujourd'hui des trajectoires qui touchent le mât, et refuse
-peut-être des poses sûres. Le planificateur n'est donc pas utilisable comme garde-fou tant que
-l'étalonnage n'est pas fait.
+Conclusion corrigée : le maillage ne contient que la plaque supérieure du support. La structure
+verticale entre le châssis et la plaque est absente, donc le planificateur ignorait le mât. La
+conversion servo → articulation, elle, s'est révélée juste dès la comparaison dans RViz.
 
 ## 2. Ce dont on a besoin
 
@@ -44,10 +41,10 @@ l'étalonnage n'est pas fait.
 |---|---|---|
 | Longueurs de segments, axes de rotation, géométrie du châssis | connues et fixes | `urdf/clawbot_x3plus.urdf` |
 | Position du mât et de la caméra | connue : `astra_joint` à `(−0,0436 ; 0 ; 0,4196)` | URDF, maillage `base_link` jusqu'à `z = 0,382` |
-| Zéro mécanique de chaque servo | **convention, non mesuré** | `arm_zero_deg` de `config/arm_controller.yaml` |
-| Signe de chaque axe | **convention, non mesuré** | `arm_scale_deg_per_rad` |
+| Zéro mécanique de chaque servo | convention `90°` **validée à l'œil dans RViz** le 2026-11-10 | `arm_zero_deg` de `config/arm_controller.yaml` |
+| Signe de chaque axe | convention `+` **validée à l'œil dans RViz** le 2026-11-10 | `arm_scale_deg_per_rad` |
 
-Seules les deux dernières lignes sont à déterminer.
+Seules les deux dernières lignes étaient à déterminer ; l'opérateur les a validées visuellement (modèle superposé au robot dans RViz, aux poses zéro et courante). La procédure ci-dessous reste la méthode à suivre si un doute réapparaît.
 
 ## 3. Pose de référence : le bras droit debout
 
@@ -98,17 +95,43 @@ python3 clawbot_moveit_config/tools/check_state.py --servos <angles lus>      # 
 Tant que ces quatre lignes ne sont pas satisfaites, la prudence reste celle des essais du
 2026-11-10 : petits pas, opérateur présent, relecture des angles après chaque mouvement.
 
-## 5. Le mât : quand faudra-t-il l'ajouter explicitement ?
+## 5. Le mât : ce qui est fait
 
-Le mât est déjà présent via le maillage de collision de `base_link`. Deux cas justifieraient un
-objet de collision dédié (boîte ou cylindre publié dans la scène de planification) :
+Le support est publié comme objet de collision `camera_support`, rattaché à `base_link`, à chaque
+démarrage de `clawbot-move-group.service` (nœud `apply_mast`, installé avec le paquet).
 
-- le maillage s'avère trop grossier après étalonnage (le planificateur laisse passer le bras à
-  travers le support alors que la pose est correcte) ;
-- le support est démonté ou déplacé : le maillage du châssis ne suivrait pas.
+| Paramètre | Valeur | Source |
+|---|---|---|
+| Empreinte reprise du maillage | `x ∈ [−0,057 ; −0,037]`, `y ∈ [−0,083 ; +0,083]` | plaque `base_link` à `z = 0,382` |
+| Hauteur couverte | `z` de 0,100 à 0,382 | haut du châssis jusqu'à la plaque |
+| Volume déclaré | boîte 0,060 × 0,206 × 0,322 m en `x = −0,047`, `y = 0` | 0,020 × 0,166 d'empreinte + marge |
+| Marge de sécurité | 0,020 m sur toutes les faces | `config/mast.yaml` |
 
-Dans ces cas seulement, publier le support comme `CollisionObject` rattaché à `base_link` avec des
-dimensions mesurées au réglet — jamais avec des dimensions estimées à vue.
+Vérifications mesurées le 2026-11-10 à 23:32, `move_group` actif, objet confirmé dans la scène par
+`/get_planning_scene` (`camera_support`, dimensions `[0,060 ; 0,206 ; 0,322]`) :
+
+| Test | Résultat |
+|---|---|
+| `check_state.py --servos 90 90 90 90 90` (pose zéro) | **valide** |
+| `check_state.py --servos 76 156 54 0 90` (pose qui avait bloqué) | **EN COLLISION**, contact `camera_support` ↔ `mono_link` |
+| Planification vers cette même pose, tolérance 0,005 rad | **refusée** (`error_code 99999`) |
+| Planification vers la pose zéro, tolérance 0,005 rad (témoin) | **acceptée** (`error_code 1`) |
+
+Le contact est détecté avec `mono_link`, un petit lien fixe porté par `arm_link4` : c'est donc cette
+pièce qui touchait le support, ce qui explique qu'aucun maillage de collision n'ait été signalé au
+départ.
+
+Deux points de méthode :
+
+1. **La tolérance d'objectif compte.** Avec ±0,05 rad, la planification vers la pose qui touche
+   réussit : MoveIt trouve un état valide dans la marge de tolérance. Un test de garde-fou se fait
+   donc à 0,005 rad, sinon il ne prouve rien.
+2. **La marge se règle dans `config/mast.yaml`** puis `sudo systemctl restart clawbot-move-group`.
+   L'enveloppe actuelle reprend l'empreinte de la plaque élargie de 2 cm ; resserrer la boîte
+   demanderait de mesurer la section réelle du support, ce qui n'a pas été fait.
+
+Cas où un objet dédié resterait nécessaire même après étalonnage : support démonté ou déplacé (le
+maillage du châssis ne suivrait pas).
 
 ## 6. Limites
 

@@ -1,0 +1,29 @@
+# Volume de collision du support de la camera Orbbec (« mat »).
+#
+# Pourquoi ce fichier existe : le maillage de collision de base_link ne contient que la
+# plaque haute du support (z = 0,382). La structure verticale entre le chassis et cette
+# plaque est absente du modele, et MoveIt accepte donc des trajectoires qui touchent.
+# Constate le 2026-11-10 : la configuration servos 76/156/54/0/90, qui a physiquement
+# bloque le bras, est declaree valide sans cet objet.
+#
+# Geometrie de depart = empreinte de la plaque relevee dans le maillage :
+#   x de -0,057 a -0,037 (axe a -0,047), y de -0,083 a +0,083, z de 0,10 a 0,382.
+# La marge est a regler : elle doit faire refuser la pose qui touchait, sans interdire la
+# pose zero ni l'espace de travail courant. Verification :
+#   python3 tools/check_state.py --servos 76 156 54 0 90     # attendu EN COLLISION
+#   python3 tools/check_state.py --servos 90 90 90 90 90     # attendu valide
+mast_collision:
+  ros__parameters:
+    object_id: camera_support
+    frame_id: base_link
+    shape: box
+    x: -0.047
+    y: 0.0
+    z_min: 0.10
+    z_max: 0.382
+    size_x: 0.020
+    size_y: 0.166
+    diameter: 0.040
+    margin: 0.020
+    timeout: 120.0
+    remove: false
