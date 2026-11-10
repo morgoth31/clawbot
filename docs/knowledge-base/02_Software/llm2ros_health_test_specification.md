@@ -3,13 +3,13 @@ title: "Spécification — test de santé des périphériques du robot (HLT)"
 date: "2026-11-10T08:12:00+08:00"
 author: "Hermes Agent"
 tags: [software, specification, health-check, peripheriques, ros2, diagnostic, tests]
-status: ouvert
+status: actif
 ---
 
 # Spécification — test de santé des périphériques (HLT)
 
-> Statut : proposition soumise à validation. Ce document passe à `validé` après accord sur les
-> décisions D-20 à D-23 (§12) ; aucun code n'est écrit avant.
+> Décisions D-20, D-22 et D-23 tranchées le 2026-11-10 ; D-21 reste non tranchée et ses seuils sont
+> appliqués en valeur provisoire, signalée dans chaque rapport.
 
 ## 1. Objet et périmètre
 
@@ -73,7 +73,7 @@ absent de l'inventaire n'est pas testé, et son absence n'est pas un défaut.
 | PER-05 | Batterie | oui | — | `/voltage` | tension dans une plage physique 8–13 V |
 | PER-06 | Lidar | non | aucun | `/scan` | — (déclaré non installé) |
 | PER-07 | Manette | non | `/dev/input/js*` avec couple propriétaire | — | au moins un bouton lu |
-| PER-08 | Chaîne YOLO | non | — | `/camera/detection_image` | nœud vivant si la chaîne est déclarée active |
+| PER-08 | Chaîne de détection YOLO | non | — | point d'entrée `http://127.0.0.1:8003/health` | `200` — le service publie en HTTP, aucun éditeur sur `/camera/detection_image` |
 | PER-09 | Arbre TF | oui | — | `/tf` | `base_link`, `odom`, `map` présents (aujourd'hui absents : [[ERR-2026-11-10-003_arbre_tf_incomplet]]) |
 
 ## 4. Modèle de sonde
@@ -178,9 +178,9 @@ l'ordre de découverte, pour que deux rapports se comparent ligne à ligne.
 
 | Usage | Forme | Exigence |
 |---|---|---|
-| opérateur | `python3 -m bridge_mcp.health --json` ; codes de sortie 0 `ok`, 1 `degraded`, 2 `failed`, 3 erreur interne | HLT-12 |
+| opérateur | `python3 -m bridge_mcp.health --json` ; codes de sortie 0 `ok`, 1 `degraded`, 2 `failed`, 3 erreur interne ; `--service-mode` sort 0 sauf erreur interne, pour ne pas marquer l'unité systemd en échec | HLT-12 |
 | S2 | outil MCP `diagnostics` (déjà au catalogue) et ressource `health://etat` | HLT-13 |
-| surveillance | `clawbot-health.service` (oneshot) déclenché par `clawbot-health.timer` toutes les 60 s, sortie au journal uniquement | HLT-15 |
+| surveillance | `clawbot-health.service` (oneshot) au démarrage, et `run_and_notify(reason=…)` appelé par S1 à chaque anomalie ; pas de timer périodique | HLT-15 |
 | déclencheurs | les sondes remplissent `Observation` (`bridge_mcp/observations.py`), consommée par `TriggerEngine` | HLT-14 |
 
 Le timer n'agit jamais : il observe et journalise. Toute correction reste une décision — humaine, ou
@@ -204,7 +204,7 @@ de S2 via les outils d'intervention encadrés par l'arbitre.
 | HLT-12 | Interface ligne de commande avec sortie JSON et codes de sortie 0/1/2/3 | `python3 -m bridge_mcp.health --json` retourne le bon code selon le verdict |
 | HLT-13 | Le rapport alimente l'outil MCP `diagnostics` et la ressource `health://etat` sans duplication de logique | `diagnostics` retourne exactement le rapport de la dernière exécution, horodaté |
 | HLT-14 | Le test de santé ne redéfinit aucune règle de déclenchement : il alimente `Observation`, `TriggerEngine` décide | Les seuils de cadence et d'âge sont lus depuis `bridge_mcp/triggers.py`, pas réécrits |
-| HLT-15 | Exécution périodique par timer systemd, sans action corrective, sortie au journal | `systemctl list-timers` montre le timer ; le journal contient un rapport par période |
+| HLT-15 | Exécution au démarrage par unité oneshot, et à chaque anomalie émise par S1 ; aucune exécution périodique, aucune action corrective | `systemctl start clawbot-health.service` produit un rapport et laisse l'unité en succès ; le journal contient une ligne `notification: <statut>` |
 | HLT-16 | Chaque verdict cite l'exigence et l'inventaire qui le justifient (`spec_refs`) | Revue de la matrice exigence → test |
 | HLT-17 | Aucun secret, aucun jeton, aucun chemin de credentials dans le rapport | Analyse statique sur 100 rapports |
 | HLT-18 | Aucune donnée inventée : une mesure impossible est `null` avec code, jamais `0` ni `false` implicite | Rapport sur périphérique débranché : mesures `null` et codes explicites |
@@ -231,12 +231,50 @@ reste en domaine 28 ([[llm2ros_mcp_test_plan]] §3).
 
 | ID | Question | Proposition |
 |---|---|---|
-| D-20 | Quels périphériques sont `requis: true` ? | caméra couleur, profondeur, IMU, carte de commande, batterie, arbre TF ; lidar, manette et YOLO en optionnels |
-| D-21 | Seuils de cadence et d'âge | `ok` ≥ 80 % du nominal, `degraded` ≥ 50 %, `failed` < 50 % ; âge `failed` au-delà de 10 périodes |
-| D-22 | Période d'exécution | 60 s par timer systemd, plus à la demande |
-| D-23 | Que faire d'un `failed` ? | journal et entrée d'audit seulement, aucune relance automatique de service : le redémarrage reste une décision |
+| D-20 | Quels périphériques sont `requis: true` ? | **Tranchée le 2026-11-10 :** le statut des périphériques est envoyé à l'humain par Telegram ; aucune barrière ni action locale. `requis` reste déclaré pour le verdict, mais `ACTIONS_ON_FAILURE` est vide. Requis : caméra couleur, profondeur, IMU, carte de commande, batterie, arbre TF |
+| D-21 | Seuils de cadence et d'âge | **Non tranchée.** Valeurs appliquées à titre provisoire : `ok` ≥ 80 % du nominal, `degraded` ≥ 50 %, `failed` < 50 % ; âge `failed` au-delà de 10 périodes. Signalées `provisional` dans chaque rapport |
+| D-22 | Période d'exécution | **Tranchée le 2026-11-10 :** au démarrage et à chaque anomalie émise par le graphe de S1, sans exécution périodique |
+| D-23 | Que faire d'un `failed` ? | **Tranchée le 2026-11-10 :** message à l'humain par Telegram, aucune relance automatique |
 
-## 13. Voir aussi
+## 13. Implémentation et mesures réelles (2026-11-10)
+
+| Module | Rôle |
+|---|---|
+| `bridge_mcp/health.py` | inventaire, vues `device` et `ros`, agrégation des verdicts, CLI, `run_and_notify` |
+| `bridge_mcp/notify.py` | message humain et envoi Telegram, jetons lus dans `/etc/clawbot/telegram-{token,chat}` |
+| `services/clawbot-health.service` | oneshot au démarrage, `--notify --reason demarrage --service-mode` |
+| `tests/mcp_bridge/health/` | 33 tests : inventaire, sondes, rapport, notification, endpoint HTTP |
+
+Rapport réel, domaine 28, deux exécutions consécutives identiques :
+
+```
+verdict: failed | durée: 7216 ms
+  PER-01 camera couleur         ok          cadence 20,087 Hz
+  PER-02 camera profondeur      ok          cadence 30,166 Hz
+  PER-03 centrale inertielle    ok          cadence 10,397 Hz
+  PER-04 carte de commande      ok          port tenu par un seul processus
+  PER-05 batterie               ok          cadence 10,399 Hz
+  PER-06 lidar                  unavailable non installé
+  PER-07 manette                failed      aucun noeud d'entree
+  PER-08 chaine de detection    ok          HTTP 200
+  PER-09 arbre TF               failed      base_link, odom, map absents
+notification: not_configured (livre=False)
+```
+
+Quatre défauts trouvés **par la mesure réelle**, invisibles sur les faux systèmes :
+
+| Défaut | Effet constaté | Correction |
+|---|---|---|
+| Âge pris sur `header.stamp` | `/voltage` (`std_msgs/Float32`, sans en-tête) jugé muet alors qu'il publiait à 10 Hz | âge d'arrivée horodaté à la réception quand l'en-tête manque |
+| Comparaison de noms de nœuds avec barre oblique | `/driver_node` déclaré absent alors qu'il tournait | comparaison normalisée |
+| Découverte DDS comptée dans la fenêtre | caméra 20 Hz mesurée à 15–18 Hz, verdict `degraded` erratique | fenêtre de découverte de 1,5 s puis compteurs remis à zéro |
+| Cadence calculée sur la durée de fenêtre | 18,4 Hz au lieu de 20,08 Hz, verdict instable d'une exécution à l'autre | cadence calculée sur l'intervalle entre premier et dernier message |
+| `PER-08` déclaré sur un topic | `/camera/detection_image` : 0 éditeur, service YOLO actif mais en HTTP | sonde HTTP sur `:8003/health` |
+
+Le service systemd sort en succès même quand le verdict est `failed` (`--service-mode`) : le verdict est
+dans le rapport et dans le message, pas dans le code de sortie de l'unité.
+
+## 14. Voir aussi
 
 - [[llm2ros_mcp_specification]] — déclencheurs et contexte d'incident
 - [[llm2ros_mcp_test_plan]] — architecture de la suite, isolation

@@ -111,9 +111,11 @@ def register_tools(mcp: MCPServer, state: BridgeState) -> None:
     def topic_stats(topic: str, window_s: int = 5) -> Any:
         return not_wired("topic_stats")
 
-    @mcp.tool(name="diagnostics", description="Diagnostics agrégés du robot, données indisponibles comprises.", annotations=READ_ONLY)
+    @mcp.tool(name="diagnostics", description="Dernier rapport de santé des périphériques, données indisponibles comprises.", annotations=READ_ONLY)
     def diagnostics(level: str = "all") -> Any:
-        return not_wired("diagnostics")
+        if state.last_health is None:
+            return error_result("MCP-E-PREREQ", "aucun rapport de sante disponible : lancer bridge_mcp.health")
+        return ok_result(state.last_health)
 
     @mcp.tool(name="param_get", description="Valeur, type et bornes d'un paramètre ROS 2.", annotations=READ_ONLY)
     def param_get(node: str, name: str) -> Any:
