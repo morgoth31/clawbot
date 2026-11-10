@@ -21,18 +21,53 @@ status: ouvert
 
 ## 1. Nature de l'échec
 
-Une consigne `geometry_msgs/Twist.linear.x = 0,10` produit, sur `/vel_raw`, une vitesse **de signe opposé** et d'amplitude **environ dix fois supérieure** : `−1,079 m/s` au pic. La bibliothèque `Rosmaster_Lib.set_car_motion()` transmet la valeur en mm/s (`int(v_x*1000)`), sans facteur d'échelle, et le nœud de conduite transmet `msg.linear.x` sans correction (`Mcnamu_driver_X3.py`, `cmd_vel_callback`).
+Le robot est sur cales, **roues en l'air** : il ne peut pas translater, seules les roues tournent. Toute consigne de vitesse non nulle produit une rotation de roues à **vitesse saturée** (~0,82 m/s), **indépendante de la consigne**, et de **signe opposé** à celle-ci :
+
+| Consigne `linear.x` | `/vel_raw.linear.x` en régime (moyenne) | Min / max sur la fenêtre |
+|---|---|---|
+| `+0,05 m/s` | **−0,680 m/s** | −1,276 / 0,000 |
+| `+0,10 m/s` | **−0,836 m/s** | −1,295 / 0,000 |
+| `+0,20 m/s` | **−0,816 m/s** | −1,303 / 0,000 |
+| `−0,10 m/s` | **+0,813 m/s** | −0,003 / +1,253 |
+
+Trois consignes de 0,05 à 0,20 m/s donnent la même vitesse à 3 % près : ce n'est pas une erreur d'échelle, c'est une **saturation de la boucle de vitesse**. Le signe opposé et la saturation pour toute consigne non nulle sont la signature d'une contre-réaction de signe inversé (signe moteur ou signe encodeur), l'erreur `consigne − mesure` augmentant au lieu de diminuer jusqu'à la butée.
+
+Chaîne concernée : `geometry_msgs/Twist` → `Mcnamu_driver_X3.py` (`cmd_vel_callback`, aucune correction) → `Rosmaster_Lib.set_car_motion()` (valeurs en mm/s) → PID du MCU (firmware 3.5, `kp 0,8 / ki 0,06 / kd 0,5`) → encodeurs.
 
 ## 2. Preuves
 
-Relevé direct, consigne maintenue 1,5 s, 24 échantillons de `/vel_raw` :
+Relevé par paliers de 3 s, moyenne sur la seconde moitié de chaque palier (20 à 24 échantillons) :
 
 ```
-consigne 0.10 m/s -> vel_raw x moyen -0.177 m/s (min -1.079 max 0.000, 24 echantillons)
-echantillons: [0.0, 0.0, 0.0, -0.011, -0.023, -0.034, -0.073, -0.15, -0.235, -0.394, -0.796, -1.079]
+odom initial (0.0, 0.0)
+consigne +0.05 m/s -> vel_raw regime moyen -0.680 m/s (min -1.276 max +0.000, 20 ech.)
+   odom apres: (-2.491, 0.047)
+consigne +0.10 m/s -> vel_raw regime moyen -0.836 m/s (min -1.295 max +0.000, 24 ech.)
+   odom apres: (-5.558, 0.139)
+consigne +0.20 m/s -> vel_raw regime moyen -0.816 m/s (min -1.303 max +0.000, 24 ech.)
+   odom apres: (-8.987, 0.212)
+consigne -0.10 m/s -> vel_raw regime moyen +0.813 m/s (min -0.003 max +1.253, 24 ech.)
+   odom apres: (-6.222, 0.243)
 ```
 
-Essai de déplacement correspondant, consigne `0,12 m/s` pendant 2,0 s (0,24 m attendus), odométrie intégrée depuis `/vel_raw` :
+Les positions `odom` sont l'intégration de ces vitesses : le robot étant sur cales, elles mesurent la **rotation des roues**, pas une translation.
+
+Mesure directe roue par roue, service arrêté, bibliothèque `Rosmaster_Lib` :
+
+```
+encodeurs au repos           (-45442, -45323, -38840, -45689)
+encodeurs apres PWM +30 1,5s (-48231, -48207, -41225, -48009)
+delta par roue               (-2789, -2884, -2385, -2320)
+
+motion avant cmd             (0.0, 0.0, 0.0)
+motion pendant cmd +0,10     (-1.287, 0.011, 0.493)
+motion apres arret           (0.0, 0.0, 0.0)
+delta encodeurs pendant cmd  (-9337, -9530, -7702, -8361)
+```
+
+Les quatre encodeurs avancent du même signe négatif, y compris en commande ouverte : le défaut est **global** (convention de signe du firmware ou du type de châssis), il ne vient pas d'un seul moteur câblé à l'envers. La vitesse angulaire `0,493 rad/s` apparaît alors que `angular.z = 0`.
+
+Essai antérieur de 2 s à 0,12 m/s via `/cmd_vel`, même chaîne :
 
 ```
 debut      : odom=(+0.000, +0.000)  degagement frontal=3.97 m
@@ -41,8 +76,6 @@ apres avant: odom=(-1.658, +0.051)  deplacement=1.659 m  degagement=3.97 m
 marche arriere -0,10 m/s pendant 2,0 s
 apres retour: odom=(-0.051, +0.003)  deplacement=1.608 m
 ```
-
-Le retour à 5 cm du point de départ indique que la vitesse rapportée reste cohérente avec elle-même sur les deux sens : l'erreur est un facteur d'échelle et un signe, pas un bruit.
 
 Contexte : [[2026-11-10_tests_cartographie]].
 
