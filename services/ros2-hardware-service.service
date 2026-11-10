@@ -13,9 +13,12 @@ ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
 Restart=on-failure
 RestartSec=5
 Environment=ROS_DOMAIN_ID=28
-Environment=WORKSPACE_PATH=/home/jetson/.openclaw/workspace
+Environment=WORKSPACE_PATH=/home/jetson/clawbot/workspace
 Environment=CAMERA_FRONT_INDEX=0
-Environment=CAMERA_CLAW_INDEX=2
+# Caméra du bras = seul périphérique UVC du bus, sur /dev/video0 (0c45:6340). L'index 2
+# n'existe pas : « claw » répondait 500. « front » pointe encore sur le même périphérique
+# tant que la vue avant (Astra, /camera/color/image_raw) n'est pas servie en ROS.
+Environment=CAMERA_CLAW_INDEX=0
 Environment=HARDWARE_SERVICE_PORT=8001
 Environment=MAX_LINEAR_MS=0.06
 Environment=MAX_ANGULAR_RS=0.25

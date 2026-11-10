@@ -20,6 +20,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | Caméra du bras | Module UVC `0c45:6340` sur le port `1-2.2.1`, aucun topic ROS publié | [[camera_usb_bras]] |
 | Perception laser | YDLIDAR TG30, TOF 360°, firmware 1.71, `/scan` à 10,05 Hz | [[ydlidar_tg30]] |
 | Bras manipulateur | 5 axes + pince, 6 servos bus série sur le MCU, présence confirmée le 2026-11-10 | [[bras_6dof]] |
+| Manipulation | MoveIt 2.5.10 + `clawbot_moveit_config` + `clawbot_arm_controller`, plan et exécution mesurés | [[manipulation_moveit]] |
 | Description géométrique | `clawbot_x3plus.urdf`, 21 liens, `clawbot-description.service` | [[modele_urdf_clawbot]] |
 | Énergie | Batterie principale, tension télémétrée 11,9 V | [[batterie_principale]] |
 | Middleware | ROS 2 Humble, `ROS_DOMAIN_ID=28` | [[ros2_graph_clawbot]] |
@@ -47,6 +48,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── systemd_robot_services.md
 │   ├── ros2_nav_stack.md
 │   ├── modele_urdf_clawbot.md
+│   ├── manipulation_moveit.md
 │   ├── ports_reseau.md
 │   ├── bom_logiciel.md
 │   ├── llm2ros_bridge.md
@@ -65,6 +67,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
     ├── 2026-11-10_bootstrap_knowledge_base.md
     ├── 2026-11-10_tests_cartographie.md
     ├── 2026-11-10_rebranchement_camera_bras.md
+    ├── 2026-11-10_mise_en_service_manipulation.md
     ├── etat_noeuds_et_services.md
     ├── mise_a_jour_firmware_carte_rosmaster.md
     └── errors_traces/
@@ -123,3 +126,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 20:35 | Cartographie : deux essais sur le robot (statique puis roues en l'air), cartes sauvegardées dans `maps/`, `/map` à 1 Hz | [[2026-11-10_tests_cartographie]] |
 | 2026-11-10 20:40 | Anomalie critique : boucle de vitesse saturée (~0,82 m/s) et signe inversé quelle que soit la consigne ; cartographie réelle impossible sur cales | [[ERR-2026-11-10-009_commande_vitesse_non_proportionnelle]] |
 | 2026-11-10 19:16 | Caméra du bras débranchée puis rebranchée : reprise UVC sur `video0` (device 6 → 16), capture V4L2 et inférence OpenCV OK ; index « claw » toujours sur 2, outil non fonctionnel ; identification de la caméra du bras séparée de l'Astra | [[2026-11-10_rebranchement_camera_bras]], [[camera_usb_bras]] |
+| 2026-11-10 19:55 | Manipulation : MoveIt 2 planifie et exécute jusqu'aux servos — paquets `clawbot_moveit_config` et `clawbot_arm_controller`, 22 tests verts, plan à 30 points, chaîne complète validée sur domaine isolé ; index caméra « claw » ramené à 0 (HTTP 200) | [[2026-11-10_mise_en_service_manipulation]], [[manipulation_moveit]] |

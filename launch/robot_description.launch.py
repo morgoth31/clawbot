@@ -32,13 +32,20 @@ def generate_launch_description():
     )
 
     # la description est passee en parametre : joint_state_publisher n'attend pas
-    # le topic /robot_description (qui reste en transient_local cote RSP)
+    # le topic /robot_description (qui reste en transient_local cote RSP).
+    # source_list : les positions du bras viennent du controleur (clawbot_arm_controller),
+    # qui publie les consignes sur /arm/joint_states ; sans cela, deux editeurs se
+    # contrediraient sur /joint_states (zeros ici, consignes la-bas).
     jsp = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
         name='joint_state_publisher',
         output='screen',
-        parameters=[{'robot_description': ParameterValue(description, value_type=str)}],
+        parameters=[{
+            'robot_description': ParameterValue(description, value_type=str),
+            'source_list': ['/arm/joint_states'],
+            'rate': 20.0,
+        }],
     )
 
     return LaunchDescription([rsp, jsp])

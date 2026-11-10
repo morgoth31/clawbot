@@ -142,6 +142,7 @@ nav:
           - Graphe ROS 2: knowledge-base/02_Software/ros2_graph_clawbot.md
           - Modèle URDF: knowledge-base/02_Software/modele_urdf_clawbot.md
           - Nœud de conduite: knowledge-base/02_Software/yahboomcar_bringup_driver_node.md
+          - Manipulation (MoveIt 2): knowledge-base/02_Software/manipulation_moveit.md
           - Chaîne de navigation: knowledge-base/02_Software/ros2_nav_stack.md
           - Services systemd: knowledge-base/02_Software/systemd_robot_services.md
   - Exploitation:
@@ -150,6 +151,7 @@ nav:
       - Journal de capture initiale: knowledge-base/03_Operations/2026-11-10_bootstrap_knowledge_base.md
       - Tests de cartographie: knowledge-base/03_Operations/2026-11-10_tests_cartographie.md
       - Rebranchement caméra du bras: knowledge-base/03_Operations/2026-11-10_rebranchement_camera_bras.md
+      - Mise en service de la manipulation: knowledge-base/03_Operations/2026-11-10_mise_en_service_manipulation.md
       - Procédure firmware carte Rosmaster: knowledge-base/03_Operations/mise_a_jour_firmware_carte_rosmaster.md
       - Traces d'erreurs:
           - ERR-001 absence de scan laser: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-001_absence_topic_scan.md
