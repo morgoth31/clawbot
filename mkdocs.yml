@@ -135,6 +135,7 @@ nav:
           - Carte Rosmaster X3: knowledge-base/01_Hardware/rosmaster_x3_mcu.md
           - Caméra Astra Pro+: knowledge-base/01_Hardware/orbbec_astra_pro_plus.md
           - Caméra du bras (UVC): knowledge-base/01_Hardware/camera_usb_bras.md
+          - Inventaire matériel: knowledge-base/01_Hardware/inventaire_materiel.md
           - Lidar YDLIDAR TG30: knowledge-base/01_Hardware/ydlidar_tg30.md
           - Bras 6 axes: knowledge-base/01_Hardware/bras_6dof.md
           - Batterie principale: knowledge-base/01_Hardware/batterie_principale.md
@@ -144,6 +145,7 @@ nav:
           - Nœud de conduite: knowledge-base/02_Software/yahboomcar_bringup_driver_node.md
           - Manipulation (MoveIt 2): knowledge-base/02_Software/manipulation_moveit.md
           - Étalonnage du bras: knowledge-base/02_Software/etalonnage_bras.md
+          - Serveur MCP (Hermes): knowledge-base/02_Software/mcp_hermes.md
           - Chaîne de navigation: knowledge-base/02_Software/ros2_nav_stack.md
           - Services systemd: knowledge-base/02_Software/systemd_robot_services.md
   - Exploitation:

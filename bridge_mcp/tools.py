@@ -18,6 +18,7 @@ from mcp.server.mcpserver import MCPServer
 
 from bridge_mcp import context, contract, limits
 from bridge_mcp.envelope import error_result, not_wired, ok_result
+from bridge_mcp.ros_layer import RosInvalid, RosLayer, RosTimeout, RosUnavailable
 from bridge_mcp.state import BridgeState
 
 READ_ONLY = types.ToolAnnotations(read_only_hint=True)
@@ -25,6 +26,29 @@ DESTRUCTIVE = types.ToolAnnotations(read_only_hint=False, destructive_hint=True,
 IDEMPOTENT = types.ToolAnnotations(read_only_hint=False, destructive_hint=True, idempotent_hint=True)
 
 PROPOSALS_DIR = Path(os.environ.get("BRIDGE_PROPOSALS_DIR", "/tmp/clawbot-proposals"))
+
+_ROS: RosLayer | None = None
+
+
+def _ros() -> RosLayer:
+    """Couche ROS 2 partagée, construite au premier usage."""
+    global _ROS
+    if _ROS is None:
+        _ROS = RosLayer()
+    return _ROS
+
+
+def _ros_call(feature: str, fn, *args, **kwargs):
+    """Traduit les exceptions de la couche basse en codes MCP stables."""
+    try:
+        return ok_result(fn(*args, **kwargs))
+    except RosInvalid as exc:
+        return error_result("MCP-E-ARG", f"{feature} : {exc}")
+    except RosTimeout as exc:
+        return error_result("MCP-E-TIMEOUT", f"{feature} : {exc}")
+    except RosUnavailable as exc:
+        return error_result("MCP-E-PREREQ", f"{feature} : couche ROS 2 indisponible",
+                            detail=str(exc))
 
 
 def _require_incident(state: BridgeState, incident_id: str | None):
@@ -101,15 +125,15 @@ def register_tools(mcp: MCPServer, state: BridgeState) -> None:
 
     @mcp.tool(name="graph_snapshot", description="Instantané du graphe ROS 2 : nœuds, topics, types, QoS.", annotations=READ_ONLY)
     def graph_snapshot(include_qos: bool = True) -> Any:
-        return not_wired("graph_snapshot")
+        return _ros_call("graph_snapshot", _ros().graph_snapshot, include_qos)
 
     @mcp.tool(name="tf_snapshot", description="Arêtes TF présentes, cadres manquants et péremption.", annotations=READ_ONLY)
     def tf_snapshot(root: str = "base_link", depth: int = 3) -> Any:
-        return not_wired("tf_snapshot")
+        return _ros_call("tf_snapshot", _ros().tf_snapshot, root, depth)
 
     @mcp.tool(name="topic_stats", description="Cadence, âge et nombre d'éditeurs d'un topic.", annotations=READ_ONLY)
     def topic_stats(topic: str, window_s: int = 5) -> Any:
-        return not_wired("topic_stats")
+        return _ros_call("topic_stats", _ros().topic_stats, topic, window_s)
 
     @mcp.tool(name="diagnostics", description="Dernier rapport de santé des périphériques, données indisponibles comprises.", annotations=READ_ONLY)
     def diagnostics(level: str = "all") -> Any:
@@ -119,11 +143,11 @@ def register_tools(mcp: MCPServer, state: BridgeState) -> None:
 
     @mcp.tool(name="param_get", description="Valeur, type et bornes d'un paramètre ROS 2.", annotations=READ_ONLY)
     def param_get(node: str, name: str) -> Any:
-        return not_wired("param_get")
+        return _ros_call("param_get", _ros().param_get, node, name)
 
     @mcp.tool(name="param_list", description="Paramètres d'un nœud ROS 2 avec leur valeur courante.", annotations=READ_ONLY)
     def param_list(node: str) -> Any:
-        return not_wired("param_list")
+        return _ros_call("param_list", _ros().param_list, node)
 
     @mcp.tool(name="logs_tail", description="Dernières entrées du journal du pont.", annotations=READ_ONLY)
     def logs_tail(since_iso: str = "", limit: int = 50) -> dict:
@@ -163,7 +187,7 @@ def register_tools(mcp: MCPServer, state: BridgeState) -> None:
 
     @mcp.tool(name="goal_list", description="Objectifs d'action actifs et actions disponibles.", annotations=READ_ONLY)
     def goal_list() -> Any:
-        return not_wired("goal_list")
+        return _ros_call("goal_list", _ros().goal_list)
 
     # ── Intervention ──────────────────────────────────────────────────────
     @mcp.tool(name="param_set", description="Écrit un paramètre ROS 2 après contrôle de la liste blanche et des bornes.", annotations=DESTRUCTIVE)
@@ -206,22 +230,27 @@ def register_tools(mcp: MCPServer, state: BridgeState) -> None:
         goal: dict | None = None,
         justification: str = "",
     ) -> Any:
-        _incident, refusal = _require_incident(state, incident_id)
-        if refusal is not None:
-            return refusal
+        if incident_id:
+            _incident, refusal = _require_incident(state, incident_id)
+            if refusal is not None:
+                return refusal
         if action not in limits.LIMITS["allowed_actions"]:
             return error_result("MCP-E-PREREQ", f"action non déclarée : {action}")
-        return not_wired("goal_send")
+        result = _ros_call("goal_send", _ros().goal_send, action, goal or {})
+        state.record("goal_send", {"incident_id": incident_id, "action": action,
+                                   "goal": goal or {}, "justification": justification})
+        return result
 
     @mcp.tool(name="safety_stop", description="Arrêt immédiat et verrou persistant, hors file des mutations.", annotations=IDEMPOTENT)
     def safety_stop(incident_id: str | None = None, reason: str = "") -> Any:
         if not reason:
             return error_result("MCP-E-ARG", "reason est obligatoire pour un arrêt")
         state.record("safety_stop_demande", {"incident_id": incident_id, "reason": reason})
-        return error_result(
-            "MCP-E-PREREQ",
-            "arrêt non délivré : l'arbitre d'actionneurs n'est pas câblé ; utiliser l'arrêt physique",
-        )
+        result = _ros_call("safety_stop", _ros().safety_stop)
+        if not (isinstance(result, dict) and result.get("status") == "refused"):
+            state.stop_latched = True
+            state.record("safety_stop_execute", {"incident_id": incident_id, "reason": reason})
+        return result
 
     @mcp.tool(name="spec_propose", description="Écrit une proposition de modification de spécification, sans exécution.", annotations=DESTRUCTIVE)
     def spec_propose(
