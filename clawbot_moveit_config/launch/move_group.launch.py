@@ -46,6 +46,13 @@ def generate_launch_description():
         'robot_description_semantic': semantic,
         'robot_description_kinematics': kinematics,
         'robot_description_planning': {'joint_limits': limits['joint_limits']},
+        # Le cadre de planification doit etre `base_link`, pas la racine du modele
+        # (`base_footprint`). Sur ce robot, `base_link` recoit son parent de deux sources — la
+        # description (`base_footprint -> base_link`) et l'EKF (`odom -> base_link`) — et la
+        # seconde l'emporte : `base_footprint` reste orphelin dans TF. Un planificateur qui s'y
+        # accroche perd la lumiere du monde, ne joint plus les cadres camera et repond
+        # `COLLISION_CHECKING_UNAVAILABLE` (-21) meme sur la pose courante.
+        'planning_frame': 'base_link',
         'default_planning_pipeline': 'ompl',
         'planning_pipelines': ['ompl'],
         'ompl': ompl,

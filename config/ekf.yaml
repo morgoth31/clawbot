@@ -1,7 +1,15 @@
 # Fusion odométrique du Clawbot X3 Plus.
 # Entrées : /odom_raw (nav_msgs/Odometry produite par le driver à partir des encodeurs)
 #           /imu/data_raw (gyro du MCU, nécessaire pour compenser le glissement Mecanum)
-# Sortie  : /odom + TF odom -> base_link
+# Sortie  : /odom + TF odom -> base_footprint
+#
+# `base_link_frame` vaut **base_footprint**, pas base_link : l'URDF déclare déjà
+# `base_footprint -> base_link` (joint fixe), et deux écrivains du parent de base_link — l'EKF et
+# robot_state_publisher — laissent TF avec deux arbres déconnectés. Conséquence mesurée le
+# 2026-11-11 : move_group ne joint plus les cadres (`base_footprint` orphelin), pick_ik répond
+# `COLLISION_CHECKING_UNAVAILABLE` (-21) même sur la pose courante, et le planificateur ne peut
+# rien produire. Avec la chaîne odom -> base_footprint -> base_link, une seule arête par lien et
+# `base_link` reste atteignable depuis odom comme avant.
 ekf_filter_node:
   ros__parameters:
     frequency: 30.0
@@ -11,7 +19,7 @@ ekf_filter_node:
     print_diagnostics: true
     map_frame: map
     odom_frame: odom
-    base_link_frame: base_link
+    base_link_frame: base_footprint
     world_frame: odom
 
     odom0: /odom_raw
