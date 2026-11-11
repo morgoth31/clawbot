@@ -61,7 +61,7 @@ et interrompt ; S2 planifie, arbitre le sens, et se réveille sur événement.
 - Apprentissage en ligne, ajustement de politique, RL.
 - Navigation 3D ou tout-terrain.
 - **Échecs : hors périmètre de cette version.** C'était un exemple d'usage, pas un objectif ; le lot
-  est décrit au §13 (ligne 11) pour ne pas le perdre, et sera instruit après la solidité système.
+  est décrit au §12 (ligne 11) pour ne pas le perdre, et sera instruit après la solidité système.
 - Échecs en compétition : un échiquier, pièces légères, niveau loisir.
 
 **Anti-objectifs** (réussite technique mais échec réel)
@@ -257,10 +257,10 @@ anti-basculement ne dépend donc que de l'arbitre et du jeton de contrôle, pas 
 - Format des snapshots et politique de rétention.
 - Stratégie de test : `ROS_DOMAIN_ID=99` obligatoire, jamais 28 pendant les tests.
 
-## 13. Réponses à la relecture indépendante (2026-11-11)
+## 12. Réponses à la relecture indépendante (2026-11-11)
 
 Onze questions ont été posées par un roboticien ROS 2 chargé d'en tirer un plan sans pouvoir
-interroger l'auteur. Dix sont tranchées ici ; deux restent à l'opérateur (§14).
+interroger l'auteur. Dix sont tranchées ici ; les deux dernières ont été arbitrées par l'opérateur (§13).
 
 | # | Question | Décision | Effet sur le plan |
 |---|---|---|---|
@@ -280,14 +280,14 @@ Précision issue de la relecture : `arm_trajectory_server` accepte l'annulation,
 pas replier** — c'est pourquoi le réflexe est un maintien puis une coupure de couple, et non un
 mouvement de repli.
 
-## 14. Arbitrages rendus par l'opérateur (2026-11-11)
+## 13. Arbitrages rendus par l'opérateur (2026-11-11)
 
 | Question | Réponse | Conséquence |
 |---|---|---|
 | Les échecs dans cette version ? | **Non.** C'était un exemple d'usage ; la priorité est une architecture système solide. | Le périmètre livrable est : déplacement, cartographie, saisie, recherche, transport, suivi de personne, interaction. Le lot échecs reste décrit et reprend plus tard sans rien casser. |
 | Quand réveiller S2 en fin de tâche ? | **Oui, en fin de tâche**, succès compris. | Le robot rend compte de ce qu'il a fait ; anti-rebond 2 s, et bascule sur Telegram si personne n'est présent depuis 60 s. |
 
-## 12. Décisions prises dans la conversation
+## 14. Décisions prises dans la conversation
 
 1. Approche **C** (hybride Nav2 + directeur JSON + arbitre séparé), pour ne pas partager
    d'ordonnanceur entre réflexe et planification.
@@ -297,3 +297,5 @@ mouvement de repli.
 5. Échelle de priorité **0 > 1 > 2 > 3**, préemption au prochain point sûr.
 6. Enceinte Bluetooth en **sortie seule**, STT sur les micros existants.
 7. Mode dégradé hors ligne conservé (S1 traite les commandes connues, S2 est un bonus).
+8. Échecs **hors périmètre** de cette version : exemple d'usage, pas objectif.
+9. **Réveil de S2 en fin de tâche**, succès compris, avec anti-rebond et repli Telegram.
