@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "yahboomcar_bringup" / "yahboomcar_bringup"))
 
-from cmd_scaling import MAX_LINEAR, scale_cmd_vel, scale_linear  # noqa: E402
+from cmd_scaling import MAX_LINEAR, feedback, scale_cmd_vel, scale_linear  # noqa: E402
 
 
 def test_command_is_proportional():
@@ -31,3 +31,13 @@ def test_nan_never_reaches_the_mcu():
 def test_lateral_axis_is_handled_like_forward():
     # base mecanum : vy est une vraie consigne, pas un bruit
     assert scale_cmd_vel(0.0, 0.1, 0.0)[1] == 0.1
+
+
+def test_feedback_sign_matches_command():
+    # mesuré sur cales : consigne +0,05 -> retour brut -0,843
+    assert feedback(-0.843) > 0
+    assert feedback(0.745) < 0
+
+
+def test_feedback_survives_nan():
+    assert feedback(float("nan")) == 0.0

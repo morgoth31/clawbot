@@ -44,3 +44,14 @@ def scale_angular(value: float, gain: float = ANGULAR_GAIN) -> float:
 def scale_cmd_vel(vx: float, vy: float, wz: float) -> tuple[float, float, float]:
     """Trame prête pour `set_car_motion(vx, vy, wz)`."""
     return scale_linear(vx), scale_linear(vy), scale_angular(wz)
+
+
+# Le MCU renvoie la vitesse avec un signe inversé (mesuré sur cales le 2026-11-11 :
+# consigne +0,05 -> retour -0,843, consigne -0,05 -> retour +0,745).
+# La correction est appliquée au retour, pas à la consigne : le MCU attend bien un signe normal.
+FEEDBACK_SIGN = -1.0
+
+
+def feedback(value: float) -> float:
+    """Vitesse mesurée remise dans la convention ROS (avance = +x)."""
+    return _finite(value) * FEEDBACK_SIGN

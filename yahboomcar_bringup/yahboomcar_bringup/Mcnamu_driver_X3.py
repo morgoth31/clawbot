@@ -18,9 +18,9 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Imu,MagneticField, JointState
 from nav_msgs.msg import Odometry
 try:
-	from .cmd_scaling import scale_cmd_vel
+	from .cmd_scaling import feedback, scale_cmd_vel
 except ImportError:  # exécution directe du fichier
-	from cmd_scaling import scale_cmd_vel
+	from cmd_scaling import feedback, scale_cmd_vel
 from rclpy.clock import Clock
 
 #from dynamic_reconfigure.server import Server
@@ -174,8 +174,8 @@ class yahboomcar_driver(Node):
 		
 		# 将小车当前的线速度和角速度发布出去
 		# Publish the current linear vel and angular vel of the car
-		twist.linear.x = vx *1.0
-		twist.linear.y = vy *1.0
+		twist.linear.x = feedback(vx)
+		twist.linear.y = feedback(vy)
 		twist.angular.z = angular*1.0    
 		self.velPublisher.publish(twist)
 		# /odom_raw : Odometry pour robot_localization (Twist nu inutilisable par l'EKF)
