@@ -60,7 +60,7 @@ def feedback(value: float) -> float:
 
 #: pas de rampe par appel de commande (m/s). À 10-20 Hz, cela borne l'accélération demandée
 #: et empêche l'intégrateur du STM32 de windup pendant le temps mort de friction statique.
-RAMP_STEP = 0.02
+RAMP_STEP = 0.05
 
 
 def ramp_cmd(prev, target, max_delta=RAMP_STEP):
@@ -70,3 +70,16 @@ def ramp_cmd(prev, target, max_delta=RAMP_STEP):
         delta = max(-max_delta, min(max_delta, _finite(t) - _finite(p)))
         out.append(_finite(p) + delta)
     return tuple(out)
+
+
+#: Impulsion de décollage : le MCU ne bouge pas avant ~1 s à cause de la friction statique.
+#: On dépasse brièvement la consigne pour casser l'adhérence, puis on y revient.
+KICK_FACTOR = 1.8
+KICK_S = 0.25
+
+
+def kick_boost(target, elapsed_s, factor=KICK_FACTOR, window_s=KICK_S):
+    """Multiplie la consigne pendant la fenêtre de décollage, puis la laisse telle quelle."""
+    if elapsed_s >= window_s or target == 0.0:
+        return target
+    return target * factor
