@@ -30,7 +30,7 @@ arm_trajectory_server:
     # Position supposee au demarrage (radians) : le MCU ne publie pas la position du
     # bras, ce noeud ne peut donc pas la lire. Mettre le bras en pose de reference
     # avant de demarrer le service, ou ajuster ici.
-    initial_positions: [0.000000, 0.000000, 0.000000, -0.017453, 0.000000]
+    initial_positions: [-0.244346, 0.122173, 0.000000, 0.000000, 0.000000]
     initial_grip_position: -0.265222
 
     # Articulations dont le servo n'est jamais commande (mais qui restent publiées dans

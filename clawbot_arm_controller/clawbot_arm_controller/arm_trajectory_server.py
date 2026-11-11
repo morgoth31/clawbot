@@ -23,6 +23,8 @@ import math
 import threading
 import time
 
+from std_msgs.msg import Bool
+
 import rclpy
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
 from rclpy.callback_groups import ReentrantCallbackGroup
@@ -64,6 +66,10 @@ class ArmTrajectoryServer(Node):
 
     def __init__(self):
         super().__init__('arm_trajectory_server')
+
+        # Le reflexe du S1 publie /safety/hold : on interrompt la trajectoire en cours.
+        self._hold = False
+        self.create_subscription(Bool, '/safety/hold', self._on_safety_hold, 10)
 
         arm_defaults = default_arm_specs()
         grip_default = default_gripper_spec()
@@ -210,6 +216,11 @@ class ArmTrajectoryServer(Node):
 
         return callback
 
+    def _on_safety_hold(self, msg):
+        if msg.data and not self._hold:
+            self.get_logger().warning('safety hold recu : interruption des trajectoires')
+        self._hold = bool(msg.data)
+
     def _handle_accepted(self, goal_handle, which):
         with self._lock:
             previous = self._active[which]
@@ -241,7 +252,7 @@ class ArmTrajectoryServer(Node):
             remaining = (origin + t_sample) - time.monotonic()
             if remaining > 0:
                 time.sleep(remaining)
-            if goal_handle.is_cancel_requested:
+            if goal_handle.is_cancel_requested or self._hold:
                 goal_handle.canceled()
                 result.error_code = SUCCESSFUL
                 result.error_string = 'annule apres %d echantillons' % sent
