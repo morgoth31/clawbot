@@ -1,0 +1,39 @@
+# Catalogue de waypoints — énumération fermée (spec §6 règle 1, §12 question 4).
+#
+# S2 ne fournit qu'un NOM pris dans cette liste. Aucune coordonnée libre n'est acceptée : la
+# résolution du nom vers une pose se fait ici, à l'endroit où la carte est connue, et pas dans
+# une requête venue du réseau.
+#
+# Contraintes vérifiées par clawbot_director/test/test_waypoints.py, contre le fichier de carte
+# de référence :
+#   - chaque waypoint tombe dans une cellule libre, avec au moins 0,40 m de dégagement ;
+#   - tous les waypoints sont dans la même composante connexe praticable (dégagement >= 0,30 m),
+#     donc chacun est réellement atteignable depuis les autres.
+#
+# Mesures (carte test_cartographie_apres_deplacement, résolution 0,05 m) :
+#   ouest  0,65 m de dégagement     centre 1,05 m     est 0,75 m
+#   ouest -> centre 1,08 m ; centre -> est 2,85 m ; ouest -> est 3,87 m
+#
+# Pour ajouter un waypoint : le mesurer sur la carte, puis relancer les tests. Un nom ajouté sans
+# vérification géométrique échouera au test de connexité, pas sur le robot.
+
+frame: map
+carte: test_cartographie_apres_deplacement
+resolution: 0.05
+
+waypoints:
+  ouest:
+    x: 1.50
+    y: -0.30
+    yaw: 0.0
+    description: "zone dégagée côté ouest de la pièce, point de repli et de départ"
+  centre:
+    x: 2.50
+    y: 0.00
+    yaw: 0.0
+    description: "centre de la pièce, le plus dégagé des trois"
+  est:
+    x: 5.30
+    y: 0.48
+    yaw: 0.0
+    description: "côté est, au-delà du passage entre les deux obstacles centraux"

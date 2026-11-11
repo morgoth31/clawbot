@@ -1,0 +1,25 @@
+[Unit]
+Description=Nav2 - navigation sur la carte du catalogue de waypoints
+After=network.target ros2-driver-node.service clawbot-ekf.service clawbot-safety-arbitrator.service
+Requires=ros2-driver-node.service clawbot-ekf.service
+Wants=clawbot-safety-arbitrator.service
+# AMCL et SLAM Toolbox en cartographie publient tous deux map -> odom.
+Conflicts=clawbot-slam.service
+
+[Service]
+Type=simple
+User=jetson
+Environment=ROS_DOMAIN_ID=28
+Environment=HOME=/home/jetson
+# La carte n'est pas passee en argument : navigation.launch.py la lit dans
+# config/waypoints.yaml, pour que le catalogue et la carte chargee ne puissent pas diverger.
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec ros2 launch /home/jetson/clawbot/launch/navigation.launch.py"
+Restart=on-failure
+RestartSec=10
+# Un arret doit laisser le robot sans consigne : Nav2 coupe ses noeuds, l'arbitre remet
+# /cmd_vel_safe a zero par son chien de garde de 0,5 s.
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

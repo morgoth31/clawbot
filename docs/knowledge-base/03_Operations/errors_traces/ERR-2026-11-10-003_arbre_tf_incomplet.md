@@ -3,7 +3,7 @@ title: "ERR-2026-11-10-003 — arbre TF incomplet (base robot absente)"
 date: "2026-11-10T06:14:06+08:00"
 author: "Hermes Agent"
 tags: [operations, erreur, trace, ros2, tf, urdf, odometrie]
-status: ouvert
+status: validé
 ---
 
 # ERR-2026-11-10-003 — arbre TF incomplet (base robot absente)
@@ -106,6 +106,19 @@ La trace passe à `validé` lorsque les trois mesures suivantes réussissent :
 1. `ros2 run tf2_ros tf2_echo odom base_link` retourne une transformation valide.
 2. `ros2 run tf2_ros tf2_echo map odom` retourne une transformation valide.
 3. `ros2 node list | grep robot_state_publisher` retourne un nœud actif.
+
+## 5 bis. Clôture (2026-11-11 16:03 CET)
+
+Les trois conditions sont satisfaites, mesurées en domaine 28 :
+
+| Condition | Mesure | Résultat |
+|---|---|---|
+| `tf2_echo odom base_link` | `- Translation: [0.000, 0.000, 0.000]` (repos) | satisfaite, publiée par `ekf_filter_node` (`clawbot-ekf.service`) |
+| `tf2_echo map odom` | chaîne `map → base_link` : `[1.500, -0.300, 0.000]` = pose initiale AMCL | satisfaite, publiée par `amcl` (`clawbot-nav2.service`) |
+| `ros2 node list \| grep robot_state_publisher` | `/robot_state_publisher` actif | satisfaite |
+
+Chaîne complète constatée : `map → odom → base_link → laser_link` (`[0.105, 0.000, 0.032]`).
+Détail du déploiement : [[navigation_nav2_waypoints]].
 
 ## 6. Voir aussi
 
