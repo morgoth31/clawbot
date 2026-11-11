@@ -245,6 +245,21 @@ def test_service_get_task_on_unknown_id_says_so(stack):
     assert reponse['status'] == 'UNKNOWN_TASK'
 
 
+def test_service_confirm_resume_seulement_en_attente_de_confirmation(stack):
+    _securite_ok(stack.node, stack.pub_safety)
+    demarree = _appeler(stack, {'op': 'start_skill', 'skill': 'arm_move',
+                                'args': {'positions': [0.0] * 5, 'duration_s': 0.5}})
+    assert demarree['status'] == 'ACCEPTED'
+
+    hors_attente = _appeler(stack, {'op': 'confirm', 'accepte': True})
+    assert hors_attente['status'] == 'NO_TASK'
+
+    stack.node.director.ask_confirmation()
+    confirme = _appeler(stack, {'op': 'confirm', 'accepte': True})
+    assert confirme['status'] == 'RUNNING'
+    assert stack.node.director.state()['task_id'] == demarree['task_id']
+
+
 def test_service_start_is_gated_by_safety_like_the_python_api(stack):
     _publier_jusqua(stack.pub_safety, 'STOP', lambda: stack.node.etat()['safety'] == 'STOP')
 

@@ -149,6 +149,7 @@ nav:
           - Cartographie SLAM: knowledge-base/02_Software/slam_cartographie.md
           - Système 1 (arbitre): knowledge-base/02_Software/systeme1_arbitre.md
           - Système 1 (directeur): knowledge-base/02_Software/directeur_s1.md
+          - Système 1 (sentinel): knowledge-base/02_Software/sentinel_s1.md
           - Chaîne de navigation: knowledge-base/02_Software/ros2_nav_stack.md
           - Services systemd: knowledge-base/02_Software/systemd_robot_services.md
   - Exploitation:
