@@ -2,57 +2,127 @@
 
 Le directeur décide quand un skill peut tourner, jamais ce que le robot doit faire. Ce nœud
 ajoute ce que la logique pure ne peut pas voir : l'état de sécurité publié par l'arbitre sur
-/safety/state. Règle unique et non négociable : dès que cet état sort de OK, la tâche en cours
-est annulée, sans attendre le prochain point sûr — la sécurité prime sur la séquence.
+/safety/state. Deux règles non négociables :
 
-/director/state publie l'état interrogeable (task_id, skill, étape) accompagné de la dernière
-valeur de sécurité connue, pour que S2 et la supervision lisent la même chose.
+  - aucune tâche ne démarre sans un OK **frais** — le silence de l'arbitre n'est pas un feu vert ;
+  - dès que cet état sort de OK, ou que le flux se tait, la tâche en cours est annulée sans
+    attendre le prochain point sûr.
+
+/director/state publie un relevé daté : état de tâche, motif de la dernière transition, valeur
+de sécurité lue, âge de cette valeur et péremption. Un relevé, jamais une conclusion.
 """
 
 from __future__ import annotations
 
 import json
+import time
 
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 
-from .director import Director
+from .director import Director, PRECONDITION_FAILED
 
 SAFETY_OK = "OK"
-STATE_PERIOD_S = 0.2   # 5 Hz : l'état est aussi republié tel quel, sans changement
+SAFETY_TIMEOUT_S = 1.0   # l'arbitre publie à 20 Hz : 1 s de silence = 20 messages manqués
+STATE_PERIOD_S = 0.2     # 5 Hz, y compris sans changement
+MOTIF_PERIME = "safety_stale"
 
 
 class DirectorNode(Node):
     def __init__(self):
         super().__init__("director")
         self.director = Director()
-        self.safety = "UNKNOWN"     # rien reçu tant que l'arbitre n'a pas parlé
+        self.safety = None          # dernière valeur lue, None si l'arbitre n'a jamais parlé
+        self.last_safety_t = None   # horloge monotone de la dernière lecture
+        self._dernier_defaut = None  # dernier défaut déjà traité, pour ne pas répéter l'alerte
 
         self.pub_state = self.create_publisher(String, "/director/state", 10)
         self.create_subscription(String, "/safety/state", self.on_safety, 10)
-        self.create_timer(STATE_PERIOD_S, self.publish_state)
+        self.create_timer(STATE_PERIOD_S, self.tick)
         self.publish_state()
 
+    # ── entrée : la sécurité est une précondition, pas une réaction ─────
+    def refus_securite(self) -> str:
+        """Raison de refus si la sécurité n'est pas un OK frais, chaîne vide sinon."""
+        if self.last_safety_t is None:
+            return "securite inconnue : aucun message recu sur /safety/state"
+        age = time.monotonic() - self.last_safety_t
+        if age > SAFETY_TIMEOUT_S:
+            return f"securite perimee : {age:.1f} s sans message (etat {self.safety})"
+        if self.safety != SAFETY_OK:
+            return f"securite {self.safety}"
+        return ""
+
+    def start(self, skill: str, args: dict | None = None) -> dict:
+        return self.start_sequence([{"skill": skill, "args": args or {}}])
+
+    def start_sequence(self, steps: list) -> dict:
+        refus = self.refus_securite()
+        if refus:
+            return {"status": PRECONDITION_FAILED, "reason": refus}
+        return self.director.start_sequence(steps)
+
+    # ── sécurité ─────────────────────────────────────────────────────────
     def on_safety(self, msg):
         etat = msg.data.strip().upper()
         self.safety = etat
-        if etat != SAFETY_OK:
-            resultat = self.director.cancel(reason="safety")
-            if resultat.get("status") not in ("NO_TASK", "UNKNOWN_TASK"):
-                self.get_logger().warning(
-                    f"safety {etat} : tache {resultat.get('task_id')} -> {resultat.get('status')}")
-            self.publish_state()
+        self.last_safety_t = time.monotonic()
+        if etat == SAFETY_OK:
+            self._dernier_defaut = None
+        elif etat != self._dernier_defaut:
+            # traité une fois par valeur de défaut : un STOP à 20 Hz ne doit ni noyer le
+            # journal ni faire mentir la cadence de /director/state
+            self._dernier_defaut = etat
+            self.annuler("safety", f"etat {etat}")
 
+    def annuler(self, motif: str, contexte: str):
+        resultat = self.director.cancel(reason=motif)
+        if resultat.get("status") not in ("NO_TASK", "UNKNOWN_TASK"):
+            self.get_logger().warning(
+                f"{motif} — {contexte} : tache {resultat.get('task_id')} "
+                f"-> {resultat.get('status')}")
+
+    def tick(self):
+        age = self.surveiller_peremption()
+        self.publish_state()
+        self._loguer_cadence(age)
+
+    def surveiller_peremption(self):
+        """Chien de garde : sans OK frais, on n'exécute pas. Le silence annule comme un défaut."""
+        if self.last_safety_t is None:
+            return None
+        age = time.monotonic() - self.last_safety_t
+        if age > SAFETY_TIMEOUT_S and self._dernier_defaut != MOTIF_PERIME:
+            self._dernier_defaut = MOTIF_PERIME
+            self.annuler(MOTIF_PERIME, f"flux muet, derniere valeur {self.safety or 'aucune'}")
+        return age
+
+    # ── sortie ──────────────────────────────────────────────────────────
     def etat(self) -> dict:
+        age = None
+        if self.last_safety_t is not None:
+            age = round(time.monotonic() - self.last_safety_t, 3)
         etat = dict(self.director.state())
-        etat["safety"] = self.safety
+        etat.update({
+            "safety": self.safety,
+            "safety_age_s": age,
+            "safety_stale": age is None or age > SAFETY_TIMEOUT_S,
+            "published_at": round(time.time(), 3),
+        })
         return etat
 
     def publish_state(self):
         # republié à chaque période, jamais seulement sur changement : un abonné tardif doit
         # voir l'état sans attendre un événement (un changement peut ne jamais venir).
         self.pub_state.publish(String(data=json.dumps(self.etat(), ensure_ascii=False)))
+
+    def _loguer_cadence(self, age):
+        self._n = getattr(self, "_n", 0) + 1
+        if self._n % 300 == 0:   # toutes les minutes
+            self.get_logger().info(
+                f"etat={self.director.state()['state']} safety={self.safety} "
+                f"age={age if age is None else round(age, 2)}")
 
 
 def main():
