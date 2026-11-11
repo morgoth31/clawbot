@@ -237,6 +237,20 @@ class yahboomcar_driver(Node):
 		# rospy.loginfo("vx: {}, vy: {}, angular: {}".format(twist.linear.x, twist.linear.y, twist.angular.z))
 		self.imuPublisher.publish(imu)
 		self.magPublisher.publish(mag)
+		# proprietary : une lecture de servo par tick (15-20 ms), cycle complet ~600 ms
+		if not hasattr(self, "_rr"):
+			self._rr = 0
+			self._angles = [-1, -1, -1, -1, -1, -1]
+			self._servo_pub = self.create_publisher(Int32MultiArray, "arm/servo_angles", 10)
+		sid = (self._rr % 6) + 1
+		self._rr += 1
+		try:
+			self._angles[sid - 1] = int(self.car.get_uart_servo_angle(sid))
+		except Exception:
+			self._angles[sid - 1] = -1
+		_msg_angles = Int32MultiArray()
+		_msg_angles.data = list(self._angles)
+		self._servo_pub.publish(_msg_angles)
 		self.volPublisher.publish(battery)
 		self.EdiPublisher.publish(edition)
 		
