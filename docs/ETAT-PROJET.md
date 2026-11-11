@@ -178,7 +178,7 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`,
 | Bras absent du costmap de Nav2 | moyen | Nav2 ne connaît le bras que par un rayon d'encombrement de 0,16 m : un waypoint peut être accepté bras en extension |
 | Encombrement de la pose de repos | moyen | la pose `[90, 180, 0, 0, 90, 149]` est **validée par l'opérateur** (`valide_par_operateur: true`), mais son volume balayé n'est pas mesuré au mètre ; seule la géométrie du mât sert de référence |
 | Cadre optique du poignet | **corrigé le 2026-11-11 20:20** | `rpy` du joint optique passé de `(-1.5708 0 -1.5708)` à `(0 0 -1.5708)` : axe horizontal à la pose de repos (vérifié), −40° à `servo 2 = 140`. Intrinsèques portées de `fx=457` à **2300 px**. Test de régression dans `tests/test_camera_poignet.py` |
-| Lectures de servo à −1 | **ouvert, fin de séance** | après la remise en pose de repos, `/arm/servo_angles` rend −1 sur les six axes en continu ; les écritures passent (`/arm/joint_states` à jour, trajectoire exécutée) et `/voltage` répond. `arm_folded` vaut `false`, donc le garde-fou refuse tout déplacement de base. Protocole : lecture directe du bus, pilote arrêté ([[bras_remise_en_service]] §6) |
+| Bus servo muet | **bloquant le bras** | depuis ~20:35, les six servos ne répondent **ni en lecture ni en mouvement** : lecture directe pilote arrêté = −1 ×6, consigne `set_uart_servo_angle(1, 85)` sans effet (0,7 px d'écart image = le bruit). Le MCU est sain (version 3.5, 11,90 V, IMU). Cycle d'alimentation à faire ; protocole et verdict dans [[2026-11-11_essai_prehen_stylo]] §9.1 |
 | Skills restants | bloquant lot 6/7 | `arm_move`/`grip_set`/`navigate_to` exécutent ; `follow_human`, `grasp_object`, `search_object`, `express_state`, `look_at_board`, `set_watch_mode` refusent en `INDISPONIBLE` |
 | `grasp_object` et la portée | **contrainte de distance** | les doigts descendent 5 cm sous le niveau du sol, donc un objet au sol **est** saisissable ; mais la portée n'est que de 0,439 m : le robot doit avancer à moins de ~0,40 m de l'objet, et le stylo mesuré le 2026-11-11 20:20 était à 0,50 m |
 | Aucun VAD/STT branché | bloquant lot 7 | `/sentinel/transcript` n'a aucun producteur : les mots d'arrêt sont prouvés en test, inopérants en réel |
@@ -296,9 +296,12 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`,
     chercher les poses qui satisfont **les deux** — pince sur le point et point sur l'axe optique —
     avec `scripts/pose_saisie_vue.py` ; sur le point du stylo il en existe 396, la meilleure à
     `j2 = 0, j3 = −1,50, j4 = −0,20`.
-34. **Un `-1` sur `/arm/servo_angles` n'est pas un servo mort.** C'est la valeur de retour des getters
-    du MCU quand la transaction échoue, alors que les écritures et la tension continuent de passer.
-    Ne pas conclure au matériel ; lire le bus directement, pilote arrêté.
+34. **Un `-1` sur `/arm/servo_angles` n'est pas un servo mort — mais ce n'est pas rien non plus.** C'est
+    la valeur de retour des getters du MCU quand la transaction échoue. Le protocole qui tranche, en
+    4 minutes : pilote arrêté, lecture directe par `Rosmaster_Lib`, puis **test d'écriture mesuré sur
+    l'image** (une consigne de 5° doit déplacer le barycentre de la pince de dizaines de pixels). Le
+    2026-11-11, lecture et écriture étaient muettes alors que version, tension et IMU répondaient :
+    le MCU était sain, le bus servo mort.
 
 ---
 
