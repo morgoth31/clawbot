@@ -374,9 +374,17 @@ Caméra du poignet **dans ROS** depuis le 2026-11-11 16:50 CET :
 - **mesure** : 5,98 im/s au niveau du périphérique (limite du module, insensible à la résolution,
   au lien et à la charge), latence 8 ms ; critère du lot corrigé de 15 Hz à « au moins 5 im/s ».
 
-**Reste de la brique** : cadrage et netteté à vérifier bras en mouvement (l'image actuelle est
-sans détail, netteté 7,3), orientation du cadre optique à confirmer en visant une cible, puis
-`search_object`, `grasp_object` (boucle fermée à 6 Hz, tolérance à mesurer) et `follow_human`.
+**Fait depuis, le 2026-11-11 à 19:45** (le bras fonctionne, donc les deux mesures bloquées sont
+faites) : cadrage et netteté mesurés **pose par pose** avec `scripts/mesure_cadrage_poignet.py` —
+netteté 55 sur un parquet uni, 85 sur un couloir, **225 à 253 sur un visage à 40-70 cm**, 0 % de
+pixels saturés à `gain=0`. Le « netteté 7,3 » d'origine venait d'une image plate et saturée, pas de
+la mise au point. L'écart d'orientation du cadre optique est chiffré : **+90° en tangage** (le modèle
+annonce −90° là où l'image montre l'horizon, et −130° à `servo 2 = 140` où l'image montre le sol).
+La pose utile à la saisie est `servo 2 ≈ 120-150` ; à la pose de repos la caméra regarde l'horizon.
+
+**Reste de la brique** : `search_object`, `grasp_object` (boucle fermée à 6 Hz, tolérance à mesurer)
+et `follow_human`. Le repère du poignet n'étant pas corrigé dans l'URDF, `grasp_object` doit viser
+sur l'image, pas sur `z_optique`.
 Page : `docs/knowledge-base/02_Software/camera_poignet.md`.
 
 ### Brique 7 — parole et audio

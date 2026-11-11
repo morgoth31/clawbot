@@ -117,10 +117,34 @@ logiciellement.
 visuel à 6 Hz est lent, la tolérance de `grasp_object` devra être mesurée avec cette cadence, pas
 supposée.
 
-**L'image actuelle est sans détail** (netteté 7,3 ; une scène texturée et nette donne des centaines
-à des milliers). Le flux est techniquement valide mais le bras est en pose de repos : la caméra
-regarde une surface lisse à très courte distance. Vérifier le cadrage et la netteté exige de
-déplacer le bras ou de présenter un objet — opérateur.
+**Cadrage et netteté, mesurés pose par pose le 2026-11-11 à 19:45** (`scripts/mesure_cadrage_poignet.py`,
+`gain=0` / `brightness=0`, paliers de 10°) :
+
+| Pose servo | Ce que voit la caméra | Moyenne | Écart-type | Netteté (var. Laplacien) | Saturés |
+|---|---|---|---|---|---|
+| **`90,180,0,0,90`** (repos) | couloir vu **horizontalement**, même scène que l'Astra | 133,4 | 61,5 | **84,9** | 0 % |
+| `90,161,0,0,90` | scène de face, plus proche | 139,3 | 35,5 | 73,7 | 0 % |
+| `90,140,0,0,90` | **le sol vu de dessus**, parquet en gros plan | 156,6 | 13,5 | 55,5 | 0 % |
+| `90,121,0,0,90` | sol et bas de mur | 163,2 | 17,7 | 86,0 | 0 % |
+| `119,180,0,0,90` | une personne à 40-70 cm, visage cadré | 119,3 | 73,5 | **224,7** | 0 % |
+| `149,180,0,0,90` | la même personne, plus près | 95,8 | 68,2 | **253,2** | 0 % |
+
+Trois conclusions, qui remplacent le « image sans détail, netteté 7,3 » :
+
+1. **La netteté dépend de ce qu'il y a devant, pas du module.** 55 sur un parquet uni à 1,3 m, 85 sur
+   un couloir, 225 à 253 sur un visage à 40-70 cm. La valeur de 7,3 mesurée le 2026-11-11 à 17:30
+   venait d'une image **plate** (écart-type 5,9) : ce n'était pas un défaut de mise au point mais une
+   scène sans texture, aggravée par la saturation au gain 70.
+2. **À la pose de repos, la caméra regarde l'horizon**, et c'est la même scène que l'Astra : bon pour
+   la perception pendant un déplacement, inutile pour saisir.
+3. **La pose utile à la saisie est `servo 2 ≈ 120-150`** : la caméra y voit le sol devant le robot en
+   gros plan, c'est-à-dire la zone où la pince descend.
+
+**L'écart d'orientation du cadre optique est maintenant chiffré.** La cinématique directe annonce
+−90° de tangage à la pose de repos, où l'image montre l'horizon ; à `servo 2 = 140` le modèle annonce
+−130° et l'image montre effectivement le sol. Les deux poses s'expliquent si le cadre optique de
+l'URDF est décalé de **+90° en tangage** par rapport au montage réel. Le fait mesuré fait foi ; le
+cadre n'est pas corrigé.
 
 ## 5. Reproduire
 
@@ -138,8 +162,8 @@ sudo fuser -v /dev/video0                                  # un seul processus d
 | Point | Gravité | Détail |
 |---|---|---|
 | Cadence 6 im/s au lieu de 15 | moyen | limite matérielle du module ; aucun réglage d'exposition exposé |
-| Image sans détail au repos | moyen | cadrage et netteté à vérifier bras en mouvement |
-| Orientation du cadre optique | **contredite par l'image** | dans la pose `[90, 180, 0, 0, 90]`, `scripts/cinematique_bras.py` annonce un axe optique à −90° (vers le bas) alors que l'image montre l'horizon et la même scène que l'Astra : le cadre optique de l'URDF est mal orienté. Non corrigé ; le fait mesuré fait foi |
+| Image sans détail au repos | **corrigé le 2026-11-11 19:45** | netteté 55 à 253 selon la scène, 0 % de pixels saturés à `gain=0` ; le 7,3 d'origine venait d'une image plate et saturée, pas de la mise au point |
+| Orientation du cadre optique | **écart de +90° en tangage** | la cinématique directe annonce −90° à la pose de repos (image : horizon) et −130° à `servo 2 = 140` (image : sol vu de dessus) : les deux se réconcilient par un décalage de +90° du cadre. Non corrigé dans l'URDF ; le fait mesuré fait foi |
 | Intrinsèques nominales, non mesurées | moyen | `config/wrist_camera_info.yaml` : `fx=fy=457 px` (demi-champ 35°), à étalonner sur mire avant toute projection 3D |
 | Pas d'échantillonnage à la demande | faible | le service YOLO lit la dernière image reçue ; aucune synchronisation avec l'instant de la décision |
 | Image sans aucune structure | **corrigé le 2026-11-11 19:19** | la cause principale était le **gain** : `gain=70`, `brightness=60` → 100 % des pixels à 255. À `gain=0` : min 8, max 224, écart-type 61, image exploitable. Les valeurs de l'unité restent à corriger |
