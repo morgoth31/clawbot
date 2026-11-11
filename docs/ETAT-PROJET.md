@@ -52,7 +52,7 @@ de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cp
 | Proprioception | ok | `/arm/servo_angles` 10 Hz, cycle 600 ms, sans casser `/imu` et `/vel_raw` ; **relecture = mesure** depuis 19:12 (valeur intermédiaire 35° jamais commandée) |
 | Pose de repos / déplacement | **validée par l'opérateur** | `[90, 180, 0, 0, 90, 149]` — bras debout, caméra du poignet vers l'avant ; `arm_folded: true` publié sur `/director/state` |
 | Manipulation | **débloquée** | MoveIt2 était mort : `base_link` avait deux parents TF, `pick_ik` répondait `COLLISION_CHECKING_UNAVAILABLE` même sur la pose courante. Corrigé le 2026-11-11 19:55 (`odom → base_footprint`), `/compute_ik` répond `SUCCESS` ; collision mât modélisée (`camera_support`) |
-| Portée du bras | **mesurée, limitante** | `/compute_fk` sur tout l'espace articulaire : les doigts descendent à z = −0,115 m dans `base_link`, soit **0,299 m au-dessus du sol** ; portée 0,439 m. **Aucune saisie possible d'un objet posé au sol** |
+| Portée du bras | **mesurée, limitante en distance** | `/compute_fk` sur tout l'espace articulaire : les doigts descendent à z = −0,115 m dans `base_link`, soit **5 cm sous le niveau du sol** (−0,064 m) ; portée horizontale **0,439 m**. La contrainte est la distance, pas la hauteur : un objet au sol est saisissable si le robot avance à moins de ~0,40 m |
 | Arbitre réflexe | **actif** | 20 Hz, obstacle 12 cm → zéro en **47 ms**, chien de garde 0,5 s |
 | Arrêt du bras par réflexe | **prouvé** | `/safety/hold` → « interrompu par safety hold après 6 échantillons » |
 | Directeur | **exécute** | nœud ROS, `/director/command`, un goal par étape, `advance()` sur résultat, annulation sécurité 1,90 ms |
@@ -177,9 +177,10 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`,
 | Cause de la panne du 17:20 | moyen | le symptôme a disparu après redémarrage du pilote (17:36:06) et du contrôleur (17:37:13) ; aucun test entre 17:37 et 19:04, aucune cause racine établie. À instrumenter si elle revient |
 | Bras absent du costmap de Nav2 | moyen | Nav2 ne connaît le bras que par un rayon d'encombrement de 0,16 m : un waypoint peut être accepté bras en extension |
 | Encombrement de la pose de repos | moyen | la pose `[90, 180, 0, 0, 90, 149]` est **validée par l'opérateur** (`valide_par_operateur: true`), mais son volume balayé n'est pas mesuré au mètre ; seule la géométrie du mât sert de référence |
-| Cadre optique du poignet dans l'URDF | moyen | `wrist_camera_optical_frame` annonce −90° de tangage dans la pose de repos alors que la caméra regarde l'horizon : orientation fausse, non corrigée, le fait mesuré fait foi |
+| Cadre optique du poignet | **corrigé le 2026-11-11 20:20** | `rpy` du joint optique passé de `(-1.5708 0 -1.5708)` à `(0 0 -1.5708)` : axe horizontal à la pose de repos (vérifié), −40° à `servo 2 = 140`. Intrinsèques portées de `fx=457` à **2300 px**. Test de régression dans `tests/test_camera_poignet.py` |
+| Lectures de servo à −1 | **ouvert, fin de séance** | après la remise en pose de repos, `/arm/servo_angles` rend −1 sur les six axes en continu ; les écritures passent (`/arm/joint_states` à jour, trajectoire exécutée) et `/voltage` répond. `arm_folded` vaut `false`, donc le garde-fou refuse tout déplacement de base. Protocole : lecture directe du bus, pilote arrêté ([[bras_remise_en_service]] §6) |
 | Skills restants | bloquant lot 6/7 | `arm_move`/`grip_set`/`navigate_to` exécutent ; `follow_human`, `grasp_object`, `search_object`, `express_state`, `look_at_board`, `set_watch_mode` refusent en `INDISPONIBLE` |
-| `grasp_object` hors de portée au sol | **bloquant la saisie** | les doigts s'arrêtent 0,299 m au-dessus du sol et portent à 0,439 m : un objet posé au sol n'est atteignable par aucune trajectoire. Il faut un support à 0,35-0,55 m, à moins de 0,40 m de la colonne |
+| `grasp_object` et la portée | **contrainte de distance** | les doigts descendent 5 cm sous le niveau du sol, donc un objet au sol **est** saisissable ; mais la portée n'est que de 0,439 m : le robot doit avancer à moins de ~0,40 m de l'objet, et le stylo mesuré le 2026-11-11 20:20 était à 0,50 m |
 | Aucun VAD/STT branché | bloquant lot 7 | `/sentinel/transcript` n'a aucun producteur : les mots d'arrêt sont prouvés en test, inopérants en réel |
 | Réveil webhook | moyen | route `clawbot-incident` configurée, passerelle non redémarrée (port 8644 muet) |
 | Repli Telegram | moyen | aucun canal configuré ; la règle « personne depuis 60 s → Telegram » n'est pas codée |
@@ -284,10 +285,20 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`,
     en `FAILURE` sans autre motif, et des avertissements « not part of the same tree » défilent pour
     chaque cadre. Correctif : l'EKF publie `odom → base_footprint`. Vérification :
     `tf.all_frames_as_yaml()` doit montrer **une seule racine** et un seul parent par lien.
-32. **La portée du bras se mesure, elle ne se suppose pas.** `/compute_fk` de MoveIt sur tout
-    l'espace articulaire donne les doigts à 0,299 m au-dessus du sol et 0,439 m de portée : tout
-    scénario de saisie d'un objet posé au sol est irréalisable, et aucune correction logicielle n'y
-    change rien. Mesurer l'enveloppe **avant** d'écrire un skill de saisie.
+32. **La hauteur du sol se mesure par histogramme, pas par percentile sur une bande d'image.** Un
+    percentile des z dans le bas de l'image a donné −0,414 m alors que le sol est à −0,064 m : la
+    bande contenait le châssis et le plan incliné de la caméra, et toute la conclusion en a été
+    inversée. Prendre le **pic de l'histogramme des z** sur toute l'image et vérifier qu'il couvre une
+    grande étendue en x, puis recalculer la portée avec cette valeur.
+33. **La caméra du poignet est à 90° de l'axe de la pince.** Une configuration qui pose les doigts sur
+    un objet peut donc tourner l'objectif vers le plafond : à `q = [0, −1,00, −0,80, +1,57, 0]` le
+    modèle annonce **+67°** et l'image ne montre qu'un plafonnier. Pour un asservissement visuel final,
+    chercher les poses qui satisfont **les deux** — pince sur le point et point sur l'axe optique —
+    avec `scripts/pose_saisie_vue.py` ; sur le point du stylo il en existe 396, la meilleure à
+    `j2 = 0, j3 = −1,50, j4 = −0,20`.
+34. **Un `-1` sur `/arm/servo_angles` n'est pas un servo mort.** C'est la valeur de retour des getters
+    du MCU quand la transaction échoue, alors que les écritures et la tension continuent de passer.
+    Ne pas conclure au matériel ; lire le bus directement, pilote arrêté.
 
 ---
 

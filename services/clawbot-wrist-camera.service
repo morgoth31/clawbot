@@ -15,9 +15,14 @@ Environment=HOME=/home/jetson
 # redémarrage ramène l'image à une luminance de 19 (mesuré) et la caméra devient inutilisable dans
 # une pièce sombre. Le module n'expose pas de contrôle d'exposition, le gain est le seul levier.
 #
+# Valeurs mesurées le 2026-11-11 : à `brightness=60` / `gain=70`, les 307 200 pixels valaient 255 —
+# image entièrement blanche en scène proche et éclairée. À `0` / `0` : min 8, max 224, écart-type 61,
+# structure lisible. Le gain est donc ramené à 0 ; en lumière faible, le remonter par paliers en
+# vérifiant la fraction de pixels saturés (`scripts/sonde_flux_camera.py`).
+#
 # Chemin by-id et non /dev/videoN : l'index dépend de l'ordre d'énumération USB, le nom by-id non.
 # L'appareil expose deux nœuds (video0 = capture, video1 = métadonnées) : index0 est le bon.
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec ros2 run v4l2_camera v4l2_camera_node --ros-args -r __ns:=/wrist_camera -r __node:=camera -p video_device:=/dev/v4l/by-id/usb-Sonix_Technology_Co.__Ltd._USB_2.0_Camera-video-index0 -p image_size:='[640, 480]' -p time_per_frame:='[1, 15]' -p pixel_format:=YUYV -p output_encoding:=yuv422_yuy2 -p camera_frame_id:=wrist_camera_optical_frame -p brightness:=60 -p gain:=70 -p camera_info_url:=file:///home/jetson/clawbot/config/wrist_camera_info.yaml"
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec ros2 run v4l2_camera v4l2_camera_node --ros-args -r __ns:=/wrist_camera -r __node:=camera -p video_device:=/dev/v4l/by-id/usb-Sonix_Technology_Co.__Ltd._USB_2.0_Camera-video-index0 -p image_size:='[640, 480]' -p time_per_frame:='[1, 15]' -p pixel_format:=YUYV -p output_encoding:=yuv422_yuy2 -p camera_frame_id:=wrist_camera_optical_frame -p brightness:=0 -p gain:=0 -p camera_info_url:=file:///home/jetson/clawbot/config/wrist_camera_info.yaml"
 Restart=on-failure
 RestartSec=5
 # Un arrêt doit rendre le périphérique proprement : sans SIGINT, le descripteur reste mappé

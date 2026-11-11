@@ -266,7 +266,36 @@ python3 scripts/moveit_plan.py 0,-1.00,-0.80,1.57,0 --executer
 python3 scripts/cherche_pose.py 0.36 0.0 0.30     # configuration de saisie a 6 mm
 ```
 
-## 8. Voir aussi
+## 9. Symptôme constaté en fin de séance : `/arm/servo_angles` à −1
+
+Après la remise du bras en pose de repos (MoveIt, `SUCCESS`), la lecture de proprioception est tombée
+à **−1 sur les six servos** et y est restée.
+
+```text
+/arm/servo_angles  -> [-1, -1, -1, -1, -1, -1]        (5 lectures sur 12 s, puis 10 Hz stable)
+/arm/joint_states  -> [0.0089, 1.5639, -1.5609, -1.5683, 0.0071, -0.265]   (consignes, correctes)
+/voltage           -> 11.80 V                          (le lien série répond)
+systemctl is-active ros2-driver-node clawbot-arm-controller -> active, active
+journal pilote     -> aucune erreur depuis 17:36:06 (dernier redémarrage)
+```
+
+Ce que cela établit et ce que cela n'établit pas :
+
+| Constat | Preuve |
+|---|---|
+| les **écritures** passent : le bras a exécuté une trajectoire de 16 s puis la consigne de pince | `execution : SUCCESS`, `/arm/joint_states` à jour, `grip_set` `ACCEPTED` |
+| le **lien série** fonctionne : la tension est lue | `/voltage` = 11,80 V |
+| la **lecture des angles de servo** ne répond plus | −1 stable sur 5 lectures, alors que le topic publie à 10 Hz |
+| la cause n'est pas dans le pilote redémarré pendant la séance | dernier redémarrage 17:36:06, aucune erreur depuis |
+
+Un `-1` est la valeur de retour des getters du MCU quand la transaction échoue (voir
+`manipulation_moveit` §6 : « une lecture qui renvoie −1 n'est pas un matériel mort »). L'hypothèse à
+tester en premier, **pilote arrêté**, est la lecture directe du bus par `Rosmaster_Lib` — c'est le
+protocole déjà écrit dans [[bras_remise_en_service]] §6. Conséquence immédiate : `arm_folded` vaut
+`false` (les angles sont inconnus) et le garde-fou de `scripts/avance_cm.py` refuse tout déplacement
+de base, ce qui est le comportement voulu.
+
+## 10. Voir aussi
 
 - [[index]]
 - [[bras_remise_en_service]]

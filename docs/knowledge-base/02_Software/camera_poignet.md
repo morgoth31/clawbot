@@ -35,22 +35,39 @@ nœud V4L2 n'appartient à l'Astra Pro+, qui passe par `usbfs`.
 ```xml
 <link name="wrist_camera_optical_frame"/>
 <joint name="wrist_camera_optical_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708" />
+    <origin xyz="0 0 0" rpy="0 0 -1.5708" />
     <parent link="mono_link" />
     <child link="wrist_camera_optical_frame" />
 </joint>
 ```
 
 Convention : `z` le long de l'axe de visée, `x` à droite, `y` vers le bas (convention optique ROS).
-`rpy=(-90°, 0, -90°)` appliqué à un repère corps (`x` avant, `y` gauche, `z` haut) donne
-`x_optique = -y_corps`, `y_optique = -z_corps`, `z_optique = +x_corps`.
 
-Deux réserves, à lever sur le robot :
+**Correction du 2026-11-11 20:20 : le cadre était décrit 90° trop bas.** L'ancien `rpy`
+(`-1.5708 0 -1.5708`) donnait, à la pose de repos `[90, 180, 0, 0, 90]`, un axe optique à **−90°**
+(vers le sol) alors que l'image montre l'horizon et la même scène que l'Astra ; à `servo 2 = 140` il
+annonçait −130° alors que l'image montre le parquet vu de dessus. Le décalage est constant, donc il
+se corrige sur le joint fixe : post-multiplier par `Rx(+90°)` dans le cadre optique ramène `rpy` à
+`(0, 0, -1.5708)`. Vérification : à la pose de repos l'axe vaut **(+1,000 ; 0 ; 0)**, tangage
+**+0,0°**, et **−40,0°** à `servo 2 = 140`. Un test de régression verrouille ces deux valeurs
+(`tests/test_camera_poignet.py`).
 
-1. l'orientation du repère corps de `mono_link` est **supposée**, pas mesurée : viser une cible
-   connue et vérifier que `z_optique` passe par elle ;
-2. la **position** du cadre optique est celle de `mono_link`, c'est-à-dire le centre du boîtier
-   déclaré par le constructeur, pas le centre optique réel du capteur.
+**Conséquence de la géométrie, mesurée le même jour** : la caméra est montée à 90° de l'axe de la
+pince. Une configuration qui pose les doigts sur un objet peut donc tourner l'objectif vers le
+plafond — constaté à la pose d'approche `q = [0, −1,00, −0,80, +1,57, 0]`, où le modèle corrigé
+annonce **+67°** et où l'image ne montre qu'un plafonnier. Pour un asservissement visuel final il
+faut une pose qui satisfait les deux : `scripts/pose_saisie_vue.py` cherche dans l'espace
+articulaire les configurations où la pince atteint le point de saisie **et** où le point tombe sur
+l'axe optique. Sur le point `(0,358 ; 0 ; 0,294)` il en trouve 396, la meilleure étant
+`j2 = 0,00, j3 = −1,50, j4 = −0,20` : pince à 8 mm, axe optique à 3 mm, caméra à 12 cm.
+
+Une réserve reste, à lever sur le robot :
+
+- la **position** du cadre optique est celle de `mono_link`, c'est-à-dire le centre du boîtier
+  déclaré par le constructeur, pas le centre optique réel du capteur.
+
+L'orientation, elle, n'est plus supposée : elle est contredite par l'image tant qu'elle est fausse, et
+c'est cette comparaison qui a permis la correction du 2026-11-11.
 
 Chaîne constatée en domaine 28 :
 
@@ -111,6 +128,18 @@ revoir ; `ros2 param set` n'est pas une correction, il est volatile.
 `--list-ctrls`), donc la piste « faible lumière + auto-exposition longue » ne peut pas être corrigée
 logiciellement.
 
+**Les intrinsèques étaient fausses d'un facteur cinq.** Le fichier annonçait `fx = fy = 457 px`
+(demi-champ 35°, objectif UVC de 70°) ; un marqueur d'environ 14 cm occupant ~390 px dans l'image
+implique `fx ≈ 2 300 px`, soit un champ d'environ 15°. La valeur est portée à 2300 le 2026-11-11
+20:25, publiée sur `/wrist_camera/camera_info` et **toujours déclarée non mesurée** : la dispersion
+de l'estimation va de 700 à 2 400 px selon la distance retenue pour le marqueur, seule une mire la
+fixera.
+
+**Le gain de l'unité saturait l'image.** À `brightness=60` / `gain=70` (les valeurs que posait
+`clawbot-wrist-camera.service`), les 307 200 pixels valaient 255. L'unité pose désormais
+`brightness:=0` / `gain:=0` : min 8, max 224, écart-type 61, structure lisible. En lumière faible,
+remonter le gain par paliers en vérifiant la fraction de pixels saturés.
+
 **Conséquence sur le critère du lot.** La conception demandait « `v4l2_camera_node` en 640×480 à
 15 Hz ». La mesure dit 6 im/s : le critère est corrigé en « image 640×480 publiée à **au moins
 5 Hz** mesurés, cadre `wrist_camera_optical_frame` », et la conséquence est écrite : un asservissement
@@ -163,8 +192,8 @@ sudo fuser -v /dev/video0                                  # un seul processus d
 |---|---|---|
 | Cadence 6 im/s au lieu de 15 | moyen | limite matérielle du module ; aucun réglage d'exposition exposé |
 | Image sans détail au repos | **corrigé le 2026-11-11 19:45** | netteté 55 à 253 selon la scène, 0 % de pixels saturés à `gain=0` ; le 7,3 d'origine venait d'une image plate et saturée, pas de la mise au point |
-| Orientation du cadre optique | **écart de +90° en tangage** | la cinématique directe annonce −90° à la pose de repos (image : horizon) et −130° à `servo 2 = 140` (image : sol vu de dessus) : les deux se réconcilient par un décalage de +90° du cadre. Non corrigé dans l'URDF ; le fait mesuré fait foi |
-| Intrinsèques nominales, non mesurées | moyen | `config/wrist_camera_info.yaml` : `fx=fy=457 px` (demi-champ 35°), à étalonner sur mire avant toute projection 3D |
+| Orientation du cadre optique | **corrigé le 2026-11-11 20:20** | l'ancien `rpy` donnait −90° à la pose de repos (l'image montre l'horizon) et −130° à `servo 2 = 140` (parquet vu de dessus) ; post-multiplication par `Rx(+90°)` → `rpy = (0, 0, -1.5708)`, axe horizontal vérifié et verrouillé par un test de régression |
+| Intrinsèques | **fx = fy = 2300 px**, toujours non calibrées | `config/wrist_camera_info.yaml` : l'ancienne valeur (457 px, demi-champ 35°) était fausse, le champ réel est de l'ordre de 15°. Mesure d'échelle sur un marqueur de ~14 cm occupant ~390 px ; dispersion de l'estimation 700 à 2 400 px selon la distance retenue. À étalonner sur mire avant toute projection 3D |
 | Pas d'échantillonnage à la demande | faible | le service YOLO lit la dernière image reçue ; aucune synchronisation avec l'instant de la décision |
 | Image sans aucune structure | **corrigé le 2026-11-11 19:19** | la cause principale était le **gain** : `gain=70`, `brightness=60` → 100 % des pixels à 255. À `gain=0` : min 8, max 224, écart-type 61, image exploitable. Les valeurs de l'unité restent à corriger |
 | Cadrage à revérifier en lumière faible | faible | `gain=0` corrige la saturation en scène éclairée ; la valeur correcte en lumière faible n'est pas mesurée |

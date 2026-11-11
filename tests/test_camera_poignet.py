@@ -55,6 +55,27 @@ def test_le_cadre_optique_existe_et_pend_au_bras(urdf):
     assert joint.find("child").get("link") == CADRE
 
 
+def test_le_cadre_optique_regarde_l_horizon_a_la_pose_de_repos():
+    """Régression du 2026-11-11 : le cadre était décrit 90° trop bas.
+
+    À la pose de repos validée `[90, 180, 0, 0, 90]`, l'image du poignet montre l'horizon et la même
+    scène que l'Astra. Un modèle qui annonce −90° (vers le sol) rend la caméra inutilisable pour
+    l'asservissement visuel, et l'erreur ne se voit qu'en comparant le modèle à l'image.
+    """
+    sys.path.insert(0, str(RACINE / "scripts"))
+    from cinematique_bras import Bras, _decrire, _servo_vers_rad
+
+    bras = Bras(URDF)
+    repos = _decrire(bras, _servo_vers_rad([90, 180, 0, 0, 90]))
+    assert abs(repos["tangage_deg"]) <= 2.0, repos["tangage_deg"]
+    # et la correction ne doit pas être un demi-tour : l'axe doit pointer vers l'avant
+    assert repos["visee"][0] > 0.95, repos["visee"]
+
+    # à servo 2 = 140 la caméra pique vers le sol, l'image montre le parquet vu de dessus
+    bas = _decrire(bras, _servo_vers_rad([90, 140, 0, 0, 90]))
+    assert -50.0 <= bas["tangage_deg"] <= -30.0, bas["tangage_deg"]
+
+
 def test_le_cadre_optique_est_atteignable_depuis_la_base(urdf):
     """`mono_link` est monté sur `arm_link4` : la chaîne doit relier base_footprint au cadre."""
     parents = {}
