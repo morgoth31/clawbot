@@ -52,11 +52,33 @@ Premier relevé réel : `[76, 96, 90, 90, 90, 149]` — servo 2 à 96°, donc au
    valeur à 20 Hz : le robot continuait d'avancer après l'arrêt de l'émetteur. Correctif :
    chien de garde de 0,5 s.
 
-## 5. Ce qui reste ouvert
+## 5. Chaîne complète : l'arbitre arrête le bras
 
-`/safety/hold` **n'a aucun consommateur sur le bras**. L'arbitre décide correctement `FREEZE` ou
-`DROP_TORQUE`, mais `arm_trajectory_server` ne s'y abonne pas : la décision est publiée, pas
-appliquée. Tant que ce maillon manque, le réflexe protège la base, pas la manipulation.
+`arm_trajectory_server` s'abonne à `/safety/hold` et interrompt la trajectoire en cours. Preuve de
+bout en bout (`scripts/test_safety_hold.py`, domaine 99, contrôleur et arbitre réels avec IMU
+simulée) :
 
-Suite : abonnement à `/safety/hold` dans le contrôleur de bras (interruption de la trajectoire en
-cours), avec un test en domaine 99 qui vérifie qu'une trajectoire est bien annulée sous 200 ms.
+```text
+objectif accepte : True
+inclinaison simulee a 13 deg -> l'arbitre doit publier hold
+code : 0 | message : interrompu par safety hold apres 6 echantillons
+SUCCES : trajectoire interrompue par le reflexe
+```
+
+### Le bug que ce test a révélé
+
+Le contrôleur appelait `goal_handle.canceled()` pour s'arrêter. Or `canceled()` n'est valide
+qu'après une **demande d'annulation du client** ; côté serveur, l'état attendu est `ABORTED`.
+Résultat : `RCLError: attempted invalid transition from state EXECUTING with event CANCELED`, un
+message « Goal state not set, assuming aborted », et **la trajectoire continuait**. Le garde-fou
+semblait fonctionner dans les journaux tout en ne stoppant rien.
+
+Correctif : `abort()` pour l'arrêt réflexe, `canceled()` conservé pour l'annulation cliente, avec
+des messages distincts (`interrompu par safety hold` / `annule apres N echantillons`).
+
+## 6. Ce qui reste ouvert
+
+- Le test d'inclinaison réel : les seuils sont validés sur IMU simulée, pas sur la mesure physique.
+- `DROP_TORQUE` est décidé et publié, mais **aucun étage ne coupe réellement le couple** des servos :
+  le contrôleur s'arrête, la pince ne relâche pas. À traiter avec `set_uart_servo_torque`.
+- Le temps mort de la base (~0,85 s) reste supérieur à ce qu'un asservissement visuel exige.
