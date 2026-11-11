@@ -28,6 +28,17 @@ LIMITS: dict[str, Any] = {
         "/arm_controller/follow_joint_trajectory",
         "/grip_controller/follow_joint_trajectory",
     ],
+    # Skills que S2 peut déclarer au directeur (§6 de la conception). Une chaîne libre est
+    # refusée avant tout appel ROS : la surface d'édition de S2 est une énumération.
+    "allowed_skills": [
+        "navigate_to",
+        "follow_human",
+        "grasp_object",
+        "search_object",
+        "express_state",
+        "look_at_board",
+        "set_watch_mode",
+    ],
     "s2_min_severity": 2,
     "budget": {"tool_calls": 8, "duration_s": 120},
     "protocol_version": "2025-11-25",

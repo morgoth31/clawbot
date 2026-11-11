@@ -21,6 +21,8 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 
+from clawbot_interfaces.srv import DirectorCommand
+
 from .director import Director, PRECONDITION_FAILED
 
 SAFETY_OK = "OK"
@@ -39,8 +41,67 @@ class DirectorNode(Node):
 
         self.pub_state = self.create_publisher(String, "/director/state", 10)
         self.create_subscription(String, "/safety/state", self.on_safety, 10)
+        self.create_service(DirectorCommand, "/director/command", self.on_commande)
         self.create_timer(STATE_PERIOD_S, self.tick)
         self.publish_state()
+
+    # ── surface de commande (ce que le pont MCP appelle) ─────────────────
+    def on_commande(self, requete, reponse):
+        reponse.response_json = json.dumps(self.commande(requete.request_json),
+                                           ensure_ascii=False)
+        return reponse
+
+    def commande(self, texte: str) -> dict:
+        """Une seule porte d'entrée : JSON en entrée, JSON en sortie, rien d'implicite."""
+        try:
+            demande = json.loads(texte)
+        except (TypeError, ValueError) as exc:
+            return {"status": "INVALID", "reason": f"requete JSON invalide : {exc}"}
+        if not isinstance(demande, dict):
+            return {"status": "INVALID", "reason": "objet JSON attendu"}
+
+        op = demande.get("op")
+        if op == "start_skill":
+            return self._start_skill(demande)
+        if op == "start_sequence":
+            return self._start_sequence(demande)
+        if op == "get_task":
+            return self._get_task(demande)
+        if op == "cancel_task":
+            return self.director.cancel(demande.get("task_id") or None,
+                                        reason=demande.get("reason") or "demande")
+        return {"status": "INVALID", "reason": f"operation inconnue : {op!r}"}
+
+    def _start_skill(self, demande):
+        skill = demande.get("skill")
+        if not isinstance(skill, str) or not skill.strip():
+            return {"status": "INVALID", "reason": "skill attendu"}
+        args = demande.get("args") or {}
+        if not isinstance(args, dict):
+            return {"status": "INVALID", "reason": "args doit etre un objet"}
+        return self.start(skill.strip(), args)
+
+    def _start_sequence(self, demande):
+        steps = demande.get("steps")
+        if not isinstance(steps, list) or not steps:
+            return {"status": "INVALID", "reason": "steps doit etre une liste non vide"}
+        for etape in steps:
+            if not isinstance(etape, dict) or not isinstance(etape.get("skill"), str) \
+                    or not etape["skill"].strip():
+                return {"status": "INVALID", "reason": "chaque etape exige un skill"}
+            if etape.get("args") is not None and not isinstance(etape["args"], dict):
+                return {"status": "INVALID", "reason": "args d etape doit etre un objet"}
+        return self.start_sequence([{"skill": e["skill"].strip(), "args": e.get("args") or {}}
+                                    for e in steps])
+
+    def _get_task(self, demande):
+        task_id = demande.get("task_id") or ""
+        if not task_id:
+            return {"status": "FOUND", "task": self.etat()}
+        trouvee = self.director.get(str(task_id))
+        if trouvee is None:
+            return {"status": "UNKNOWN_TASK", "task_id": task_id}
+        return {"status": "FOUND", "task": trouvee}
 
     # ── entrée : la sécurité est une précondition, pas une réaction ─────
     def refus_securite(self) -> str:
