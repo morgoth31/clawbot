@@ -30,7 +30,7 @@ Retour à l'[[index]] ; graphe détaillé : [[ros2_graph_clawbot]] ; MCP : [[mcp
 | 10 | Manette de jeu | **aucun `/dev/input/js*`** | non | `clawbot-joy-teleop.service` actif sans périphérique | — | **service inutile** |
 | 11 | Sortie audio (haut-parleur) | lecture : HDMI uniquement | **non** | `aplay -l` ne liste aucun haut-parleur USB/I2S | — | **absent** : le TTS n'a pas de sortie |
 | 12 | Entrée audio (micro) | carte 0 (caméra USB), carte 1 (Astra) | oui | `arecord -l` liste deux entrées de capture | — | présent, **aucun nœud** |
-| 13 | Odométrie `/odom` et TF `odom → base_link` | — | **non** | topic absent, transformation absente | aucun | **manquant** |
+| 13 | Odométrie `/odom` et TF `odom → base_link` | — | **oui** depuis le 2026-11-11 16:01 CET | 10,0 Hz, TF publiée par `ekf_filter_node` | `/ekf_filter_node` (`clawbot-ekf.service`) | **ok** |
 | 14 | Carte `/map` | — | non (hors session SLAM) | aucun message pendant 9 s | `slam_toolbox` non lancé | normal hors cartographie |
 
 ## 2. Ce que l'inventaire change dans le plan
@@ -41,7 +41,7 @@ Retour à l'[[index]] ; graphe détaillé : [[ros2_graph_clawbot]] ; MCP : [[mcp
 | La caméra du bras fonctionne mais n'a aucun nœud | elle n'est visible ni du graphe, ni de la supervision, ni de MoveIt ; seule la voie OpenCV la voit |
 | Aucun haut-parleur détecté | la phase TTS du plan directeur est bloquée par le matériel, pas par le logiciel : prévoir un module audio USB |
 | Pas de manette détectée alors que l'unité `joy-teleop` tourne | l'unité doit être arrêtée ou la manette branchée ; elle consomme sans servir |
-| `/odom` et `odom → base_link` absents | Nav2 et `NavigateTo` resteront non fonctionnels même configurés (déjà tracé en ERR-003) |
+| `/odom` et `odom → base_link` corrigés le 2026-11-11 | Nav2 est déployé et `navigate_to` atteint trois waypoints nommés en simulation ([[navigation_nav2_waypoints]]) |
 | Buzzer et LED jamais sollicités | deux sorties d'alerte disponibles pour le superviseur S1, à tester avant de s'en servir |
 
 ## 3. Commandes de reproduction

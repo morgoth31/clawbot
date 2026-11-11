@@ -1,0 +1,23 @@
+[Unit]
+Description=Filtre EKF (robot_localization) - /odom et TF odom -> base_link
+After=network.target ros2-driver-node.service
+Requires=ros2-driver-node.service
+
+[Service]
+Type=simple
+User=jetson
+Environment=ROS_DOMAIN_ID=28
+Environment=HOME=/home/jetson
+# Le binaire du paquet Debian de ce poste linke libdiagnostic_updater.so, absente en Humble
+# (bibliotheque header-only) : il ne demarre pas. Celui du workspace constructeur, apparie a
+# librl_lib.so de la meme construction, fonctionne -- a condition de resoudre librl_lib.so, qui
+# n'est pas dans /opt/ros/humble/lib.
+Environment=LD_LIBRARY_PATH=/home/jetson/yahboomcar_ros2_ws/software/library_ws/install/robot_localization/lib:/opt/ros/humble/lib:/opt/ros/humble/lib/aarch64-linux-gnu
+ExecStart=/home/jetson/yahboomcar_ros2_ws/software/library_ws/install/robot_localization/lib/robot_localization/ekf_node \
+  --ros-args --params-file /home/jetson/clawbot/config/ekf.yaml -r __node:=ekf_filter_node \
+  -r odometry/filtered:=odom
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

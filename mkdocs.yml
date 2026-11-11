@@ -151,6 +151,7 @@ nav:
           - Système 1 (directeur): knowledge-base/02_Software/directeur_s1.md
           - Système 1 (sentinel): knowledge-base/02_Software/sentinel_s1.md
           - Chaîne de navigation: knowledge-base/02_Software/ros2_nav_stack.md
+          - Navigation sur carte (waypoints): knowledge-base/02_Software/navigation_nav2_waypoints.md
           - Services systemd: knowledge-base/02_Software/systemd_robot_services.md
   - Exploitation:
       - État des nœuds et services: knowledge-base/03_Operations/etat_noeuds_et_services.md

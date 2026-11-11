@@ -39,6 +39,12 @@ UNITS = [
     ("rosbridge.service", "Passerelle WebSocket (port 9090)"),
     ("yolo-inference.service", "Inférence YOLO (port 8003)"),
     ("clawbot-joy-teleop.service", "Téléopération manette"),
+    ("clawbot-ekf.service", "Filtre EKF (/odom, TF odom -> base_link)"),
+    ("clawbot-nav2.service", "Navigation Nav2 sur carte (AMCL, waypoints)"),
+    ("clawbot-slam.service", "SLAM Toolbox (cartographie, concurrence Nav2)"),
+    ("clawbot-safety-arbitrator.service", "Arbitre réflexe 20 Hz (/cmd_vel_safe)"),
+    ("clawbot-director.service", "Directeur S1 (/director/command)"),
+    ("clawbot-sentinel.service", "Sentinel S1 (attention, mots d'arrêt)"),
     ("clawbot-health.service", "Test de santé des périphériques"),
     ("clawbot-docs.service", "Site de documentation (port 8080)"),
 ]

@@ -1,8 +1,7 @@
 # État du projet Clawbot — reprise de session
 
-**Date** : 2026-11-11, fin de session longue (compactions multiples)
-**Branche** : `docs/site-okf-merge` ; dernier commit de code `95bd39a`, ce document est le suivant
-dans l'historique
+**Date** : 2026-11-11, après le lot 5 (navigation sur carte)
+**Branche** : `docs/site-okf-merge` ; dernier commit de code avant ce lot `95bd39a`
 **Robot** : Clawbot X3 Plus, Jetson Orin NX, ROS 2 Humble, domaine 28
 
 > Ce document est fait pour être lu **au début d'une nouvelle session**, à la place d'un
@@ -17,11 +16,15 @@ Ouvrir une nouvelle session et envoyer :
 
 > Lis `/home/jetson/clawbot/docs/ETAT-PROJET.md` et
 > `docs/superpowers/specs/2026-11-11-architecture-s1-s2-design.md`, puis reprends au §8
-> (prochaines étapes) à la brique 5.
+> (prochaines étapes) à la brique 6.
 
-Les briques 1 à 4 sont faites : nœud ROS du directeur, surface MCP, exécution réelle des goals,
-sentinel. Ne pas les refaire. Ne pas relancer les diagnostics déjà faits : ils sont tous dans ce
-document avec leurs chiffres.
+Les briques 1 à 5 sont faites : nœud ROS du directeur, surface MCP, exécution réelle des goals,
+sentinel, navigation sur carte avec waypoints fermés. Ne pas les refaire. Ne pas relancer les
+diagnostics déjà faits : ils sont tous dans ce document avec leurs chiffres.
+
+**La brique 5 n'est pas close pour autant** : la preuve en simulation est faite (3 waypoints à
+0,000 / 0,121 / 0,082 m), l'essai **physique** des trois waypoints reste à faire, robot au sol,
+opérateur présent. Protocole au §8, brique 5.
 
 **État du dépôt** : le worktree porte des modifications **antérieures** non commitées (suppressions
 de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cpp/`, `slam3d/`,
@@ -51,10 +54,14 @@ de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cp
 | Pont MCP → Hermes | ok | **25 outils**, stdio, `hermes mcp test clawbot` liste les 25 |
 | Surface directeur (S2) | ok | `start_skill` / `get_task` / `cancel_task`, tâches terminales consultables, ~2 s par appel |
 | Déclenchement S1→S2 | voie CLI | 46,4 s mesuré ; webhook configuré mais passerelle non redémarrée |
+| EKF persistant | **en service** | `clawbot-ekf.service`, `/odom` 10,0 Hz, TF `odom→base_link` |
+| Nav2 sur carte | **actif** | `clawbot-nav2.service`, 12 nœuds, costmap globale 177×80 (carte du catalogue) |
+| Waypoints | **3 nommés** | `ouest` (1,50 ; −0,30), `centre` (2,50 ; 0,00), `est` (5,30 ; 0,48), dégagements 0,65 / 1,05 / 0,75 m |
+| `navigate_to` | **exécute** | adaptateur `NavigateToPose`, coordonnées libres refusées, 3 waypoints atteints à 0,000 / 0,121 / 0,082 m en simulation (domaine 99) |
 
-**Suite de tests : 236 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
-l'échelle, dérive, round-robin, directeur, surface MCP, exécution des skills, sentinel). Commande
-exacte :
+**Suite de tests : 268 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
+l'échelle, dérive, round-robin, directeur, surface MCP, exécution des skills, sentinel, catalogue
+de waypoints, adaptateur `navigate_to`, cohérence des paramètres Nav2). Commande exacte :
 
 ```bash
 cd /home/jetson/clawbot
@@ -66,6 +73,14 @@ python3 -m pytest tests/mcp_bridge clawbot_safety/test clawbot_arm_controller/te
   clawbot_director/test clawbot_sentinel/test tests/test_ekf_config.py \
   tests/test_cmd_vel_scaling.py tests/test_measure_odom_drift.py \
   tests/test_servo_round_robin.py -p no:launch_testing -p no:launch_ros -o addopts="" -q
+```
+
+Preuve de bout en bout de la navigation, en simulation, sans déplacer le robot :
+
+```bash
+export ROS_DOMAIN_ID=99   # la base virtuelle refuse tout autre domaine
+python3 scripts/preuve_navigation_99.py
+# 3 waypoints nommes atteints a +/-20 cm, get_task montre les etapes
 ```
 
 ---
@@ -106,10 +121,11 @@ S2  Hermes ── MCP stdio (25 outils) ──┐        ▲ webhook (réveil, p
 `/safety/state` (`OK|HOLD|FREEZE|DROP_TORQUE|STOP|SENSOR_STALE|BATTERY_LOW`), `/director/state`
 (JSON daté), `/sentinel/state`, `/sentinel/event`, `/sentinel/transcript` (couture VAD/STT).
 
-**Services systemd actifs** : `ros2-driver-node`, `clawbot-lidar`, `orbbec-camera`,
-`clawbot-description`, `clawbot-arm-controller`, `clawbot-move-group`, `clawbot-slam`,
-`clawbot-safety-arbitrator`, `clawbot-director`, `clawbot-sentinel`, `clawbot-docs`,
-`yolo-inference`, `ros2-hardware-service`, `ros2-llm-bridge-cpp`.
+**Services systemd actifs** : `ros2-driver-node`, `clawbot-ekf`, `clawbot-lidar`, `orbbec-camera`,
+`clawbot-description`, `clawbot-arm-controller`, `clawbot-move-group`, `clawbot-nav2` (`clawbot-slam`
+en conflit déclaré : deux écrivains de `map→odom`), `clawbot-safety-arbitrator`, `clawbot-director`,
+`clawbot-sentinel`, `clawbot-docs`, `yolo-inference`, `ros2-hardware-service`,
+`ros2-llm-bridge-cpp`.
 
 **Paquets créés** : `clawbot_safety`, `clawbot_director` (logique + nœud + skills),
 `clawbot_sentinel`, `clawbot_interfaces` (`srv/DirectorCommand`), `clawbot_arm_controller`,
@@ -142,7 +158,10 @@ S2  Hermes ── MCP stdio (25 outils) ──┐        ▲ webhook (réveil, p
 | Point | Gravité | Détail |
 |---|---|---|
 | `DROP_TORQUE` n'actionne rien | **sécurité** | l'état est publié, le contrôleur s'arrête, mais aucun étage ne coupe le couple (`set_uart_servo_torque`). Décision prise, non appliquée. |
-| Directeur sans skill physique | bloquant lot 5/6 | `arm_move`/`grip_set` exécutent ; tous les skills de la spec refusent en `INDISPONIBLE` avec leur lot |
+| Essai physique des waypoints | bloquant la clôture du lot 5 | la navigation est prouvée en simulation ; aucun déplacement réel n'a encore été commandé par Nav2 |
+| Bras absent du costmap de Nav2 | moyen | Nav2 ne connaît le bras que par un rayon d'encombrement de 0,16 m : un waypoint peut être accepté bras en extension |
+| `STRUCTURAL_ABSENCES` codées en dur | moyen | `bridge_mcp/context.py` déclare encore `/scan`, `/odom` et les cadres TF absents ; cette liste doit être dérivée de l'observation |
+| Skills restants | bloquant lot 6/7 | `arm_move`/`grip_set`/`navigate_to` exécutent ; `follow_human`, `grasp_object`, `search_object`, `express_state`, `look_at_board`, `set_watch_mode` refusent en `INDISPONIBLE` |
 | Aucun VAD/STT branché | bloquant lot 7 | `/sentinel/transcript` n'a aucun producteur : les mots d'arrêt sont prouvés en test, inopérants en réel |
 | Réveil webhook | moyen | route `clawbot-incident` configurée, passerelle non redémarrée (port 8644 muet) |
 | Repli Telegram | moyen | aucun canal configuré ; la règle « personne depuis 60 s → Telegram » n'est pas codée |
@@ -196,6 +215,23 @@ S2  Hermes ── MCP stdio (25 outils) ──┐        ▲ webhook (réveil, p
     reconnecte pas : `scripts/audio_enceinte_defaut.sh` enchaîne connexion, rechargement des modules,
     profil `a2dp-sink` et sink par défaut.
 19. **`btmgmt find` est rejeté (`0x0b`) quand `bluetoothd` tourne** : utiliser `bluetoothctl scan on`.
+20. **Un nœud Nav2 crée son serveur d'action avant d'être activé** : un goal envoyé à ce moment est
+    refusé, et le directeur marque l'étape en échec — à raison. Attendre
+    `lifecycle_manager_localization/is_active` **et** `lifecycle_manager_navigation/is_active`,
+    pas seulement `wait_for_server()`.
+21. **`nav2_costmap_2d` attend `width` et `height` en entiers** : écrire `3.0` fait mourir
+    `controller_server` à la construction (`parameter 'height' has invalid type`), sans que le
+    reste de la pile signale autre chose qu'un `Waiting for service controller_server/get_state`.
+22. **`ekf_node` du paquet Debian de ce poste ne démarre pas** : il linke `libdiagnostic_updater.so`,
+    absente en Humble (bibliothèque header-only). Utiliser le binaire du workspace constructeur
+    (`yahboomcar_ros2_ws/software/library_ws/install/robot_localization/lib/robot_localization/`)
+    avec `LD_LIBRARY_PATH` sur ses bibliothèques, sinon `librl_lib.so` manque.
+23. **`/scan` est publié en `laser_link`, pas en `laser`** : le `slam_launch.py` historique déclarait
+    `laser`, frame inexistante — les scans étaient muets pour SLAM. Vérifier le `frame_id` réel du
+    message avant de déclarer un capteur absent.
+24. **Le bord de la carte n'est pas de l'espace libre** : un champ de distance calculé sur les
+    seules cellules occupées désigne les coins non observés comme les points les plus sûrs. Le bord
+    doit compter comme obstacle, sinon un waypoint proposé automatiquement tombe hors de la pièce.
 
 ---
 
@@ -228,15 +264,27 @@ mots d'arrêt locaux (« stop », « arrête-toi », « halte ») qui coupent la
 anti-rebondi 2 s + mémoire du `task_id`, échec de POST journalisé avec `delivered: false`.
 23 tests, trois mutations vérifient leur pouvoir de discrimination.
 
-### Brique 5 — cartographie, waypoints et Nav2 (prochaine)
-Objectif : donner un premier skill physique à `navigate_to`.
-- catalogue de waypoints **en énumération fermée** (`config/waypoints.yaml`), résolus sur la carte
-  courante ; aucune coordonnée libre acceptée de S2 ;
-- Nav2 (`nav2_bt_navigator`) démarre sur la carte existante ; `navigate_to` devient un adaptateur
-  `NavigateToPose` dans `skills.py` (retirer l'entrée `INDISPONIBLE` du registre) ;
-- critère de sortie : 3 waypoints nommés atteints à ±20 cm, `get_task` montre les étapes.
+### Brique 5 — cartographie, waypoints et Nav2 — **faite en simulation, essai physique à faire**
+- catalogue **en énumération fermée** : `config/waypoints.yaml`, trois waypoints (`ouest`
+  1,50/−0,30, `centre` 2,50/0,00, `est` 5,30/0,48) mesurés sur la carte
+  `test_cartographie_apres_deplacement`, dégagements 0,65 / 1,05 / 0,75 m, même composante connexe ;
+- résolution nom → pose dans `clawbot_director/waypoints.py` : refus des coordonnées libres, huit
+  catalogues malformés refusés au chargement (doublon, non fini, hors bornes, clé inconnue, nom
+  invalide) ;
+- `navigate_to` n'est plus `INDISPONIBLE` : `skills.py` construit un goal `NavigateToPose` en
+  `map`, horodatage nul (TF la plus récente), délai 90 s ;
+- Nav2 déployé par `clawbot-nav2.service` (`config/nav2_clawbot.yaml`, `launch/navigation.launch.py`
+  qui **déduit la carte du catalogue**), AMCL + NavFn + Regulated Pure Pursuit ;
+- EKF enfin persistant (`clawbot-ekf.service`) : sans `/odom` ni TF, rien de tout cela ne tenait ;
+- **preuve** : `scripts/preuve_navigation_99.py` (base virtuelle + scan par lancer de rayons sur la
+  vraie carte + Nav2 avec les paramètres du robot) → 3 waypoints atteints à **0,000 / 0,121 /
+  0,082 m**, `get_task` à 3/3, `DONE` ;
+- **reste** : l'essai physique des trois waypoints, robot au sol, opérateur présent. C'est le seul
+  critère de sortie du lot qui ne soit pas encore mesuré sur le matériel. Protocole dans
+  `docs/knowledge-base/02_Software/navigation_nav2_waypoints.md` §6, et
+  `scripts/poser_pose_initiale.py` pour déclarer la pose réelle à AMCL.
 
-### Brique 6 — perception et saisie
+### Brique 6 — perception et saisie (prochaine)
 Caméra du poignet dans ROS (`v4l2_camera_node` 640×480 à 15 Hz, `wrist_camera_optical_frame` sur
 `arm_link5`), puis `search_object`, `grasp_object` (boucle fermée, tolérance 1–2 cm, répétabilité
 sur 10 saisies), `follow_human`.
@@ -268,6 +316,14 @@ ros2 topic echo /safety/state --once
 ros2 topic echo /director/state --once
 ros2 topic echo /sentinel/state --once
 ros2 topic hz /arm/servo_angles
+
+# navigation (domaine 99 pour toute preuve, jamais 28)
+systemctl is-active clawbot-ekf clawbot-nav2 clawbot-slam
+ros2 run tf2_ros tf2_echo map base_link
+python3 scripts/poser_pose_initiale.py ouest          # domaine 28, robot posé sur le waypoint
+echo '{"op":"start_skill","skill":"navigate_to","args":{"destination":"centre"}}' \
+  | python3 -m bridge_mcp.director_client
+ROS_DOMAIN_ID=99 python3 scripts/preuve_navigation_99.py
 
 # base
 ROS_DOMAIN_ID=28 python3 scripts/base_probe_l1.py --speed 0.05 --duration 3
@@ -309,6 +365,7 @@ sudo systemctl restart clawbot-docs && curl -s -o /dev/null -w '%{http_code}\n' 
 ## 11. Derniers commits
 
 ```text
+a0bbea3 feat(nav2): navigation sur carte, catalogue de waypoints ferme, navigate_to
 95bd39a feat(audio): enceinte SRS-XB100 appairee, A2DP verifie, procedure conservee
 0807648 docs(okf): directives BR/EDR + cache + MGMT appliquees, meme blocage HCI
 d18f000 docs(okf): compte rendu de reprise sur l'appairage Bluetooth SRS-XB100
