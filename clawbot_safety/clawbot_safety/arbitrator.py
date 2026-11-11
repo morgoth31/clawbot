@@ -36,7 +36,9 @@ def decide(cmd, front_m, roll, pitch, servo2, samples, age_scan, age_imu):
         return "STOP", (0.0, 0.0, 0.0)
     etat = tilt_state(roll, pitch, servo2)
     if etat != "ok":
-        return "HOLD", (0.0, 0.0, 0.0)
+        # HOLD, DROP_TORQUE ou FREEZE : l'aval doit pouvoir distinguer « maintenir » de
+        # « couper le couple », ce ne sont pas les mêmes gestes sur le bras.
+        return etat.upper(), (0.0, 0.0, 0.0)
     if battery_state(samples, time.time()) == "low":
         return "BATTERY_LOW", (0.0, 0.0, 0.0)
     return "OK", cmd

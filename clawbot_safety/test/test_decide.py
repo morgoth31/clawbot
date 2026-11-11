@@ -23,6 +23,13 @@ def test_tilt_holds_even_without_command():
     etat, cmd = decide((0.0, 0.0, 0.0), 1.0, 9.0, 0.0, 96, [11.9] * 20, 0.1, 0.1)
     assert etat == "HOLD" and cmd == (0.0, 0.0, 0.0)
 
+
+def test_freeze_and_drop_are_distinguished():
+    # bras releve (96) : coupure interdite, on maintient
+    assert decide((0.05, 0, 0), 2.0, 0.0, 13.0, 96, [11.9] * 20, 0.1, 0.1)[0] == "FREEZE"
+    # bras vers l avant (70) : la chute va au sol, on coupe le couple
+    assert decide((0.05, 0, 0), 2.0, 0.0, 13.0, 70, [11.9] * 20, 0.1, 0.1)[0] == "DROP_TORQUE"
+
 def test_zero_command_when_no_recent_input():
     # le chien de garde vit dans le nœud, mais la décision doit rester sûre avec une consigne nulle
     etat, cmd = decide((0.0, 0.0, 0.0), 1.0, 0.0, 0.0, 96, [11.9] * 20, 0.1, 0.1)
