@@ -1,0 +1,18 @@
+[Unit]
+Description=Arbitre reflexe S1 - Clawbot X3 Plus
+After=network.target ros2-driver-node.service
+Requires=ros2-driver-node.service
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+Environment=ROS_DOMAIN_ID=28
+Environment=HOME=/home/jetson
+WorkingDirectory=/home/jetson/clawbot
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec python3 -c 'from clawbot_safety.arbitrator import main; main()'"
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

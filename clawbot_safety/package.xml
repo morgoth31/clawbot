@@ -6,4 +6,5 @@
   <maintainer email="jetson@clawbot.local">jetson</maintainer>
   <license>Proprietary</license>
   <depend>rclpy</depend>
+  <export><build_type>ament_python</build_type></export>
 </package>
