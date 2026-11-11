@@ -86,6 +86,11 @@ class DirectorNode(Node):
         if op == "cancel_task":
             return self.annuler_tache(demande.get("reason") or "demande",
                                       demande.get("task_id") or None)
+        if op == "confirm":
+            accepte = demande.get("accepte")
+            if not isinstance(accepte, bool):
+                return {"status": "INVALID", "reason": "accepte doit etre un booleen"}
+            return self.director.resume(accepte)
         return {"status": "INVALID", "reason": f"operation inconnue : {op!r}"}
 
     def _start_skill(self, demande):
