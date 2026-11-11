@@ -252,11 +252,20 @@ class ArmTrajectoryServer(Node):
             remaining = (origin + t_sample) - time.monotonic()
             if remaining > 0:
                 time.sleep(remaining)
-            if goal_handle.is_cancel_requested or self._hold:
+            if goal_handle.is_cancel_requested:
                 goal_handle.canceled()
                 result.error_code = SUCCESSFUL
                 result.error_string = 'annule apres %d echantillons' % sent
                 self.get_logger().warning('trajectoire %s annulee' % which)
+                return result
+            if self._hold:
+                # Arret decide par le serveur (reflexe S1), pas par le client : l'etat attendu
+                # est ABORTED. Appeler canceled() sans requete cliente leve une transition
+                # invalide et laisse croire a un succes.
+                goal_handle.abort()
+                result.error_code = SUCCESSFUL
+                result.error_string = 'interrompu par safety hold apres %d echantillons' % sent
+                self.get_logger().warning('trajectoire %s interrompue par safety hold' % which)
                 return result
             with self._lock:
                 for spec, q in zip(specs, positions):
