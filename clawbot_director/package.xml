@@ -7,6 +7,7 @@
   <license>Proprietary</license>
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
+  <depend>clawbot_interfaces</depend>
   <test_depend>pytest</test_depend>
   <export><build_type>ament_python</build_type></export>
 </package>

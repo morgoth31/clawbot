@@ -1,7 +1,8 @@
-"""Catalogue des 22 outils MCP du pont (spécification §4.2 et §4.3).
+"""Catalogue des 25 outils MCP du pont (spécification §4.2, §4.3 et §6 de la conception).
 
 Étape 4 : le contrat est satisfait — noms, schémas, annotations, enveloppes et refus typés.
-Les outils qui exigent la couche ROS 2 ou l'arbitre refusent explicitement (`MCP-E-PREREQ`)
+La surface du directeur (start_skill, get_task, cancel_task) est câblée sur le service
+/director/command ; les outils qui exigent une couche encore absente refusent (`MCP-E-PREREQ`)
 au lieu de renvoyer une valeur inventée.
 """
 
@@ -189,6 +190,21 @@ def register_tools(mcp: MCPServer, state: BridgeState) -> None:
     def goal_list() -> Any:
         return _ros_call("goal_list", _ros().goal_list)
 
+    @mcp.tool(name="get_task", description="État, étape et raison d'une tâche du directeur S1, en cours ou terminée.", annotations=READ_ONLY)
+    def get_task(task_id: str = "") -> Any:
+        charge: dict[str, Any] = {"op": "get_task"}
+        if task_id:
+            charge["task_id"] = task_id
+        resultat = _ros_call("get_task", _ros().director_command, charge)
+        if not isinstance(resultat, dict):
+            return resultat
+        statut = resultat["data"].get("status")
+        if statut == "UNKNOWN_TASK":
+            return error_result("MCP-E-ARG", f"tâche inconnue du directeur : {task_id}")
+        if statut == "INVALID":
+            return error_result("MCP-E-ARG", resultat["data"].get("reason", "requête refusée"))
+        return resultat
+
     # ── Intervention ──────────────────────────────────────────────────────
     @mcp.tool(name="param_set", description="Écrit un paramètre ROS 2 après contrôle de la liste blanche et des bornes.", annotations=DESTRUCTIVE)
     def param_set(
@@ -240,6 +256,45 @@ def register_tools(mcp: MCPServer, state: BridgeState) -> None:
         state.record("goal_send", {"incident_id": incident_id, "action": action,
                                    "goal": goal or {}, "justification": justification})
         return result
+
+    @mcp.tool(name="start_skill", description="Déclare un skill au directeur S1 : une intention, jamais des coordonnées.", annotations=DESTRUCTIVE)
+    def start_skill(
+        skill: str = "",
+        args: dict | None = None,
+        justification: str = "",
+        incident_id: str | None = None,
+    ) -> Any:
+        if skill not in limits.LIMITS["allowed_skills"]:
+            return error_result("MCP-E-ARG", f"skill non déclaré : {skill!r}",
+                                allowed=list(limits.LIMITS["allowed_skills"]))
+        if args is not None and not isinstance(args, dict):
+            return error_result("MCP-E-ARG", "args doit être un objet")
+        if incident_id:
+            _incident, refusal = _require_incident(state, incident_id)
+            if refusal is not None:
+                return refusal
+        resultat = _ros_call("start_skill", _ros().director_command,
+                             {"op": "start_skill", "skill": skill, "args": args or {}})
+        state.record("start_skill", {"incident_id": incident_id, "skill": skill,
+                                     "args": args or {}, "justification": justification})
+        if isinstance(resultat, dict) and resultat["data"].get("status") == "INVALID":
+            return error_result("MCP-E-ARG", resultat["data"].get("reason", "requête refusée"))
+        return resultat
+
+    @mcp.tool(name="cancel_task", description="Annule une tâche du directeur au prochain point sûr.", annotations=IDEMPOTENT)
+    def cancel_task(task_id: str = "", reason: str = "",
+                    incident_id: str | None = None) -> Any:
+        motif = reason or "demande"
+        if motif.startswith("safety"):
+            # S2 ne s'attribue pas une annulation de sécurité : ce motif appartient à S1
+            return error_result("MCP-E-ARG", "le motif safety est réservé au Système 1")
+        resultat = _ros_call("cancel_task", _ros().director_command,
+                             {"op": "cancel_task", "task_id": task_id, "reason": motif})
+        state.record("cancel_task", {"incident_id": incident_id, "task_id": task_id,
+                                     "reason": motif})
+        if isinstance(resultat, dict) and resultat["data"].get("status") == "UNKNOWN_TASK":
+            return error_result("MCP-E-ARG", f"tâche inconnue du directeur : {task_id}")
+        return resultat
 
     @mcp.tool(name="safety_stop", description="Arrêt immédiat et verrou persistant, hors file des mutations.", annotations=IDEMPOTENT)
     def safety_stop(incident_id: str | None = None, reason: str = "") -> Any:

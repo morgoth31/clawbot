@@ -14,14 +14,18 @@ Sécurité : aucun argument n'est concaténé sans validation ; les noms doivent
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import selectors
 import shlex
 import subprocess
 import time
+from pathlib import Path
 
 ROS_SETUP = "/opt/ros/humble/setup.bash"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DIRECTOR_SERVICE_TIMEOUT_S = 8.0
 NAME_RE = re.compile(r"^/?[A-Za-z0-9_][A-Za-z0-9_./-]*$")
 
 #: actions autorisées à recevoir un objectif, avec leur type et l'ordre des articulations
@@ -227,6 +231,44 @@ class RosLayer:
                 "measured_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
 
     # ── intervention ──────────────────────────────────────────────────────
+    def director_command(self, request: dict, timeout: float | None = None) -> dict:
+        """Une opération sur le directeur S1, via son service /director/command.
+
+        Le pont n'embarque pas de contexte rclpy : il lance `bridge_mcp.director_client`
+        (JSON sur stdin, JSON sur stdout). `ros2 service call` est écarté : le CLI réinterprète
+        l'argument en YAML et mange les guillemets du JSON.
+        """
+        if not isinstance(request, dict) or not request.get("op"):
+            raise RosInvalid("requete directeur : objet avec op attendu")
+        delai = float(timeout or min(self.timeout, DIRECTOR_SERVICE_TIMEOUT_S))
+        commande = (f"source {ROS_SETUP} >/dev/null 2>&1 && cd {shlex.quote(str(REPO_ROOT))} "
+                    "&& source install/setup.bash && exec python3 -m bridge_mcp.director_client")
+        env = dict(self._env(), DIRECTOR_CLIENT_TIMEOUT_S=f"{delai:g}")
+        try:
+            proc = subprocess.run(["bash", "-c", commande],
+                                  input=json.dumps(request, ensure_ascii=False),
+                                  capture_output=True, text=True, env=env, timeout=delai + 10.0)
+        except FileNotFoundError as exc:
+            raise RosUnavailable(f"bash introuvable : {exc}") from exc
+        except subprocess.TimeoutExpired as exc:
+            raise RosTimeout(f"directeur muet au-dela de {delai + 10.0:g} s") from exc
+
+        try:
+            reponse = json.loads(proc.stdout)
+        except ValueError as exc:
+            message = (proc.stderr or proc.stdout or "").strip().splitlines()
+            raise RosUnavailable(
+                message[-1] if message else f"reponse illisible (code {proc.returncode})") from exc
+        if proc.returncode == 3:
+            raise RosUnavailable(reponse.get("reason") or "service /director/command absent")
+        if proc.returncode == 4:
+            raise RosTimeout(reponse.get("reason") or "directeur muet")
+        if proc.returncode != 0:
+            raise RosUnavailable(reponse.get("reason") or f"code {proc.returncode}")
+        if not isinstance(reponse, dict) or "status" not in reponse:
+            raise RosUnavailable(f"reponse du directeur sans statut : {str(reponse)[:200]}")
+        return reponse
+
     def safety_stop(self) -> dict:
         """Vitesse nulle publiée sur /cmd_vel ; l'arrêt physique reste requis pour le bras."""
         published = 0

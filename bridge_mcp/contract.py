@@ -28,6 +28,7 @@ READ_ONLY_TOOLS: tuple[str, ...] = (
     "resources_snapshot",
     "capabilities",
     "goal_list",
+    "get_task",
 )
 
 #: Outils de mutation ou d'écriture (sûreté : effet de bord, traçabilité obligatoire).
@@ -36,6 +37,8 @@ MUTATION_TOOLS: tuple[str, ...] = (
     "param_restore",
     "goal_cancel",
     "goal_send",
+    "start_skill",
+    "cancel_task",
     "safety_stop",
     "spec_propose",
     "patch_propose",
@@ -43,7 +46,7 @@ MUTATION_TOOLS: tuple[str, ...] = (
     "escalate",
 )
 
-#: Les 22 outils attendus (exigences MCP-02, plan de tests §7.3).
+#: Les 25 outils attendus (exigences MCP-02, plan de tests §7.3, + surface directeur §6).
 EXPECTED_TOOLS: tuple[str, ...] = READ_ONLY_TOOLS + MUTATION_TOOLS
 
 #: Outils prioritaires, hors file des mutations (exigence MCP-15).

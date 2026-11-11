@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import time
 import uuid
+from collections import OrderedDict
 from dataclasses import dataclass, field
 
 BUSY = "BUSY"
@@ -27,6 +28,7 @@ WAITING_CONFIRMATION = "WAITING_CONFIRMATION"
 IDLE = "IDLE"
 
 MAX_STEPS = 6
+HISTORY_SIZE = 20   # tâches terminées conservées pour get_task(task_id)
 
 
 @dataclass
@@ -38,6 +40,7 @@ class Task:
     step: int = 0
     steps: list = field(default_factory=list)
     started_at: float = 0.0
+    finished_at: float = 0.0
     history: list = field(default_factory=list)
 
 
@@ -48,20 +51,42 @@ class Director:
         self._preconditions = preconditions or (lambda skill, args: (True, ""))
         self._clock = clock
         self._task: Task | None = None
+        self._historique: OrderedDict[str, dict] = OrderedDict()
 
     # ── interrogation ─────────────────────────────────────────────────────
     def state(self) -> dict:
         """Jeu de clés fixe, que la tâche existe ou non : un contrat de supervision doit être
         typable. Les valeurs absentes sont nulles, pas omises."""
-        t = self._task
-        if t is None:
+        if self._task is None:
             return {"state": IDLE, "task_id": None, "skill": None, "step": None,
                     "steps": 0, "elapsed_s": 0.0, "started_at": None, "reason": None}
+        return self._instantane(self._task)
+
+    def get(self, task_id: str) -> dict | None:
+        """État d'une tâche, en cours ou terminée ; None si l'identifiant est inconnu.
+
+        Une tâche terminée reste consultable (anneau borné) : S2 demande souvent « pourquoi
+        annulé ? » après qu'une autre tâche a démarré.
+        """
+        if self._task is not None and self._task.task_id == task_id:
+            return self._instantane(self._task)
+        return self._historique.get(task_id)
+
+    def _instantane(self, t: Task) -> dict:
+        fin = t.finished_at or self._clock()
         return {"state": t.state, "task_id": t.task_id, "skill": t.skill,
                 "step": t.step, "steps": len(t.steps),
-                "elapsed_s": round(self._clock() - t.started_at, 2),
+                "elapsed_s": round(fin - t.started_at, 2),
                 "started_at": t.started_at,
                 "reason": t.history[-1].get("reason") if t.history else None}
+
+    def _archiver(self):
+        t = self._task
+        if t is None:
+            return
+        self._historique[t.task_id] = self._instantane(t)
+        while len(self._historique) > HISTORY_SIZE:
+            self._historique.popitem(last=False)
 
     # ── démarrage ────────────────────────────────────────────────────────
     def start(self, skill: str, args: dict | None = None) -> dict:
@@ -79,6 +104,7 @@ class Director:
             return {"status": PRECONDITION_FAILED, "reason": raison,
                     "skill": premier["skill"]}
 
+        self._archiver()
         self._task = Task(
             task_id="t-" + uuid.uuid4().hex[:10],
             skill=premier["skill"],
@@ -99,6 +125,7 @@ class Director:
         t.history[-1]["result"] = success
         if not success:
             t.state = FAILED
+            t.finished_at = self._clock()
             t.history[-1]["reason"] = reason
             return {"status": FAILED, "task_id": t.task_id, "step": t.step,
                     "reason": reason}
@@ -106,6 +133,7 @@ class Director:
         t.step += 1
         if t.step >= len(t.steps):
             t.state = DONE
+            t.finished_at = self._clock()
             return {"status": DONE, "task_id": t.task_id, "steps": len(t.steps)}
 
         suivant = t.steps[t.step]
@@ -113,6 +141,7 @@ class Director:
         ok, refus = self._preconditions(suivant["skill"], suivant.get("args") or {})
         if not ok:
             t.state = FAILED
+            t.finished_at = self._clock()
             t.history.append({"step": t.step, "skill": suivant["skill"],
                               "state": PRECONDITION_FAILED, "reason": refus})
             return {"status": PRECONDITION_FAILED, "task_id": t.task_id,
@@ -135,6 +164,7 @@ class Director:
             return {"status": "NO_TASK"}
         if not accepte:
             self._task.state = CANCELLED_SAFETY
+            self._task.finished_at = self._clock()
             return {"status": CANCELLED_SAFETY, "task_id": self._task.task_id}
         self._task.state = RUNNING
         return {"status": RUNNING, "task_id": self._task.task_id}
@@ -152,6 +182,7 @@ class Director:
         # Tout motif de la famille « safety » est une annulation de sécurité : le motif précis
         # (safety, safety_stale) est conservé dans l'historique, le code reste CANCELLED_SAFETY.
         t.state = CANCELLED_SAFETY if reason.startswith("safety") else "CANCELLED"
+        t.finished_at = self._clock()
         t.history.append({"step": t.step, "skill": t.skill, "state": t.state,
                           "reason": reason})
         return {"status": t.state, "task_id": t.task_id, "step": t.step}

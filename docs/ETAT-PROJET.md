@@ -36,13 +36,14 @@ Ne pas relancer les diagnostics déjà faits : ils sont tous dans ce document av
 | Manipulation | ok | MoveIt planifie et exécute, collision mât modélisée |
 | Arbitre réflexe | **actif** | 20 Hz, obstacle 12 cm → zéro en **47 ms**, chien de garde 0,5 s |
 | Arrêt du bras par réflexe | **prouvé** | `/safety/hold` → « interrompu par safety hold après 6 échantillons » |
-| Directeur | **cœur fait** | task_id, BUSY, préconditions, séquences 6 étapes, 7 tests |
+| Directeur | **branché jusqu'à la déclaration** | nœud ROS, service `/director/command`, annulation sécurité 1,9 ms, 27 tests |
 | SLAM | **réparé** | carte 8,1 × 6,5 m, `map→odom` recale 24 cm sur 2,6 m |
-| Pont MCP → Hermes | ok | 22 outils, stdio, `hermes mcp test clawbot` liste les 22 |
+| Pont MCP → Hermes | ok | 25 outils, stdio, `hermes mcp test clawbot` liste les 25 |
+| Surface directeur (S2) | **faite** | `start_skill` / `get_task` / `cancel_task`, tâches terminées consultables, ~2 s par appel |
 | Déclenchement S1→S2 | voie CLI | 46,4 s mesuré, webhook prêt (redémarrage passerelle requis) |
 
-**Suite de tests : 174 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
-l'échelle, dérive, round-robin, directeur). Commande exacte :
+**Suite de tests : 205 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
+l'échelle, dérive, round-robin, directeur, surface MCP du directeur). Commande exacte :
 
 ```bash
 cd /home/jetson/clawbot
@@ -156,6 +157,9 @@ S2  Hermes ── MCP stdio (22 outils) ──┐        ▲ webhook (réveil, p
    bloqué en sécurité nominale.
 11. **Mesurer avec une boucle qui tourne à vide affame l'executor** : la latence DDS mesurée passe
    de 2 ms à 13 ms si la boucle d'attente ne rend pas le GIL. Laisser dormir 0,5 ms par tour.
+12. **`ros2 service call` n'est pas un transport JSON** : le CLI réinterprète l'argument en YAML,
+   mange les guillemets et casse sur une apostrophe. Pour parler au directeur, passer par
+   `bridge_mcp.director_client` (JSON sur stdin/stdout).
 
 ---
 
@@ -181,14 +185,29 @@ Trois garde-fous ajoutés après revue, chacun avec son test :
   `published_at`, `safety_age_s`, `safety_stale`. Un seul STOP n'écrit qu'une annulation, même
   s'il est publié 20 fois par seconde.
 
-Service `clawbot-director` actif en domaine 28. Reste pour la brique 2 : aucune entrée n'existe
-encore dans le graphe (ni service, ni topic) — la surface MCP est ce qui l'ouvrira, et c'est elle
-qui doit exposer `start` / `cancel` / `get_task` en réutilisant `DirectorNode.start_sequence()`.
+Service `clawbot-director` actif en domaine 28 ; la brique 2 lui a ouvert une entrée.
 
-### Brique 2 — surface MCP
-Trois outils dans `bridge_mcp` : `start_skill(skill, args)`, `get_task()`, `cancel_task(task_id)`.
-Le directeur devient accessible à S2, qui déclare des séquences au lieu de piloter des topics.
-Ajouter les tests contractuels (le pont en a déjà 22 outils, l'enveloppe est réutilisable).
+### Brique 2 — surface MCP — **faite**
+Un service `/director/command` (`clawbot_interfaces/srv/DirectorCommand`, une requête JSON, une
+réponse JSON) porte quatre opérations : `start_skill`, `start_sequence`, `get_task`,
+`cancel_task`. Trois outils MCP l'exposent : `start_skill(skill, args)`, `get_task(task_id)`,
+`cancel_task(task_id, reason)`. Le pont refuse un skill hors énumération avant tout appel ROS
+(`limits.allowed_skills`), refuse qu'un motif `safety` soit signé par S2, et traduit un
+`UNKNOWN_TASK` en `MCP-E-ARG`. Le catalogue MCP passe de 22 à **25 outils**, vérifié par
+`hermes mcp test clawbot`.
+
+Le pont n'embarque pas rclpy : `RosLayer.director_command` lance `bridge_mcp.director_client`
+(JSON sur stdin, JSON sur stdout, code 3 = service absent, 4 = délai). **Piège payé** :
+`ros2 service call` réinterprète l'argument en YAML et mange les guillemets du JSON — une
+apostrophe dans un référent casse en plus le quoting bash. Ne pas y revenir.
+
+Coût mesuré d'un appel pont → directeur : **~2,0 s** (médiane 1,98 s, max 2,4 s sur 5 appels),
+essentiellement l'initialisation rclpy du client ponctuel. Acceptable pour un outil MCP appelé
+par S2, pas pour du polling serré : si la supervision en a besoin, passer à un client persistant.
+
+Preuve bout en bout sur le robot (domaine 28) : `get_task` → IDLE, `start_skill navigate_to` →
+ACCEPTED, second `start_skill` → BUSY avec le même `task_id`, `cancel_task` → CANCELLED,
+`get_task` → état terminal avec `reason`. Aucun mouvement : la brique 3 n'est pas faite.
 
 ### Brique 3 — accrochage aux actions réelles
 `advance()` doit être appelé par la fin d'un goal : `FollowJointTrajectory` pour le bras,
@@ -200,8 +219,8 @@ Ajouter les tests contractuels (le pont en a déjà 22 outils, l'enveloppe est r
   annuler un goal de skill appartient à la brique 3. Ne pas présenter l'un comme l'autre.
 - **`advance()` et `TIMEOUT`** : tant que la fin de goal ne fait pas avancer la séquence, `RUNNING`
   est un mensonge permanent — brique 3.
-- **Anneau des tâches terminales** : `get_task(task_id)` après le démarrage d'une nouvelle tâche
-  n'a rien à répondre ; garder les N dernières avec motif et horodatage — brique 2.
+- **Anneau des tâches terminales** — fait : `Director.get(task_id)` garde les 20 dernières tâches
+  avec motif, horodatage et durée ; `get_task(task_id)` y répond après coup.
 - **Redémarrage** : le registre est en RAM ; `Requires=` fait tomber le directeur avec l'arbitre et
   repart à `IDLE`. Acceptable tant qu'aucun skill n'est engagé ; `ExecStop` qui annule et publie
   devient nécessaire en brique 3.
@@ -238,6 +257,12 @@ ROS_DOMAIN_ID=28 python3 scripts/base_probe_l1.py --speed 0.05 --duration 3
 
 # preuve réflexe -> bras (domaine 99, sûr)
 ROS_DOMAIN_ID=99 python3 scripts/test_safety_hold.py
+
+# directeur (après source /opt/ros/humble/setup.bash et install/setup.bash) : JSON sur stdin
+echo '{"op":"get_task"}' | python3 -m bridge_mcp.director_client
+echo '{"op":"start_skill","skill":"navigate_to","args":{"waypoint":"cuisine"}}' \
+  | python3 -m bridge_mcp.director_client
+echo '{"op":"cancel_task","reason":"operateur"}' | python3 -m bridge_mcp.director_client
 
 # documentation
 sudo systemctl restart clawbot-docs && curl -s -o /dev/null -w '%{http_code}\n' \

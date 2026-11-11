@@ -14,11 +14,11 @@ pytestmark = pytest.mark.contract
 
 
 def test_catalogue_has_exactly_the_specified_tools(client):
-    """MCP-02 : 22 outils, noms strictement conformes à la spécification §4.2-4.3."""
+    """MCP-02 : 25 outils, noms strictement conformes à la spécification §4.2-4.3 et §6."""
     tools = client.list_tools()
     names = {tool.name for tool in tools.tools}
     assert names == set(contract.EXPECTED_TOOLS)
-    assert len(tools.tools) == 22
+    assert len(tools.tools) == 25
 
 
 def test_each_tool_schema_is_valid_json_schema(client):

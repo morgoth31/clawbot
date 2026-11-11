@@ -83,6 +83,39 @@ def test_state_has_a_stable_key_set_when_a_task_exists():
     assert repos["steps"] == 0 and actif["steps"] == 1
 
 
+def test_finished_task_stays_consultable_after_a_new_one_starts():
+    # get_task(task_id) doit répondre après coup : une tâche terminée n'est pas effacée
+    d = Director()
+    t1 = d.start("navigate_to", {})["task_id"]
+    d.cancel(t1, reason="safety")
+    t2 = d.start("grasp_object", {})["task_id"]
+    assert t2 != t1
+
+    ancienne = d.get(t1)
+    assert ancienne["task_id"] == t1
+    assert ancienne["state"] == CANCELLED_SAFETY
+    assert ancienne["reason"] == "safety"
+    assert ancienne["skill"] == "navigate_to"
+    assert ancienne["elapsed_s"] >= 0
+    assert d.get(t2)["state"] == RUNNING
+
+
+def test_unknown_task_is_not_invented():
+    d = Director()
+    assert d.get("t-inexistant") is None
+
+
+def test_task_history_is_bounded():
+    d = Director()
+    premiers = []
+    for i in range(25):
+        tid = d.start("navigate_to", {"n": i})["task_id"]
+        if i == 0:
+            premiers.append(tid)
+        d.cancel(tid)
+    assert d.get(premiers[0]) is None, "la plus ancienne tache doit etre evincee"
+
+
 def test_confirmation_is_the_only_place_yes_no_is_consumed():
     d = Director()
     d.start("grasp_object", {})
