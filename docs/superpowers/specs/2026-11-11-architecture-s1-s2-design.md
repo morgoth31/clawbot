@@ -247,6 +247,31 @@ anti-basculement ne dépend donc que de l'arbitre et du jeton de contrôle, pas 
 - Format des snapshots et politique de rétention.
 - Stratégie de test : `ROS_DOMAIN_ID=99` obligatoire, jamais 28 pendant les tests.
 
+## 13. Réponses à la relecture indépendante (2026-11-11)
+
+Onze questions ont été posées par un roboticien ROS 2 chargé d'en tirer un plan sans pouvoir
+interroger l'auteur. Dix sont tranchées ici ; deux restent à l'opérateur (§14).
+
+| # | Question | Décision | Effet sur le plan |
+|---|---|---|---|
+| 1 | Le MCU renvoie-t-il l'état réel du bras ? | **Non aujourd'hui** : `/servo_ctrl` est une consigne, `/arm/joint_states` aussi ; aucun topic de retour. Mais le bus répond en lecture (`scripts/read_arm_angles.py` renvoie `[71, 127, 55, 55, 90, 149]` de façon répétée) : le correctif est **dans le driver**, publier `/arm/servo_angles` à 5 Hz. Aucun changement de firmware. | Ajout d'une **étape 3 bis (proprioception)** avant l'arbitre, et préconditions de bras écrites sur des mesures, pas des consignes |
+| 2 | Qui possède `/servo_ctrl`, comment se replier ? | L'arbitre **n'écrit jamais** `/servo_ctrl`. Deux seuils : 8° → annulation + **maintien** (couple conservé, position figée) ; 12° → **coupure de couple** du bras (chute contrôlée plutôt que basculement du châssis). Le repli actif n'est pas un réflexe — il coûte des secondes — c'est une action de reprise après stabilisation. L'arbitre possède la base (sortie unique `/cmd_vel`) et publie un estop logique `/safety/hold` que le contrôleur de bras honore. | Un seul écrivain par actionneur ; l'étape 4 se découpe en « seuils » puis « estop » |
+| 3 | Que devient la surface MCP existante et la prise manuelle ? | Les endpoints de **mouvement** du service `:8001` sont dépréciés (la capture reste) ; un seul verrou d'arrêt, celui de l'arbitre. Priorité **0,5 « opérateur »** ajoutée (estop physique, clavier, manette si un jour branchée), au-dessus de S2 et en dessous de la sécurité réflexe. | Retrait de deux écrivains de `/cmd_vel` sur quatre ; l'invariant « propriétaire unique » devient vrai |
+| 4 | Quelle carte, quels waypoints ? | Ajout d'une **étape 2 bis (SLAM Toolbox + localisation)** après l'odométrie. Waypoints dans un **catalogue YAML en énumération fermée** ; `navigate_to` refuse toute chaîne libre ; un référent symbolique se résout dans la carte courante seulement. | Une étape de plus, et un contrat d'entrée vérifiable |
+| 5 | Le directeur compose-t-il, ou S2 boucle-t-il skill par skill ? | Le directeur **exécute une séquence déclarée** par S2 (JSON, 6 étapes maximum), une sous-tâche par étape avec un point sûr entre deux. Il ne compose rien et n'invente rien. Boucler par S2 coûterait 5 à 10 s par étape. | Directeur = exécuteur de séquence, pas moteur de workflow |
+| 6 | Existe-t-il un chemin local pour l'urgence ? | Oui : **grammaire fermée dans le sentinel** (« stop », « arrête-toi », « halte », « oui », « non »), priorité 0,5, traitée sans S2. Le mode dégradé hors ligne = cette grammaire + les skills déjà chargés. | L'urgence ne dépend plus du réseau ; critère de l'étape 5 rendu mesurable |
+| 7 | Quels événements réveillent S2, et la session est-elle continue ? | Le directeur publie `task_state` ; réveil de S2 sur état **terminal** (`DONE`, `FAILED`, `CANCELLED`) avec anti-rebond 2 s. Le pont **conserve un `session_id`** et reprend la session (`--resume`) : sans ça, « non, l'autre tasse » est intraduisible. | Ajout d'un flux d'événements S1→S2 et d'un identifiant de session persistant |
+| 8 | Enceinte : achat, étape 6 bloquante ? | **Non bloquante.** Sortie vocale repoussée à l'arrivée du matériel ; le critère de l'étape 6 devient « LED + buzzer + Telegram », et l'étape se rejoue avec le TTS une fois l'enceinte appairée. | Aucun chemin critique ne dépend d'un achat |
+| 9 | `follow_human` : d'où vient `target_id` ? | `target_id` est une **désignation** (« la personne la plus centrale du champ »), pas une identité. Pas de ré-identification en v1 ; suivi visuel à 10-15 Hz, détection rafraîchie à 2-5 Hz. | `follow_human` reste simple ; la ré-identification devient une extension explicite |
+| 10 | `grasp_object` : quelle précision, quelle calibration ? | Boucle fermée caméra du poignet, tolérance 1-2 cm, pince compliante ; **pas de calibration sur mire en v1**, on mesure la répétabilité (10 saisies, écart-type) et on l'inscrit comme critère. | La calibration main-œil devient une mesure, pas un préalable |
+| 11 | Échecs : moteur, lecture du plateau, caméra ? | **Spike séparé, hors chemin critique.** Stockfish en local, état du plateau par `look_at_board` + OpenCV → FEN, et **point de vue fixe au-dessus du plateau** : la caméra du poignet ne peut pas servir d'yeux et de main en même temps. | L'étape 7 se termine sur les six autres tâches ; les échecs sont un lot autonome |
+
+Précision issue de la relecture : `arm_trajectory_server` accepte l'annulation, mais **annuler n'est
+pas replier** — c'est pourquoi le réflexe est un maintien puis une coupure de couple, et non un
+mouvement de repli.
+
+## 14. Questions réservées à l'opérateur
+
 ## 12. Décisions prises dans la conversation
 
 1. Approche **C** (hybride Nav2 + directeur JSON + arbitre séparé), pour ne pas partager
