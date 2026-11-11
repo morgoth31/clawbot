@@ -72,6 +72,15 @@ class Director:
             return self._instantane(self._task)
         return self._historique.get(task_id)
 
+    def current_step(self) -> dict | None:
+        """Étape en cours, telle que déclarée par S2 (skill + args), None hors exécution."""
+        t = self._task
+        if t is None or t.state not in (RUNNING, WAITING_CONFIRMATION):
+            return None
+        if 0 <= t.step < len(t.steps):
+            return t.steps[t.step]
+        return None
+
     def _instantane(self, t: Task) -> dict:
         fin = t.finished_at or self._clock()
         return {"state": t.state, "task_id": t.task_id, "skill": t.skill,

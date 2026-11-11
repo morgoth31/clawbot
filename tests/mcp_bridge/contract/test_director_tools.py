@@ -132,6 +132,18 @@ def test_director_tools_refusent_proprement_quand_le_directeur_est_absent(monkey
         assert result.structured_content["error"]["code"] in {"MCP-E-PREREQ", "MCP-E-TIMEOUT"}
 
 
+def test_un_skill_declare_mais_indisponible_refuse_en_prerequis(monkeypatch, client):
+    faux = FauxDirecteur([{"status": "INDISPONIBLE",
+                           "reason": "catalogue de waypoints absent (lot 5)"}])
+    monkeypatch.setattr(tools_module, "_ROS", faux)
+
+    result = client.call_tool("start_skill", {"skill": "navigate_to", "args": {}})
+
+    assert result.is_error is True
+    assert result.structured_content["error"]["code"] == "MCP-E-PREREQ"
+    assert "waypoints" in result.structured_content["error"]["message"]
+
+
 def test_les_trois_outils_sont_dans_le_contrat():
     assert {"start_skill", "get_task", "cancel_task"} <= set(contract.EXPECTED_TOOLS)
     assert "get_task" in contract.READ_ONLY_TOOLS
