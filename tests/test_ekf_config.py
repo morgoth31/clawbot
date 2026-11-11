@@ -15,7 +15,10 @@ def test_frames_and_rate():
     assert node["frequency"] == 30.0
     assert node["two_d_mode"] is True
     assert node["odom_frame"] == "odom"
-    assert node["base_link_frame"] == "base_link"
+    # L'EKF publie odom -> base_footprint, pas odom -> base_link : l'URDF declare deja
+    # `base_footprint -> base_link`. Deux ecrivains du parent de base_link laissent TF avec deux
+    # arbres deconnectes et cassent move_group (pick_ik : COLLISION_CHECKING_UNAVAILABLE).
+    assert node["base_link_frame"] == "base_footprint"
     assert node["world_frame"] == "odom"
     assert node["publish_tf"] is True
 
