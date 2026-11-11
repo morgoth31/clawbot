@@ -256,6 +256,62 @@ rejetée) :
   autre changement. Toute la difficulté est en amont, dans l'appairage HCI.
 - Les traces et ce compte rendu sont versionnés : `docs/knowledge-base/03_Operations/`.
 
+
+## 10. Directives appliquées le 2026-11-11 16:20 — résultat
+
+Quatre règles ont été appliquées strictement, sans `hcitool` ni `hciconfig` :
+
+1. **BR/EDR forcé** — `/etc/bluetooth/main.conf` (sauvegarde `main.conf.bak-20261111`) :
+
+   ```ini
+   PairableTimeout = 0
+   ControllerMode = bredr
+   JustWorksRepairing = always
+   ```
+
+   Vérifié ensuite par `btmgmt info` : `current settings: powered bondable ssp br/edr secure-conn`
+   — `le` **absent** de la liste, donc BLE bien désactivé.
+2. **Cache purgé** : `FF:72:18:F0:2C:C9` et `40:72:18:F0:2C:C9` supprimés de
+   `/var/lib/bluetooth/DC:4A:9E:DF:D6:E3/cache/`.
+3. **Réglages MGMT** : `ssp on`, `bondable on`, `pairable on`, `le off` acceptés.
+   `sc off` **refusé** : `Set Secure Connections for hci0 failed with status 0x0c (Not Supported)`,
+   y compris contrôleur éteint (`power off` → `sc off` → `power on`). `secure-conn` reste donc actif ;
+   à noter que l'enceinte n'annonce pas SC (ses extended features ne portent que
+   `Secure Simple Pairing (Host Support)`), donc l'hypothèse SC n'est pas testable par ce levier.
+4. **Scan MGMT** : `btmgmt find` est **rejeté** quand `bluetoothd` tourne
+   (`Unable to start discovery. status 0x0b (Rejected)`) ; le scan a été fait par
+   `bluetoothctl scan on`, même pile MGMT. L'enceinte est bien vue :
+   `NEW Device 40:72:18:F0:2C:C9 SRS-XB100`.
+
+Appairage demandé :
+
+```bash
+sudo btmgmt cancelpair 40:72:18:F0:2C:C9      # état propre après un premier essai « Busy »
+sudo btmgmt pair -c 3 -t 0 40:72:18:F0:2C:C9  # -c 3 = NoInputNoOutput, -t 0 = BR/EDR
+```
+
+Trace HCI obtenue (capture `btmon`, 30 s) :
+
+```text
+< HCI Command: Authentication Requested
+> HCI Event: Link Key Request            40:72:18:F0:2C:C9
+< HCI Command: Link Key Request Negative Reply
+> HCI Event: IO Capability Request
+> HCI Event: Read Remote Supported Features   (l'enceinte répond)
+> HCI Event: Read Remote Extended Features
+   ... aucune IO Capability Request Reply, ni négative ...
+@ MGMT Close: btmgmt                      après 30 s
+```
+
+État final : `Paired: no`, `Connected: yes` (ACL nue), aucune carte `bluez` dans PulseAudio.
+
+**Conclusion de cette passe** : ni le mode BR/EDR forcé, ni la purge du cache, ni `JustWorksRepairing`,
+ni l'appairage MGMT en `NoInputNoOutput` ne changent le symptôme. Le gestionnaire noyau
+`hci_io_capa_request_evt` reste muet alors que `bondable` est actif et `HCI_MGMT` nécessairement
+établi (les commandes mgmt fonctionnent). Deux explications restent : `hci_conn_hash_lookup_ba`
+échoue pour cette connexion, ou le noyau L4T embarque une variante de ce gestionnaire. Les deux se
+tranchent par instrumentation (`bpftrace` sur `hci_io_capa_request_evt`), pas par configuration.
+
 ## Voir aussi
 
 [[ERR-2026-11-11-011_bluetooth_appairage_sans_ble]] · [[inventaire_materiel]] ·
