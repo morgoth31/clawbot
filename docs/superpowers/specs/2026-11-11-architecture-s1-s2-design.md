@@ -60,6 +60,8 @@ et interrompt ; S2 planifie, arbitre le sens, et se réveille sur événement.
 - Autonomie longue sans opérateur : l'opérateur reste présent lors des essais physiques.
 - Apprentissage en ligne, ajustement de politique, RL.
 - Navigation 3D ou tout-terrain.
+- **Échecs : hors périmètre de cette version.** C'était un exemple d'usage, pas un objectif ; le lot
+  est décrit au §13 (ligne 11) pour ne pas le perdre, et sera instruit après la solidité système.
 - Échecs en compétition : un échiquier, pièces légères, niveau loisir.
 
 **Anti-objectifs** (réussite technique mais échec réel)
@@ -160,6 +162,14 @@ Machine à états `IDLE → WATCHING → ENGAGED`, avec hystérésis et cooldown
 
 Le sentinel ne réveille que sur **transition d'état**, jamais en continu. Cooldown par canal
 (60 s visuel, 5 s audio) pour éviter l'orage de réveils.
+
+**Fin de tâche (décidé le 2026-11-11)** : le directeur publie `task_state` et S2 est réveillé sur
+état **terminal**, succès compris — `DONE`, `FAILED`, `CANCELLED`. Le robot annonce donc ce qu'il a
+fait, et S2 peut enchaîner (« la tasse est posée, je range le reste ? »). Deux garde-fous de coût :
+anti-rebond de 2 s pour fusionner les fins rapprochées, et si aucun humain n'est dans le champ
+depuis plus de 60 s, l'annonce part sur Telegram au lieu d'une synthèse coûteuse. Un réveil de fin
+de tâche vaut 5 à 10 s et des jetons : c'est un choix assumé pour qu'une tâche composite se raconte,
+pas un défaut de latence.
 
 ## 6. Contrat MCP : des intentions, pas de la plomberie
 
@@ -264,13 +274,18 @@ interroger l'auteur. Dix sont tranchées ici ; deux restent à l'opérateur (§1
 | 8 | Enceinte : achat, étape 6 bloquante ? | **Non bloquante.** Sortie vocale repoussée à l'arrivée du matériel ; le critère de l'étape 6 devient « LED + buzzer + Telegram », et l'étape se rejoue avec le TTS une fois l'enceinte appairée. | Aucun chemin critique ne dépend d'un achat |
 | 9 | `follow_human` : d'où vient `target_id` ? | `target_id` est une **désignation** (« la personne la plus centrale du champ »), pas une identité. Pas de ré-identification en v1 ; suivi visuel à 10-15 Hz, détection rafraîchie à 2-5 Hz. | `follow_human` reste simple ; la ré-identification devient une extension explicite |
 | 10 | `grasp_object` : quelle précision, quelle calibration ? | Boucle fermée caméra du poignet, tolérance 1-2 cm, pince compliante ; **pas de calibration sur mire en v1**, on mesure la répétabilité (10 saisies, écart-type) et on l'inscrit comme critère. | La calibration main-œil devient une mesure, pas un préalable |
-| 11 | Échecs : moteur, lecture du plateau, caméra ? | **Spike séparé, hors chemin critique.** Stockfish en local, état du plateau par `look_at_board` + OpenCV → FEN, et **point de vue fixe au-dessus du plateau** : la caméra du poignet ne peut pas servir d'yeux et de main en même temps. | L'étape 7 se termine sur les six autres tâches ; les échecs sont un lot autonome |
+| 11 | Échecs : moteur, lecture du plateau, caméra ? | **Hors périmètre de cette version** (arbitré le 2026-11-11) ; lot séparé, hors chemin critique. Stockfish en local, état du plateau par `look_at_board` + OpenCV → FEN, et **point de vue fixe au-dessus du plateau** : la caméra du poignet ne peut pas servir d'yeux et de main en même temps. | L'étape 7 se termine sur les six autres tâches ; le lot échecs est instruit après la solidité système |
 
 Précision issue de la relecture : `arm_trajectory_server` accepte l'annulation, mais **annuler n'est
 pas replier** — c'est pourquoi le réflexe est un maintien puis une coupure de couple, et non un
 mouvement de repli.
 
-## 14. Questions réservées à l'opérateur
+## 14. Arbitrages rendus par l'opérateur (2026-11-11)
+
+| Question | Réponse | Conséquence |
+|---|---|---|
+| Les échecs dans cette version ? | **Non.** C'était un exemple d'usage ; la priorité est une architecture système solide. | Le périmètre livrable est : déplacement, cartographie, saisie, recherche, transport, suivi de personne, interaction. Le lot échecs reste décrit et reprend plus tard sans rien casser. |
+| Quand réveiller S2 en fin de tâche ? | **Oui, en fin de tâche**, succès compris. | Le robot rend compte de ce qu'il a fait ; anti-rebond 2 s, et bascule sur Telegram si personne n'est présent depuis 60 s. |
 
 ## 12. Décisions prises dans la conversation
 
