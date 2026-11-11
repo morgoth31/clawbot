@@ -53,7 +53,7 @@ def test_context_contains_every_required_block():
 
 
 def test_unavailable_data_is_declared_with_a_code():
-    """CTX-02 : /scan, /odom, les cadres TF absents et la jauge apparaissent explicitement."""
+    """CTX-02 : ce que l'observation ne contient pas est déclaré, avec un code stable."""
     engine, observation, incident = _incident()
     payload = context.build_context(incident, observation, engine.state)
     joined = " ".join(payload["unavailable"])
@@ -62,7 +62,38 @@ def test_unavailable_data_is_declared_with_a_code():
         assert expected in joined, f"{expected} doit être déclaré indisponible"
     assert "ROS2-TOPIC-ABSENT" in joined
     assert "TF-FRAME-MISSING" in joined
-    assert "ENOENT" in joined or "ENERGY" in joined
+
+
+def test_les_absences_suivent_l_observation_et_non_une_liste_figee():
+    """CTX-02b : un robot complet ne déclare aucune absence structurelle.
+
+    La liste était codée en dur : elle annonçait `/scan`, `/odom` et les cadres `map`/`odom`/
+    `base_link` absents alors que le robot les publie depuis le 2026-11-11. Une déclaration qui ne
+    dépend pas de la mesure est fausse un jour sur deux.
+    """
+    engine, observation, incident = _incident()
+    observation.topics.extend([
+        observations.TopicObs("/scan", 0.1, 0.05, 10.0, 10.0),
+        observations.TopicObs("/odom", 0.1, 0.05, 10.0, 10.0),
+    ])
+    observation.tf_ages.update({"base_link": 0.02, "odom": 0.02, "map": 0.05})
+
+    payload = context.build_context(incident, observation, engine.state)
+
+    assert payload["unavailable"] == [], payload["unavailable"]
+    assert payload["tf"]["frames_expected_missing"] == []
+
+
+def test_une_jauge_d_energie_absente_porte_son_code():
+    """CTX-02c : la seule absence qui reste vraiment structurelle sur ce robot."""
+    engine, observation, incident = _incident()
+    observation.resources.voltage_v = None
+
+    payload = context.build_context(incident, observation, engine.state)
+    joined = " ".join(payload["unavailable"])
+
+    assert "ENOENT" in joined
+    assert "/voltage: ROS2-TOPIC-ABSENT" in joined
 
 
 def test_context_is_bounded_in_size():

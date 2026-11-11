@@ -31,7 +31,7 @@ os.environ['ROS_DOMAIN_ID'] = '99'
 rclpy = pytest.importorskip('rclpy')
 from rclpy.executors import MultiThreadedExecutor  # noqa: E402
 from rclpy.node import Node  # noqa: E402
-from std_msgs.msg import String  # noqa: E402
+from std_msgs.msg import Int32MultiArray, String  # noqa: E402
 
 from clawbot_director.director import (  # noqa: E402
     CANCELLED_SAFETY, PRECONDITION_FAILED, RUNNING,
@@ -50,6 +50,9 @@ def stack():
 
     probe = Node('probe_director')
     pub_safety = probe.create_publisher(String, '/safety/state', 10)
+    # `navigate_to` exige un bras replié mesuré : sans ce flux, la précondition refuse la tâche et
+    # ces tests ne mesureraient plus l'annulation mais le refus.
+    pub_bras = probe.create_publisher(Int32MultiArray, '/arm/servo_angles', 10)
     published = []
     probe.create_subscription(String, '/director/state',
                               lambda m: published.append((time.monotonic(), json.loads(m.data))),
@@ -59,12 +62,28 @@ def stack():
     bras = FauxBras(mode='silencieux')
     thread = threading.Thread(target=executor.spin, daemon=True)
     thread.start()
+    angles = Int32MultiArray()
+    angles.data = [76, 97, 90, 90, 90, 149]
+    arret = threading.Event()
+
+    def _alimenter_bras():
+        while not arret.is_set():
+            pub_bras.publish(angles)
+            time.sleep(0.05)
+
+    threading.Thread(target=_alimenter_bras, daemon=True).start()
+
     try:
         assert _attendre(lambda: pub_safety.get_subscription_count() > 0, timeout=5.0), \
-            'appariement DDS non etabli avant le test'
+            'appariement DDS non établi avant le test'
+        assert _attendre(lambda: pub_bras.get_subscription_count() > 0, timeout=5.0), \
+            'flux des angles de bras non apparié'
+        assert _attendre(lambda: node.etat()['arm_folded'], timeout=3.0), \
+            'le directeur doit voir le bras replié avant de démarrer une tâche'
         assert _attendre(lambda: len(published) > 0, timeout=2.0), '/director/state muet'
         yield SimpleNamespace(node=node, pub_safety=pub_safety, published=published, probe=probe)
     finally:
+        arret.set()
         bras.fermer()
         executor.shutdown()
         node.destroy_node()

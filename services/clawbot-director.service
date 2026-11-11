@@ -11,6 +11,10 @@ Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
 WorkingDirectory=/home/jetson/clawbot
 ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec python3 -c 'from clawbot_director.director_node import main; main()'"
+# Un arret ou un redemarrage n'annulait aucun goal en vol : la tache restait RUNNING cote serveurs
+# d'action, sans personne pour l'attendre. ExecStop parle au noeud encore vivant.
+ExecStop=/bin/bash /home/jetson/clawbot/scripts/annuler_tache_service.sh
+TimeoutStopSec=20
 Restart=always
 RestartSec=3
 
