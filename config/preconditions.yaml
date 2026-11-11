@@ -5,15 +5,23 @@
 # un bras invisible dans son costmap.
 #
 # L'enveloppe ci-dessous est en DEGRÉS DE SERVO, lus sur /arm/servo_angles (6 valeurs : 5 axes du
-# bras, puis la pince). Elle est calée sur la pose de repos mesurée sur le robot à l'arrêt :
+# bras, puis la pince).
 #
-#   2026-11-11T16:20:00+01:00   /arm/servo_angles -> [76, 97, 90, 90, 90, 149]
+# Pose de repos retenue pour les déplacements, **validée par l'opérateur** :
 #
-# ATTENTION : cette pose de repos est une pose observée, pas une pose dont l'encombrement a été
-# mesuré. La géométrie du volume balayé par le bras n'est pas connue autrement que par le seuil de
-# collision du mât (servo 2 ≈ 114°). L'enveloppe doit donc être **validée par l'opérateur, bras
-# libre**, avant le premier essai physique de navigation ; c'est le premier point du protocole de
-# la page `02_Software/navigation_nav2_waypoints.md`.
+#   2026-11-11T19:20:40+01:00   /arm/servo_angles -> [90, 180, 0, 0, 90, 149]
+#
+# Le bras est debout au-dessus de la colonne (arm_link3 et arm_link4 à x ≈ 0,015 m, pince à
+# x = 0,190 m / z = 0,304 m, calculé par scripts/cinematique_bras.py), et la caméra du poignet
+# regarde vers l'avant, dans le même sens que l'Astra — vérifié le 2026-11-11 19:19 en comparant
+# les deux images : même scène (interrupteur du mur gauche, couloir au centre, portes sombres à
+# droite). C'est la seule pose où le bras est à la fois compact et utile à la perception en
+# déplacement.
+#
+# La cinématique directe de l'URDF annonce −90° de tangage pour `wrist_camera_optical_frame` dans
+# cette pose, alors que la caméra regarde l'horizon : le cadre optique de l'URDF est mal orienté et
+# ne doit pas servir de référence d'orientation. Le fait mesuré prime (voir
+# `02_Software/camera_poignet.md`).
 #
 # Le mode d'échec est volontairement fermé : angles périmés, jamais reçus, ou hors bande -> refus
 # avec le numéro du servo fautif. Un bras inconnu n'est pas un bras replié.
@@ -22,10 +30,10 @@ arm:
   source: /arm/servo_angles
   max_age_s: 1.0          # 10 périodes à 10 Hz : au-delà, la mesure ne dit plus rien
   joints: [1, 2, 3, 4, 5]
-  reference_deg: [76, 97, 90, 90, 90]
-  tolerance_deg: [10, 10, 10, 10, 10]
-  mesure_le: "2026-11-11T16:20:00+01:00"
-  valide_par_operateur: false
+  reference_deg: [90, 180, 0, 0, 90]
+  tolerance_deg: [5, 5, 5, 5, 5]   # relecture entrelacée, quantifiée au degré, ±1° constaté
+  mesure_le: "2026-11-11T19:20:40+01:00"
+  valide_par_operateur: true
 
 # Skills qui déplacent la base : eux seuls exigent le bras replié. `arm_move` et `grip_set` en sont
 # exclus, sans quoi le bras ne pourrait plus être replié par le directeur lui-même.

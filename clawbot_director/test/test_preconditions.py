@@ -34,8 +34,8 @@ def test_l_enveloppe_par_defaut_se_charge():
     assert ENVELOPPE.arm.joints == (1, 2, 3, 4, 5)
     assert ENVELOPPE.exige_bras_replie("navigate_to")
     assert not ENVELOPPE.exige_bras_replie("arm_move")
-    # l'enveloppe n'est pas validée par l'opérateur : c'est écrit, pas sous-entendu
-    assert ENVELOPPE.arm.valide_par_operateur is False
+    # l'enveloppe est validée par l'opérateur, et c'est écrit dans le fichier
+    assert ENVELOPPE.arm.valide_par_operateur is True
 
 
 def test_un_bras_dans_l_enveloppe_est_accepte():
@@ -45,7 +45,7 @@ def test_un_bras_dans_l_enveloppe_est_accepte():
 
 
 def test_un_bras_hors_enveloppe_refuse_en_nommant_le_servo():
-    angles = [76, 120, 90, 90, 90, 149]      # servo 2 en extension
+    angles = [90, 120, 0, 0, 90, 149]         # servo 2 en extension, hors de la pose de repos
     ok, raison = regles.verifier("navigate_to", angles, 0.1, ENVELOPPE)
     assert not ok
     assert "servo 2" in raison and "120" in raison
@@ -128,8 +128,8 @@ from clawbot_interfaces.srv import DirectorCommand  # noqa: E402
 from soutien_actions import FauxBras  # noqa: E402
 from soutien_navigation import FauxNavigateur  # noqa: E402
 
-ANGLES_REPLIE = [76, 97, 90, 90, 90, 149]
-ANGLES_EXTENSION = [76, 120, 90, 90, 90, 149]
+ANGLES_REPLIE = [90, 180, 0, 0, 90, 149]      # pose de repos validée par l'opérateur
+ANGLES_EXTENSION = [90, 120, 0, 0, 90, 149]
 
 
 @pytest.fixture()

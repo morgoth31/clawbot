@@ -1,10 +1,11 @@
 # État du projet Clawbot — reprise de session
 
-**Date** : 2026-11-11 18:10, fin de session (lot 5 clos, brique 6 à moitié, **bras en panne**)
+**Date** : 2026-11-11 19:30, reprise en cours (lot 5 clos, brique 6 à moitié, **bras remis en
+service et pose de repos validée**)
 **Branche** : `docs/site-okf-merge` ; dernier commit `c6ac7c1`
-**Prochaine action, dans l'ordre** : (1) le test d'une minute qui départage la panne du bras —
-§8 « bras » ; (2) l'essai physique des waypoints, robot au sol ; (3) la cohérence des caméras du
-sentinel — §8 « dettes ».
+**Prochaine action, dans l'ordre** : (1) ~~le test d'une minute qui départage la panne du bras~~ —
+fait, le bras bouge, §8 « bras » ; (2) l'essai physique des waypoints, robot au sol ; (3) la
+cohérence des caméras du sentinel — §8 « dettes ».
 **Robot** : Clawbot X3 Plus, Jetson Orin NX, ROS 2 Humble, domaine 28
 
 > Ce document est fait pour être lu **au début d'une nouvelle session**, à la place d'un
@@ -26,8 +27,10 @@ sentinel, navigation sur carte avec waypoints fermés. La brique 6 est à moiti�
 poignet est dans ROS. Ne pas refaire ces briques. Ne pas relancer les diagnostics déjà faits : ils
 sont tous dans ce document avec leurs chiffres et leur date.
 
-**Trois choses ne sont pas closes** : la panne du bras (bloquante, §8), l'essai **physique** des
-trois waypoints (robot au sol), et la cohérence des caméras du sentinel (§8, dettes).
+**Deux choses ne sont pas closes** : l'essai **physique** des trois waypoints (robot au sol), et la
+cohérence des caméras du sentinel (§8, dettes). La panne du bras est levée (§8) : les servos
+exécutent, la pose de repos validée par l'opérateur est `[90, 180, 0, 0, 90, 149]` et elle est
+inscrite dans `config/preconditions.yaml`.
 
 **État du dépôt** : le worktree porte des modifications **antérieures** non commitées (suppressions
 de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cpp/`, `slam3d/`,
@@ -45,8 +48,9 @@ de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cp
 | EKF | **actif** | `/odom` 10 Hz + TF `odom→base_link`, stables à l'arrêt (0,0000 m sur 5 s) |
 | Lidar TG30 | ok | `/scan` 10,08 Hz, 1296 points |
 | Astra Pro+ | ok | couleur 20,06 / profondeur 29,99 / IR 29,97 / points 29,08 Hz |
-| Bras + pince | ok | servos relus `[76, 96, 90, 90, 90, 149]` |
-| Proprioception | ok | `/arm/servo_angles` 10 Hz, cycle 600 ms, sans casser `/imu` et `/vel_raw` |
+| Bras + pince | **exécute** | 2026-11-11 19:05-19:20 : servo 2 (10°), servo 4 (90°), servo 3 (90°), servo 1 (14°) exécutés, prouvés par l'image frontale (barycentre du masque de la pince 353 → 301 px, étendue au repos ±0,9 px) |
+| Proprioception | ok | `/arm/servo_angles` 10 Hz, cycle 600 ms, sans casser `/imu` et `/vel_raw` ; **relecture = mesure** depuis 19:12 (valeur intermédiaire 35° jamais commandée) |
+| Pose de repos / déplacement | **validée par l'opérateur** | `[90, 180, 0, 0, 90, 149]` — bras debout, caméra du poignet vers l'avant ; `arm_folded: true` publié sur `/director/state` |
 | Manipulation | ok | MoveIt planifie et exécute, collision mât modélisée |
 | Arbitre réflexe | **actif** | 20 Hz, obstacle 12 cm → zéro en **47 ms**, chien de garde 0,5 s |
 | Arrêt du bras par réflexe | **prouvé** | `/safety/hold` → « interrompu par safety hold après 6 échantillons » |
@@ -61,7 +65,7 @@ de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cp
 | Nav2 sur carte | **actif** | `clawbot-nav2.service`, 12 nœuds, costmap globale 177×80 (carte du catalogue) |
 | Waypoints | **3 nommés** | `ouest` (1,50 ; −0,30), `centre` (2,50 ; 0,00), `est` (5,30 ; 0,48), dégagements 0,65 / 1,05 / 0,75 m |
 | `navigate_to` | **exécute** | adaptateur `NavigateToPose`, coordonnées libres refusées, 3 waypoints atteints à 0,000 / 0,121 / 0,082 m en simulation (domaine 99) |
-| Préconditions de mouvement | **actives** | bras mesuré sur `/arm/servo_angles` avant tout skill qui déplace la base ; `arm_folded: true` publié sur `/director/state` |
+| Préconditions de mouvement | **actives, enveloppe validée** | bras mesuré sur `/arm/servo_angles` avant tout skill qui déplace la base ; enveloppe ±5° autour de la pose validée ; `arm_folded: true` publié sur `/director/state` |
 | Contexte MCP | **dérivé** | les absences (`/scan`, `/odom`, cadres TF) sont lues dans l'observation, plus dans une liste figée |
 | Caméra du poignet | **dans le graphe** | `/wrist_camera/image_raw` 640×480 `yuv422_yuy2`, cadre `wrist_camera_optical_frame`, 5,98 im/s mesurés (module UVC), latence 8 ms |
 | Propriété du périphérique | **unique** | `clawbot-wrist-camera` le tient ; `yolo-inference` lit le topic (`CAMERA_CLAW_SOURCE=ros`) |
@@ -169,9 +173,10 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`,
 |---|---|---|
 | `DROP_TORQUE` n'actionne rien | **sécurité** | l'état est publié, le contrôleur s'arrête, mais aucun étage ne coupe le couple (`set_uart_servo_torque`). Décision prise, non appliquée. |
 | Essai physique des waypoints | bloquant la clôture du lot 5 | la navigation est prouvée en simulation ; aucun déplacement réel n'a encore été commandé par Nav2 |
-| **Servos du bras inertes** | **bloquant** | depuis le 2026-11-11 17:20 : le MCU enregistre les consignes et les renvoie à la lecture, le bras ne bouge pas (constat opérateur), alimentation et carte saines. `/arm/servo_angles` n'est donc plus une mesure de position. Chaîne, faits datés et protocole de test : `docs/knowledge-base/02_Software/bras_remise_en_service.md` |
+| Cause de la panne du 17:20 | moyen | le symptôme a disparu après redémarrage du pilote (17:36:06) et du contrôleur (17:37:13) ; aucun test entre 17:37 et 19:04, aucune cause racine établie. À instrumenter si elle revient |
 | Bras absent du costmap de Nav2 | moyen | Nav2 ne connaît le bras que par un rayon d'encombrement de 0,16 m : un waypoint peut être accepté bras en extension |
-| Enveloppe du bras non validée | moyen | la précondition refuse un bras hors de la pose de repos mesurée ; cette pose n'a pas été validée par l'opérateur, bras libre (`valide_par_operateur: false`) |
+| Encombrement de la pose de repos | moyen | la pose `[90, 180, 0, 0, 90, 149]` est **validée par l'opérateur** (`valide_par_operateur: true`), mais son volume balayé n'est pas mesuré au mètre ; seule la géométrie du mât sert de référence |
+| Cadre optique du poignet dans l'URDF | moyen | `wrist_camera_optical_frame` annonce −90° de tangage dans la pose de repos alors que la caméra regarde l'horizon : orientation fausse, non corrigée, le fait mesuré fait foi |
 | Skills restants | bloquant lot 6/7 | `arm_move`/`grip_set`/`navigate_to` exécutent ; `follow_human`, `grasp_object`, `search_object`, `express_state`, `look_at_board`, `set_watch_mode` refusent en `INDISPONIBLE` |
 | Aucun VAD/STT branché | bloquant lot 7 | `/sentinel/transcript` n'a aucun producteur : les mots d'arrêt sont prouvés en test, inopérants en réel |
 | Réveil webhook | moyen | route `clawbot-incident` configurée, passerelle non redémarrée (port 8644 muet) |
@@ -257,7 +262,10 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`,
     n'avait pas bougé : le MCU renvoie son registre de consigne. Le 2026-11-10 le même canal
     retardait sur la consigne quand un servo forçait — la lecture était alors une mesure. Ne jamais
     conclure « le bras a bougé » sur une valeur qui suit la consigne : seule une valeur qui en
-    **diffère** prouve que le servo travaille.
+    **diffère** prouve que le servo travaille. Depuis le 2026-11-11 19:12 la lecture est de nouveau
+    une mesure (35° relevés pour une consigne 20° → 40°), mais un pas de 10° est trop court pour que
+    la relecture entrelacée (un servo par 600 ms) en attrape une valeur intermédiaire : l'absence de
+    valeur intermédiaire sur un petit pas ne prouve pas un blocage.
 29. **Un `systemctl stop ros2-driver-node` met la pile en cascade** (`Requires=`) : arbitre,
     contrôleur de bras, directeur, sentinel et Nav2 tombent en `failed`, et relancer le seul pilote
     ne les relance pas. Toujours `systemctl list-units --state=failed` puis relance dans l'ordre
@@ -318,27 +326,39 @@ anti-rebondi 2 s + mémoire du `task_id`, échec de POST journalisé avec `deliv
   `docs/knowledge-base/02_Software/navigation_nav2_waypoints.md` §6, et
   `scripts/poser_pose_initiale.py` pour déclarer la pose réelle à AMCL.
 
-### Panne du bras — **à trancher en premier** (1 minute)
-Depuis le 2026-11-11 17:20 les servos du bras n'exécutent plus les consignes : le MCU les enregistre
-et les renvoie à la lecture, le bras ne bouge pas (constat opérateur), la carte répond (version 3.5,
-11,90 V) et le pilote fait tout ce qu'il doit (couple activé ligne 102, `set_uart_servo_angle` par
-servo, trois copies identiques). Page complète, avec la chaîne et les faits datés :
-`docs/knowledge-base/02_Software/bras_remise_en_service.md`.
+### Panne du bras — **tranchée le 2026-11-11 19:20**
+Le test d'une minute a répondu : **le bras bouge**. Paliers exécutés dans la séance, tous relus à
+la cible et sans défaut de sécurité (`/safety/state = OK`) : servo 2 de 97° à 87° et retour, servo 4
+de 90° à 0°, servo 3 de 90° à 0°, servo 1 de 76° à 90°, servo 2 de 97° à 180°.
 
-```bash
-export ROS_DOMAIN_ID=28 && source /opt/ros/humble/setup.bash
-python3 /home/jetson/clawbot/scripts/pas_bras.py --servo 2 --vers 87 --max-pas 12
-```
+Preuves, parce que la relecture ne suffisait pas :
 
-| Observation | Conclusion |
-|---|---|
-| le bras bouge | la chaîne fonctionne, le défaut est dans la pile ROS |
-| rien, bras **raide** | couple actif, consignes non exécutées : mode servo ou chaîne de bus (daisy chain) |
-| rien, bras **mou** | la commande de couple n'atteint pas les servos |
-| la relecture **retarde** | le servo répond, la lecture redevient une mesure |
+- **image frontale** : barycentre du masque sombre de la pince, stable à ±0,9 px au repos, déplacé de
+  353 → 301 px pour les 10° du servo 2 (carte des différences localisée sur la silhouette, fond
+  inchangé) ;
+- **relecture** : une consigne 20° → 40° sur le servo 4 a fait passer la lecture par **35°**, valeur
+  jamais commandée — c'est une mesure, plus un registre.
 
-Ne rien conclure de `/arm/servo_angles` seul (§7, piège 28). L'état du bras conditionne
-`grasp_object`, l'orientation réelle de la caméra du poignet et les préconditions de mouvement.
+**Ce qui n'est pas établi** : la cause de la panne de 17:20. Le seul changement d'état visible entre
+les observations de 17:20-17:35 et la reprise de 19:05 est le redémarrage du pilote (17:36:06) et du
+contrôleur de bras (17:37:13) ; aucun test du bras n'a eu lieu entre 17:37 et 19:04. Un redémarrage
+qui efface le symptôme ne dit pas ce qui l'a produit : si elle revient, instrumenter le journal du
+pilote avant tout redémarrage.
+
+Trois faits sortis de ce test, à garder :
+
+1. **la pose de repos change** : `[90, 180, 0, 0, 90, 149]`, validée par l'opérateur comme position
+   de déplacement — bras debout, caméra du poignet tournée vers l'avant dans le même sens que
+   l'Astra. Elle est dans `config/preconditions.yaml` (`valide_par_operateur: true`, ±5°), et
+   `arm_folded` vaut `true` sur le robot dans cette pose ;
+2. **le seuil de collision du mât dépend de q3 et q4** : la montée du servo 2 de 97° à 180° s'est
+   faite sans contact, segments à x ≈ 0,015 m contre un mât à x ≈ −0,044 m, alors que la base
+   documentait un contact à ≈ 114° dans une autre configuration ;
+3. **la caméra du poignet était blanche, ce n'était pas la netteté** : `gain=70`/`brightness=60`
+   saturaient les 307 200 pixels à 255 ; à `gain=0` l'image redevient exploitable (min 8, max 224,
+   écart-type 61). Les réglages de l'unité restent à corriger.
+
+Page complète, chaîne, faits datés et protocole : `docs/knowledge-base/02_Software/bras_remise_en_service.md`.
 
 ### Brique 6 — perception et saisie — **première moitié faite**
 Caméra du poignet **dans ROS** depuis le 2026-11-11 16:50 CET :
@@ -393,9 +413,10 @@ python3 scripts/etat_directeur.py        # état, sécurité, angles de bras, ar
 ros2 topic echo /sentinel/state --once
 ros2 topic hz /arm/servo_angles
 
-# bras : un pas, avec relecture qui attend le cycle de proprioception
-python3 scripts/pas_bras.py --servo 2 --vers 87 --max-pas 12
-python3 scripts/cinematique_bras.py --q 76,97,90,90,90     # ou regarde la camera, sans bouger
+# bras : un pas, avec relecture qui attend le cycle de proprioception (install/ obligatoire)
+source /home/jetson/clawbot/install/setup.bash
+python3 scripts/pas_bras.py --servo 2 --vers 170 --max-pas 10
+python3 scripts/cinematique_bras.py --q 90,180,0,0,90     # pose de repos validee
 python3 scripts/test_couple_bras.py --servo 4 --pas 5      # couple + un pas, pilote arrete
 python3 scripts/read_arm_angles.py                          # lecture directe du bus
 

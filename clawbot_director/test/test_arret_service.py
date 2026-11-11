@@ -81,7 +81,7 @@ def monde():
 
     def _alimenter():
         angles = Int32MultiArray()
-        angles.data = [76, 97, 90, 90, 90, 149]
+        angles.data = [90, 180, 0, 0, 90, 149]
         while not arret.is_set():
             pub_safety.publish(String(data="OK"))
             pub_bras.publish(angles)
