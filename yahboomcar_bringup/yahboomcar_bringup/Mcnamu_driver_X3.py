@@ -34,10 +34,29 @@ class yahboomcar_driver(Node):
 		super().__init__(name)
 		global car_type_dic
 		self.RA2DE = 180 / pi
-		self.car = Rosmaster()
-		self.car.set_car_type(1)
+		# X3 Plus : moteurs 520, cinématique Mecanum. La trame de set_car_motion embarque ce
+		# type ; avec le type par défaut (1 = X3, moteurs 370) le PID interne du STM32 recevait
+		# les encodeurs à l'envers et partait en contre-réaction positive (ERR-010).
+		self.car = Rosmaster(car_type=2)
+		# Séquence validée sur le matériel : le fil de réception doit tourner et le report
+		# automatique doit être armé AVANT set_car_type, sinon le STM32 ignore la trame.
+		self.car.create_receive_threading()
+		self.car.set_auto_report_state(True, forever=False)
+		self.car.set_car_type(2)
+		sleep(0.2)
+		self._car_type_ok = False
+		for _ in range(20):
+			# renvoye a chaque tour : la premiere trame tombe pendant le boot du STM32
+			self.car.set_car_type(2)
+			sleep(0.15)
+			if self.car.get_car_type_from_machine() == 2:
+				self._car_type_ok = True
+				break
+		if not self._car_type_ok:
+			self.get_logger().error("car_type != 2 : mouvement refuse (ERR-010)")
+
 		#get parameter
-		self.declare_parameter('car_type', 'X3')
+		self.declare_parameter('car_type', 'X3PLUS')
 		self.car_type = self.get_parameter('car_type').get_parameter_value().string_value
 		print (self.car_type)
 		self.declare_parameter('imu_link', 'imu_link')
@@ -130,6 +149,15 @@ class yahboomcar_driver(Node):
 
 	#pub data
 	def pub_data(self):
+		if not getattr(self, "_type_logged", False):
+			# lu sur la carte, une fois la boucle stable
+			self._type_logged = True
+			try:
+				self.get_logger().info(
+					f"carte : car_type={self.car.get_car_type_from_machine()} "
+					f"firmware={self.car.get_version()} pid={self.car.get_motion_pid()}")
+			except Exception as exc:  # noqa: BLE001
+				self.get_logger().warn(f"lecture carte impossible : {exc}")
 		time_stamp = Clock().now()
 		imu = Imu()
 		twist = Twist()

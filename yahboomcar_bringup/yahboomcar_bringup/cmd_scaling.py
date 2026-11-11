@@ -46,10 +46,11 @@ def scale_cmd_vel(vx: float, vy: float, wz: float) -> tuple[float, float, float]
     return scale_linear(vx), scale_linear(vy), scale_angular(wz)
 
 
-# Le MCU renvoie la vitesse avec un signe inversé (mesuré sur cales le 2026-11-11 :
-# consigne +0,05 -> retour -0,843, consigne -0,05 -> retour +0,745).
-# La correction est appliquée au retour, pas à la consigne : le MCU attend bien un signe normal.
-FEEDBACK_SIGN = -1.0
+# Signe du retour encodeur. L'inversion observée venait de la trame : le driver annonçait
+# car_type=1 (X3, moteurs 370) alors que le châssis est un X3 Plus (moteurs 520). Avec
+# car_type=2 dans la trame ET en EEPROM, le STM32 renvoie un signe positif natif (mesuré
+# le 2026-11-11 : échelon +0,05 -> retour positif, sans emballement). Aucune correction.
+FEEDBACK_SIGN = 1.0
 
 
 def feedback(value: float) -> float:
