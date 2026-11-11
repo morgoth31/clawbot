@@ -18,9 +18,9 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Imu,MagneticField, JointState
 from nav_msgs.msg import Odometry
 try:
-	from .cmd_scaling import feedback, scale_cmd_vel
+	from .cmd_scaling import RAMP_STEP, feedback, ramp_cmd, scale_cmd_vel
 except ImportError:  # exécution directe du fichier
-	from cmd_scaling import feedback, scale_cmd_vel
+	from cmd_scaling import RAMP_STEP, feedback, ramp_cmd, scale_cmd_vel
 from rclpy.clock import Clock
 
 #from dynamic_reconfigure.server import Server
@@ -88,7 +88,11 @@ class yahboomcar_driver(Node):
         # 下发线速度和角速度
         # Issue linear vel and angular vel
 		# ERR-009 : bande morte et butées appliquées avant le MCU
-		vx, vy, angular = scale_cmd_vel(msg.linear.x, msg.linear.y, msg.angular.z)
+		# rampe : un echelon brutal fait winduper l'integrateur du MCU (pic 4,9x mesuré)
+		r = ramp_cmd(getattr(self, "_ramp", (0.0, 0.0, 0.0)),
+		              (msg.linear.x, msg.linear.y, msg.angular.z), RAMP_STEP)
+		self._ramp = r
+		vx, vy, angular = scale_cmd_vel(*r)
 		self.car.set_car_motion(vx, vy, angular)
 		'''print("cmd_vx: ",vx)
 		print("cmd_vy: ",vy)

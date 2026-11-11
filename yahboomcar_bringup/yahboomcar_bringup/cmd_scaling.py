@@ -55,3 +55,17 @@ FEEDBACK_SIGN = -1.0
 def feedback(value: float) -> float:
     """Vitesse mesurée remise dans la convention ROS (avance = +x)."""
     return _finite(value) * FEEDBACK_SIGN
+
+
+#: pas de rampe par appel de commande (m/s). À 10-20 Hz, cela borne l'accélération demandée
+#: et empêche l'intégrateur du STM32 de windup pendant le temps mort de friction statique.
+RAMP_STEP = 0.02
+
+
+def ramp_cmd(prev, target, max_delta=RAMP_STEP):
+    """Approche la consigne par petits pas au lieu d'un échelon."""
+    out = []
+    for p, t in zip(prev, target):
+        delta = max(-max_delta, min(max_delta, _finite(t) - _finite(p)))
+        out.append(_finite(p) + delta)
+    return tuple(out)
