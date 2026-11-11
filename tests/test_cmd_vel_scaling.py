@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "yahboomcar_bringup" / "yahboomcar_bringup"))
 
-from cmd_scaling import MAX_LINEAR, feedback, scale_cmd_vel, scale_linear  # noqa: E402
+from cmd_scaling import MAX_LINEAR, RAMP_STEP, feedback, ramp_cmd, scale_cmd_vel, scale_linear  # noqa: E402
 
 
 def test_command_is_proportional():
@@ -41,3 +41,12 @@ def test_feedback_sign_matches_command():
 
 def test_feedback_survives_nan():
     assert feedback(float("nan")) == 0.0
+
+
+def test_ramp_reaches_target_without_step():
+    prev = (0.0, 0.0, 0.0)
+    for _ in range(10):
+        nxt = ramp_cmd(prev, (0.05, 0.0, 0.0))
+        assert abs(nxt[0] - prev[0]) <= RAMP_STEP + 1e-9
+        prev = nxt
+    assert abs(prev[0] - 0.05) < 1e-9
