@@ -170,6 +170,7 @@ nav:
           - ERR-007 retour d'angle servo 4: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-007_retour_angle_servo_bras.md
           - ERR-008 paquet OpenCV et compilation SLAM: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-008_paquet_opencv_incomplet.md
           - ERR-009 commande de vitesse non proportionnelle: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-009_commande_vitesse_non_proportionnelle.md
+          - ERR-011 appairage Bluetooth sans BLE: knowledge-base/03_Operations/errors_traces/ERR-2026-11-11-011_bluetooth_appairage_sans_ble.md
   - Référence:
       - BOM logiciel: knowledge-base/02_Software/bom_logiciel.md
       - Ports réseau: knowledge-base/02_Software/ports_reseau.md
