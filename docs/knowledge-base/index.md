@@ -16,6 +16,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 |---|---|---|
 | Calcul embarqué | NVIDIA Jetson Orin NX 16 Go, L4T R36.4.7, Ubuntu 22.04.5 | [[jetson_orin_nx]] |
 | Carte de commande bas niveau | Carte Rosmaster (Yahboom), lien série UART 115 200 Bd | [[rosmaster_x3_mcu]] |
+| Sortie audio | Sony SRS-XB100, A2DP appairée le 2026-11-11 (contournement HCI) | [[srs_xb100]] |
 | Perception RGB-D | Orbbec Astra Pro+ (USB `2bc5:060f` profondeur, `2bc5:050f` couleur, hors V4L) | [[orbbec_astra_pro_plus]] |
 | Caméra du bras | Module UVC `0c45:6340` sur le port `1-2.2.1`, aucun topic ROS publié | [[camera_usb_bras]] |
 | Perception laser | YDLIDAR TG30, TOF 360°, firmware 1.71, `/scan` à 10,05 Hz | [[ydlidar_tg30]] |
@@ -43,6 +44,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 │   ├── bras_6dof.md
 │   ├── camera_usb_bras.md
 │   ├── inventaire_materiel.md
+│   ├── srs_xb100.md
 │   └── batterie_principale.md
 ├── 02_Software/
 │   ├── documentation_constructeur_yahboom.md
@@ -141,6 +143,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-11 08:40 | ERR-010 ouverte : base non proportionnelle documentée — signe inversé mesuré sur cales (corrigé), temps mort 1,2 s, gain 1,64, pics 5,6x, saturation 1,29 ; type de châssis et PID à lire depuis le driver | [[ERR-2026-11-11-010_base_non_proportionnelle]] |
 | 2026-11-11 12:00 | SLAM réparé : `base_frame` valait `base_footprint` (inexistante), tous les scans rejetés ; carte 8,1 × 6,5 m obtenue, `map→odom` recale 24 cm sur 2,6 m | [[slam_cartographie]] |
 | 2026-11-11 14:10 | Directeur S1 branché : nœud `clawbot-director`, service `/director/command`, exécution d'un goal par étape, annulation sécurité 1,90 ms, 3 outils MCP (25 au catalogue), 212 tests verts ; skills physiques encore indisponibles | [[directeur_s1]] |
+| 2026-11-11 16:45 | Enceinte appairée : contournement HCI (`IO_Capability_Request_Reply` injecté), clé stockée, sortie A2DP active et testée au son ; procédure conservée dans `scripts/appairer_enceinte_bluetooth.sh` | [[srs_xb100]], [[ERR-2026-11-11-011_bluetooth_appairage_sans_ble]] |
 | 2026-11-11 16:05 | Compte rendu de reprise sur l'appairage Bluetooth : configuration mesurée, modifications, preuves HCI, hypothèses éliminées et pistes classées par coût | [[2026-11-11_compte_rendu_bluetooth_srs_xb100]] |
 | 2026-11-11 15:20 | Bluetooth : appairage de la SRS-XB100 impossible — noyau sans BLE (`CONFIG_BT_LE` absent), profils audio NVIDIA désactivés et module PulseAudio manquant corrigés ; trace ouverte | [[ERR-2026-11-11-011_bluetooth_appairage_sans_ble]] |
 | 2026-11-11 14:20 | Sentinel S1 déployé : machine d'attention (2 frames, 0,75 / 3,5 m, cooldowns 60 s et 5 s), mots d'arrêt locaux, réveil de fin de tâche anti-rebondi ; 236 tests verts, `depth_available` vrai ; VAD et repli Telegram absents | [[sentinel_s1]] |
