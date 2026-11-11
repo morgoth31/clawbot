@@ -1,0 +1,43 @@
+# Intrinsèques nominales de la caméra du poignet — NON CALIBRÉES.
+#
+# Fichier lu par `v4l2_camera_node` (paramètre `camera_info_url`) et publié sur
+# /wrist_camera/camera_info. Il existe pour qu'un consommateur reçoive une structure valide et
+# sache d'où viennent les chiffres, pas pour faire croire à une calibration.
+#
+# Origine des valeurs : aucune mire, aucune mesure. `fx = fy = 457 px` correspond à un demi-angle
+# horizontal de 35° sur 640 px ((640/2)/tan(35°) = 457), ordre de grandeur d'un objectif UVC de
+# 70° de champ. `cx`/`cy` sont le centre géométrique de l'image.
+#
+# Conséquence, à ne pas oublier : une projection pixel -> mètre issue de ces valeurs porte une
+# erreur d'échelle de plusieurs dizaines de pour cent. `grasp_object` (boucle fermée sur la caméra
+# du poignet) exige une calibration sur mire avant d'être utile ; la spec l'assume en v1 (on mesure
+# la répétabilité, pas la justesse absolue), mais aucun chiffre de ce fichier ne doit être présenté
+# comme mesuré.
+image_width: 640
+image_height: 480
+# Nom tel que le nœud caméra le rapporte (`usb_2.0_camera`) : s'il diffère, v4l2_camera
+# avertit à chaque démarrage et ignore le fichier.
+camera_name: usb_2.0_camera
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [457.0, 0.0, 319.5,
+         0.0, 457.0, 239.5,
+         0.0, 0.0, 1.0]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [0.0, 0.0, 0.0, 0.0, 0.0]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.0, 0.0, 0.0,
+         0.0, 1.0, 0.0,
+         0.0, 0.0, 1.0]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [457.0, 0.0, 319.5, 0.0,
+         0.0, 457.0, 239.5, 0.0,
+         0.0, 0.0, 1.0, 0.0]

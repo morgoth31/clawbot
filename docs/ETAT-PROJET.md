@@ -60,6 +60,8 @@ de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cp
 | `navigate_to` | **exécute** | adaptateur `NavigateToPose`, coordonnées libres refusées, 3 waypoints atteints à 0,000 / 0,121 / 0,082 m en simulation (domaine 99) |
 | Préconditions de mouvement | **actives** | bras mesuré sur `/arm/servo_angles` avant tout skill qui déplace la base ; `arm_folded: true` publié sur `/director/state` |
 | Contexte MCP | **dérivé** | les absences (`/scan`, `/odom`, cadres TF) sont lues dans l'observation, plus dans une liste figée |
+| Caméra du poignet | **dans le graphe** | `/wrist_camera/image_raw` 640×480 `yuv422_yuy2`, cadre `wrist_camera_optical_frame`, 5,98 im/s mesurés (module UVC), latence 8 ms |
+| Propriété du périphérique | **unique** | `clawbot-wrist-camera` le tient ; `yolo-inference` lit le topic (`CAMERA_CLAW_SOURCE=ros`) |
 
 **Suite de tests : 293 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
 l'échelle, dérive, round-robin, directeur, surface MCP, exécution des skills, sentinel, catalogue
@@ -126,8 +128,8 @@ S2  Hermes ── MCP stdio (25 outils) ──┐        ▲ webhook (réveil, p
 
 **Services systemd actifs** : `ros2-driver-node`, `clawbot-ekf`, `clawbot-lidar`, `orbbec-camera`,
 `clawbot-description`, `clawbot-arm-controller`, `clawbot-move-group`, `clawbot-nav2` (`clawbot-slam`
-en conflit déclaré : deux écrivains de `map→odom`), `clawbot-safety-arbitrator`, `clawbot-director`,
-`clawbot-sentinel`, `clawbot-docs`, `yolo-inference`, `ros2-hardware-service`,
+en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`, `clawbot-safety-arbitrator`,
+`clawbot-director`, `clawbot-sentinel`, `clawbot-docs`, `yolo-inference`, `ros2-hardware-service`,
 `ros2-llm-bridge-cpp`.
 
 **Paquets créés** : `clawbot_safety`, `clawbot_director` (logique + nœud + skills),
@@ -235,7 +237,16 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-safety-arbitra
     lisent des variables non définies, et un `source` qui échoue sous `set -u` fait sortir le shell
     appelant — le script s'arrête sans message, sans code d'erreur explicite. Un script d'`ExecStop`
     doit donc sourcer sans mode strict et finir par `exit 0`.
-25. **Le bord de la carte n'est pas de l'espace libre** : un champ de distance calculé sur les
+25. **Un device V4L2 est exclusif en streaming** : sans erreur côté appelant, le second processus
+    meurt sur `Failed mapping device memory`. Un seul propriétaire, les autres lisent le topic —
+    `fuser -v /dev/video0` doit montrer un seul processus.
+26. **Une unité systemd sans `Environment=ROS_DOMAIN_ID=28` crée son nœud en domaine 0** : le nœud
+    apparaît, l'abonnement existe, et aucun message n'arrive, sans la moindre erreur. Le domaine
+    est une propriété de l'unité, pas du code.
+27. **`rclpy` s'importe depuis le venv `yolov5_env` à condition de sourcer `/opt/ros/humble`** : les
+    deux Python sont 3.10. C'est ce qui permet à un service GPU de consommer un topic ROS sans
+    second bridge.
+28. **Le bord de la carte n'est pas de l'espace libre** : un champ de distance calculé sur les
     seules cellules occupées désigne les coins non observés comme les points les plus sûrs. Le bord
     doit compter comme obstacle, sinon un waypoint proposé automatiquement tombe hors de la pièce.
 
@@ -290,10 +301,24 @@ anti-rebondi 2 s + mémoire du `task_id`, échec de POST journalisé avec `deliv
   `docs/knowledge-base/02_Software/navigation_nav2_waypoints.md` §6, et
   `scripts/poser_pose_initiale.py` pour déclarer la pose réelle à AMCL.
 
-### Brique 6 — perception et saisie (prochaine)
-Caméra du poignet dans ROS (`v4l2_camera_node` 640×480 à 15 Hz, `wrist_camera_optical_frame` sur
-`arm_link5`), puis `search_object`, `grasp_object` (boucle fermée, tolérance 1–2 cm, répétabilité
-sur 10 saisies), `follow_human`.
+### Brique 6 — perception et saisie — **première moitié faite**
+Caméra du poignet **dans ROS** depuis le 2026-11-11 16:50 CET :
+- `clawbot-wrist-camera.service` : `v4l2_camera_node` sur le chemin by-id, 640×480, encodage natif
+  `yuv422_yuy2`, cadre `wrist_camera_optical_frame` ;
+- cadre optique dans l'URDF, **enfant de `mono_link` sur `arm_link4`** (le montage physique existait
+  déjà ; `arm_link5` aurait décrit un second montage) ;
+- **un seul propriétaire du périphérique** : `yolo-inference.service` lit désormais
+  `/wrist_camera/image_raw` (`CAMERA_CLAW_SOURCE=ros`) au lieu d'ouvrir l'index V4L2 — deux
+  processus sur un device V4L2 se volaient les tampons ;
+- calibration `config/wrist_camera_info.yaml` **déclarée non mesurée** (`fx=fy=457 px`, demi-champ
+  35°, aucune mire) ;
+- **mesure** : 5,98 im/s au niveau du périphérique (limite du module, insensible à la résolution,
+  au lien et à la charge), latence 8 ms ; critère du lot corrigé de 15 Hz à « au moins 5 im/s ».
+
+**Reste de la brique** : cadrage et netteté à vérifier bras en mouvement (l'image actuelle est
+sans détail, netteté 7,3), orientation du cadre optique à confirmer en visant une cible, puis
+`search_object`, `grasp_object` (boucle fermée à 6 Hz, tolérance à mesurer) et `follow_human`.
+Page : `docs/knowledge-base/02_Software/camera_poignet.md`.
 
 ### Brique 7 — parole et audio
 VAD Silero + faster-whisper tiny sur les micros existants → publication sur
@@ -371,6 +396,7 @@ sudo systemctl restart clawbot-docs && curl -s -o /dev/null -w '%{http_code}\n' 
 ## 11. Derniers commits
 
 ```text
+0ea832f feat(perception): camera du poignet dans ROS, proprietaire unique du peripherique
 2d36f24 feat(director): preconditions de mouvement, ExecStop, absences derivees
 a0bbea3 feat(nav2): navigation sur carte, catalogue de waypoints ferme, navigate_to
 95bd39a feat(audio): enceinte SRS-XB100 appairee, A2DP verifie, procedure conservee
