@@ -51,7 +51,8 @@ de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cp
 | Bras + pince | **exécute** | 2026-11-11 19:05-19:20 : servo 2 (10°), servo 4 (90°), servo 3 (90°), servo 1 (14°) exécutés, prouvés par l'image frontale (barycentre du masque de la pince 353 → 301 px, étendue au repos ±0,9 px) |
 | Proprioception | ok | `/arm/servo_angles` 10 Hz, cycle 600 ms, sans casser `/imu` et `/vel_raw` ; **relecture = mesure** depuis 19:12 (valeur intermédiaire 35° jamais commandée) |
 | Pose de repos / déplacement | **validée par l'opérateur** | `[90, 180, 0, 0, 90, 149]` — bras debout, caméra du poignet vers l'avant ; `arm_folded: true` publié sur `/director/state` |
-| Manipulation | ok | MoveIt planifie et exécute, collision mât modélisée |
+| Manipulation | **débloquée** | MoveIt2 était mort : `base_link` avait deux parents TF, `pick_ik` répondait `COLLISION_CHECKING_UNAVAILABLE` même sur la pose courante. Corrigé le 2026-11-11 19:55 (`odom → base_footprint`), `/compute_ik` répond `SUCCESS` ; collision mât modélisée (`camera_support`) |
+| Portée du bras | **mesurée, limitante** | `/compute_fk` sur tout l'espace articulaire : les doigts descendent à z = −0,115 m dans `base_link`, soit **0,299 m au-dessus du sol** ; portée 0,439 m. **Aucune saisie possible d'un objet posé au sol** |
 | Arbitre réflexe | **actif** | 20 Hz, obstacle 12 cm → zéro en **47 ms**, chien de garde 0,5 s |
 | Arrêt du bras par réflexe | **prouvé** | `/safety/hold` → « interrompu par safety hold après 6 échantillons » |
 | Directeur | **exécute** | nœud ROS, `/director/command`, un goal par étape, `advance()` sur résultat, annulation sécurité 1,90 ms |
@@ -178,6 +179,7 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`,
 | Encombrement de la pose de repos | moyen | la pose `[90, 180, 0, 0, 90, 149]` est **validée par l'opérateur** (`valide_par_operateur: true`), mais son volume balayé n'est pas mesuré au mètre ; seule la géométrie du mât sert de référence |
 | Cadre optique du poignet dans l'URDF | moyen | `wrist_camera_optical_frame` annonce −90° de tangage dans la pose de repos alors que la caméra regarde l'horizon : orientation fausse, non corrigée, le fait mesuré fait foi |
 | Skills restants | bloquant lot 6/7 | `arm_move`/`grip_set`/`navigate_to` exécutent ; `follow_human`, `grasp_object`, `search_object`, `express_state`, `look_at_board`, `set_watch_mode` refusent en `INDISPONIBLE` |
+| `grasp_object` hors de portée au sol | **bloquant la saisie** | les doigts s'arrêtent 0,299 m au-dessus du sol et portent à 0,439 m : un objet posé au sol n'est atteignable par aucune trajectoire. Il faut un support à 0,35-0,55 m, à moins de 0,40 m de la colonne |
 | Aucun VAD/STT branché | bloquant lot 7 | `/sentinel/transcript` n'a aucun producteur : les mots d'arrêt sont prouvés en test, inopérants en réel |
 | Réveil webhook | moyen | route `clawbot-incident` configurée, passerelle non redémarrée (port 8644 muet) |
 | Repli Telegram | moyen | aucun canal configuré ; la règle « personne depuis 60 s → Telegram » n'est pas codée |
@@ -274,6 +276,18 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`,
 30. **Le bord de la carte n'est pas de l'espace libre** : un champ de distance calculé sur les
     seules cellules occupées désigne les coins non observés comme les points les plus sûrs. Le bord
     doit compter comme obstacle, sinon un waypoint proposé automatiquement tombe hors de la pièce.
+31. **Un lien ne peut avoir qu'un seul parent dans TF.** `base_link` en avait deux — la description
+    (`base_footprint → base_link`, URDF) et l'EKF (`odom → base_link`) — et TF gardait **deux arbres
+    déconnectés** : `base_footprint`, racine du modèle et cadre de planification par défaut de
+    `move_group`, restait orphelin. Symptômes trompeurs : `pick_ik` répond
+    `COLLISION_CHECKING_UNAVAILABLE` (-21) **même sur la pose courante**, toute planification échoue
+    en `FAILURE` sans autre motif, et des avertissements « not part of the same tree » défilent pour
+    chaque cadre. Correctif : l'EKF publie `odom → base_footprint`. Vérification :
+    `tf.all_frames_as_yaml()` doit montrer **une seule racine** et un seul parent par lien.
+32. **La portée du bras se mesure, elle ne se suppose pas.** `/compute_fk` de MoveIt sur tout
+    l'espace articulaire donne les doigts à 0,299 m au-dessus du sol et 0,439 m de portée : tout
+    scénario de saisie d'un objet posé au sol est irréalisable, et aucune correction logicielle n'y
+    change rien. Mesurer l'enveloppe **avant** d'écrire un skill de saisie.
 
 ---
 

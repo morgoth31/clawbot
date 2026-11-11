@@ -163,6 +163,7 @@ part vers le servo, la position reste suivie).
 | `AttributeError: FollowJointTrajectory_Goal has no attribute request` | le `goal_callback` reçoit la requête, pas un handle d'objectif | signature corrigée ; les tests de contrat le vérifient |
 | `move_group` choisissait CHOMP | plusieurs plugins de planification chargés, aucun `planning_plugin` imposé | `planning_plugin: ompl_interface/OMPLPlanner` dans `ompl_planning.yaml` |
 | `joint_state_publisher` publiait 0 pour les articulations du bras | deux éditeurs se contredisaient sur `/joint_states` | `source_list: ['/arm/joint_states']` dans `launch/robot_description.launch.py` ; vérifié par la sonde §4 |
+| `pick_ik` répondait `COLLISION_CHECKING_UNAVAILABLE` (-21) même sur la pose courante, et toute planification échouait (`not part of the same tree`) | **`base_link` avait deux parents dans TF** : `base_footprint → base_link` par `robot_state_publisher` (URDF) et `odom → base_link` par l'EKF. `base_footprint`, racine du modèle et cadre de planification par défaut, restait orphelin | l'EKF publie `odom → base_footprint` (`base_link_frame`, 2026-11-11 19:55) : chaîne unique `map → odom → base_footprint → base_link → bras`, 27 cadres, une racine. `planning_frame` fixé à `base_link` dans `move_group.launch.py`. `/compute_ik` répond `SUCCESS` |
 
 ## 6. Limites constatées
 
@@ -204,6 +205,13 @@ part vers le servo, la position reste suivie).
   bande morte du servo). Un axe chargé peut rester à 1° de sa consigne.
 - **Bras 5 axes** : une pose 6D arbitraire n'est pas atteignable ; `pick_ik` échoue souvent sur des
   objectifs de pose. La planification en espace articulaire fonctionne.
+- **Enveloppe atteignable mesurée (2026-11-11 20:10, `/compute_fk` de MoveIt, 2 205 échantillons sur
+  tout l'espace articulaire)** : `arm_link5` et les deux doigts descendent au plus bas à
+  **z = −0,115 m dans `base_link`**, et portent au plus à **x = +0,439 m**. Le sol mesuré par la
+  profondeur Astra est à **z = −0,414 m** : **les doigts s'arrêtent 0,299 m au-dessus du sol**. Ce
+  bras ne peut donc rien saisir **posé au sol**, quelle que soit la position de la caméra ; il faut
+  un support dont le dessus est entre 0,35 et 0,55 m, à moins de 0,40 m de la colonne.
+  Repères : `base_link` est à 0,414 m du sol, l'Astra à 0,42 m dans `base_link` (0,83 m du sol).
 - **Caméra du bras sur le même index que « front »** : le seul périphérique UVC (`0c45:6340`) sert
   les deux noms dans la configuration actuelle, voir [[camera_usb_bras]].
 - Durée maximale d'une trajectoire acceptée par le contrôleur : `max_duration_s: 30,0` ; au-delà,
