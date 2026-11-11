@@ -74,7 +74,83 @@ pas encore `mcp_clawbot_*` dans sa propre liste d'outils.
 | `goal_send` | fonctionne avec ou sans incident, mais chaque appel est journalisé (`state.record`) |
 | `safety_stop` | publie la vitesse nulle et verrouille `stop_latched` ; **ne coupe pas le bras** — l'arrêt physique reste requis |
 
-## 4. Limites
+## 4. Déclencher une prompt Hermes depuis le Système 1
+
+**Réponse courte** : un serveur MCP ne peut pas prendre l'initiative. Le protocole est piloté par
+le client : Hermes ouvre l'appel d'outil, le serveur répond. Pour que le robot réveille Hermes,
+trois voies existent — deux hors MCP, une dans MCP.
+
+| Voie | Mécanisme | Disponibilité | Coût / latence |
+|---|---|---|---|
+| `cli` | S1 lance `hermes chat --oneshot --query-file -`, contexte JSON sur stdin | **vérifiée le 2026-11-11** (46,4 s, réponse exploitable) | une session Hermes complète par appel |
+| `webhook` | S1 signe un POST HMAC ; la passerelle Hermes crée l'exécution | route `clawbot-incident` créée, passerelle **à redémarrer** pour l'écouter | asynchrone, découplé de toute session |
+| `sampling` | le serveur MCP demande une complétion au client | seulement **pendant** un appel d'outil en cours | inadapté à un réveil spontané |
+
+Module : `bridge_mcp/hermes_trigger.py` — `trigger(context, question, transport="cli"|"webhook")`.
+
+### 4.1 Voie `cli` — opérationnelle
+
+```python
+from bridge_mcp.hermes_trigger import trigger
+reponse = trigger({"incident": {...}, "topics": {"/scan": {"hz": 10.08}}},
+                  "Faut-il relancer la caméra du bras ?", transport="cli")
+print(reponse["answer"])
+```
+
+Essai réel du 2026-11-11 00:25 : contexte incident + graphe + pose du bras, question sur la
+caméra rebranchée → réponse en 46,4 s, structurée en diagnostic / action / garde-fou, appuyée sur
+les fiches de la base (`[76, 97, 90, 90, 90, 149]`, seuil 114°, `/dev/video0` sans nœud ROS).
+
+Deux pièges mesurés, corrigés dans le module :
+
+- `--source` provoque un `invalid_params` du fournisseur : ne pas le passer.
+- l'atteinte de `--max-turns` renvoie un code de sortie non nul **avec** une réponse : seul
+  l'absence de texte est un échec.
+- le prompt passe par `--query-file -` (stdin), jamais par la ligne de commande : guillemets,
+  `$(...)` et backticks du contexte sont préservés verbatim.
+
+### 4.2 Voie `webhook` — configurée, activation en attente
+
+```text
+$ hermes webhook subscribe clawbot-incident --events incident --deliver log \
+    --prompt "Incident Clawbot (urgence {urgency}) : {question} … {context} …"
+  Secret: 2pw65kVM… (propre à la route, pas le secret global)
+```
+
+Le module lit l'URL et le **secret de la route** dans `~/.hermes/webhook_subscriptions.json` :
+signer avec le secret global donne un 401 silencieux.
+
+Activation — la passerelle a été démarrée avant l'ajout de la plateforme `webhook`, elle ne
+l'écoute donc pas encore. Le redémarrage interrompt les sessions Hermes en cours, il est laissé à
+l'opérateur :
+
+```bash
+hermes gateway restart --yes
+curl -s http://127.0.0.1:8644/health     # {"status": "ok"}
+```
+
+Tant que ce redémarrage n'est pas fait, `post_webhook` échoue proprement :
+`TriggerError: passerelle Hermes injoignable … Connection refused` (vérifié).
+
+### 4.3 Ce que S1 doit envoyer
+
+```json
+{"event": "incident", "urgency": "haute", "question": "…",
+ "context": {"incident": {"id": "INC-…", "severite": 2}, "topics": {"…": {"hz": 10.0}},
+             "bras": {"servos_deg": [76, 97, 90, 90, 90, 149]}, "materiel": {"…": "…"}}}
+```
+
+Règle : le contexte est un **relevé mesuré**, jamais une conclusion. Les valeurs inventées sont
+refusées par la base (règle de sourçage) et rendent la réponse de S2 inutilisable.
+
+### 4.4 Limites
+
+- Voie `cli` : pas de continuité entre appels ; chaque déclenchement ouvre une session neuve.
+- Voie `webhook` : `--deliver log` seulement ; pour pousser la réponse vers un canal, remplacer
+  par `--deliver telegram --deliver-chat-id …` et redémarrer la passerelle.
+- Aucune voie ne permet à S1 d'**exécuter** une action : S2 propose, S1 décide et agit.
+
+## 5. Limites du serveur MCP
 
 - `topic_stats` mesure sur une fenêtre de 2 à 30 s : c'est une cadence observée à l'instant, pas une
   garantie de stabilité.
@@ -84,9 +160,10 @@ pas encore `mcp_clawbot_*` dans sa propre liste d'outils.
 - Le serveur ne survit pas à la fermeture de la session Hermes en mode stdio : c'est le client qui le
   possède. Pour un accès permanent, utiliser le mode HTTP et une unité systemd (non déployée ici).
 
-## 5. Voir aussi
+## 6. Voir aussi
 
 - Inventaire matériel : [[inventaire_materiel]]
+- Déclenchement S1 → S2 : §4 de cette page
 - Spécification MCP : [[llm2ros_mcp_specification]], [[llm2ros_mcp_test_plan]]
 - Pont LLM → ROS 2 : [[llm2ros_bridge]], [[llm2ros_bridge_architecture]]
 - Manipulation exposée par `goal_send` : [[manipulation_moveit]]
