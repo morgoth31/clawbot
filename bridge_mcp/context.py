@@ -24,15 +24,28 @@ MAX_LOGS = 200
 MAX_COMMANDS = 50
 MAX_BYTES = 256 * 1024
 
-#: Absences structurelles constatées sur ce robot (contraintes C-01 à C-03).
-STRUCTURAL_ABSENCES: tuple[tuple[str, str], ...] = (
-    ("/scan", "ROS2-TOPIC-ABSENT"),
-    ("/odom", "ROS2-TOPIC-ABSENT"),
-    ("base_link", "TF-FRAME-MISSING"),
-    ("odom", "TF-FRAME-MISSING"),
-    ("map", "TF-FRAME-MISSING"),
-    ("etat de charge batterie", "ENOENT"),
-)
+#: Flux et cadres dont l'absence est une information de premier ordre pour S2.
+TOPICS_ATTENDUS: tuple[str, ...] = ("/scan", "/odom")
+CADRES_ATTENDUS: tuple[str, ...] = ("base_link", "odom", "map")
+
+
+def absences_structurelles(observation: Observation) -> list[tuple[str, str]]:
+    """Ce qui manque **dans cette observation**, avec un code stable.
+
+    Ces absences étaient écrites en dur dans une constante, au motif qu'elles décrivaient l'état du
+    robot au 2026-11-10. Elles sont maintenant dérivées de l'observation : une liste figée annonce
+    à S2 un robot qui n'existe plus (le 2026-11-11, `/odom`, `/scan` et les cadres `map`/`odom`/
+    `base_link` sont publiés), et pire, elle continuerait de le faire après la panne qui les rend
+    vrais — un contexte qui ment dans les deux sens ne sert à rien.
+    """
+    presents = {topic.name for topic in observation.topics}
+    absences: list[tuple[str, str]] = [
+        (topic, "ROS2-TOPIC-ABSENT") for topic in TOPICS_ATTENDUS if topic not in presents]
+    absences += [(cadre, "TF-FRAME-MISSING") for cadre in CADRES_ATTENDUS
+                 if cadre not in observation.tf_ages]
+    if observation.resources.voltage_v is None:
+        absences.append(("etat de charge batterie", "ENOENT"))
+    return absences
 
 
 def _iso(epoch: float) -> str:
@@ -74,7 +87,7 @@ def build_context(incident: Incident, observation: Observation, state: BridgeSta
     trigger.setdefault("subject", incident.subject)
     trigger["occurrences"] = incident.occurrences
 
-    unavailable = [f"{name}: {code}" for name, code in STRUCTURAL_ABSENCES]
+    unavailable = [f"{name}: {code}" for name, code in absences_structurelles(observation)]
     if observation.resources.voltage_v is None:
         unavailable.append("/voltage: ROS2-TOPIC-ABSENT")
 

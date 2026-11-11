@@ -87,7 +87,7 @@ os.environ["ROS_DOMAIN_ID"] = "99"
 rclpy = pytest.importorskip("rclpy")
 from rclpy.executors import SingleThreadedExecutor  # noqa: E402
 from rclpy.node import Node  # noqa: E402
-from std_msgs.msg import String  # noqa: E402
+from std_msgs.msg import Int32MultiArray, String  # noqa: E402
 
 from clawbot_director.director_node import DirectorNode  # noqa: E402
 from clawbot_interfaces.srv import DirectorCommand  # noqa: E402
@@ -106,19 +106,27 @@ def monde():
 
     sonde = Node("sonde_brique5")
     pub_safety = sonde.create_publisher(String, "/safety/state", 10)
+    # `navigate_to` exige un bras replié : le fixture publie la pose de repos mesurée sur le robot,
+    # sinon la précondition refuserait chaque étape et ces tests mesureraient autre chose.
+    pub_bras = sonde.create_publisher(Int32MultiArray, "/arm/servo_angles", 10)
     executeur.add_node(sonde)
     threading.Thread(target=executeur.spin, daemon=True).start()
 
     nav2 = FauxNavigateur(mode="succes")
     arret = threading.Event()
 
+    angles_bras = Int32MultiArray()
+    angles_bras.data = [76, 97, 90, 90, 90, 149]
+
     def _alimenter():
         while not arret.is_set():
             pub_safety.publish(String(data="OK"))
+            pub_bras.publish(angles_bras)
             time.sleep(0.05)
 
     try:
         assert _attendre(lambda: pub_safety.get_subscription_count() > 0, timeout=5.0)
+        assert _attendre(lambda: pub_bras.get_subscription_count() > 0, timeout=5.0)
         while node.etat()["safety"] != "OK" or node.etat()["safety_stale"]:
             pub_safety.publish(String(data="OK"))
             time.sleep(0.05)

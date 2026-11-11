@@ -58,10 +58,13 @@ de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cp
 | Nav2 sur carte | **actif** | `clawbot-nav2.service`, 12 nœuds, costmap globale 177×80 (carte du catalogue) |
 | Waypoints | **3 nommés** | `ouest` (1,50 ; −0,30), `centre` (2,50 ; 0,00), `est` (5,30 ; 0,48), dégagements 0,65 / 1,05 / 0,75 m |
 | `navigate_to` | **exécute** | adaptateur `NavigateToPose`, coordonnées libres refusées, 3 waypoints atteints à 0,000 / 0,121 / 0,082 m en simulation (domaine 99) |
+| Préconditions de mouvement | **actives** | bras mesuré sur `/arm/servo_angles` avant tout skill qui déplace la base ; `arm_folded: true` publié sur `/director/state` |
+| Contexte MCP | **dérivé** | les absences (`/scan`, `/odom`, cadres TF) sont lues dans l'observation, plus dans une liste figée |
 
-**Suite de tests : 268 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
+**Suite de tests : 293 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
 l'échelle, dérive, round-robin, directeur, surface MCP, exécution des skills, sentinel, catalogue
-de waypoints, adaptateur `navigate_to`, cohérence des paramètres Nav2). Commande exacte :
+de waypoints, adaptateur `navigate_to`, cohérence des paramètres Nav2, préconditions de mouvement,
+`ExecStop` du directeur, absence dérivée du contexte MCP). Commande exacte :
 
 ```bash
 cd /home/jetson/clawbot
@@ -160,17 +163,16 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-safety-arbitra
 | `DROP_TORQUE` n'actionne rien | **sécurité** | l'état est publié, le contrôleur s'arrête, mais aucun étage ne coupe le couple (`set_uart_servo_torque`). Décision prise, non appliquée. |
 | Essai physique des waypoints | bloquant la clôture du lot 5 | la navigation est prouvée en simulation ; aucun déplacement réel n'a encore été commandé par Nav2 |
 | Bras absent du costmap de Nav2 | moyen | Nav2 ne connaît le bras que par un rayon d'encombrement de 0,16 m : un waypoint peut être accepté bras en extension |
-| `STRUCTURAL_ABSENCES` codées en dur | moyen | `bridge_mcp/context.py` déclare encore `/scan`, `/odom` et les cadres TF absents ; cette liste doit être dérivée de l'observation |
+| Enveloppe du bras non validée | moyen | la précondition refuse un bras hors de la pose de repos mesurée ; cette pose n'a pas été validée par l'opérateur, bras libre (`valide_par_operateur: false`) |
 | Skills restants | bloquant lot 6/7 | `arm_move`/`grip_set`/`navigate_to` exécutent ; `follow_human`, `grasp_object`, `search_object`, `express_state`, `look_at_board`, `set_watch_mode` refusent en `INDISPONIBLE` |
 | Aucun VAD/STT branché | bloquant lot 7 | `/sentinel/transcript` n'a aucun producteur : les mots d'arrêt sont prouvés en test, inopérants en réel |
 | Réveil webhook | moyen | route `clawbot-incident` configurée, passerelle non redémarrée (port 8644 muet) |
 | Repli Telegram | moyen | aucun canal configuré ; la règle « personne depuis 60 s → Telegram » n'est pas codée |
 | Cause racine Bluetooth | moyen | le noyau ne répond pas à `IO_Capability_Request` ; contournement en place, noyau non instrumentable (`CONFIG_KPROBES`, ftrace functions, `DYNAMIC_DEBUG` absents) |
-| `ExecStop` du directeur | moyen | un redémarrage n'annule aucun goal en vol ; à faire au premier skill physique |
 | Test d'inclinaison réel | moyen | seuils validés sur IMU **simulée** seulement |
 | Temps mort base ~0,85 s | moyen | friction statique du MCU, insuffisant pour un asservissement visuel |
-| Endpoints de mouvement `:8001` | faible | publient encore sur `/cmd_vel` (2e écrivain) |
-| `joy-teleop` actif sans manette | faible | à arrêter |
+| Endpoints de mouvement `:8001` | faible | publient encore sur `/cmd_vel` (3e écrivain, derrière l'arbitre). Les retirer casse le pont C++ historique, encore en service : décision à prendre, pas à subir |
+| `joy-teleop` | **corrigé** | unité arrêtée et désactivée le 2026-11-11 : aucun `/dev/input/js*` n'existe sur ce poste |
 | Caméra du bras hors graphe | moyen | seule la voie OpenCV la voit |
 
 ---
@@ -229,7 +231,11 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-safety-arbitra
 23. **`/scan` est publié en `laser_link`, pas en `laser`** : le `slam_launch.py` historique déclarait
     `laser`, frame inexistante — les scans étaient muets pour SLAM. Vérifier le `frame_id` réel du
     message avant de déclarer un capteur absent.
-24. **Le bord de la carte n'est pas de l'espace libre** : un champ de distance calculé sur les
+24. **`source /opt/ros/humble/setup.bash` tue un script en `set -u`** : les scripts `setup.bash`
+    lisent des variables non définies, et un `source` qui échoue sous `set -u` fait sortir le shell
+    appelant — le script s'arrête sans message, sans code d'erreur explicite. Un script d'`ExecStop`
+    doit donc sourcer sans mode strict et finir par `exit 0`.
+25. **Le bord de la carte n'est pas de l'espace libre** : un champ de distance calculé sur les
     seules cellules occupées désigne les coins non observés comme les points les plus sûrs. Le bord
     doit compter comme obstacle, sinon un waypoint proposé automatiquement tombe hors de la pièce.
 
@@ -311,9 +317,9 @@ VAD Silero + faster-whisper tiny sur les micros existants → publication sur
 systemctl is-active ros2-driver-node clawbot-safety-arbitrator clawbot-arm-controller \
   clawbot-director clawbot-sentinel clawbot-slam clawbot-docs
 
-# chaîne de sécurité et sentinel
+# chaîne de sécurité, bras et sentinel
 ros2 topic echo /safety/state --once
-ros2 topic echo /director/state --once
+python3 scripts/etat_directeur.py        # état, sécurité, angles de bras, arm_folded
 ros2 topic echo /sentinel/state --once
 ros2 topic hz /arm/servo_angles
 
@@ -365,6 +371,7 @@ sudo systemctl restart clawbot-docs && curl -s -o /dev/null -w '%{http_code}\n' 
 ## 11. Derniers commits
 
 ```text
+2d36f24 feat(director): preconditions de mouvement, ExecStop, absences derivees
 a0bbea3 feat(nav2): navigation sur carte, catalogue de waypoints ferme, navigate_to
 95bd39a feat(audio): enceinte SRS-XB100 appairee, A2DP verifie, procedure conservee
 0807648 docs(okf): directives BR/EDR + cache + MGMT appliquees, meme blocage HCI

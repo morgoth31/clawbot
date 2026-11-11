@@ -162,6 +162,9 @@ même défaut que deux éditeurs pour `/cmd_vel`.
 | `clawbot-slam` invisible du graphe | unité lancée en **root** : découverte DDS isolée (défaut déjà connu, unité non corrigée) | `User=jetson` |
 | `controller_server` meurt à la construction | `width`/`height` du costmap local écrits `3.0`, attendus entiers | `width: 3`, `height: 3` |
 | Un goal envoyé trop tôt est refusé | le serveur d'action existe avant l'activation du cycle de vie | la preuve attend `lifecycle_manager_*/is_active` |
+| `navigate_to` démarrait bras en extension | la précondition du directeur était un *callable* « toujours vrai » | bras replié mesuré sur `/arm/servo_angles`, voir [[preconditions_mouvement]] |
+| Un arrêt du directeur laissait la tâche `RUNNING` | aucun `ExecStop` : le goal survivait sans personne pour l'attendre | `scripts/annuler_tache_service.sh`, motif `arret_service` |
+| Le contexte MCP annonçait `/scan` et `/odom` absents | liste d'absences codée en dur, datée du 2026-11-10 | dérivée de l'observation (`absences_structurelles`) |
 
 ## 8. Tests
 
@@ -205,8 +208,8 @@ et ce que S1 applique est impossible par construction.
 | Point | Gravité | Détail |
 |---|---|---|
 | Essai physique des 3 waypoints | bloquant la clôture du lot | dépend de la présence de l'opérateur |
-| Absences structurelles de `bridge_mcp/context.py` | moyen | `STRUCTURAL_ABSENCES` déclare encore `/scan`, `/odom` et les cadres TF absents ; cette liste doit être dérivée de l'observation, pas codée en dur |
-| Modèle 3D du bras dans le costmap | moyen | Nav2 ne voit le bras que par un rayon d'encombrement : un waypoint peut être accepté bras en extension |
+| Enveloppe du bras non validée par l'opérateur | moyen | la précondition refuse un bras hors de la pose de repos mesurée, mais cette pose n'a pas été validée bras libre — voir [[preconditions_mouvement]] |
+| Modèle 3D du bras dans le costmap | moyen | Nav2 ne voit le bras que par un rayon d'encombrement : la précondition compense à l'entrée, elle ne modélise pas le volume balayé |
 | `map → odom` sans AMCL correcte | moyen | si la pose initiale est fausse, Nav2 planifie depuis une position imaginaire ; le symptôme est un premier goal refusé par le costmap |
 | Carte de 8,4 m² praticables seulement | faible | la pièce est petite : les waypoints sont peu nombreux, toute extension demande une nouvelle cartographie |
 
@@ -220,3 +223,4 @@ et ce que S1 applique est impossible par construction.
 - [[mcp_hermes]]
 - [[systemd_robot_services]]
 - [[inventaire_materiel]]
+- [[preconditions_mouvement]]

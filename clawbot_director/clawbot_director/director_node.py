@@ -2,11 +2,14 @@
 
 Le directeur décide quand un skill peut tourner, jamais ce que le robot doit faire. Ce nœud
 ajoute ce que la logique pure ne peut pas voir : l'état de sécurité publié par l'arbitre sur
-/safety/state. Deux règles non négociables :
+/safety/state, et la pose réelle du bras lue sur /arm/servo_angles. Trois règles non négociables :
 
   - aucune tâche ne démarre sans un OK **frais** — le silence de l'arbitre n'est pas un feu vert ;
   - dès que cet état sort de OK, ou que le flux se tait, la tâche en cours est annulée sans
-    attendre le prochain point sûr.
+    attendre le prochain point sûr ;
+  - un skill qui déplace la base n'est lancé que si le bras est **mesuré** dans son enveloppe de
+    repos : Nav2 ne connaît le bras que par un rayon d'encombrement, un bras en extension est
+    invisible dans son costmap.
 
 /director/state publie un relevé daté : état de tâche, motif de la dernière transition, valeur
 de sécurité lue, âge de cette valeur et péremption. Un relevé, jamais une conclusion.
@@ -21,10 +24,11 @@ import rclpy
 from action_msgs.msg import GoalStatus
 from rclpy.action import ActionClient
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import Int32MultiArray, String
 
 from clawbot_interfaces.srv import DirectorCommand
 
+from . import preconditions as regles_preconditions
 from .director import (ACCEPTED, Director, PRECONDITION_FAILED, RUNNING,
                        WAITING_CONFIRMATION)
 from .skills import (SkillIndisponible, SkillInconnu, SkillInvalide,
@@ -47,13 +51,17 @@ ETATS_GOAL = {
 class DirectorNode(Node):
     def __init__(self):
         super().__init__("director")
-        self.director = Director()
+        self.regles = regles_preconditions.charger()
+        self.director = Director(preconditions=self.verifier_preconditions)
         self.safety = None          # dernière valeur lue, None si l'arbitre n'a jamais parlé
         self.last_safety_t = None   # horloge monotone de la dernière lecture
+        self.angles_bras = None     # dernier /arm/servo_angles, None si jamais reçu
+        self.last_bras_t = None     # horloge monotone de la dernière lecture du bras
         self._dernier_defaut = None  # dernier défaut déjà traité, pour ne pas répéter l'alerte
 
         self.pub_state = self.create_publisher(String, "/director/state", 10)
         self.create_subscription(String, "/safety/state", self.on_safety, 10)
+        self.create_subscription(Int32MultiArray, self.regles.arm.source, self.on_bras, 10)
         self.create_service(DirectorCommand, "/director/command", self.on_commande)
         self.create_timer(STATE_PERIOD_S, self.tick)
         self.create_timer(WATCHDOG_PERIOD_S, self.verifier_delai_etape)
@@ -123,6 +131,21 @@ class DirectorNode(Node):
         if trouvee is None:
             return {"status": "UNKNOWN_TASK", "task_id": task_id}
         return {"status": "FOUND", "task": trouvee}
+
+    # ── préconditions : le bras est une mesure, pas une déclaration ──────
+    def on_bras(self, msg):
+        self.angles_bras = list(msg.data)
+        self.last_bras_t = time.monotonic()
+
+    def age_bras(self) -> float | None:
+        if self.last_bras_t is None:
+            return None
+        return time.monotonic() - self.last_bras_t
+
+    def verifier_preconditions(self, skill: str, args: dict) -> tuple[bool, str]:
+        """Précondition de la logique pure, branchée sur la mesure réelle du bras."""
+        return regles_preconditions.verifier(skill, self.angles_bras, self.age_bras(),
+                                             self.regles)
 
     # ── entrée : la sécurité est une précondition, pas une réaction ─────
     def refus_securite(self) -> str:
@@ -326,10 +349,17 @@ class DirectorNode(Node):
         if self.last_safety_t is not None:
             age = round(time.monotonic() - self.last_safety_t, 3)
         etat = dict(self.director.state())
+        age_bras = self.age_bras()
         etat.update({
             "safety": self.safety,
             "safety_age_s": age,
             "safety_stale": age is None or age > SAFETY_TIMEOUT_S,
+            # le bras est publié comme une mesure datée : un consommateur doit pouvoir juger de
+            # sa fraîcheur sans avoir à faire confiance à une conclusion
+            "arm_angles": self.angles_bras,
+            "arm_age_s": None if age_bras is None else round(age_bras, 3),
+            "arm_folded": regles_preconditions.verifier_bras(
+                self.angles_bras, age_bras, self.regles)[0],
             "published_at": round(time.time(), 3),
         })
         return etat
