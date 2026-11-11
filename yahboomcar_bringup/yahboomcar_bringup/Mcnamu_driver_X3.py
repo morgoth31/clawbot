@@ -16,6 +16,11 @@ from rclpy.node import Node
 from std_msgs.msg import String,Float32,Int32,Bool,Int32MultiArray
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Imu,MagneticField, JointState
+from nav_msgs.msg import Odometry
+try:
+	from .cmd_scaling import scale_cmd_vel
+except ImportError:  # exécution directe du fichier
+	from cmd_scaling import scale_cmd_vel
 from rclpy.clock import Clock
 
 #from dynamic_reconfigure.server import Server
@@ -64,6 +69,7 @@ class yahboomcar_driver(Node):
 		self.velPublisher = self.create_publisher(Twist,"vel_raw",50)
 		self.imuPublisher = self.create_publisher(Imu,"imu/data_raw",100)
 		self.magPublisher = self.create_publisher(MagneticField,"imu/mag",100)
+		self.odomPublisher = self.create_publisher(Odometry,"odom_raw",20)
 
 		#create timer
 		self.timer = self.create_timer(0.1, self.pub_data)
@@ -81,10 +87,8 @@ class yahboomcar_driver(Node):
 		if not isinstance(msg, Twist): return
         # 下发线速度和角速度
         # Issue linear vel and angular vel
-		vx = msg.linear.x*1.0
-        #vy = msg.linear.y/1000.0*180.0/3.1416    #Radian system
-		vy = msg.linear.y*1.0
-		angular = msg.angular.z*1.0     # wait for chang
+		# ERR-009 : bande morte et butées appliquées avant le MCU
+		vx, vy, angular = scale_cmd_vel(msg.linear.x, msg.linear.y, msg.angular.z)
 		self.car.set_car_motion(vx, vy, angular)
 		'''print("cmd_vx: ",vx)
 		print("cmd_vy: ",vy)
@@ -174,6 +178,19 @@ class yahboomcar_driver(Node):
 		twist.linear.y = vy *1.0
 		twist.angular.z = angular*1.0    
 		self.velPublisher.publish(twist)
+		# /odom_raw : Odometry pour robot_localization (Twist nu inutilisable par l'EKF)
+		odom = Odometry()
+		odom.header.stamp = time_stamp.to_msg()
+		odom.header.frame_id = "odom"
+		odom.child_frame_id = "base_link"
+		odom.twist.twist = twist
+		# covariances : encodeurs mecanum, glissement réel non modélisé
+		for i, var in enumerate([0.02, 0.02, 1e6, 1e6, 1e6, 0.05]):
+			odom.twist.covariance[i * 7] = var
+		# la pose n'est pas mesurée : variance énorme pour que l'EKF ne la fusionne pas
+		for i in range(6):
+			odom.pose.covariance[i * 7] = 1e6
+		self.odomPublisher.publish(odom)
 		# print("ax: %.5f, ay: %.5f, az: %.5f" % (ax, ay, az))
 		# print("gx: %.5f, gy: %.5f, gz: %.5f" % (gx, gy, gz))
 		# print("mx: %.5f, my: %.5f, mz: %.5f" % (mx, my, mz))
