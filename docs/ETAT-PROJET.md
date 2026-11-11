@@ -87,12 +87,13 @@ S2  Hermes ── MCP stdio (22 outils) ──┐        ▲ webhook (réveil, p
 ```
 
 **Topics clés** : `/odom_raw`, `/odom`, `/arm/servo_angles`, `/cmd_vel_safe`, `/safety/hold`,
-`/safety/state` (`OK|HOLD|FREEZE|DROP_TORQUE|STOP|SENSOR_STALE|BATTERY_LOW`).
+`/safety/state` (`OK|HOLD|FREEZE|DROP_TORQUE|STOP|SENSOR_STALE|BATTERY_LOW`), `/director/state`
+(JSON : état de tâche + dernière valeur de sécurité vue).
 
 **Services systemd actifs** : `ros2-driver-node`, `clawbot-lidar`, `orbbec-camera`,
 `clawbot-description`, `clawbot-arm-controller`, `clawbot-move-group`, `clawbot-slam`,
-`clawbot-safety-arbitrator`, `clawbot-docs`, `yolo-inference`, `ros2-hardware-service`,
-`ros2-llm-bridge-cpp`.
+`clawbot-safety-arbitrator`, `clawbot-director`, `clawbot-docs`, `yolo-inference`,
+`ros2-hardware-service`, `ros2-llm-bridge-cpp`.
 
 **Paquets créés** : `clawbot_safety` (seuils + arbitre), `clawbot_director` (cœur),
 `clawbot_arm_controller`, `clawbot_moveit_config`.
@@ -122,7 +123,7 @@ S2  Hermes ── MCP stdio (22 outils) ──┐        ▲ webhook (réveil, p
 | Point | Gravité | Détail |
 |---|---|---|
 | `DROP_TORQUE` n'actionne rien | **sécurité** | l'état est publié, le contrôleur s'arrête, mais aucun étage ne coupe le couple des servos (`set_uart_servo_torque`). Décision prise, non appliquée. |
-| Directeur non branché | bloquant lot 3 | pas de nœud ROS, pas d'outils MCP, `advance()` appelé à la main |
+| Directeur à moitié branché | bloquant lot 3 | nœud ROS `clawbot-director` et annulation sur `safety` faits (2,0 ms) ; pas d'outils MCP, `advance()` encore appelé à la main |
 | Test d'inclinaison réel | moyen | les seuils sont validés sur IMU **simulée** |
 | Temps mort base ~0,85 s | moyen | friction statique du MCU, insuffisant pour un asservissement visuel |
 | Endpoints de mouvement `:8001` | faible | publient encore sur `/cmd_vel` (2e écrivain) |
@@ -154,10 +155,14 @@ S2  Hermes ── MCP stdio (22 outils) ──┐        ▲ webhook (réveil, p
 
 ## 8. Prochaines étapes, dans l'ordre
 
-### Brique 1 — nœud ROS du directeur (courte, sans matériel)
+### Brique 1 — nœud ROS du directeur (courte, sans matériel) — **faite**
 `clawbot_director/director_node.py` : instancie `Director`, s'abonne à `/safety/state` et annule
 la tâche dès que l'état sort de `OK`, publie `/director/state`. Test domaine 99 : état
 `/safety/state` à `STOP` → tâche `CANCELLED_SAFETY` en < 200 ms.
+Mesuré : **2,0 ms médian, 2,5 ms max** sur 5 essais (domaine 99, DDS local). Service
+`clawbot-director` actif en domaine 28, `/director/state` publié à 5 Hz même sans changement
+(un abonné tardif doit voir l'état). Reste pour la brique 2 : rien ne peut encore démarrer de
+tâche dans ce nœud — c'est la surface MCP qui l'ouvrira.
 
 ### Brique 2 — surface MCP
 Trois outils dans `bridge_mcp` : `start_skill(skill, args)`, `get_task()`, `cancel_task(task_id)`.
