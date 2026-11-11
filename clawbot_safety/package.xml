@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>clawbot_safety</name>
+  <version>0.1.0</version>
+  <description>Arbitre reflexe et seuils de securite du Clawbot X3 Plus</description>
+  <maintainer email="jetson@clawbot.local">jetson</maintainer>
+  <license>Proprietary</license>
+  <depend>rclpy</depend>
+</package>
