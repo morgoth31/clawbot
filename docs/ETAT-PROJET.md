@@ -1,7 +1,10 @@
 # État du projet Clawbot — reprise de session
 
-**Date** : 2026-11-11, après le lot 5 (navigation sur carte)
-**Branche** : `docs/site-okf-merge` ; dernier commit de code avant ce lot `95bd39a`
+**Date** : 2026-11-11 18:10, fin de session (lot 5 clos, brique 6 à moitié, **bras en panne**)
+**Branche** : `docs/site-okf-merge` ; dernier commit `c6ac7c1`
+**Prochaine action, dans l'ordre** : (1) le test d'une minute qui départage la panne du bras —
+§8 « bras » ; (2) l'essai physique des waypoints, robot au sol ; (3) la cohérence des caméras du
+sentinel — §8 « dettes ».
 **Robot** : Clawbot X3 Plus, Jetson Orin NX, ROS 2 Humble, domaine 28
 
 > Ce document est fait pour être lu **au début d'une nouvelle session**, à la place d'un
@@ -15,16 +18,16 @@
 Ouvrir une nouvelle session et envoyer :
 
 > Lis `/home/jetson/clawbot/docs/ETAT-PROJET.md` et
-> `docs/superpowers/specs/2026-11-11-architecture-s1-s2-design.md`, puis reprends au §8
-> (prochaines étapes) à la brique 6.
+> `docs/superpowers/specs/2026-11-11-architecture-s1-s2-design.md`, puis commence par le §8
+> « bras » : c'est le seul point bloquant, et il se tranche en une minute.
 
 Les briques 1 à 5 sont faites : nœud ROS du directeur, surface MCP, exécution réelle des goals,
-sentinel, navigation sur carte avec waypoints fermés. Ne pas les refaire. Ne pas relancer les
-diagnostics déjà faits : ils sont tous dans ce document avec leurs chiffres.
+sentinel, navigation sur carte avec waypoints fermés. La brique 6 est à moitié faite : la caméra du
+poignet est dans ROS. Ne pas refaire ces briques. Ne pas relancer les diagnostics déjà faits : ils
+sont tous dans ce document avec leurs chiffres et leur date.
 
-**La brique 5 n'est pas close pour autant** : la preuve en simulation est faite (3 waypoints à
-0,000 / 0,121 / 0,082 m), l'essai **physique** des trois waypoints reste à faire, robot au sol,
-opérateur présent. Protocole au §8, brique 5.
+**Trois choses ne sont pas closes** : la panne du bras (bloquante, §8), l'essai **physique** des
+trois waypoints (robot au sol), et la cohérence des caméras du sentinel (§8, dettes).
 
 **État du dépôt** : le worktree porte des modifications **antérieures** non commitées (suppressions
 de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cpp/`, `slam3d/`,
@@ -63,10 +66,10 @@ de meshes `yahboomcar_description`, 19 fichiers non suivis : `ros2_llm_bridge_cp
 | Caméra du poignet | **dans le graphe** | `/wrist_camera/image_raw` 640×480 `yuv422_yuy2`, cadre `wrist_camera_optical_frame`, 5,98 im/s mesurés (module UVC), latence 8 ms |
 | Propriété du périphérique | **unique** | `clawbot-wrist-camera` le tient ; `yolo-inference` lit le topic (`CAMERA_CLAW_SOURCE=ros`) |
 
-**Suite de tests : 293 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
+**Suite de tests : 303 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
 l'échelle, dérive, round-robin, directeur, surface MCP, exécution des skills, sentinel, catalogue
 de waypoints, adaptateur `navigate_to`, cohérence des paramètres Nav2, préconditions de mouvement,
-`ExecStop` du directeur, absence dérivée du contexte MCP). Commande exacte :
+`ExecStop` du directeur, absence dérivée du contexte MCP, caméra du poignet). Commande exacte :
 
 ```bash
 cd /home/jetson/clawbot
@@ -77,7 +80,9 @@ source /opt/ros/humble/setup.bash && source install/setup.bash
 python3 -m pytest tests/mcp_bridge clawbot_safety/test clawbot_arm_controller/test \
   clawbot_director/test clawbot_sentinel/test tests/test_ekf_config.py \
   tests/test_cmd_vel_scaling.py tests/test_measure_odom_drift.py \
-  tests/test_servo_round_robin.py -p no:launch_testing -p no:launch_ros -o addopts="" -q
+  tests/test_servo_round_robin.py tests/test_camera_poignet.py \
+  -p no:launch_testing -p no:launch_ros -o addopts="" -q
+# 303 passed
 ```
 
 Preuve de bout en bout de la navigation, en simulation, sans déplacer le robot :
@@ -247,7 +252,18 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`,
 27. **`rclpy` s'importe depuis le venv `yolov5_env` à condition de sourcer `/opt/ros/humble`** : les
     deux Python sont 3.10. C'est ce qui permet à un service GPU de consommer un topic ROS sans
     second bridge.
-28. **Le bord de la carte n'est pas de l'espace libre** : un champ de distance calculé sur les
+28. **`/arm/servo_angles` n'est pas une preuve de position.** Le 2026-11-11 17:35, pilote arrêté,
+    `get_uart_servo_angle_array()` a rendu exactement les consignes envoyées alors que le bras
+    n'avait pas bougé : le MCU renvoie son registre de consigne. Le 2026-11-10 le même canal
+    retardait sur la consigne quand un servo forçait — la lecture était alors une mesure. Ne jamais
+    conclure « le bras a bougé » sur une valeur qui suit la consigne : seule une valeur qui en
+    **diffère** prouve que le servo travaille.
+29. **Un `systemctl stop ros2-driver-node` met la pile en cascade** (`Requires=`) : arbitre,
+    contrôleur de bras, directeur, sentinel et Nav2 tombent en `failed`, et relancer le seul pilote
+    ne les relance pas. Toujours `systemctl list-units --state=failed` puis relance dans l'ordre
+    `driver → ekf → arbitre → description → bras → directeur → caméra → nav2 → sentinel → yolo`.
+    Une session entière a été menée avec six unités mortes sans que rien ne le signale.
+30. **Le bord de la carte n'est pas de l'espace libre** : un champ de distance calculé sur les
     seules cellules occupées désigne les coins non observés comme les points les plus sûrs. Le bord
     doit compter comme obstacle, sinon un waypoint proposé automatiquement tombe hors de la pièce.
 
@@ -302,6 +318,28 @@ anti-rebondi 2 s + mémoire du `task_id`, échec de POST journalisé avec `deliv
   `docs/knowledge-base/02_Software/navigation_nav2_waypoints.md` §6, et
   `scripts/poser_pose_initiale.py` pour déclarer la pose réelle à AMCL.
 
+### Panne du bras — **à trancher en premier** (1 minute)
+Depuis le 2026-11-11 17:20 les servos du bras n'exécutent plus les consignes : le MCU les enregistre
+et les renvoie à la lecture, le bras ne bouge pas (constat opérateur), la carte répond (version 3.5,
+11,90 V) et le pilote fait tout ce qu'il doit (couple activé ligne 102, `set_uart_servo_angle` par
+servo, trois copies identiques). Page complète, avec la chaîne et les faits datés :
+`docs/knowledge-base/02_Software/bras_remise_en_service.md`.
+
+```bash
+export ROS_DOMAIN_ID=28 && source /opt/ros/humble/setup.bash
+python3 /home/jetson/clawbot/scripts/pas_bras.py --servo 2 --vers 87 --max-pas 12
+```
+
+| Observation | Conclusion |
+|---|---|
+| le bras bouge | la chaîne fonctionne, le défaut est dans la pile ROS |
+| rien, bras **raide** | couple actif, consignes non exécutées : mode servo ou chaîne de bus (daisy chain) |
+| rien, bras **mou** | la commande de couple n'atteint pas les servos |
+| la relecture **retarde** | le servo répond, la lecture redevient une mesure |
+
+Ne rien conclure de `/arm/servo_angles` seul (§7, piège 28). L'état du bras conditionne
+`grasp_object`, l'orientation réelle de la caméra du poignet et les préconditions de mouvement.
+
 ### Brique 6 — perception et saisie — **première moitié faite**
 Caméra du poignet **dans ROS** depuis le 2026-11-11 16:50 CET :
 - `clawbot-wrist-camera.service` : `v4l2_camera_node` sur le chemin by-id, 640×480, encodage natif
@@ -327,10 +365,16 @@ VAD Silero + faster-whisper tiny sur les micros existants → publication sur
 `express_state` sur LED/buzzer.
 
 ### Dettes à traiter en parallèle
-- `DROP_TORQUE` (coupe de couple servo) — opérateur présent.
-- `ExecStop` du directeur qui annule et publie.
+- **cohérence des caméras du sentinel** : `clawbot_sentinel` interroge `/detect_raw` **sans**
+  préciser de caméra, donc le service YOLO répond avec `claw` — la caméra du poignet — alors que la
+  distance vient de la profondeur de l'Astra. Détections et distances viennent de deux points de vue
+  différents. Le mode source ROS existe désormais : passer `CAMERA_FRONT_SOURCE=ros` +
+  `CAMERA_FRONT_ROS_TOPIC=/camera/color/image_raw` et faire pointer le sentinel sur
+  `?camera=front`. C'est la correction que l'opérateur a demandée le 2026-11-11.
+- `DROP_TORQUE` (coupe de couple servo) — opérateur présent ; `set_uart_servo_torque` existe.
 - test d'inclinaison réel.
-- arrêter `joy-teleop`, déprécier les endpoints de mouvement de `:8001`.
+- déprécier les endpoints de mouvement de `:8001` (casse le pont C++ historique : décision à
+  prendre, pas à subir). `joy-teleop` est arrêté et désactivé depuis le 2026-11-11.
 - redémarrer la passerelle Hermes pour activer le webhook (coupe la session en cours : `--yes`),
   ou coder le repli Telegram.
 
@@ -348,6 +392,16 @@ ros2 topic echo /safety/state --once
 python3 scripts/etat_directeur.py        # état, sécurité, angles de bras, arm_folded
 ros2 topic echo /sentinel/state --once
 ros2 topic hz /arm/servo_angles
+
+# bras : un pas, avec relecture qui attend le cycle de proprioception
+python3 scripts/pas_bras.py --servo 2 --vers 87 --max-pas 12
+python3 scripts/cinematique_bras.py --q 76,97,90,90,90     # ou regarde la camera, sans bouger
+python3 scripts/test_couple_bras.py --servo 4 --pas 5      # couple + un pas, pilote arrete
+python3 scripts/read_arm_angles.py                          # lecture directe du bus
+
+# camera du poignet
+systemctl is-active clawbot-wrist-camera && ros2 topic hz /wrist_camera/image_raw
+python3 scripts/capture_compressee.py --topic /wrist_camera/image_raw/compressed --out /tmp/p.png
 
 # navigation (domaine 99 pour toute preuve, jamais 28)
 systemctl is-active clawbot-ekf clawbot-nav2 clawbot-slam
@@ -384,9 +438,11 @@ sudo systemctl restart clawbot-docs && curl -s -o /dev/null -w '%{http_code}\n' 
 
 ## 10. Documentation
 
-- Base OKF : `/Robot_Knowledge_Base` (**55 fichiers, 0 erreur**), publiée sur `:8080`.
+- Base OKF : `/Robot_Knowledge_Base` (**59 fichiers, 0 erreur**), publiée sur `:8080`.
 - Conception : `docs/superpowers/specs/2026-11-11-architecture-s1-s2-design.md`
 - Plan : `docs/superpowers/plans/2026-11-11-architecture-s1-s2.md`
+- Pages clés de cette session : `navigation_nav2_waypoints`, `preconditions_mouvement`,
+  `camera_poignet`, `bras_remise_en_service`.
 - Pages clés : `inventaire_materiel`, `slam_cartographie`, `systeme1_arbitre`, `directeur_s1`,
   `sentinel_s1`, `srs_xb100`, `mcp_hermes`, `manipulation_moveit`,
   `ERR-2026-11-11-010_base_non_proportionnelle`, `ERR-2026-11-11-011_bluetooth_appairage_sans_ble`,
@@ -397,6 +453,7 @@ sudo systemctl restart clawbot-docs && curl -s -o /dev/null -w '%{http_code}\n' 
 ## 11. Derniers commits
 
 ```text
+c6ac7c1 docs(bra): chaine de commande du bras, faits dates, pieges et test qui departage
 0ea832f feat(perception): camera du poignet dans ROS, proprietaire unique du peripherique
 2d36f24 feat(director): preconditions de mouvement, ExecStop, absences derivees
 a0bbea3 feat(nav2): navigation sur carte, catalogue de waypoints ferme, navigate_to
