@@ -37,6 +37,7 @@ from clawbot_director.director import (  # noqa: E402
     CANCELLED_SAFETY, PRECONDITION_FAILED, RUNNING,
 )
 from clawbot_director.director_node import DirectorNode  # noqa: E402
+from soutien_actions import FauxBras  # noqa: E402
 from clawbot_interfaces.srv import DirectorCommand  # noqa: E402
 
 
@@ -55,6 +56,7 @@ def stack():
                               10)
     executor.add_node(probe)
 
+    bras = FauxBras(mode='silencieux')
     thread = threading.Thread(target=executor.spin, daemon=True)
     thread.start()
     try:
@@ -63,6 +65,7 @@ def stack():
         assert _attendre(lambda: len(published) > 0, timeout=2.0), '/director/state muet'
         yield SimpleNamespace(node=node, pub_safety=pub_safety, published=published, probe=probe)
     finally:
+        bras.fermer()
         executor.shutdown()
         node.destroy_node()
         probe.destroy_node()
@@ -107,7 +110,7 @@ def _appeler(pile, charge, timeout=5.0):
 
 def test_stop_cancels_running_task_within_200ms(stack):
     _securite_ok(stack.node, stack.pub_safety)
-    demarree = stack.node.start('navigate_to', {'waypoint': 'cuisine'})
+    demarree = stack.node.director.start('navigate_to', {'waypoint': 'cuisine'})
     assert demarree['status'] == 'ACCEPTED'
     assert stack.node.director.state()['state'] == RUNNING
 
@@ -122,7 +125,7 @@ def test_stop_cancels_running_task_within_200ms(stack):
 
 def test_ok_state_does_not_cancel_the_task(stack):
     _securite_ok(stack.node, stack.pub_safety)
-    stack.node.start('navigate_to', {'waypoint': 'cuisine'})
+    stack.node.director.start('navigate_to', {'waypoint': 'cuisine'})
 
     stack.pub_safety.publish(String(data='OK'))
     time.sleep(0.3)
@@ -146,7 +149,7 @@ def test_director_state_is_published_even_without_any_change(stack):
 
 def test_director_state_reports_the_cancellation(stack):
     _securite_ok(stack.node, stack.pub_safety)
-    demarree = stack.node.start('navigate_to', {'waypoint': 'cuisine'})
+    demarree = stack.node.director.start('navigate_to', {'waypoint': 'cuisine'})
 
     assert _publier_jusqua(stack.pub_safety, 'HOLD',
                            lambda: any(m['state'] == CANCELLED_SAFETY for _, m in stack.published))
@@ -175,7 +178,7 @@ def test_task_is_refused_when_safety_never_spoke(stack):
 
 def test_silent_safety_feed_cancels_the_task_via_watchdog(stack):
     _securite_ok(stack.node, stack.pub_safety)
-    stack.node.start('navigate_to', {'waypoint': 'cuisine'})
+    stack.node.director.start('navigate_to', {'waypoint': 'cuisine'})
 
     # plus aucun message : l'arbitre est muet, la dernière valeur connue est périmée
     assert _attendre(lambda: stack.node.director.state()['state'] == CANCELLED_SAFETY,
@@ -186,7 +189,7 @@ def test_silent_safety_feed_cancels_the_task_via_watchdog(stack):
 
 def test_repeated_stop_does_not_duplicate_the_cancellation(stack):
     _securite_ok(stack.node, stack.pub_safety)
-    stack.node.start('navigate_to', {'waypoint': 'cuisine'})
+    stack.node.director.start('navigate_to', {'waypoint': 'cuisine'})
 
     for _ in range(20):
         stack.pub_safety.publish(String(data='STOP'))
@@ -201,8 +204,8 @@ def test_repeated_stop_does_not_duplicate_the_cancellation(stack):
 def test_service_start_skill_accepts_and_the_task_is_visible(stack):
     _securite_ok(stack.node, stack.pub_safety)
 
-    reponse = _appeler(stack, {'op': 'start_skill', 'skill': 'navigate_to',
-                               'args': {'waypoint': 'cuisine'}})
+    reponse = _appeler(stack, {'op': 'start_skill', 'skill': 'arm_move',
+                               'args': {'positions': [0.0] * 5, 'duration_s': 0.5}})
     assert reponse['status'] == 'ACCEPTED'
     assert reponse['task_id'].startswith('t-')
 
@@ -210,12 +213,13 @@ def test_service_start_skill_accepts_and_the_task_is_visible(stack):
     assert etat['status'] == 'FOUND'
     assert etat['task']['task_id'] == reponse['task_id']
     assert etat['task']['state'] == RUNNING
-    assert etat['task']['skill'] == 'navigate_to'
+    assert etat['task']['skill'] == 'arm_move'
 
 
 def test_service_second_start_receives_busy_with_the_current_task_id(stack):
     _securite_ok(stack.node, stack.pub_safety)
-    premier = _appeler(stack, {'op': 'start_skill', 'skill': 'navigate_to', 'args': {}})
+    premier = _appeler(stack, {'op': 'start_skill', 'skill': 'arm_move',
+                               'args': {'positions': [0.0] * 5, 'duration_s': 0.5}})
 
     second = _appeler(stack, {'op': 'start_skill', 'skill': 'grasp_object', 'args': {}})
     assert second['status'] == 'BUSY'
@@ -224,7 +228,8 @@ def test_service_second_start_receives_busy_with_the_current_task_id(stack):
 
 def test_service_cancel_task_cancels_and_stays_consultable(stack):
     _securite_ok(stack.node, stack.pub_safety)
-    demarree = _appeler(stack, {'op': 'start_skill', 'skill': 'navigate_to', 'args': {}})
+    demarree = _appeler(stack, {'op': 'start_skill', 'skill': 'arm_move',
+                               'args': {'positions': [0.0] * 5, 'duration_s': 0.5}})
 
     annulee = _appeler(stack, {'op': 'cancel_task', 'task_id': demarree['task_id'],
                                'reason': 'operateur'})
@@ -243,7 +248,8 @@ def test_service_get_task_on_unknown_id_says_so(stack):
 def test_service_start_is_gated_by_safety_like_the_python_api(stack):
     _publier_jusqua(stack.pub_safety, 'STOP', lambda: stack.node.etat()['safety'] == 'STOP')
 
-    reponse = _appeler(stack, {'op': 'start_skill', 'skill': 'navigate_to', 'args': {}})
+    reponse = _appeler(stack, {'op': 'start_skill', 'skill': 'arm_move',
+                               'args': {'positions': [0.0] * 5, 'duration_s': 0.5}})
     assert reponse['status'] == PRECONDITION_FAILED
     assert 'STOP' in reponse['reason']
 

@@ -18,17 +18,30 @@ import json
 import time
 
 import rclpy
+from action_msgs.msg import GoalStatus
+from rclpy.action import ActionClient
 from rclpy.node import Node
 from std_msgs.msg import String
 
 from clawbot_interfaces.srv import DirectorCommand
 
-from .director import Director, PRECONDITION_FAILED
+from .director import (ACCEPTED, Director, PRECONDITION_FAILED, RUNNING,
+                       WAITING_CONFIRMATION)
+from .skills import (SkillIndisponible, SkillInconnu, SkillInvalide,
+                     construire_plan)
 
 SAFETY_OK = "OK"
 SAFETY_TIMEOUT_S = 1.0   # l'arbitre publie à 20 Hz : 1 s de silence = 20 messages manqués
 STATE_PERIOD_S = 0.2     # 5 Hz, y compris sans changement
+WATCHDOG_PERIOD_S = 0.1  # vérification des délais d'étape
 MOTIF_PERIME = "safety_stale"
+
+ETATS_GOAL = {
+    GoalStatus.STATUS_SUCCEEDED: "succeeded",
+    GoalStatus.STATUS_ABORTED: "aborted",
+    GoalStatus.STATUS_CANCELED: "canceled",
+    GoalStatus.STATUS_CANCELING: "canceling",
+}
 
 
 class DirectorNode(Node):
@@ -43,6 +56,9 @@ class DirectorNode(Node):
         self.create_subscription(String, "/safety/state", self.on_safety, 10)
         self.create_service(DirectorCommand, "/director/command", self.on_commande)
         self.create_timer(STATE_PERIOD_S, self.tick)
+        self.create_timer(WATCHDOG_PERIOD_S, self.verifier_delai_etape)
+        self._clients_action: dict[tuple[str, str], ActionClient] = {}
+        self._etape = None          # goal en vol : plan, task_id, step, handle, deadline
         self.publish_state()
 
     # ── surface de commande (ce que le pont MCP appelle) ─────────────────
@@ -68,8 +84,8 @@ class DirectorNode(Node):
         if op == "get_task":
             return self._get_task(demande)
         if op == "cancel_task":
-            return self.director.cancel(demande.get("task_id") or None,
-                                        reason=demande.get("reason") or "demande")
+            return self.annuler_tache(demande.get("reason") or "demande",
+                                      demande.get("task_id") or None)
         return {"status": "INVALID", "reason": f"operation inconnue : {op!r}"}
 
     def _start_skill(self, demande):
@@ -122,7 +138,147 @@ class DirectorNode(Node):
         refus = self.refus_securite()
         if refus:
             return {"status": PRECONDITION_FAILED, "reason": refus}
-        return self.director.start_sequence(steps)
+        # BUSY d'abord : la réponse à « puis-je démarrer ? » ne dépend pas du skill demandé,
+        # et S2 doit recevoir le task_id courant, pas un refus sur le contenu de sa demande.
+        etat = self.director.state()
+        if etat["state"] in (RUNNING, WAITING_CONFIRMATION):
+            return {"status": "BUSY", "task_id": etat["task_id"], "skill": etat["skill"]}
+        # Une étape non exécutable est refusée avant que quoi que ce soit bouge : un skill
+        # inconnu ou pas encore implémenté ne doit pas produire une tâche ACCEPTED fantôme.
+        for etape in steps:
+            try:
+                construire_plan(etape)
+            except SkillInconnu as exc:
+                return {"status": "INVALID", "reason": str(exc)}
+            except SkillInvalide as exc:
+                return {"status": "INVALID", "reason": str(exc)}
+            except SkillIndisponible as exc:
+                return {"status": "INDISPONIBLE", "reason": str(exc)}
+        reponse = self.director.start_sequence(steps)
+        if reponse.get("status") == ACCEPTED:
+            self._executer_etape()
+        return reponse
+
+    # ── exécution : un goal à la fois, advance() sur le résultat ─────────
+    def _client_action(self, plan) -> ActionClient:
+        cle = (plan.action, plan.type_action.__name__)
+        client = self._clients_action.get(cle)
+        if client is None:
+            client = ActionClient(self, plan.type_action, plan.action)
+            self._clients_action[cle] = client
+        return client
+
+    def _executer_etape(self):
+        etat = self.director.state()
+        if etat["state"] != RUNNING:
+            return
+        etape = self.director.current_step()
+        if etape is None:
+            return
+        try:
+            plan = construire_plan(etape)
+        except (SkillInconnu, SkillInvalide, SkillIndisponible) as exc:
+            self.director.advance(False, str(exc))
+            self.publish_state()
+            return
+
+        client = self._client_action(plan)
+        if not client.server_is_ready():
+            self.director.advance(False, f"action indisponible : {plan.action}")
+            self.publish_state()
+            return
+
+        suivi = {"plan": plan, "task_id": etat["task_id"], "step": etat["step"],
+                 "handle": None, "deadline": time.monotonic() + plan.timeout_s}
+        self._etape = suivi
+        futur = client.send_goal_async(plan.goal)
+        futur.add_done_callback(lambda f: self._goal_repondu(f, suivi))
+        self.get_logger().info(
+            f"etape {suivi['step']} : {etat['skill']} -> {plan.action} "
+            f"(delai {plan.timeout_s:g} s)")
+
+    def _goal_repondu(self, futur, suivi):
+        handle = futur.result()
+        perime = self._etape is not suivi
+        if handle is not None and handle.accepted and (perime or suivi.get("annule")):
+            # annulation demandée avant que le handle n'existe : on la rattrape ici
+            self._annuler_goal(handle)
+            return
+        if perime:
+            return
+        if handle is None or not handle.accepted:
+            self._terminer_etape(suivi, False, "goal refuse")
+            return
+        suivi["handle"] = handle
+        handle.get_result_async().add_done_callback(lambda f: self._resultat(f, suivi))
+
+    def _resultat(self, futur, suivi):
+        if self._etape is not suivi:
+            return   # étape annulée ou périmée : le résultat tardif ne compte pas
+        statut = futur.result().status
+        succes = statut == GoalStatus.STATUS_SUCCEEDED
+        motif = "" if succes else f"goal {ETATS_GOAL.get(statut, statut)}"
+        self._terminer_etape(suivi, succes, motif)
+
+    def _terminer_etape(self, suivi, succes: bool, motif: str):
+        if self._etape is suivi:
+            self._etape = None
+        etat = self.director.state()
+        if etat["state"] != RUNNING or etat["task_id"] != suivi["task_id"] \
+                or etat["step"] != suivi["step"]:
+            self.publish_state()
+            return
+        reponse = self.director.advance(succes, motif)
+        if not succes:
+            self.get_logger().warning(f"etape {suivi['step']} echouee : {motif}")
+        if reponse.get("status") == RUNNING:
+            self._executer_etape()
+        else:
+            self.publish_state()
+
+    def verifier_delai_etape(self):
+        """Un goal qui ne rend jamais la main ne bloque pas la tâche : on annule et on échoue."""
+        suivi = self._etape
+        if suivi is None or time.monotonic() <= suivi["deadline"]:
+            return
+        self._etape = None
+        if suivi["handle"] is not None:
+            self._annuler_goal(suivi["handle"])
+        etat = self.director.state()
+        if etat["state"] == RUNNING and etat["task_id"] == suivi["task_id"] \
+                and etat["step"] == suivi["step"]:
+            self.director.advance(False, "TIMEOUT")
+            self.get_logger().warning(
+                f"etape {suivi['step']} : TIMEOUT apres {suivi['plan'].timeout_s:g} s, goal annule")
+        self.publish_state()
+
+    def _annuler_etape(self):
+        suivi = self._etape
+        self._etape = None
+        if suivi is None:
+            return
+        suivi["annule"] = True
+        if suivi["handle"] is not None:
+            self._annuler_goal(suivi["handle"])
+
+    @staticmethod
+    def _annuler_goal(handle):
+        futur = handle.cancel_goal_async()
+
+        def _consommer(reponse):
+            try:
+                reponse.result()
+            except Exception:   # le sort du goal est déjà tranché ailleurs
+                pass
+
+        futur.add_done_callback(_consommer)
+
+    def annuler_tache(self, motif: str, task_id: str | None = None) -> dict:
+        """Annule la tâche et, si un goal est en vol, le goal lui-même."""
+        resultat = self.director.cancel(task_id, reason=motif)
+        if resultat.get("status") in ("CANCELLED", "CANCELLED_SAFETY"):
+            self._annuler_etape()
+        return resultat
 
     # ── sécurité ─────────────────────────────────────────────────────────
     def on_safety(self, msg):
@@ -138,7 +294,7 @@ class DirectorNode(Node):
             self.annuler("safety", f"etat {etat}")
 
     def annuler(self, motif: str, contexte: str):
-        resultat = self.director.cancel(reason=motif)
+        resultat = self.annuler_tache(motif)
         if resultat.get("status") not in ("NO_TASK", "UNKNOWN_TASK"):
             self.get_logger().warning(
                 f"{motif} — {contexte} : tache {resultat.get('task_id')} "

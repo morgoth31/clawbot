@@ -279,6 +279,9 @@ def register_tools(mcp: MCPServer, state: BridgeState) -> None:
                                      "args": args or {}, "justification": justification})
         if isinstance(resultat, dict) and resultat["data"].get("status") == "INVALID":
             return error_result("MCP-E-ARG", resultat["data"].get("reason", "requête refusée"))
+        if isinstance(resultat, dict) and resultat["data"].get("status") == "INDISPONIBLE":
+            return error_result("MCP-E-PREREQ", resultat["data"].get("reason", "skill indisponible"),
+                                skill=skill)
         return resultat
 
     @mcp.tool(name="cancel_task", description="Annule une tâche du directeur au prochain point sûr.", annotations=IDEMPOTENT)

@@ -36,14 +36,14 @@ Ne pas relancer les diagnostics déjà faits : ils sont tous dans ce document av
 | Manipulation | ok | MoveIt planifie et exécute, collision mât modélisée |
 | Arbitre réflexe | **actif** | 20 Hz, obstacle 12 cm → zéro en **47 ms**, chien de garde 0,5 s |
 | Arrêt du bras par réflexe | **prouvé** | `/safety/hold` → « interrompu par safety hold après 6 échantillons » |
-| Directeur | **branché jusqu'à la déclaration** | nœud ROS, service `/director/command`, annulation sécurité 1,9 ms, 27 tests |
+| Directeur | **exécute** | nœud ROS, `/director/command`, un goal par étape, `advance()` sur résultat, annulation sécurité 1,9 ms |
 | SLAM | **réparé** | carte 8,1 × 6,5 m, `map→odom` recale 24 cm sur 2,6 m |
 | Pont MCP → Hermes | ok | 25 outils, stdio, `hermes mcp test clawbot` liste les 25 |
 | Surface directeur (S2) | **faite** | `start_skill` / `get_task` / `cancel_task`, tâches terminées consultables, ~2 s par appel |
 | Déclenchement S1→S2 | voie CLI | 46,4 s mesuré, webhook prêt (redémarrage passerelle requis) |
 
-**Suite de tests : 205 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
-l'échelle, dérive, round-robin, directeur, surface MCP du directeur). Commande exacte :
+**Suite de tests : 212 verts** (pont MCP, seuils, arbitre, contrôleur de bras, EKF, mise à
+l'échelle, dérive, round-robin, directeur, surface MCP, exécution des skills). Commande exacte :
 
 ```bash
 cd /home/jetson/clawbot
@@ -124,7 +124,7 @@ S2  Hermes ── MCP stdio (22 outils) ──┐        ▲ webhook (réveil, p
 | Point | Gravité | Détail |
 |---|---|---|
 | `DROP_TORQUE` n'actionne rien | **sécurité** | l'état est publié, le contrôleur s'arrête, mais aucun étage ne coupe le couple des servos (`set_uart_servo_torque`). Décision prise, non appliquée. |
-| Directeur à moitié branché | bloquant lot 3 | nœud ROS `clawbot-director` et annulation sur `safety` faits (2,0 ms) ; pas d'outils MCP, `advance()` encore appelé à la main |
+| Directeur sans skill physique | bloquant lot 5/6 | le directeur exécute des goals et annule ; seuls `arm_move`/`grip_set` existent, les skills de la spec refusent en `INDISPONIBLE` avec leur lot |
 | Test d'inclinaison réel | moyen | les seuils sont validés sur IMU **simulée** |
 | Temps mort base ~0,85 s | moyen | friction statique du MCU, insuffisant pour un asservissement visuel |
 | Endpoints de mouvement `:8001` | faible | publient encore sur `/cmd_vel` (2e écrivain) |
@@ -160,6 +160,14 @@ S2  Hermes ── MCP stdio (22 outils) ──┐        ▲ webhook (réveil, p
 12. **`ros2 service call` n'est pas un transport JSON** : le CLI réinterprète l'argument en YAML,
    mange les guillemets et casse sur une apostrophe. Pour parler au directeur, passer par
    `bridge_mcp.director_client` (JSON sur stdin/stdout).
+13. **Un `ActionServer` rclpy refuse les annulations par défaut** (`default_cancel_callback` →
+   REJECT). Sans `cancel_callback` explicite, un faux serveur de test ne voit jamais d'annulation
+   et le test conclut à tort que le directeur n'annule pas.
+14. **Ne jamais nommer un attribut `_clients` sur un `Node`** : c'est la liste interne des clients
+   rclpy ; l'écraser casse l'executor (`'tuple' object has no attribute '_executor_event'`).
+15. **Ordre d'arrêt d'un serveur d'action en test** : `executor.shutdown()`, puis
+   `server.destroy()`, puis `node.destroy_node()`. Détruire le serveur pendant le spin fait tomber
+   le processus (abort rclcpp, pas une exception Python).
 
 ---
 
@@ -209,21 +217,36 @@ Preuve bout en bout sur le robot (domaine 28) : `get_task` → IDLE, `start_skil
 ACCEPTED, second `start_skill` → BUSY avec le même `task_id`, `cancel_task` → CANCELLED,
 `get_task` → état terminal avec `reason`. Aucun mouvement : la brique 3 n'est pas faite.
 
-### Brique 3 — accrochage aux actions réelles
-`advance()` doit être appelé par la fin d'un goal : `FollowJointTrajectory` pour le bras,
-`NavigateToPose` pour la base. C'est ce qui permet « va là, prends ça, reviens ».
+### Brique 3 — accrochage aux actions réelles — **faite**
+`clawbot_director/skills.py` traduit une étape déclarée en goal : le directeur envoie un goal par
+étape, attend le résultat, et `advance()` n'est plus appelé à la main. Une étape = un goal, un
+résultat = une transition. `RUNNING` veut maintenant dire « un goal est en vol », et un état
+terminal veut dire qu'un goal s'est terminé.
+
+- primitives exécutables : `arm_move` (5 articulations, bornes ±rad) et `grip_set` (pince),
+  via `FollowJointTrajectory` sur `/arm_controller` et `/grip_controller` ;
+- skills de la spec : déclarés mais **refusés avant exécution** en `INDISPONIBLE` avec le lot
+  manquant (`navigate_to` → lot 5, `grasp_object`/`follow_human`/`search_object` → lot 6,
+  `express_state` → lot 7, `set_watch_mode` → lot 4). Une tâche `ACCEPTED` fantôme n'existe plus ;
+- délai par étape (`timeout_s`, défaut 30 s) : goal annulé, tâche `FAILED` motif `TIMEOUT` ;
+- annulation réelle : sortie de `OK`, `cancel_task` ou redémarrage ⇒ `cancel_goal_async` sur le
+  goal en vol, y compris quand l'annulation arrive avant que le handle n'existe ;
+- `BUSY` est répondu avant la validation du skill : la question « puis-je démarrer ? » ne dépend
+  pas de ce que S2 demande.
+
+Preuves domaine 99 avec un faux contrôleur de bras : séquence de 3 étapes → 3 goals, `DONE` ;
+goal qui échoue → `FAILED` sans étape suivante ; goal muet → `TIMEOUT` + goal annulé ; `STOP` →
+`CANCELLED_SAFETY` + goal annulé ; `cancel_task` → idem. **Aucun mouvement réel** : `arm_move`
+n'a pas été lancé sur le robot (opérateur requis).
 
 ### Dettes issues de la revue de la brique 1 (à ne pas perdre)
-- **`goal_cancel` réel** : l'annulation du directeur est aujourd'hui un changement d'état, pas un
-  arrêt de mouvement. L'arrêt physique est `/safety/hold`, honoré par le contrôleur de bras ;
-  annuler un goal de skill appartient à la brique 3. Ne pas présenter l'un comme l'autre.
-- **`advance()` et `TIMEOUT`** : tant que la fin de goal ne fait pas avancer la séquence, `RUNNING`
-  est un mensonge permanent — brique 3.
+- **`goal_cancel` réel** — fait : le goal en vol est annulé sur sécurité, `cancel_task` et délai.
+- **`advance()` et `TIMEOUT`** — faits : la séquence avance sur le résultat du goal.
 - **Anneau des tâches terminales** — fait : `Director.get(task_id)` garde les 20 dernières tâches
   avec motif, horodatage et durée ; `get_task(task_id)` y répond après coup.
-- **Redémarrage** : le registre est en RAM ; `Requires=` fait tomber le directeur avec l'arbitre et
-  repart à `IDLE`. Acceptable tant qu'aucun skill n'est engagé ; `ExecStop` qui annule et publie
-  devient nécessaire en brique 3.
+- **Redémarrage** : le registre est en RAM ; un redémarrage du directeur n'annule aucun goal en
+  vol. Maintenant qu'un goal peut tourner, un `ExecStop` qui annule et publie devient nécessaire —
+  à faire quand le premier skill physique sera branché (lot 5/6), avec l'opérateur.
 - **Anti-rebond** : un `HOLD` d'un seul échantillon tue définitivement une tâche. C'est la lettre
   du §8 (« dès que l'état sort de OK »), donc assumé ; à revoir si un hoquet de `/scan` suffit à
   interrompre une saisie en cours.
