@@ -1,7 +1,8 @@
 # État du projet Clawbot — reprise de session
 
 **Date** : 2026-11-11, fin de session longue (compactions multiples)
-**Branche** : `docs/site-okf-merge` ; dernier commit de code `95bd39a`, ce document `d5c4ec7`
+**Branche** : `docs/site-okf-merge` ; dernier commit de code `95bd39a`, ce document est le suivant
+dans l'historique
 **Robot** : Clawbot X3 Plus, Jetson Orin NX, ROS 2 Humble, domaine 28
 
 > Ce document est fait pour être lu **au début d'une nouvelle session**, à la place d'un
