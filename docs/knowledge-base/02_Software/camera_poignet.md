@@ -97,9 +97,19 @@ age du message  : 0.008 s
 
 **Le module délivre 6 images par seconde, quelle que soit la résolution.** Ce n'est ni le lien USB
 (480 Mb/s, et la même cadence Astra arrêtée), ni la conversion d'image (mesurée avant et après
-passage à l'encodage natif : 7,7 Hz dans les deux cas), ni la charge CPU. Le contrôle d'exposition
-n'est pas exposé par ce module (`auto_exposure` absent de `--list-ctrls`), donc la piste « faible
-lumière + auto-exposition longue » ne peut pas être corrigée logiciellement.
+passage à l'encodage natif : 7,7 Hz dans les deux cas), ni la charge CPU.
+
+**Une image entièrement blanche, ce n'est pas la netteté : ce sont les réglages.** Le 2026-11-11 à
+19:19, dans la pose de repos validée, `brightness=60` / `gain=70` (les valeurs que pose l'unité)
+donnaient **307 200 pixels à 255 sur 307 200** — moyenne 255,0, écart-type 0,0. La même scène à
+`gain=0` / `brightness=0` donne min 8, max 224, moyenne 131,9, **écart-type 61,1**, et l'on y
+reconnaît la pièce. Le module n'expose pas de temps d'exposition : le gain est le seul levier, et
+`gain:=70` le pousse au-delà du nécessaire en scène proche et éclairée. Les valeurs de l'unité sont à
+revoir ; `ros2 param set` n'est pas une correction, il est volatile.
+
+**Le contrôle d'exposition n'est pas exposé par ce module** (`auto_exposure` absent de
+`--list-ctrls`), donc la piste « faible lumière + auto-exposition longue » ne peut pas être corrigée
+logiciellement.
 
 **Conséquence sur le critère du lot.** La conception demandait « `v4l2_camera_node` en 640×480 à
 15 Hz ». La mesure dit 6 im/s : le critère est corrigé en « image 640×480 publiée à **au moins
@@ -129,10 +139,11 @@ sudo fuser -v /dev/video0                                  # un seul processus d
 |---|---|---|
 | Cadence 6 im/s au lieu de 15 | moyen | limite matérielle du module ; aucun réglage d'exposition exposé |
 | Image sans détail au repos | moyen | cadrage et netteté à vérifier bras en mouvement |
-| Orientation du cadre optique supposée | moyen | `mono_link` non mesuré ; confirmer en visant une cible connue |
+| Orientation du cadre optique | **contredite par l'image** | dans la pose `[90, 180, 0, 0, 90]`, `scripts/cinematique_bras.py` annonce un axe optique à −90° (vers le bas) alors que l'image montre l'horizon et la même scène que l'Astra : le cadre optique de l'URDF est mal orienté. Non corrigé ; le fait mesuré fait foi |
 | Intrinsèques nominales, non mesurées | moyen | `config/wrist_camera_info.yaml` : `fx=fy=457 px` (demi-champ 35°), à étalonner sur mire avant toute projection 3D |
 | Pas d'échantillonnage à la demande | faible | le service YOLO lit la dernière image reçue ; aucune synchronisation avec l'instant de la décision |
-| Image sans aucune structure | **ouvert** | constaté le 2026-11-11 17:30 : netteté 3 à 29 (Astra : 133) sur la même scène, insensible à 47° de bascule des axes 2 et 4 et à 20° de l'axe 5. Le bras **n'a pas bougé** : les servos n'exécutent pas les consignes (voir l'encadré ci-dessous) |
+| Image sans aucune structure | **corrigé le 2026-11-11 19:19** | la cause principale était le **gain** : `gain=70`, `brightness=60` → 100 % des pixels à 255. À `gain=0` : min 8, max 224, écart-type 61, image exploitable. Les valeurs de l'unité restent à corriger |
+| Cadrage à revérifier en lumière faible | faible | `gain=0` corrige la saturation en scène éclairée ; la valeur correcte en lumière faible n'est pas mesurée |
 | `CAMERA_FRONT_SOURCE` reste `opencv` | faible | le canal « front » du service YOLO ouvre toujours `/dev/video0` : à basculer aussi, ou à retirer |
 
 ## 7. Voir aussi

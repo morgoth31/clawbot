@@ -116,7 +116,7 @@ def monde():
     arret = threading.Event()
 
     angles_bras = Int32MultiArray()
-    angles_bras.data = [76, 97, 90, 90, 90, 149]
+    angles_bras.data = [90, 180, 0, 0, 90, 149]
 
     def _alimenter():
         while not arret.is_set():

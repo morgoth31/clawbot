@@ -63,7 +63,7 @@ def stack():
     thread = threading.Thread(target=executor.spin, daemon=True)
     thread.start()
     angles = Int32MultiArray()
-    angles.data = [76, 97, 90, 90, 90, 149]
+    angles.data = [90, 180, 0, 0, 90, 149]
     arret = threading.Event()
 
     def _alimenter_bras():

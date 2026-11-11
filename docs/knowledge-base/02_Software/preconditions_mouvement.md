@@ -38,10 +38,10 @@ arm:
   source: /arm/servo_angles
   max_age_s: 1.0
   joints: [1, 2, 3, 4, 5]
-  reference_deg: [76, 97, 90, 90, 90]
-  tolerance_deg: [10, 10, 10, 10, 10]
-  mesure_le: "2026-11-11T16:20:00+01:00"
-  valide_par_operateur: false
+  reference_deg: [90, 180, 0, 0, 90]
+  tolerance_deg: [5, 5, 5, 5, 5]
+  mesure_le: "2026-11-11T19:20:40+01:00"
+  valide_par_operateur: true
 skills_exigeant_bras_replie: [navigate_to, follow_human, search_object]
 ```
 
@@ -49,22 +49,32 @@ L'enveloppe est en **degrés de servo**, tels que publiés par `/arm/servo_angle
 articulaires. La pose de référence est celle lue sur le robot à l'arrêt :
 
 ```text
-2026-11-11T16:20:00+01:00  /arm/servo_angles -> [76, 97, 90, 90, 90, 149]
+2026-11-11T19:20:40+01:00  /arm/servo_angles -> [90, 180, 0, 0, 90, 149]
 ```
 
-**Réserve majeure constatée le 2026-11-11 17:35 : `/arm/servo_angles` n'est pas une mesure de
-position.** Le pilote appelle bien `get_uart_servo_angle(id)` sur le bus, mais le MCU renvoie son
-**registre de consigne** : après avoir commandé 69° puis 109°, pilote arrêté, la lecture directe par
-`Rosmaster_Lib.get_uart_servo_angle_array()` rendait exactement ces valeurs alors que le bras
-n'avait pas bougé (constat de l'opérateur, caméra du poignet toujours au plafond). Cette
-précondition vérifie donc une valeur *déclarée*, pas une position : elle détecte un bras laissé
-dans une autre pose **par le directeur**, elle ne protège pas d'un servo non alimenté ou bloqué.
-Tant que la chaîne d'exécution n'est pas prouvée, `arm_folded: true` ne vaut pas preuve de position.
+**Cette pose est celle validée par l'opérateur le 2026-11-11 à 19:20 comme position de repos et de
+déplacement.** Le bras est debout au-dessus de la colonne — `arm_link3` et `arm_link4` à x ≈ 0,015 m,
+pince à x = 0,190 m / z = 0,304 m, calculés par `scripts/cinematique_bras.py` — et la caméra du
+poignet regarde vers l'avant, dans le même sens que l'Astra : vérifié à 19:19 en comparant les deux
+images, qui montrent la même scène (interrupteur du mur gauche, couloir au centre, portes sombres à
+droite). C'est la seule pose connue où le bras est à la fois compact et utile à la perception pendant
+un déplacement.
 
-**`valide_par_operateur: false` est une information, pas un oubli.** La pose de repos est une pose
-*observée* ; l'encombrement du bras dans cette pose n'a pas été mesuré, et la seule géométrie connue
-du bras est le seuil de collision du mât (servo 2 ≈ 114°). L'enveloppe doit être validée par
-l'opérateur, bras libre, avant le premier essai physique de navigation.
+La pose précédente — `[76, 97, 90, 90, 90]`, mesurée à 16:20 — avait un bras vertical haut et la
+caméra du poignet tournée vers le plafond : elle ne servait à rien en déplacement et n'a jamais été
+validée. Elle est remplacée, pas complétée.
+
+**La lecture redevient une mesure depuis le 2026-11-11 19:12.** Le 17:35, `/arm/servo_angles`
+renvoyait exactement les consignes envoyées, bras immobile : c'était le registre du MCU. Depuis, une
+relecture échantillonnée pendant un pas montre des valeurs **jamais commandées** et intermédiaires —
+35° puis 39° pour une consigne 20° → 40°, et 115°, 135°, 179° au cours de la montée du servo 2. La
+valeur retarde sur la consigne, donc elle mesure un déplacement. La précondition vérifie une
+position, pas une valeur déclarée ; la réserve inverse (un servo non alimenté) reste possible.
+
+**`valide_par_operateur: true` porte la parole de l'opérateur, rien de plus.** L'encombrement du bras
+dans cette pose n'a pas été mesuré au mètre ; c'est le seuil de collision du mât (servo 2 ≈ 114°,
+constaté dans une autre configuration) qui reste la seule géométrie de référence. La validation
+autorise le premier essai physique de navigation ; elle ne remplace pas la mesure.
 
 ## 4. Comportement en cas de doute
 
@@ -73,11 +83,11 @@ l'opérateur, bras libre, avant le premier essai physique de navigation.
 | angles jamais reçus | refus | « bras inconnu : aucun message recu sur /arm/servo_angles » |
 | angles plus vieux que 1,0 s | refus | « angles de bras perimes : 1,4 s sans message » |
 | moins de 5 valeurs | refus | « angles de bras incomplets : 2 valeurs » |
-| un servo hors bande | refus | « bras non replie : servo 2 a 120 degres, hors de l'enveloppe [87, 107] » |
+| un servo hors bande | refus | « bras non replie : servo 2 a 120 degres, hors de l'enveloppe [175, 185] » |
 | tout est dans la bande | accepté | — |
 
 Le refus nomme le servo et sa bande : « bras non replié » ne se corrige pas, « servo 2 à 120° hors
-bande [87, 107] » si. Le silence vaut refus, comme pour `/safety/state` : un bras inconnu n'est pas
+bande [175, 185] » si. Le silence vaut refus, comme pour `/safety/state` : un bras inconnu n'est pas
 un bras replié.
 
 ## 5. Mesures
@@ -92,16 +102,20 @@ Domaine 99, faux serveur `NavigateToPose` et faux contrôleur de bras :
 | `arm_move` bras hors enveloppe | `ACCEPTED` — le bras reste commandable |
 | configuration malformée (8 cas) | `PreconditionsInvalides` au chargement |
 
-Sur le robot, domaine 28, au repos :
+Sur le robot, domaine 28, au repos dans la pose validée :
 
 ```text
 $ python3 scripts/etat_directeur.py
 state          = IDLE
 safety         = OK
-arm_angles     = [76, 97, 90, 90, 90, 149]
-arm_age_s      = 0.063
+arm_angles     = [90, 180, 0, 0, 90, 149]
+arm_age_s      = 0.036
 arm_folded     = True
 ```
+
+Relevé à 19:24, après redémarrage de `clawbot-director` pour recharger la nouvelle enveloppe : la
+pose que l'opérateur vient de valider est acceptée par la précondition, sans quoi elle n'aurait
+servi à rien — c'est le sens de ce test.
 
 `/director/state` publie désormais `arm_angles`, `arm_age_s` et `arm_folded` : un relevé daté, pas
 une conclusion — un consommateur peut juger de la fraîcheur sans faire confiance au booléen.
@@ -110,7 +124,8 @@ une conclusion — un consommateur peut juger de la fraîcheur sans faire confia
 
 | Limite | Conséquence |
 |---|---|
-| enveloppe non validée par l'opérateur | elle interdit une pose *différente de la pose de repos*, pas une pose dangereuse en soi |
+| l'encombrement de la pose validée n'est pas mesuré | la validation autorise l'essai, elle ne remplace pas la mesure du volume balayé ni des dégagements |
+| bande de ±5° | un bras qui dérive de plus de 5° sur un axe est refusé : c'est voulu, mais cela se produira en usage réel et le message doit rester lisible |
 | pas de mesure de l'occupation de la pince | « pince vide » reste non vérifiable : aucun capteur |
 | vérification à l'entrée et entre deux étapes | un bras déplacé **pendant** une navigation n'est pas détecté ; cela relèverait de l'arbitre, pas du directeur |
 | enveloppe globale, pas par trajectoire | un waypoint passant près du mât ne réduit pas la bande admissible |
