@@ -33,8 +33,8 @@ def nom_code(valeur: int) -> str:
 
 def main() -> int:
     args = sys.argv[1:]
-    executer = "--executer" in args
-    args = [a for a in args if a != "--executer"]
+    executer = "--executer" in args or "--execute" in args
+    args = [a for a in args if a not in ("--executer", "--execute")]
 
     rclpy.init()
     n = Node("moveit_plan")

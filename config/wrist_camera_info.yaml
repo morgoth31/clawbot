@@ -1,18 +1,21 @@
-# Intrinsèques nominales de la caméra du poignet — NON CALIBRÉES.
+# Intrinsèques de la caméra du poignet — NON CALIBRÉES (ordre de grandeur, pas une calibration).
 #
 # Fichier lu par `v4l2_camera_node` (paramètre `camera_info_url`) et publié sur
 # /wrist_camera/camera_info. Il existe pour qu'un consommateur reçoive une structure valide et
 # sache d'où viennent les chiffres, pas pour faire croire à une calibration.
 #
-# Origine des valeurs : aucune mire, aucune mesure. `fx = fy = 457 px` correspond à un demi-angle
-# horizontal de 35° sur 640 px ((640/2)/tan(35°) = 457), ordre de grandeur d'un objectif UVC de
-# 70° de champ. `cx`/`cy` sont le centre géométrique de l'image.
+# Origine des valeurs (2026-11-11 20:25) : `fx = fy = 2300 px` vient d'une mesure d'échelle sur un
+# marqueur d'environ 14 cm qui occupait environ 390 px dans l'image du poignet. Le calcul
+# (390 x 0,85 / 0,14) donne 2 370 ; 2300 est retenu.
 #
-# Conséquence, à ne pas oublier : une projection pixel -> mètre issue de ces valeurs porte une
-# erreur d'échelle de plusieurs dizaines de pour cent. `grasp_object` (boucle fermée sur la caméra
-# du poignet) exige une calibration sur mire avant d'être utile ; la spec l'assume en v1 (on mesure
-# la répétabilité, pas la justesse absolue), mais aucun chiffre de ce fichier ne doit être présenté
-# comme mesuré.
+# ATTENTION — la dispersion de cette estimation est grande : selon la distance retenue pour le
+# marqueur (0,25 à 0,85 m selon la méthode de triangulation employée), le même calcul donne 700 à
+# 2 400 px. La valeur précédente, 457 px (demi-champ 35°, objectif UVC de 70°), était fausse : le
+# champ réel de ce module est bien plus étroit, de l'ordre de 15°.
+#
+# Ce qui reste à faire : une calibration sur mire. En attendant, aucune projection pixel -> mètre
+# issue de ces valeurs ne doit être présentée comme une mesure, et une erreur d'échelle de plusieurs
+# dizaines de pour cent reste possible.
 image_width: 640
 image_height: 480
 # Nom tel que le nœud caméra le rapporte (`usb_2.0_camera`) : s'il diffère, v4l2_camera
@@ -21,8 +24,8 @@ camera_name: usb_2.0_camera
 camera_matrix:
   rows: 3
   cols: 3
-  data: [457.0, 0.0, 319.5,
-         0.0, 457.0, 239.5,
+  data: [2300.0, 0.0, 319.5,
+         0.0, 2300.0, 239.5,
          0.0, 0.0, 1.0]
 distortion_model: plumb_bob
 distortion_coefficients:
@@ -38,6 +41,6 @@ rectification_matrix:
 projection_matrix:
   rows: 3
   cols: 4
-  data: [457.0, 0.0, 319.5, 0.0,
-         0.0, 457.0, 239.5, 0.0,
+  data: [2300.0, 0.0, 319.5, 0.0,
+         0.0, 2300.0, 239.5, 0.0,
          0.0, 0.0, 1.0, 0.0]

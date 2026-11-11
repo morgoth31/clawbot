@@ -566,8 +566,15 @@
          une cible connue et verifier que l'axe z passe bien par elle. Aucune calibration
          d'intrinseques n'a ete faite (voir config/wrist_camera_info.yaml). -->
     <link name="wrist_camera_optical_frame"/>
+    <!-- Correction du 2026-11-11 20:20 : le cadre optique etait decrit avec 90 deg de tangage de
+         trop. Mesure : a la pose de repos [90, 180, 0, 0, 90], l'ancien rpy (-1.5708 0 -1.5708)
+         donnait un axe optique a -90 deg (vers le bas) alors que l'image montre l'horizon et la
+         meme scene que l'Astra ; a servo 2 = 140 il annoncait -130 deg alors que l'image montre le
+         sol vu de dessus. Le decalage est constant, donc il se corrige ici, sur le joint fixe :
+         post-multiplier par Rx(+90 deg) dans le cadre optique ramene rpy a (0, 0, -1.5708).
+         Verification : scripts/cinematique_bras.py avec q = 90,180,0,0,90 doit annoncer tangage 0. -->
     <joint name="wrist_camera_optical_joint" type="fixed">
-        <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708" />
+        <origin xyz="0 0 0" rpy="0 0 -1.5708" />
         <parent link="mono_link" />
         <child link="wrist_camera_optical_frame" />
     </joint>
