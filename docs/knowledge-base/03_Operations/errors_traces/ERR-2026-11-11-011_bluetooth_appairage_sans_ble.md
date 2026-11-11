@@ -3,7 +3,7 @@ title: "ERR-011 — appairage Bluetooth impossible : noyau sans BLE et profils a
 date: "2026-11-11T15:20:00+01:00"
 author: "Hermes Agent"
 tags: [erreur, bluetooth, audio, a2dp, noyau, rtl8822cu, jetson]
-status: ouvert
+status: validé
 ---
 
 # ERR-2026-11-11-011 — appairage Bluetooth de la SRS-XB100 impossible
@@ -16,7 +16,7 @@ status: ouvert
 | Topics concernés | aucun ; chaîne audio PulseAudio / BlueZ |
 | Composant | adaptateur Realtek `0bda:c822` (RTL8822CU), `btusb` + `btrtl`, noyau 5.15.148-tegra, BlueZ 5.64 |
 | Gravité d'exploitation | moyenne — la sortie vocale A2DP du §9 de la conception est bloquée |
-| Statut | **ouvert** — contournement non appliqué |
+| Statut | **validé** — contournement en place, cause racine ouverte (noyau) |
 
 ## 1. Nature de l'échec
 
@@ -119,6 +119,35 @@ Deux voies pour y arriver, aucune essayée à ce jour :
 - **recompilation du noyau L4T avec `CONFIG_BT_LE=y`** : lourde, risque de démarrage, à planifier
   avec l'opérateur et une sauvegarde de la partition.
 
-## 5. Voir aussi
+## 5. Contournement validé (2026-11-11 16:40)
+
+L'opérateur a fourni la réponse HCI manquante : pendant `btmgmt pair -c 3 -t 0`, une boucle injecte
+
+```text
+IO_Capability_Request_Reply      (OGF 0x01, OCF 0x002b) : IO cap 0x03, OOB 0x00, AuthReq 0x04
+User_Confirmation_Request_Reply  (OGF 0x01, OCF 0x002c) : valide le « Just Works »
+```
+
+Résultat mesuré :
+
+```text
+hci0 new_link_key 40:72:18:F0:2C:C9 type 0x04 pin_len 0 store_hint 1
+Paired with 40:72:18:F0:2C:C9 (BR/EDR)
+Connection successful
+Paired: yes · Trusted: yes · Connected: yes
+pactl : bluez_card.40_72_18_F0_2C_C9, profil a2dp_sink, sink bluez_sink.…a2dp_sink
+paplay Front_Center.wav : sink SUSPENDED -> IDLE, son entendu
+```
+
+La clé est stockée par BlueZ (`store_hint 1`) : l'appairage survit au redémarrage. Le contournement
+est conservé dans `scripts/appairer_enceinte_bluetooth.sh` et la page [[srs_xb100]].
+
+Cause racine inchangée : le noyau ne répond pas à `IO_Capability_Request`. La commande constructeur
+de désactivation de Secure Connections (`hcitool -i hci0 cmd 0x03 0x007a 0x00`) est refusée
+(`status 0x0c`) et n'explique pas le succès.
+
+## 6. Voir aussi
+
+[[srs_xb100]] · [[2026-11-11_compte_rendu_bluetooth_srs_xb100]] · [[inventaire_materiel]] · [[index]]
 
 [[inventaire_materiel]] · [[jetson_orin_nx]] · [[systemd_robot_services]] · [[index]]

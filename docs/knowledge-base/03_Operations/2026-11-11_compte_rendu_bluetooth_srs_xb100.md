@@ -312,6 +312,19 @@ ni l'appairage MGMT en `NoInputNoOutput` ne changent le symptôme. Le gestionnai
 échoue pour cette connexion, ou le noyau L4T embarque une variante de ce gestionnaire. Les deux se
 tranchent par instrumentation (`bpftrace` sur `hci_io_capa_request_evt`), pas par configuration.
 
+## 11. Résolution (2026-11-11 16:40) — contournement HCI
+
+L'opérateur a contourné le silence du noyau en injectant lui-même la réponse HCI pendant
+`btmgmt pair` : `IO_Capability_Request_Reply` (0x002b, IO cap 0x03, OOB 0x00, AuthReq 0x04) puis
+`User_Confirmation_Request_Reply` (0x002c), en boucle courte. Résultat : `new_link_key … store_hint 1`,
+`Paired: yes`, `Connection successful`, carte `bluez_card.40_72_18_F0_2C_C9` en `a2dp_sink`, son
+entendu (`paplay`).
+
+Procédure conservée : `scripts/appairer_enceinte_bluetooth.sh` (script validé manuellement, à
+relancer seulement après désappairage ou reset de l'enceinte). Détail : [[srs_xb100]].
+La cause racine — noyau qui n'émet jamais cette réponse — reste ouverte ; le contournement la rend
+sans effet opérationnel.
+
 ## Voir aussi
 
 [[ERR-2026-11-11-011_bluetooth_appairage_sans_ble]] · [[inventaire_materiel]] ·

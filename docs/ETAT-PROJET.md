@@ -38,6 +38,7 @@ Ne pas relancer les diagnostics déjà faits : ils sont tous dans ce document av
 | Arrêt du bras par réflexe | **prouvé** | `/safety/hold` → « interrompu par safety hold après 6 échantillons » |
 | Directeur | **exécute** | nœud ROS, `/director/command`, un goal par étape, `advance()` sur résultat, annulation sécurité 1,9 ms |
 | SLAM | **réparé** | carte 8,1 × 6,5 m, `map→odom` recale 24 cm sur 2,6 m |
+| Audio A2DP | **appairé** | SRS-XB100 `40:72:18:F0:2C:C9`, clé stockée, sink `a2dp_sink`, son testé ; contournement HCI documenté |
 | Pont MCP → Hermes | ok | 25 outils, stdio, `hermes mcp test clawbot` liste les 25 |
 | Surface directeur (S2) | **faite** | `start_skill` / `get_task` / `cancel_task`, tâches terminées consultables, ~2 s par appel |
 | Déclenchement S1→S2 | voie CLI | 46,4 s mesuré, webhook prêt (redémarrage passerelle requis) |
