@@ -149,7 +149,13 @@ S2  Hermes ── MCP stdio (22 outils) ──┐        ▲ webhook (réveil, p
    cliente.
 7. **`colcon build --symlink-install` casse** certains paquets ament_python de ce dépôt.
 8. **pytest + plugin launch_testing** exige `-p no:launch_testing -p no:launch_ros`.
-9. **Jamais `ROS_DOMAIN_ID=28` pendant les tests** (ENV-01) : 99 uniquement.
+9. **Jamais `ROS_DOMAIN_ID=28` pendant les tests** (ENV-01) : 99 uniquement. Et `setdefault`
+   ne suffit pas : si 28 est déjà exporté, il ne fait rien. La garde doit échouer explicitement.
+10. **Le silence d'un flux de sécurité n'est pas un feu vert** : `/safety/state` muet plus de 1 s
+   vaut défaut. Croire éternellement une dernière valeur reçue, c'est transformer un arbitre
+   bloqué en sécurité nominale.
+11. **Mesurer avec une boucle qui tourne à vide affame l'executor** : la latence DDS mesurée passe
+   de 2 ms à 13 ms si la boucle d'attente ne rend pas le GIL. Laisser dormir 0,5 ms par tour.
 
 ---
 
@@ -159,10 +165,25 @@ S2  Hermes ── MCP stdio (22 outils) ──┐        ▲ webhook (réveil, p
 `clawbot_director/director_node.py` : instancie `Director`, s'abonne à `/safety/state` et annule
 la tâche dès que l'état sort de `OK`, publie `/director/state`. Test domaine 99 : état
 `/safety/state` à `STOP` → tâche `CANCELLED_SAFETY` en < 200 ms.
-Mesuré : **2,0 ms médian, 2,5 ms max** sur 5 essais (domaine 99, DDS local). Service
-`clawbot-director` actif en domaine 28, `/director/state` publié à 5 Hz même sans changement
-(un abonné tardif doit voir l'état). Reste pour la brique 2 : rien ne peut encore démarrer de
-tâche dans ce nœud — c'est la surface MCP qui l'ouvrira.
+Mesuré : **médiane 1,90 ms, p95 2,2 ms, max 2,9 ms** sur 20 essais (domaine 99, DDS local,
+`perf_counter`). Ce chiffre mesure le **passage de la tâche à `CANCELLED_SAFETY`**, pas l'arrêt
+physique : celui-ci est l'affaire de `/safety/hold` (prouvé côté bras) et de `goal_cancel` sur les
+serveurs d'action (brique 3). Un premier chiffre de 12-14 ms venait d'une boucle de mesure qui
+affamait le GIL de l'executor : mesurer, c'est aussi mesurer l'instrument.
+
+Trois garde-fous ajoutés après revue, chacun avec son test :
+
+- **porte à l'entrée** : aucune tâche ne démarre sans un `OK` **frais** ; le silence de l'arbitre
+  n'est pas un feu vert (refus `PRECONDITION_FAILED` explicite) ;
+- **chien de garde** : plus de 1,0 s sans `/safety/state` (20 messages manqués à 20 Hz) → tâche
+  annulée avec le motif `safety_stale`, code `CANCELLED_SAFETY` ;
+- **`/director/state` est un relevé daté** : jeu de clés fixe, `reason`, `started_at`,
+  `published_at`, `safety_age_s`, `safety_stale`. Un seul STOP n'écrit qu'une annulation, même
+  s'il est publié 20 fois par seconde.
+
+Service `clawbot-director` actif en domaine 28. Reste pour la brique 2 : aucune entrée n'existe
+encore dans le graphe (ni service, ni topic) — la surface MCP est ce qui l'ouvrira, et c'est elle
+qui doit exposer `start` / `cancel` / `get_task` en réutilisant `DirectorNode.start_sequence()`.
 
 ### Brique 2 — surface MCP
 Trois outils dans `bridge_mcp` : `start_skill(skill, args)`, `get_task()`, `cancel_task(task_id)`.
@@ -172,6 +193,21 @@ Ajouter les tests contractuels (le pont en a déjà 22 outils, l'enveloppe est r
 ### Brique 3 — accrochage aux actions réelles
 `advance()` doit être appelé par la fin d'un goal : `FollowJointTrajectory` pour le bras,
 `NavigateToPose` pour la base. C'est ce qui permet « va là, prends ça, reviens ».
+
+### Dettes issues de la revue de la brique 1 (à ne pas perdre)
+- **`goal_cancel` réel** : l'annulation du directeur est aujourd'hui un changement d'état, pas un
+  arrêt de mouvement. L'arrêt physique est `/safety/hold`, honoré par le contrôleur de bras ;
+  annuler un goal de skill appartient à la brique 3. Ne pas présenter l'un comme l'autre.
+- **`advance()` et `TIMEOUT`** : tant que la fin de goal ne fait pas avancer la séquence, `RUNNING`
+  est un mensonge permanent — brique 3.
+- **Anneau des tâches terminales** : `get_task(task_id)` après le démarrage d'une nouvelle tâche
+  n'a rien à répondre ; garder les N dernières avec motif et horodatage — brique 2.
+- **Redémarrage** : le registre est en RAM ; `Requires=` fait tomber le directeur avec l'arbitre et
+  repart à `IDLE`. Acceptable tant qu'aucun skill n'est engagé ; `ExecStop` qui annule et publie
+  devient nécessaire en brique 3.
+- **Anti-rebond** : un `HOLD` d'un seul échantillon tue définitivement une tâche. C'est la lettre
+  du §8 (« dès que l'état sort de OK »), donc assumé ; à revoir si un hoquet de `/scan` suffit à
+  interrompre une saisie en cours.
 
 ### Puis
 4. Sentinel : VAD, YOLO 1-2 Hz, mots d'arrêt locaux, réveil S2 par webhook.

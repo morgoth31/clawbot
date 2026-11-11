@@ -51,12 +51,17 @@ class Director:
 
     # ── interrogation ─────────────────────────────────────────────────────
     def state(self) -> dict:
-        if self._task is None:
-            return {"state": IDLE, "task_id": None, "skill": None, "step": None}
+        """Jeu de clés fixe, que la tâche existe ou non : un contrat de supervision doit être
+        typable. Les valeurs absentes sont nulles, pas omises."""
         t = self._task
+        if t is None:
+            return {"state": IDLE, "task_id": None, "skill": None, "step": None,
+                    "steps": 0, "elapsed_s": 0.0, "started_at": None, "reason": None}
         return {"state": t.state, "task_id": t.task_id, "skill": t.skill,
                 "step": t.step, "steps": len(t.steps),
-                "elapsed_s": round(self._clock() - t.started_at, 2)}
+                "elapsed_s": round(self._clock() - t.started_at, 2),
+                "started_at": t.started_at,
+                "reason": t.history[-1].get("reason") if t.history else None}
 
     # ── démarrage ────────────────────────────────────────────────────────
     def start(self, skill: str, args: dict | None = None) -> dict:
@@ -144,7 +149,9 @@ class Director:
             return {"status": "UNKNOWN_TASK", "task_id": t.task_id}
         if t.state in (DONE, FAILED, CANCELLED_SAFETY):
             return {"status": t.state, "task_id": t.task_id}
-        t.state = CANCELLED_SAFETY if reason == "safety" else "CANCELLED"
+        # Tout motif de la famille « safety » est une annulation de sécurité : le motif précis
+        # (safety, safety_stale) est conservé dans l'historique, le code reste CANCELLED_SAFETY.
+        t.state = CANCELLED_SAFETY if reason.startswith("safety") else "CANCELLED"
         t.history.append({"step": t.step, "skill": t.skill, "state": t.state,
                           "reason": reason})
         return {"status": t.state, "task_id": t.task_id, "step": t.step}

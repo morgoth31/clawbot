@@ -64,6 +64,25 @@ def test_cancel_is_immediate_and_named():
     assert d.state()["state"] == CANCELLED_SAFETY
 
 
+def test_stale_safety_is_a_safety_cancellation_too():
+    # le motif précis est conservé (« safety_stale »), le code reste CANCELLED_SAFETY
+    d = Director()
+    t = d.start("navigate_to", {})
+    r = d.cancel(t["task_id"], reason="safety_stale")
+    assert r["status"] == CANCELLED_SAFETY
+    assert d.state()["reason"] == "safety_stale"
+
+
+def test_state_has_a_stable_key_set_when_a_task_exists():
+    d = Director()
+    repos = d.state()
+    d.start("navigate_to", {})
+    actif = d.state()
+    assert set(repos) == set(actif)
+    assert actif["started_at"] > 0 and repos["started_at"] is None
+    assert repos["steps"] == 0 and actif["steps"] == 1
+
+
 def test_confirmation_is_the_only_place_yes_no_is_consumed():
     d = Director()
     d.start("grasp_object", {})
