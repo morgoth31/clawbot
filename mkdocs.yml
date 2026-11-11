@@ -145,6 +145,7 @@ nav:
           - Nœud de conduite: knowledge-base/02_Software/yahboomcar_bringup_driver_node.md
           - Manipulation (MoveIt 2): knowledge-base/02_Software/manipulation_moveit.md
           - Étalonnage du bras: knowledge-base/02_Software/etalonnage_bras.md
+          - Bras (chaîne de commande): knowledge-base/02_Software/bras_remise_en_service.md
           - Serveur MCP (Hermes): knowledge-base/02_Software/mcp_hermes.md
           - Cartographie SLAM: knowledge-base/02_Software/slam_cartographie.md
           - Système 1 (arbitre): knowledge-base/02_Software/systeme1_arbitre.md

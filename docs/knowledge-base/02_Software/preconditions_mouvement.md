@@ -46,12 +46,20 @@ skills_exigeant_bras_replie: [navigate_to, follow_human, search_object]
 ```
 
 L'enveloppe est en **degrés de servo**, tels que publiés par `/arm/servo_angles`, et non en radians
-articulaires : c'est la seule mesure disponible sans passer par `joint_states`, qui n'est qu'une
-consigne. La pose de référence est celle mesurée sur le robot à l'arrêt :
+articulaires. La pose de référence est celle lue sur le robot à l'arrêt :
 
 ```text
 2026-11-11T16:20:00+01:00  /arm/servo_angles -> [76, 97, 90, 90, 90, 149]
 ```
+
+**Réserve majeure constatée le 2026-11-11 17:35 : `/arm/servo_angles` n'est pas une mesure de
+position.** Le pilote appelle bien `get_uart_servo_angle(id)` sur le bus, mais le MCU renvoie son
+**registre de consigne** : après avoir commandé 69° puis 109°, pilote arrêté, la lecture directe par
+`Rosmaster_Lib.get_uart_servo_angle_array()` rendait exactement ces valeurs alors que le bras
+n'avait pas bougé (constat de l'opérateur, caméra du poignet toujours au plafond). Cette
+précondition vérifie donc une valeur *déclarée*, pas une position : elle détecte un bras laissé
+dans une autre pose **par le directeur**, elle ne protège pas d'un servo non alimenté ou bloqué.
+Tant que la chaîne d'exécution n'est pas prouvée, `arm_folded: true` ne vaut pas preuve de position.
 
 **`valide_par_operateur: false` est une information, pas un oubli.** La pose de repos est une pose
 *observée* ; l'encombrement du bras dans cette pose n'a pas été mesuré, et la seule géométrie connue

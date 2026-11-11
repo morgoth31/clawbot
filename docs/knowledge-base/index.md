@@ -32,6 +32,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | Sentinel S1 (attention) | `clawbot_sentinel`, YOLO + profondeur, mots d'arrêt, réveil S2 | [[sentinel_s1]] |
 | Navigation sur carte | Nav2 (`clawbot-nav2.service`) + AMCL, catalogue fermé de 3 waypoints | [[navigation_nav2_waypoints]] |
 | Préconditions de mouvement | bras replié mesuré avant tout skill qui déplace la base | [[preconditions_mouvement]] |
+| Bras (chaîne de commande) | `/servo_ctrl` → MCU → servos ; remise en service, pièges et test qui départage | [[bras_remise_en_service]] |
 
 ## 2. Arborescence normalisée
 
@@ -150,5 +151,6 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-11 15:20 | Bluetooth : appairage de la SRS-XB100 impossible — noyau sans BLE (`CONFIG_BT_LE` absent), profils audio NVIDIA désactivés et module PulseAudio manquant corrigés ; trace ouverte | [[ERR-2026-11-11-011_bluetooth_appairage_sans_ble]] |
 | 2026-11-11 14:20 | Sentinel S1 déployé : machine d'attention (2 frames, 0,75 / 3,5 m, cooldowns 60 s et 5 s), mots d'arrêt locaux, réveil de fin de tâche anti-rebondi ; 236 tests verts, `depth_available` vrai ; VAD et repli Telegram absents | [[sentinel_s1]] |
 | 2026-11-11 13:00 | Lot 2 : proprioception `/arm/servo_angles` à 10 Hz sans casser l'EKF, seuils purs (8/12°, 15 cm, 10,5 V), arbitre 20 Hz validé (obstacle 47 ms, chien de garde) | [[systeme1_arbitre]] |
+| 2026-11-11 18:00 | Bras : les servos n'exécutent plus les consignes depuis 17:20 alors que le MCU les enregistre et les renvoie à la lecture ; la relecture `/arm/servo_angles` n'est donc plus une mesure de position. Chaîne, faits datés, pièges et protocole de test consolidés dans une page unique | [[bras_remise_en_service]] |
 | 2026-11-11 16:41 | Préconditions de mouvement : `navigate_to` exige désormais un bras **mesuré** dans son enveloppe de repos (refus si angles périmés ou jamais reçus), `ExecStop` du directeur annule la tâche en vol, absences du contexte MCP dérivées de l'observation ; 293 tests verts | [[preconditions_mouvement]] |
 | 2026-11-11 16:17 | Lot 5 : navigation sur carte — catalogue de waypoints fermé (`ouest`, `centre`, `est`), `navigate_to` devient un adaptateur `NavigateToPose`, EKF et Nav2 en unités persistantes ; 3 waypoints atteints à 0,000 / 0,121 / 0,082 m en simulation, 268 tests verts | [[navigation_nav2_waypoints]] |

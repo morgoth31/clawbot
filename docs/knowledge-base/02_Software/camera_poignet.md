@@ -132,6 +132,7 @@ sudo fuser -v /dev/video0                                  # un seul processus d
 | Orientation du cadre optique supposée | moyen | `mono_link` non mesuré ; confirmer en visant une cible connue |
 | Intrinsèques nominales, non mesurées | moyen | `config/wrist_camera_info.yaml` : `fx=fy=457 px` (demi-champ 35°), à étalonner sur mire avant toute projection 3D |
 | Pas d'échantillonnage à la demande | faible | le service YOLO lit la dernière image reçue ; aucune synchronisation avec l'instant de la décision |
+| Image sans aucune structure | **ouvert** | constaté le 2026-11-11 17:30 : netteté 3 à 29 (Astra : 133) sur la même scène, insensible à 47° de bascule des axes 2 et 4 et à 20° de l'axe 5. Le bras **n'a pas bougé** : les servos n'exécutent pas les consignes (voir l'encadré ci-dessous) |
 | `CAMERA_FRONT_SOURCE` reste `opencv` | faible | le canal « front » du service YOLO ouvre toujours `/dev/video0` : à basculer aussi, ou à retirer |
 
 ## 7. Voir aussi
