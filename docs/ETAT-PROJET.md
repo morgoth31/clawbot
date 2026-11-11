@@ -164,6 +164,7 @@ en conflit déclaré : deux écrivains de `map→odom`), `clawbot-wrist-camera`,
 |---|---|---|
 | `DROP_TORQUE` n'actionne rien | **sécurité** | l'état est publié, le contrôleur s'arrête, mais aucun étage ne coupe le couple (`set_uart_servo_torque`). Décision prise, non appliquée. |
 | Essai physique des waypoints | bloquant la clôture du lot 5 | la navigation est prouvée en simulation ; aucun déplacement réel n'a encore été commandé par Nav2 |
+| **Servos du bras inertes** | **bloquant** | depuis le 2026-11-11 17:20 : le MCU enregistre les consignes et les renvoie à la lecture, le bras ne bouge pas (constat opérateur), alimentation et carte saines. `/arm/servo_angles` n'est donc plus une mesure de position. Chaîne, faits datés et protocole de test : `docs/knowledge-base/02_Software/bras_remise_en_service.md` |
 | Bras absent du costmap de Nav2 | moyen | Nav2 ne connaît le bras que par un rayon d'encombrement de 0,16 m : un waypoint peut être accepté bras en extension |
 | Enveloppe du bras non validée | moyen | la précondition refuse un bras hors de la pose de repos mesurée ; cette pose n'a pas été validée par l'opérateur, bras libre (`valide_par_operateur: false`) |
 | Skills restants | bloquant lot 6/7 | `arm_move`/`grip_set`/`navigate_to` exécutent ; `follow_human`, `grasp_object`, `search_object`, `express_state`, `look_at_board`, `set_watch_mode` refusent en `INDISPONIBLE` |
