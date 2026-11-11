@@ -38,6 +38,7 @@ UNITS = [
     ("clawbot-move-group.service", "MoveIt 2 move_group (démarré à la demande)"),
     ("rosbridge.service", "Passerelle WebSocket (port 9090)"),
     ("yolo-inference.service", "Inférence YOLO (port 8003)"),
+    ("clawbot-wrist-camera.service", "Caméra du poignet dans ROS (/wrist_camera/image_raw)"),
     ("clawbot-joy-teleop.service", "Téléopération manette"),
     ("clawbot-ekf.service", "Filtre EKF (/odom, TF odom -> base_link)"),
     ("clawbot-nav2.service", "Navigation Nav2 sur carte (AMCL, waypoints)"),

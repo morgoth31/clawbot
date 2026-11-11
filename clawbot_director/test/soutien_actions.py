@@ -29,6 +29,10 @@ class FauxBras:
         self.recus = 0
         self.annules = 0
         self.goals = []
+        # Détruit un serveur pendant qu'un goal s'exécute fait tomber le processus (abort rclcpp,
+        # pas une exception) : la fermeture signale d'abord l'arrêt, puis attend que la boucle
+        # sorte. Observé une fois en SIGSEGV sur la suite complète avant ce garde-fou.
+        self._arret = threading.Event()
         self._serveur = ActionServer(
             self.node, FollowJointTrajectory, ACTION_BRAS, self._executer,
             callback_group=ReentrantCallbackGroup(),
@@ -49,7 +53,7 @@ class FauxBras:
         if self.mode == 'silencieux':
             fin = time.monotonic() + 30.0
             while time.monotonic() < fin:
-                if objectif.is_cancel_requested:
+                if self._arret.is_set() or objectif.is_cancel_requested:
                     self.annules += 1
                     objectif.canceled()
                     return FollowJointTrajectory.Result()
@@ -60,8 +64,10 @@ class FauxBras:
         return FollowJointTrajectory.Result()
 
     def fermer(self):
-        # arrêter le spin AVANT de détruire les entités : détruire un serveur pendant que
-        # l'executor tourne fait tomber le processus (abort rclcpp, pas une exception)
+        # 1. demander aux exécutions en cours de sortir, 2. arrêter le spin, 3. détruire :
+        # l'ordre inverse fait tomber le processus (abort rclcpp, pas une exception)
+        self._arret.set()
+        time.sleep(0.05)
         self._executeur.shutdown()
         self._serveur.destroy()
         self.node.destroy_node()

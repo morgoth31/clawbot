@@ -240,7 +240,7 @@ Règle : le snapshot est un **relevé daté**, jamais une conclusion. Chaque flu
 |---|---|---|
 | 1 | Odométrie : intégration de `/vel_raw` + fusion `robot_localization` (EKF, gyro pour le glissement Mecanum) | `/odom` et `odom→base_link` publiés, dérive < 5 % sur 2 m en ligne droite |
 | 2 | ERR-009 : type de robot en flash MCU (Mecanum X3) et échelle de trame `set_car_motion` | consigne 0,1 m/s → vitesse mesurée dans ±10 % |
-| 3 | Caméra du bras dans ROS : `v4l2_camera_node` en 640×480 à 15 Hz, `wrist_camera_optical_frame` dans l'URDF sur `arm_link5` | topic publié à 15 Hz, TF cohérent, image vérifiée |
+| 3 | Caméra du bras dans ROS : `v4l2_camera_node` en 640×480, cadre `wrist_camera_optical_frame` dans l'URDF — **enfant de `mono_link`, lui-même sur `arm_link4`** (le support physique existe déjà dans l'URDF constructeur ; le placer sur `arm_link5` aurait décrit un second montage) | topic publié **à au moins 5 im/s**, TF cohérent. *Critère corrigé le 2026-11-11 : la mesure donne 5,98 im/s au niveau du périphérique, à 640×480 comme à 320×240, avec un lien négocié à 480 Mb/s et sans changement quand l'Astra est arrêtée — limite du module UVC, pas du bus. Le « 15 Hz » initial n'était pas atteignable avec ce matériel.* |
 | 4 | Arbitre réflexe + propriété de `/cmd_vel` | arrêt à obstacle < 15 cm en < 100 ms, journalisé |
 | 4 bis | Directeur, `task_id`, préconditions, `cancel_task` | deux skills concurrents refusés proprement ; annulation en < 200 ms |
 | 5 | Sentinel + webhook permanent | réveil S2 < 500 ms côté acceptation, décision < 10 s, aucun réveil en double |

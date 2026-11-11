@@ -556,4 +556,19 @@
         <axis xyz="0 0 1" rpy="0 0 0" />
         <limit effort="100" velocity="1" />
     </joint>
-    </robot>
+        <!-- Cadre optique de la camera du poignet (USB 0c45:6340), montee sur mono_link.
+         Convention REP-103 renversee pour une camera : z vers l'avant de l'objectif, x a droite,
+         y vers le bas. rpy=(-90,0,-90) applique a un repere corps (x avant, y gauche, z haut) :
+             x_optique = -y_corps (droite)
+             y_optique = -z_corps (bas)
+             z_optique = +x_corps (axe de visee)
+         L'orientation supposee du repere corps de mono_link reste A CONFIRMER sur le robot : viser
+         une cible connue et verifier que l'axe z passe bien par elle. Aucune calibration
+         d'intrinseques n'a ete faite (voir config/wrist_camera_info.yaml). -->
+    <link name="wrist_camera_optical_frame"/>
+    <joint name="wrist_camera_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708" />
+        <parent link="mono_link" />
+        <child link="wrist_camera_optical_frame" />
+    </joint>
+</robot>

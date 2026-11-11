@@ -32,6 +32,9 @@ class FauxNavigateur:
         self.recus = 0
         self.annules = 0
         self.goals = []
+        # voir soutien_actions : détruire un serveur pendant l'exécution d'un goal fait tomber
+        # le processus, donc on signale l'arrêt et on laisse la boucle sortir.
+        self._arret = threading.Event()
         self._serveur = ActionServer(
             self.node, NavigateToPose, ACTION_NAVIGATION, self._executer,
             callback_group=ReentrantCallbackGroup(),
@@ -50,7 +53,7 @@ class FauxNavigateur:
         if self.mode == "silencieux":
             fin = time.monotonic() + 30.0
             while time.monotonic() < fin:
-                if objectif.is_cancel_requested:
+                if self._arret.is_set() or objectif.is_cancel_requested:
                     self.annules += 1
                     objectif.canceled()
                     return NavigateToPose.Result()
@@ -61,8 +64,9 @@ class FauxNavigateur:
         return NavigateToPose.Result()
 
     def fermer(self):
-        # arrêter le spin AVANT de détruire les entités : détruire un serveur pendant que
-        # l'executor tourne fait tomber le processus (abort rclcpp, pas une exception)
+        # 1. demander aux exécutions en cours de sortir, 2. arrêter le spin, 3. détruire
+        self._arret.set()
+        time.sleep(0.05)
         self._executeur.shutdown()
         self._serveur.destroy()
         self.node.destroy_node()

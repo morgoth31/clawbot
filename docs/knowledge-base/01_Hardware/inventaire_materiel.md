@@ -21,7 +21,7 @@ Retour à l'[[index]] ; graphe détaillé : [[ros2_graph_clawbot]] ; MCP : [[mcp
 | 1 | Carte de commande Rosmaster | `1a86:7523`, `/dev/myserial` → `ttyUSB1`, firmware 3.5 | oui | `/voltage` 10,000 Hz (11,90 V), `/vel_raw` 9,999 Hz, `/imu/data_raw` 10,000 Hz, servos répondent | `driver_node` | **ok** |
 | 2 | Lidar YDLIDAR TG30 | CP2102 `10c4:ea60`, `/dev/ydlidar` → `ttyUSB0` | oui | `/scan` 10,082 Hz, `frame_id: laser_link` | `ydlidar_ros2_driver_node` | **ok** |
 | 3 | Caméra RGB-D Orbbec Astra Pro+ | `2bc5:060f` (profondeur) + `2bc5:050f` (couleur, `usbfs`) | oui | couleur 20,06 Hz, profondeur 29,99 Hz, IR 29,97 Hz, points 29,08 Hz | `/camera/camera` | **ok** |
-| 4 | Caméra du bras (UVC) | `0c45:6340`, port `1-2.2.1`, `/dev/video0` + `video1` | oui | capture V4L2 et OpenCV, image vérifiée | **aucun** (accès OpenCV par les services 8001/8003) | présent, **hors graphe** |
+| 4 | Caméra du bras (UVC) | `0c45:6340`, port `1-2.2.1`, `/dev/video1` = métadonnées du même appareil | oui depuis le 2026-11-11 16:50 CET | 640×480 YUYV, 5,98 im/s (limite du module), latence 8 ms | `/wrist_camera/camera` (`clawbot-wrist-camera.service`) | **ok**, cadence sous les 15 im/s attendus |
 | 5 | Bras 5 axes + pince | 6 servos bus, ids 1-6 via le MCU | oui | angles relus, 6 servos commandables (±1°), planification et exécution MoveIt validées | `arm_trajectory_server`, `move_group` | **ok** |
 | 6 | IMU intégrée à la carte | via le MCU | oui | `/imu/data_raw` 10,000 Hz, `/imu/mag` publié | `driver_node` | ok (qualité non évaluée) |
 | 7 | Batterie | aucune jauge, tension seule | oui | 11,90 V à 10 Hz | `driver_node` | **partiel** : pas d'état de charge |
@@ -38,7 +38,7 @@ Retour à l'[[index]] ; graphe détaillé : [[ros2_graph_clawbot]] ; MCP : [[mcp
 | Constat | Conséquence |
 |---|---|
 | 9 périphériques sur 12 ont un nœud ROS 2 vivant et une mesure | la chaîne de base est saine ; les verrous sont logiciels (ERR-009, odométrie) et non matériels |
-| La caméra du bras fonctionne mais n'a aucun nœud | elle n'est visible ni du graphe, ni de la supervision, ni de MoveIt ; seule la voie OpenCV la voit |
+| La caméra du bras est entrée dans le graphe le 2026-11-11 | `/wrist_camera/image_raw` publié avec le cadre `wrist_camera_optical_frame` ; le service YOLO la lit par le topic, le périphérique n'a plus qu'un propriétaire ([[camera_poignet]]) |
 | Aucun haut-parleur détecté | la phase TTS du plan directeur est bloquée par le matériel, pas par le logiciel : prévoir un module audio USB |
 | Pas de manette détectée alors que l'unité `joy-teleop` tourne | l'unité doit être arrêtée ou la manette branchée ; elle consomme sans servir |
 | `/odom` et `odom → base_link` corrigés le 2026-11-11 | Nav2 est déployé et `navigate_to` atteint trois waypoints nommés en simulation ([[navigation_nav2_waypoints]]) |
@@ -63,7 +63,7 @@ done
 - Carte de commande : [[rosmaster_x3_mcu]]
 - Lidar : [[ydlidar_tg30]]
 - Caméra RGB-D : [[orbbec_astra_pro_plus]]
-- Caméra du bras : [[camera_usb_bras]]
+- Caméra du bras : [[camera_usb_bras]] — nœud ROS, cadre optique et débit réel : [[camera_poignet]]
 - Bras et servos : [[bras_6dof]]
 - Manipulation : [[manipulation_moveit]]
 - Serveur MCP et accès depuis Hermes : [[mcp_hermes]]

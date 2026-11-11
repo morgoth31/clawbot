@@ -47,22 +47,30 @@ cette attribution est fausse et a été corrigée sur place.
 |---|---|---|
 | `YUYV` 4:2:2 (seul format exposé) | 640 × 480, 352 × 288, 320 × 240, 176 × 144, 160 × 120 | 30 / 25 / 20 / 15 / 10 / 5 i/s pour chacune des cinq tailles |
 
-Aucun format compressé (`MJPG`) n'est exposé : à 640 × 480 et 30 i/s le flux occupe
+Aucun format compressé (`MJPG`) n'est exposé : à 640 × 480 et 30 i/s le flux occuperait
 640 × 480 × 2 × 30 ≈ 18,4 Mo/s, sur un hub USB 2.0 partagé avec la carte de commande, le lidar et
-la caméra RGB-D.
+la caméra RGB-D. Mesure du 2026-11-11 : le module ne dépasse pas **5,98 im/s** (≈ 3,7 Mo/s) à
+640 × 480 comme à 320 × 240 ; le lien négocié est pourtant à 480 Mb/s et la cadence ne change pas
+quand l'Astra est arrêtée. La limite est donc celle du module, pas celle du bus.
 
 ## 4. Flux ROS 2 publiés
 
-**Aucun.** Cette caméra n'est consommée par aucun nœud ROS 2 :
+**Publiés depuis le 2026-11-11 16:50 CET** par `clawbot-wrist-camera.service` : la caméra est
+entrée dans le graphe. Ce tableau remplace le constat « aucun nœud ROS » du 2026-11-10, qui n'est
+plus vrai.
 
 | Vérification | Résultat | Source |
 |---|---|---|
-| Nœud tenant `/dev/video0` | aucun (`fuser -v /dev/video0` vide) | 2026-11-10T19:11+01:00 |
-| Topic publié depuis ce périphérique | aucun ; `ros2 topic list` ne contient que les topics Astra et ceux du châssis | `ros2 topic list`, `ros2 topic info -v` |
-| `frame_id` connu | Donnée non disponible — `ROS2-TOPIC-ABSENT`, aucun TF ne décrit cette caméra | `ros2 run tf2_ros tf2_echo base_link <frame>` |
+| Nœud tenant `/dev/video0` | `v4l2_camera_node` seul (`fuser -v /dev/video0`) | 2026-11-11T16:51+01:00 |
+| Topic publié | `/wrist_camera/image_raw` + `/camera_info`, `frame_id` = `wrist_camera_optical_frame` | `ros2 topic echo /wrist_camera/image_raw --field header` |
+| Cadence livrée | **5,98 im/s** au niveau du périphérique, 4,6 à 7,8 Hz côté abonnés | `v4l2-ctl --stream-mmap --stream-count=40`, `scripts/sonde_flux_camera.py` |
+| Cadence négociée | 30 im/s annoncés par `--get-parm`, jamais tenus | `v4l2-ctl -d … --get-parm` |
+| `frame_id` dans TF | `wrist_camera_optical_frame`, enfant de `mono_link` (lui-même sur `arm_link4`) | `tf2_echo arm_link4 wrist_camera_optical_frame` |
 
-Conséquence : elle est invisible pour le graphe ROS 2, pour la supervision (`etat_noeuds_et_services`)
-et pour tout outil qui ne passe pas par OpenCV. La seule voie d'accès est l'index brut d'OpenCV.
+Conséquence : la caméra est visible du graphe, de la supervision et de MoveIt (par son cadre). Le
+périphérique n'a plus qu'un propriétaire ; `yolo-inference.service` la lit par le topic
+(`CAMERA_CLAW_SOURCE=ros`) au lieu d'ouvrir l'index V4L2. Détail des mesures, cadre optique et
+limites : [[camera_poignet]].
 
 ## 5. Accès applicatif
 

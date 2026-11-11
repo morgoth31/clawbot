@@ -153,6 +153,7 @@ nav:
           - Chaîne de navigation: knowledge-base/02_Software/ros2_nav_stack.md
           - Navigation sur carte (waypoints): knowledge-base/02_Software/navigation_nav2_waypoints.md
           - Préconditions de mouvement: knowledge-base/02_Software/preconditions_mouvement.md
+          - Caméra du poignet (ROS): knowledge-base/02_Software/camera_poignet.md
           - Services systemd: knowledge-base/02_Software/systemd_robot_services.md
   - Exploitation:
       - État des nœuds et services: knowledge-base/03_Operations/etat_noeuds_et_services.md
