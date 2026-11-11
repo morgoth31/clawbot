@@ -164,6 +164,7 @@ nav:
       - Rebranchement caméra du bras: knowledge-base/03_Operations/2026-11-10_rebranchement_camera_bras.md
       - Mise en service de la manipulation: knowledge-base/03_Operations/2026-11-10_mise_en_service_manipulation.md
       - Compte rendu Bluetooth (SRS-XB100): knowledge-base/03_Operations/2026-11-11_compte_rendu_bluetooth_srs_xb100.md
+      - Essai de préhension d'un stylo: knowledge-base/03_Operations/2026-11-11_essai_prehen_stylo.md
       - Procédure firmware carte Rosmaster: knowledge-base/03_Operations/mise_a_jour_firmware_carte_rosmaster.md
       - Traces d'erreurs:
           - ERR-001 absence de scan laser: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-001_absence_topic_scan.md
