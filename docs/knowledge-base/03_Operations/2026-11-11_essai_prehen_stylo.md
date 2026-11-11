@@ -289,11 +289,71 @@ Ce que cela établit et ce que cela n'établit pas :
 | la cause n'est pas dans le pilote redémarré pendant la séance | dernier redémarrage 17:36:06, aucune erreur depuis |
 
 Un `-1` est la valeur de retour des getters du MCU quand la transaction échoue (voir
-`manipulation_moveit` §6 : « une lecture qui renvoie −1 n'est pas un matériel mort »). L'hypothèse à
-tester en premier, **pilote arrêté**, est la lecture directe du bus par `Rosmaster_Lib` — c'est le
-protocole déjà écrit dans [[bras_remise_en_service]] §6. Conséquence immédiate : `arm_folded` vaut
-`false` (les angles sont inconnus) et le garde-fou de `scripts/avance_cm.py` refuse tout déplacement
-de base, ce qui est le comportement voulu.
+`manipulation_moveit` §6 : « une lecture qui renvoie −1 n'est pas un matériel mort »).
+
+### 9.1 Protocole exécuté le 2026-11-11 à 20:40 — verdict : bus servo muet dans les deux sens
+
+Pilote arrêté (`ros2-driver-node` inactive), port série libre, lecture directe par `Rosmaster_Lib` :
+
+```text
+Rosmaster Serial Opened! Baudrate=115200
+liaison serie : version=3.5 tension=11.90 V (OK)
+lecture 1 : [-1, -1, -1, -1, -1, -1]
+lecture 2 : [-1, -1, -1, -1, -1, -1]
+lecture 3 : [-1, -1, -1, -1, -1, -1]
+lecture 4 : [-1, -1, -1, -1, -1, -1]
+```
+
+Sonde fine, servo par servo, avec 0,6 s d'attente puis une seconde lecture, puis tableau complet
+après 1,0 s, puis après re-commande du couple :
+
+```text
+version=3.5  tension=11.90 V
+servo 1 : -1 puis -1      servo 4 : -1 puis -1
+servo 2 : -1 puis -1      servo 5 : -1 puis -1
+servo 3 : -1 puis -1      servo 6 : -1 puis -1
+tableau complet          : [-1, -1, -1, -1, -1, -1]
+apres set_uart_servo_torque(1) : [-1, -1, -1, -1, -1, -1]
+imu pitch/roll/yaw       : (-0.298, -0.183, -8.938)
+```
+
+**Test d'écriture**, puisque les lectures seules ne disent pas si la voie sortante fonctionne :
+consigne `set_uart_servo_angle(1, 85, 1000)` (5° depuis 90) puis 2 s d'attente, mesurée sur l'image
+frontale par le barycentre du masque de la pince :
+
+```text
+temoin (2 captures sans commande) : barycentre x 405.0 -> 405.5  (ecart 0.6 px)
+apres ecriture servo 1            : barycentre x 404.8           (ecart 0.7 px)
+```
+
+Le bras **n'a pas bougé** : l'écart est celui du bruit. La voie de commande est donc muette elle
+aussi.
+
+**Conclusion, et ce qu'elle exclut** :
+
+| Hypothèse | Verdict |
+|---|---|
+| thread de lecture du nœud ROS bloqué | **exclue** — la lecture directe, pilote arrêté, échoue de la même façon |
+| trame perdue, tampon désynchronisé | **exclue** — 4 lectures espacées, puis 12 lectures individuelles avec 0,6 s d'attente |
+| couple coupé, servos en mode passif | **exclue** — `set_uart_servo_torque(1)` puis relecture : toujours −1, et aucune réponse à une consigne |
+| MCU planté | **exclue** — version, tension et IMU répondent normalement |
+| **bus servo ou alimentation des servos** | **retenue** — le MCU dialogue, les servos ne répondent ni en lecture ni en mouvement |
+
+**Chronologie encadrante** : les lectures fonctionnaient à 20:03 (`[90, 33, 42, 173, 90, 2]`, une
+mesure réelle) ; elles sont muettes à 20:35. Entre les deux, une trajectoire MoveIt de 16 s à 0,4 de
+facteur d'échelle a amené les axes 2, 3 et 4 **simultanément sur leurs butées mécaniques**
+(servo 2 = 180, servo 3 et 4 = 0), puis le retour en pose de repos.
+
+**Remédiation** : cycle d'alimentation complet du robot. Au redémarrage, dans cet ordre — lecture
+directe du bus, pilote arrêté (`scripts/read_arm_angles.py`) ; si les angles reviennent et diffèrent
+de la pose supposée, `scripts/sync_arm_pose.py` **avant** de relancer le contrôleur ; puis relance de
+la pile dans l'ordre documenté. Si le bus reste muet après le cycle, le suspect est le câblage du bus
+ou le convertisseur d'alimentation des servos — et le test qui tranche est manuel : bras libre, il
+tient sa position (servos alimentés) ou retombe (alimentation absente).
+
+**État laissé** : pile complètement relancée, 11 unités actives, aucune en échec ; `/voltage` 11,80 V,
+`/safety/state = OK`, caméra du poignet à 6,7 im/s. `/arm/servo_angles` reste à −1 et `arm_folded`
+à `false` : tout déplacement de base est refusé par le garde-fou, ce qui est le comportement voulu.
 
 ## 10. Voir aussi
 
