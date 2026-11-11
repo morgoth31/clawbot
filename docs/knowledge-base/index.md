@@ -138,3 +138,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-11 00:30 | Déclenchement S1 → Hermes : voie `cli` vérifiée (46,4 s, réponse sourcée), route webhook `clawbot-incident` créée, activation par redémarrage de la passerelle en attente | [[mcp_hermes]] §4 |
 | 2026-11-11 08:40 | ERR-010 ouverte : base non proportionnelle documentée — signe inversé mesuré sur cales (corrigé), temps mort 1,2 s, gain 1,64, pics 5,6x, saturation 1,29 ; type de châssis et PID à lire depuis le driver | [[ERR-2026-11-11-010_base_non_proportionnelle]] |
 | 2026-11-11 12:00 | SLAM réparé : `base_frame` valait `base_footprint` (inexistante), tous les scans rejetés ; carte 8,1 × 6,5 m obtenue, `map→odom` recale 24 cm sur 2,6 m | [[slam_cartographie]] |
+| 2026-11-11 13:00 | Lot 2 : proprioception `/arm/servo_angles` à 10 Hz sans casser l'EKF, seuils purs (8/12°, 15 cm, 10,5 V), arbitre 20 Hz validé (obstacle 47 ms, chien de garde) | [[systeme1_arbitre]] |
