@@ -1,6 +1,6 @@
 ---
 title: "Skills — Agents autonomes"
-date: "2026-11-10T13:25:44+08:00"
+date: "2026-11-12T01:25:15+01:00"
 author: "Hermes Agent"
 tags: [skills, agent, hermes, autonomous-ai-agents]
 status: "actif"
@@ -19,7 +19,7 @@ Délégation à des agents externes (Claude Code, Codex, OpenCode).
 | `claude-code` | Delegate coding to Claude Code CLI (features, PRs). | — | `~/.hermes/skills/autonomous-ai-agents/claude-code/` |
 | `codex` | Delegate coding to OpenAI Codex CLI (features, PRs). | — | `~/.hermes/skills/autonomous-ai-agents/codex/` |
 | `computer-use` | Drive the desktop background-first; escalate on signal. | — | `~/.hermes/skills/autonomous-ai-agents/computer-use/` |
-| `hermes-agent` | Use, configure, theme, extend, and orchestrate Hermes Agent. | 20 réf. | `~/.hermes/skills/autonomous-ai-agents/hermes-agent/` |
+| `hermes-agent` | Use, configure, theme, extend, and orchestrate Hermes Agent. | 21 réf. | `~/.hermes/skills/autonomous-ai-agents/hermes-agent/` |
 | `opencode` | Delegate coding to OpenCode CLI (features, PR review). | — | `~/.hermes/skills/autonomous-ai-agents/opencode/` |
 | `skill-repo-install` | Use when installing skills from an external Git repo. | 1 réf. | `~/.hermes/skills/autonomous-ai-agents/skill-repo-install/` |
 

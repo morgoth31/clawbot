@@ -102,6 +102,16 @@ La correction à la source consiste soit à exécuter les tests dans un environn
 n'est pas chargé, soit à aligner `launch_testing` sur le pytest installé. Aucune des deux n'a été
 appliquée : la pile ROS 2 en exécution n'a pas été modifiée.
 
+Variante vérifiée sur la suite du skill `ros2-engineering-skills` (dépôt sans `pytest.ini` modifiable) :
+
+```
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest -q
+→ 2188 passed in 152.37s   (2026-11-12, ROS Humble sourcé, PATH sans le venv Hermes)
+```
+
+Elle désactive tous les plugins auto-chargés, y compris `pytest-cov` et `pytest-timeout` ; une suite
+qui en dépend doit alors les réactiver par `-p <nom>`.
+
 ## 6. Portée et suites
 
 Les 70 tests du pont s'exécutent désormais dans les deux environnements (shell nu et shell ROS chargé).

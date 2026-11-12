@@ -112,6 +112,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-10 06:53 | Installation du skill `ros2-engineering-skills` (28 références, 15 validateurs) et ajout du menu Skills au site | [[ros2_engineering_skills]] |
 | 2026-11-10 07:00 | Installation des 5 skills ACSL / Frama-C (`acsl-verify`, `acsl-spec`, `frama-c-wp`, `verifiable-c`, `wp-coq`) | [[acsl_frama_c_skills]] |
 | 2026-11-10 07:24 | Installation des 27 skills `mattpocock/skills` (20 ingénierie système + 7 productivité) | [[mattpocock_engineering_skills]] |
+| 2026-11-12 01:20 | Mise à jour de `ros2-engineering-skills` 1.7.2 → 1.8.0 : 31 références dont 3 locales, leçons de terrain sorties du corps (11 609 / 12 000 octets), 2 188 tests verts | [[ros2_engineering_skills]] |
 | 2026-11-10 07:35 | Étape 1 du projet MCP : spécification des exigences S1/S2 (interface, déclencheurs, contexte) | [[llm2ros_mcp_specification]] |
 | 2026-11-10 07:45 | Étape 2 du projet MCP : architecture de la suite de tests, isolation, traçabilité | [[llm2ros_mcp_test_plan]] |
 | 2026-11-10 07:52 | Étape 3 du projet MCP : squelettes de tests MCP livrés, 1 vert / 22 rouges attendus | [[llm2ros_mcp_test_plan]] |
