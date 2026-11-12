@@ -98,6 +98,8 @@ def main(argv=None):
         elif node.voltage < node.voltage_floor:
             reason = f"tension {node.voltage:.2f} V trop basse : aucun mouvement commande"
         else:
+            node.last_odom = time.time()      # la vérification de péremption part d'ici
+            origin = node.pose
             start = time.time()
             overspeed = 0
             while time.time() - start < args.duration:
@@ -132,7 +134,7 @@ def main(argv=None):
         node.destroy_node()
         rclpy.shutdown()
 
-    distance = math.hypot(node.pose[0], node.pose[1])
+    distance = math.hypot(node.pose[0] - origin[0], node.pose[1] - origin[1]) if node.rows else 0.0
     print(f"arret  : {reason}")
     print(f"distance parcourue : {distance:.3f} m")
     print(f"pose finale : x={node.pose[0]:.3f} y={node.pose[1]:.3f} yaw={node.pose[2]:.2f} deg")
