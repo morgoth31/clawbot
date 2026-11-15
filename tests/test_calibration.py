@@ -14,7 +14,7 @@ import yaml
 RACINE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RACINE / "joy_teleop"))
 
-from calibration import Calibration  # noqa: E402
+from calibration import Calibration, compter_appuis  # noqa: E402
 
 
 def test_refuse_ecriture_si_entree_declaree_non_traitee(tmp_path):
@@ -311,3 +311,45 @@ def test_reponse_oui_est_comprise():
     assert calibration.reponse_booleenne("Oui") is True
     assert calibration.reponse_booleenne("n") is False
     assert calibration.reponse_booleenne("") is False
+
+
+# ── Turbo (bouton T) ────────────────────────────────────────────────────────
+
+class FauxLecteurRafale:
+    """Rejoue un motif d'appuis sur un index : 1,0,1,0… pour simuler le turbo."""
+
+    def __init__(self, motif, index=3):
+        self.motif = motif
+        self.index = index
+        self.rang = 0
+
+    def lire(self, attente=0.02):
+        return True
+
+    def etat(self):
+        from js_lecteur import Etat
+        valeur = self.motif[min(self.rang, len(self.motif) - 1)]
+        self.rang += 1
+        boutons = [0] * 14
+        boutons[self.index] = valeur
+        return Etat(axes=[0.0] * 6, boutons=boutons)
+
+
+def test_compte_les_appuis_d_un_mainien_unique():
+    lecteur = FauxLecteurRafale([0, 1, 1, 1, 1, 0])
+    assert compter_appuis(lecteur, 3, 0.12) == 1
+
+
+def test_compte_les_appuis_d_une_rafale_turbo():
+    lecteur = FauxLecteurRafale([0, 1, 0, 1, 0, 1, 0, 1])
+    assert compter_appuis(lecteur, 3, 0.16) >= 3
+
+
+def test_turbo_enregistre(tmp_path):
+    cal = Calibration(sortie=tmp_path / "m.yaml")
+    cal.enregistrer_turbo(bouton="T", actif=True, repetitions=6,
+                          reference="A", duree_s=2.0)
+    cal.ecrire()
+    contenu = yaml.safe_load((tmp_path / "m.yaml").read_text(encoding="utf-8"))
+    assert contenu["capacites"]["turbo"]["actif"] is True
+    assert contenu["capacites"]["turbo"]["repetitions"] == 6

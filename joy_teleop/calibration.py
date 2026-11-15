@@ -146,6 +146,27 @@ def vider_appuis(lecteur, delai_s: float = 2.0) -> None:
             return
 
 
+def compter_appuis(lecteur, index: int, duree_s: float) -> int:
+    """Compte les fronts 0→1 d'un bouton pendant `duree_s`.
+
+    Sert à caractériser le TURBO : un bouton maintenu produit un seul front ; un
+    bouton en mode turbo en produit plusieurs par seconde. C'est la seule façon de
+    distinguer « T ne fait rien » de « T arme un turbo sur un autre bouton ».
+    """
+    n = max(2, int(duree_s / 0.02))
+    appuis = 0
+    precedent = None
+    for _ in range(n):
+        if not lecteur.lire(0.02):
+            break
+        boutons = lecteur.etat().boutons
+        actuel = bool(boutons[index]) if index < len(boutons) else False
+        if actuel and precedent is False:
+            appuis += 1
+        precedent = actuel
+    return appuis
+
+
 def attendre_pret(lecteur, delai_s: float = 120.0, journal=None) -> int:
     """Attend un premier appui « je suis prêt » avant d'énumérer les entrées.
 
@@ -239,6 +260,17 @@ class Calibration:
         """Entrée qui existe sans être un bouton du rapport HID (commutateur, etc.)."""
         self.donnees.setdefault("reserve", {})[nom] = raison
         self._traitees.add(nom)
+
+    def enregistrer_turbo(self, bouton: str, actif: bool, repetitions: int,
+                          reference: str, duree_s: float) -> None:
+        """Trace le turbo : bouton armant, bouton de référence, répétitions mesurées."""
+        self.donnees.setdefault("capacites", {})["turbo"] = {
+            "bouton": bouton,
+            "actif": bool(actif),
+            "reference": reference,
+            "repetitions": int(repetitions),
+            "duree_mesure_s": float(duree_s),
+        }
 
     def enregistrer_gachette(self, nom: str, analogique: bool, axes=None) -> None:
         entree = {"analogique": bool(analogique)}
