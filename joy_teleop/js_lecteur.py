@@ -24,6 +24,34 @@ JS_EVENT_BUTTON = 0x01
 JS_EVENT_AXIS = 0x02
 JS_EVENT_INIT = 0x80
 
+# Mots à exclure du choix de périphérique : ce sont des capteurs inertiels.
+EXCLUS = ("IMU", "ACCEL", "GYRO", "MAGNET", "COMPASS")
+
+
+def lister_manettes() -> list[tuple[str, str]]:
+    """[(chemin, nom)] des nœuds js qui ne sont pas des capteurs inertiels.
+
+    Le pad et son IMU exposent le MÊME nom : seule l'exclusion par mot-clé permet
+    de choisir le bon nœud de façon déterministe.
+    """
+    manettes: list[tuple[str, str]] = []
+    nom = None
+    try:
+        with open("/proc/bus/input/devices", encoding="utf-8", errors="replace") as f:
+            for ligne in f:
+                if ligne.startswith("N: Name="):
+                    nom = ligne[len("N: Name="):].strip().strip('"')
+                elif ligne.startswith("H: Handlers="):
+                    for jeton in ligne.split():
+                        if jeton.startswith("js") and jeton[2:].isdigit():
+                            if nom and not any(m in nom.upper() for m in EXCLUS):
+                                manettes.append((f"/dev/input/{jeton}", nom))
+                elif not ligne.strip():
+                    nom = None
+    except OSError:
+        pass
+    return manettes
+
 
 @dataclass
 class Etat:
