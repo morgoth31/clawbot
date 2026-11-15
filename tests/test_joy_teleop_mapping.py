@@ -1,18 +1,17 @@
-"""Manette : mapping mesuré, choix du périphérique, et absence de dépendance à SDL.
+"""Manette : la configuration YAML pilote le teleop, plus aucune constante.
 
-Ces tests protègent les trois choses qui ont réellement cassé le 2026-11-15 et
-qui casseraient en silence si on y touchait :
+Trois pièges mesurés le 2026-11-15 sont couverts ici :
 
-  1. Les gâchettes ne sont pas dans l'ordre « L, R, ZL, ZR » mais ZL, ZR, L, R.
-     Un code qui vise ZR en croyant viser l'index 8 commande L : sur un deadman,
-     cela veut dire aucune protection.
-  2. Les axes Y valent +1 vers le haut. Une inversion héritée fait reculer le
-     robot quand on pousse le stick vers l'avant.
-  3. Le pad et son IMU exposent le même nom. Le choix du périphérique doit donc
-     se faire sur le nom du nœud d'entrée, pas sur un index SDL.
+  1. La numérotation des boutons dépend de la couche qui lit (SDL ≠ jsdev). Le
+     teleop ne connaît donc plus d'index : seulement des noms, résolus par
+     `config/manette.yaml`.
+  2. Les axes Y sont négatifs vers le haut sur jsdev ; SDL inversait les deux. Le
+     sens vient de la calibration, pas d'une convention supposée.
+  3. Un pad mal mappé vaut moins qu'un pad absent : sans YAML valide, le nœud
+     refuse de démarrer.
 
-Aucun test ici ne déplace le robot : le nœud teleop est instancié en domaine 99,
-où rien n'écoute /cmd_vel ni /servo_ctrl.
+Aucun test ici ne déplace le robot : le nœud est instancié en domaine 98, où rien
+n'écoute /cmd_vel ni /servo_ctrl.
 """
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ import pytest
 RACINE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RACINE / "joy_teleop"))
 
-os.environ["ROS_DOMAIN_ID"] = "98"   # 98 : isolé de la simulation (99) et du robot (28)
+os.environ["ROS_DOMAIN_ID"] = "98"   # isolé de la simulation (99) et du robot (28)
 
 rclpy = pytest.importorskip("rclpy")
 from geometry_msgs.msg import Twist          # noqa: E402
@@ -36,13 +35,15 @@ from std_msgs.msg import Int32MultiArray     # noqa: E402
 
 import clawbot_joy_teleop as teleop          # noqa: E402
 
+FIXTURE = RACINE / "tests" / "fixtures" / "manette_test.yaml"
 
-# ── Fixture : nœud teleop + publication synthétique de /joy ──────────────────
+
+# ── Banc : nœud réel + publication synthétique de /joy ──────────────────────
 
 class Banc:
     def __init__(self):
-        self.node = teleop.ClawbotJoyTeleop()
-        self.node.get_logger().set_level(40)   # WARN : le nœud journalise chaque servo
+        self.node = teleop.ClawbotJoyTeleop(config=FIXTURE)
+        self.node.get_logger().set_level(40)
         self.pub = self.node.create_publisher(Joy, "/joy", 10)
         self.twists: list[Twist] = []
         self.servos: list[list[int]] = []
@@ -56,7 +57,6 @@ class Banc:
         self.servos.append(list(msg.data))
 
     def envoyer(self, axes=None, boutons=None, duree=0.4):
-        """Publie un état /joy pendant `duree` (le nœud traite chaque message)."""
         axes = axes if axes is not None else [0.0] * 6
         boutons = boutons if boutons is not None else [0] * 14
         fin = time.time() + duree
@@ -68,11 +68,7 @@ class Banc:
             rclpy.spin_once(self.node, timeout_sec=0.02)
 
     def vider(self, duree=0.3):
-        """Vide les listes APRÈS avoir laissé arriver les messages déjà en vol.
-
-        Sans cette purge, les messages du scénario précédent arrivent pendant le
-        suivant et le test attribue à un bouton l'effet d'un autre.
-        """
+        """Laisse arriver les messages en vol AVANT de purger les listes."""
         fin = time.time() + duree
         while time.time() < fin:
             rclpy.spin_once(self.node, timeout_sec=0.02)
@@ -92,32 +88,37 @@ def banc():
     rclpy.try_shutdown()
 
 
-# ── Constantes : la mesure, pas la tradition ─────────────────────────────────
+# ── La configuration décide ─────────────────────────────────────────────────
 
-def test_indices_gachettes():
-    assert teleop.BTN_ZL == 5
-    assert teleop.BTN_ZR == 6
-    assert teleop.BTN_L == 7
-    assert teleop.BTN_R == 8
-    assert teleop.BTN_A == 1 and teleop.BTN_B == 0
+def test_les_noms_resolvent_les_index_du_yaml():
+    from manette_config import charger
+    m = charger(FIXTURE)
+    assert m.bouton("home") == 11
+    assert m.bouton("ZR") == 8
+    assert m.bouton("M1") == m.bouton("A")      # alias
 
 
-def test_signes_axes_mesures():
-    """Signes relevés sur la source jsdev : X positive à droite, Y négative en haut.
+def test_sans_configuration_le_noeud_refuse_de_demarrer(tmp_path):
+    """Un pad mal mappé vaut moins qu'un pad absent."""
+    rclpy.init()
+    try:
+        with pytest.raises(SystemExit) as err:
+            teleop.ClawbotJoyTeleop(config=tmp_path / "absent.yaml")
+        assert err.value.code == 1
+    finally:
+        rclpy.try_shutdown()
 
-    Le paquet `joy` (SDL) inversait les deux. Une table relevée à travers SDL donne
-    donc les signes opposés, et un code qui s'y fie commande la marche arrière.
-    """
+
+def test_aucune_table_d_indices_dans_le_noeud():
     source = (RACINE / "joy_teleop" / "clawbot_joy_teleop.py").read_text()
-    assert "haut   = -1" in source          # AX_LY, AX_RY, AX_DY
-    assert "droite = +1" in source          # AX_LX, AX_RX, AX_DX
-    assert "return -self._brut(axes, idx)" in source   # _haut inverse le Y
+    assert "BTN_HOME" not in source
+    assert "AX_LX" not in source
+    assert "manette_config" in source
 
 
-# ── Sélection du périphérique ────────────────────────────────────────────────
+# ── Sélection du périphérique et source ─────────────────────────────────────
 
 def test_peripherique_choisi_nest_pas_l_imu():
-    pytest.importorskip("rclpy")
     import js_joy_source
 
     manettes = js_joy_source.lister_manettes()
@@ -129,7 +130,6 @@ def test_peripherique_choisi_nest_pas_l_imu():
 
 
 def test_source_sans_sdl():
-    """La source ne doit pas dépendre du paquet joy (SDL) ni de SDL lui-même."""
     source = (RACINE / "joy_teleop" / "js_joy_source.py").read_text()
     assert "import rclpy" in source
     assert "import sdl" not in source.lower()
@@ -139,32 +139,26 @@ def test_source_sans_sdl():
     assert "js_joy_source.py" in lancement
 
 
-def test_argument_lancement_jamais_vide():
-    """`-p device_path:=` vide fait mourir le nœud au démarrage (rcl refuse).
+def test_source_reutilise_le_lecteur():
+    source = (RACINE / "joy_teleop" / "js_joy_source.py").read_text()
+    assert "from js_lecteur import LecteurJs" in source
+    assert "struct.unpack" not in source
 
-    Mesuré le 2026-11-15 : RCLError « Couldn't parse parameter override rule ».
-    Le défaut doit donc être une valeur exploitable, et le nœud doit la traiter
-    comme « détection automatique ».
-    """
+
+def test_argument_lancement_jamais_vide():
+    """`-p device_path:=` vide fait mourir le nœud au démarrage (rcl refuse)."""
     lancement = (RACINE / "joy_teleop" / "joy_teleop_launch.py").read_text()
     assert 'DeclareLaunchArgument("device_path",    default_value="auto"' in lancement
     source = (RACINE / "joy_teleop" / "js_joy_source.py").read_text()
     assert 'chemin == "auto"' in source
 
 
-def test_source_reutilise_le_lecteur():
-    """La source ne doit pas redécoder js_event : js_lecteur en est l'unique copie."""
-    source = (RACINE / "joy_teleop" / "js_joy_source.py").read_text()
-    assert "from js_lecteur import LecteurJs" in source
-    assert "struct.unpack" not in source
-
-
-# ── Comportement en mode véhicule ────────────────────────────────────────────
+# ── Mode véhicule ───────────────────────────────────────────────────────────
 
 def _passer_mode_vehicule(banc):
     banc.envoyer(boutons=[0] * 14, duree=0.1)
     boutons = [0] * 14
-    boutons[teleop.BTN_HOME] = 1
+    boutons[11] = 1                      # home
     banc.envoyer(boutons=boutons, duree=0.2)
     banc.envoyer(boutons=[0] * 14, duree=0.1)
 
@@ -173,7 +167,7 @@ def test_stick_droit_haut_avance(banc):
     _passer_mode_vehicule(banc)
     banc.vider()
     axes = [0.0] * 6
-    axes[teleop.AX_RY] = -1.0          # mesuré : haut = -1 sur la source jsdev
+    axes[3] = -1.0                       # mesuré : haut = -1 sur jsdev
     banc.envoyer(axes=axes)
     assert banc.twists, "aucun /cmd_vel publié"
     assert banc.twists[-1].linear.x > 0.0
@@ -183,7 +177,7 @@ def test_stick_droit_bas_recule(banc):
     _passer_mode_vehicule(banc)
     banc.vider()
     axes = [0.0] * 6
-    axes[teleop.AX_RY] = +1.0          # bas = +1
+    axes[3] = 1.0
     banc.envoyer(axes=axes)
     assert banc.twists[-1].linear.x < 0.0
 
@@ -192,34 +186,34 @@ def test_stick_droit_droite_strafe_a_droite(banc):
     _passer_mode_vehicule(banc)
     banc.vider()
     axes = [0.0] * 6
-    axes[teleop.AX_RX] = +1.0          # mesuré : droite = +1
+    axes[2] = 1.0                        # mesuré : droite = +1
     banc.envoyer(axes=axes)
-    assert banc.twists[-1].linear.y < 0.0   # REP-103 : y négatif = droite
+    assert banc.twists[-1].linear.y < 0.0    # REP-103 : y négatif = droite
 
 
 def test_stick_gauche_droite_tourne_a_droite(banc):
     _passer_mode_vehicule(banc)
     banc.vider()
     axes = [0.0] * 6
-    axes[teleop.AX_LX] = +1.0          # mesuré : droite = +1
+    axes[0] = 1.0
     banc.envoyer(axes=axes)
-    assert banc.twists[-1].angular.z < 0.0  # z négatif = horaire = droite
+    assert banc.twists[-1].angular.z < 0.0   # z négatif = horaire = droite
 
 
-# ── Comportement en mode bras ────────────────────────────────────────────────
+# ── Mode bras ───────────────────────────────────────────────────────────────
 
 def test_zr_ne_commande_pas_le_meme_servo_que_l(banc):
-    """ZR et L doivent agir sur deux servos différents (1 et 5)."""
+    """ZR (8) et L (5) doivent agir sur deux servos différents (1 et 5)."""
     banc.envoyer(boutons=[0] * 14, duree=0.1)
 
     boutons = [0] * 14
-    boutons[teleop.BTN_ZR] = 1
+    boutons[8] = 1                       # ZR
     banc.vider()
     banc.envoyer(boutons=boutons, duree=0.3)
     servos_zr = [s for s in banc.servos if s]
 
     boutons = [0] * 14
-    boutons[teleop.BTN_L] = 1
+    boutons[5] = 1                       # L
     banc.vider()
     banc.envoyer(boutons=boutons, duree=0.3)
     servos_l = [s for s in banc.servos if s]
@@ -232,10 +226,10 @@ def test_zr_ne_commande_pas_le_meme_servo_que_l(banc):
 def test_plus_remet_la_consigne_a_zero(banc):
     _passer_mode_vehicule(banc)
     axes = [0.0] * 6
-    axes[teleop.AX_RY] = 1.0
+    axes[3] = -1.0
     banc.envoyer(axes=axes, duree=0.3)
     boutons = [0] * 14
-    boutons[teleop.BTN_PLUS] = 1
+    boutons[10] = 1                       # +
     banc.vider()
     banc.envoyer(axes=axes, boutons=boutons, duree=0.3)
     assert banc.twists[-1].linear.x == 0.0

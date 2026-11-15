@@ -1,297 +1,250 @@
-    #!/usr/bin/env python3
+#!/usr/bin/env python3
+"""Clawbot Joy Teleop — /joy → /cmd_vel + /servo_ctrl, piloté par config/manette.yaml.
+
+Aucun index n'est codé ici. Le fichier de calibration nomme les entrées, mesure les
+signes d'axe et fixe les zones mortes ; ce nœud ne fait que traduire des noms en
+consignes ROS. Un pad remplacé ou recalibré ne demande aucune modification de code.
+
+MAPPING LOGIQUE (les noms sont ceux du YAML)
+  MOUVEMENT (mode 2, châssis mécanum)
+    stick_droit_y   linear_x   — haut = avant
+    stick_droit_x   linear_y   — droite = droite (y négatif)
+    stick_gauche_x  angular_z  — droite = horaire (z négatif)
+    plus            stop d'urgence
+
+  BRAS (mode 1, incrément de arm_step par tick)
+    ZL / ZR        servo 1 — base
+    stick_droit_x  servo 6 — pince
+    stick_droit_y  servo 4 — poignet
+    stick_gauche_y servo 2 — épaule
+    stick_gauche_x servo 3 — coude
+    L / R          servo 5 — rotation pince
+    croix_x / croix_y — déplacement châssis très lent
+
+  BOUTONS
+    A / B / Y — base du bras (0° / 90° / 180°), X — bascule caméra haute/basse
+
+  Les SENS mécaniques du bras ne sont pas validés : à confirmer bras libre,
+  opérateur présent.
+
+PARAMÈTRES ROS 2
+  manette_config  chemin du YAML de calibration
+  linear_scale, angular_scale, arm_step, deadman_button, deadband
 """
-Clawbot Joy Teleop — Nintendo Switch Pro Controller (ou manette générique)
-════════════════════════════════════════════════════════════════════════════
 
-MAPPING PAR DÉFAUT (Pro Controller via hid-nintendo ou générique compatible):
-
-  MOUVEMENT (chassis mécanum)
-  ┌─────────────────┬──────────────────────────────────────────┐
-  │ Stick gauche Y  │ linear_x  (avant / arrière)              │
-  │ Stick gauche X  │ linear_y  (strafe gauche / droite)       │
-  │ Stick droit  X  │ angular_z (rotation)                     │
-  │ ZR  (hold)      │ Deadman switch (obligatoire pour bouger) │
-  │ Plus (+)        │ Stop d'urgence                           │
-  └─────────────────┴──────────────────────────────────────────┘
-
-  BRAS (servos 1-5, incrément par tick)
-  ┌─────────────────┬──────────────────────────────────────────┐
-  │ D-pad Y         │ Servo 1 — base rotation                  │
-  │ D-pad X         │ Servo 2 — épaule                         │
-  │ Stick droit Y   │ Servo 3 — coude                          │
-  │ L (shoulder)    │ Servo 4 — poignet -                      │
-  │ R (shoulder)    │ Servo 4 — poignet +                      │
-  │ ZL (hold)       │ Servo 5 — rotation poignet -             │
-  │   + D-pad X     │   (ZL modifie D-pad X → servo 5)        │
-  └─────────────────┴──────────────────────────────────────────┘
-
-  PINCE & POSES
-  ┌─────────────────┬──────────────────────────────────────────┐
-  │ A               │ Pince ouverte (servo 6 = 0°)             │
-  │ B               │ Pince fermée  (servo 6 = 180°)           │
-  │ Y               │ Pose sécurisée (anti-collision)          │
-  │ X               │ Pose détendue (90° partout)              │
-  │ Minus (-)       │ Reset bras — tout à 90°                  │
-  └─────────────────┴──────────────────────────────────────────┘
-
-AJUSTEMENTS RAPIDES via paramètres ROS2:
-  linear_scale    — vitesse max linéaire (défaut: 0.06 m/s)
-  angular_scale   — vitesse max angulaire (défaut: 0.25 rad/s)
-  arm_step        — degrés par tick pour le bras (défaut: 3°)
-  deadman_button  — index du bouton deadman (défaut: 7 = ZR)
-  invert_ly       — inverser axe stick gauche Y (défaut: true)
-  invert_ry       — inverser axe stick droit  Y (défaut: true)
-"""
+import sys
 
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 
-from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Joy
 from std_msgs.msg import Int32MultiArray
 
-# ── Limites hardware ──────────────────────────────────────────────────────────
-MAX_LINEAR_MS  = 0.5    # m/s   — identique au hardware_service
-MAX_ANGULAR_RS = 1.5    # rad/s
+from manette_config import ConfigInvalide, Manette, charger
 
-SAFE_POSE    = [90, 130, 10, 60, 90]   # anti-collision
-NEUTRAL_POSE = [90,  90, 90, 90, 90]   # bras détendu
+CHEMIN_CONFIG = "/home/jetson/clawbot/config/manette.yaml"
 
-# ── Mapping axes ─────────────────────────────────────────────────────────────
-# Détecté via jstest pour Nintendo Switch Pro Controller (USB via hid_nintendo)
-# 6 axes: X, Y, Rx, Ry, Hat0X, Hat0Y
-AX_LX = 0   # Stick gauche X
-AX_LY = 1   # Stick gauche Y
-AX_RX = 2   # Stick droit  X
-AX_RY = 3   # Stick droit  Y
-AX_DX = 4   # D-pad X (FX)
-AX_DY = 5   # D-pad Y (FY)
-
-# ── Mapping boutons ───────────────────────────────────────────────────────────
-# Détecté via jstest: 14 boutons
-# BtnA, BtnB, BtnX, BtnY, BtnZ, BtnTL, BtnTR, BtnTL2, BtnTR2, BtnSelect, BtnStart, BtnMode, BtnThumbL, BtnThumbR
-BTN_B      = 0
-BTN_A      = 1
-BTN_X      = 2
-BTN_Y      = 3
-BTN_O      = 4
-BTN_L      = 5
-BTN_R      = 6
-BTN_ZL     = 7
-BTN_ZR     = 8
-BTN_MINUS  = 9   # -
-BTN_PLUS   = 10  # +
-BTN_HOME   = 11  # Home
-BTN_LS     = 12  # JL
-BTN_RS     = 13  # JR
+# Limites hardware du châssis, identiques au hardware_service.
+MAX_LINEAR_MS = 0.5
+MAX_ANGULAR_RS = 1.5
 
 
-def _clamp(v: float, lo: float, hi: float) -> float:
-    return max(lo, min(hi, v))
+def _clamp(valeur: float, mini: float, maxi: float) -> float:
+    return max(mini, min(maxi, valeur))
 
 
 class ClawbotJoyTeleop(Node):
 
-    def __init__(self):
+    def __init__(self, config=None):
         super().__init__("clawbot_joy_teleop")
 
-        # ── Paramètres ────────────────────────────────────────────────────────
-        self.declare_parameter("linear_scale",   MAX_LINEAR_MS)
-        self.declare_parameter("angular_scale",  MAX_ANGULAR_RS)
-        self.declare_parameter("arm_step",       3.0)        # degrés / tick
-        self.declare_parameter("deadman_button", BTN_ZR)     # tenir ZR (btn 9) pour bouger
-        self.declare_parameter("invert_ly",      True)       # axes Y souvent inversés
-        self.declare_parameter("invert_ry",      True)
-        self.declare_parameter("deadband",       0.08)       # seuil stick mort
+        self.declare_parameter("manette_config", CHEMIN_CONFIG)
+        self.declare_parameter("linear_scale", MAX_LINEAR_MS)
+        self.declare_parameter("angular_scale", MAX_ANGULAR_RS)
+        self.declare_parameter("arm_step", 3.0)
+        self.declare_parameter("deadman_button", -1)     # index, -1 = désactivé
+        self.declare_parameter("deadband", 0.08)
 
-        self.lin_scale  = self.get_parameter("linear_scale").value
-        self.ang_scale  = self.get_parameter("angular_scale").value
-        self.arm_step   = self.get_parameter("arm_step").value
-        self.deadman    = self.get_parameter("deadman_button").value
-        self.inv_ly     = self.get_parameter("invert_ly").value
-        self.inv_ry     = self.get_parameter("invert_ry").value
-        self.deadband   = self.get_parameter("deadband").value
+        chemin = config if config is not None else self.get_parameter("manette_config").value
+        try:
+            self.manette: Manette = charger(chemin)
+        except ConfigInvalide as err:
+            # Aucun mapping par défaut : un pad mal mappé vaut moins qu'un pad absent.
+            self.get_logger().error(f"configuration de manette refusée — {err}")
+            raise SystemExit(1)
 
-        # ── État interne ─────────────────────────────────────────────────────
-        # Angles courants du bras (IDs 1-5) — -1 = inconnu
+        self.lin_scale = float(self.get_parameter("linear_scale").value)
+        self.ang_scale = float(self.get_parameter("angular_scale").value)
+        self.arm_step = float(self.get_parameter("arm_step").value)
+        self.deadman = int(self.get_parameter("deadman_button").value)
+        self.deadband = float(self.get_parameter("deadband").value)
+
         self.arm_angles = {i: 90 for i in range(1, 6)}
-        self.claw_angle = 90   # servo 6
-        
-        # Modes de fonctionnement
-        self.mode = 1          # 1: Pilotage du bras, 2: Pilotage du robot
+        self.claw_angle = 90
+        self.mode = 1                  # 1 : bras, 2 : véhicule
         self.camera_high = False
-
-        # Anti-répétition boutons
         self._btn_prev: list[int] = []
 
-        # ── Publishers ────────────────────────────────────────────────────────
-        self.cmd_vel_pub = self.create_publisher(Twist,           "/cmd_vel",    10)
-        self.servo_pub   = self.create_publisher(Int32MultiArray, "/servo_ctrl", 10)
-
-        # ── Subscriber ───────────────────────────────────────────────────────
+        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
+        self.servo_pub = self.create_publisher(Int32MultiArray, "/servo_ctrl", 10)
         self.create_subscription(Joy, "/joy", self._joy_cb, 10)
 
         self.get_logger().info(
-            f"✅ ClawbotJoyTeleop ready — deadman=BTN[{self.deadman}] (ZR par défaut)\n"
-            f"   linear={self.lin_scale} m/s  angular={self.ang_scale} rad/s  "
-            f"arm_step={self.arm_step}°"
-        )
+            f"✅ ClawbotJoyTeleop prêt — {self.manette.chemin} "
+            f"({len(self.manette.boutons)} boutons, {len(self.manette.axes)} axes), "
+            f"deadman={self.deadman}, mode initial=bras")
 
-    # ── Helpers ───────────────────────────────────────────────────────────────
+    # ── accès nommés ─────────────────────────────────────────────────────────
 
-    def _ax(self, axes: list, idx: int, invert: bool = False) -> float:
-        """Lire un axe avec deadband et inversion optionnelle."""
-        if idx >= len(axes):
-            return 0.0
-        v = axes[idx] * (-1.0 if invert else 1.0)
-        return v if abs(v) > self.deadband else 0.0
+    def _index(self, nom: str) -> int | None:
+        return self.manette.bouton_ou_none(nom)
 
-    def _btn(self, buttons: list, idx: int) -> bool:
-        """Lire un bouton."""
-        return bool(buttons[idx]) if idx < len(buttons) else False
+    def _presse(self, boutons: list[int], nom: str) -> bool:
+        i = self._index(nom)
+        return bool(boutons[i]) if i is not None and i < len(boutons) else False
 
-    def _btn_just_pressed(self, buttons: list, idx: int) -> bool:
-        """True seulement au premier tick où le bouton est enfoncé."""
-        cur  = self._btn(buttons, idx)
-        prev = bool(self._btn_prev[idx]) if idx < len(self._btn_prev) else False
-        return cur and not prev
+    def _vient_d_etre_presse(self, boutons: list[int], nom: str) -> bool:
+        i = self._index(nom)
+        if i is None:
+            return False
+        actuel = bool(boutons[i]) if i < len(boutons) else False
+        precedent = bool(self._btn_prev[i]) if i < len(self._btn_prev) else False
+        return actuel and not precedent
 
-    def _send_servo(self, servo_id: int, angle: float) -> None:
-        """Clamp et publie une commande servo."""
+    def _axe(self, axes: list[float], nom: str) -> float:
+        """Valeur normalisée : positif = droite pour X, haut pour Y (sens du YAML)."""
+        return self.manette.valeur(axes, nom)
+
+    # ── servos ───────────────────────────────────────────────────────────────
+
+    def _envoyer_servo(self, ident: int, angle: float) -> None:
         angle = int(_clamp(angle, 0, 180))
-        self.arm_angles[servo_id] = angle
+        self.arm_angles[ident] = angle
         msg = Int32MultiArray()
-        msg.data = [servo_id, angle]
+        msg.data = [ident, angle]
         self.servo_pub.publish(msg)
-        self.get_logger().info(f"Servo {servo_id} → {angle}°")
+        self.get_logger().info(f"Servo {ident} → {angle}°")
 
-    def _send_arm_pose(self, angles: list) -> None:
-        """Envoyer tous les servos 1-5 vers une pose."""
+    def _bouger_servo(self, ident: int, delta: float) -> None:
+        self._envoyer_servo(ident, self.arm_angles.get(ident, 90) + delta)
+
+    def _envoyer_pose(self, angles: list[float]) -> None:
         for i, a in enumerate(angles):
-            self._send_servo(i + 1, float(a))
-        self.get_logger().info(f"Pose → {angles}")
+            self._envoyer_servo(i + 1, float(a))
 
-    def _move_servo(self, servo_id: int, delta: float) -> None:
-        """Incrémenter un servo de delta degrés."""
-        new_angle = self.arm_angles.get(servo_id, 90) + delta
-        self._send_servo(servo_id, new_angle)
-
-    # ── Callback principal ────────────────────────────────────────────────────
+    # ── callback ─────────────────────────────────────────────────────────────
 
     def _joy_cb(self, msg: Joy) -> None:
-        axes    = msg.axes
-        buttons = list(msg.buttons)
-
-        # Initialiser prev au premier message
+        axes = msg.axes
+        boutons = list(msg.buttons)
         if not self._btn_prev:
-            self._btn_prev = [0] * len(buttons)
+            self._btn_prev = [0] * len(boutons)
 
-        # ── STOP D'URGENCE — Plus (+) ─────────────────────────────────────────
-        if self._btn(buttons, BTN_PLUS):
+        # Deadman : s'il est armé sur un index, aucun mouvement sans lui.
+        if self.deadman >= 0:
+            arme = self.deadman < len(boutons) and bool(boutons[self.deadman])
+            if not arme:
+                self.cmd_vel_pub.publish(Twist())
+                self._btn_prev = boutons[:]
+                return
+
+        if self._presse(boutons, "plus"):
             self.cmd_vel_pub.publish(Twist())
             self.get_logger().warn("⛔ STOP D'URGENCE")
-            self._btn_prev = buttons[:]
+            self._btn_prev = boutons[:]
             return
-            
-        # ── CHANGEMENT DE MODE — Home ─────────────────────────────────────────
-        if self._btn_just_pressed(buttons, BTN_HOME):
+
+        if self._vient_d_etre_presse(boutons, "home"):
             self.mode = 2 if self.mode == 1 else 1
-            mode_name = "1: Bras" if self.mode == 1 else "2: Véhicule"
-            self.get_logger().info(f"🔄 MODE CHANGÉ → {mode_name}")
-            # Stop vehicle when changing mode
+            self.get_logger().info(
+                f"🔄 MODE → {'1: Bras' if self.mode == 1 else '2: Véhicule'}")
             self.cmd_vel_pub.publish(Twist())
 
         twist = Twist()
 
         if self.mode == 1:
-            # ── MODE 1 : Pilotage du bras ─────────────────────────────────────
-            # Bras
-            zl = self._btn(buttons, BTN_ZL)
-            zr = self._btn(buttons, BTN_ZR)
-            if zl: self._move_servo(1, -self.arm_step)   # ZL rotate gauche/droite
-            if zr: self._move_servo(1, self.arm_step)    # ZR rotate gauche/droite
-            
-            rx = self._ax(axes, AX_RX)
-            if rx != 0.0:
-                # Ouverture/fermeture de la pince (Servo 6)
-                # RX varie de -1 à 1. On peut incrémenter de arm_step selon le signe
-                self._move_servo(6, -rx * self.arm_step * 2.0)
-                
-            ry = self._ax(axes, AX_RY, invert=self.inv_ry)
-            if ry != 0.0:
-                self._move_servo(4, ry * self.arm_step)  # RY -> servo 4
-                
-            ly = self._ax(axes, AX_LY, invert=self.inv_ly)
-            if ly != 0.0:
-                self._move_servo(2, ly * self.arm_step)  # LY -> servo 2
-                
-            lx = self._ax(axes, AX_LX)
-            if lx != 0.0:
-                self._move_servo(3, lx * self.arm_step)  # LX -> servo 3
-                
-            l = self._btn(buttons, BTN_L)
-            r = self._btn(buttons, BTN_R)
-            if l: self._move_servo(5, self.arm_step)     # L rotate pince
-            if r: self._move_servo(5, -self.arm_step)    # R rotate pince
-            
-            # Robot très lent (utiliser boutons D-pad reconnus comme axes FX/FY)
-            fx = self._ax(axes, AX_DX)  # D-pad X (FX)
-            fy = self._ax(axes, AX_DY, invert=True)  # D-pad Y (FY) inversé sur hid_nintendo souvent
-            
-            twist.linear.x  = _clamp(fy * self.lin_scale * 0.2, -MAX_LINEAR_MS, MAX_LINEAR_MS)
-            twist.linear.y  = _clamp(fx * self.lin_scale * 0.2, -MAX_LINEAR_MS, MAX_LINEAR_MS)
+            if self._presse(boutons, "ZL"):
+                self._bouger_servo(1, -self.arm_step)
+            if self._presse(boutons, "ZR"):
+                self._bouger_servo(1, self.arm_step)
+
+            pince = self._axe(axes, "stick_droit_x")
+            if pince != 0.0:
+                self._bouger_servo(6, pince * self.arm_step * 2.0)
+
+            poignet = self._axe(axes, "stick_droit_y")
+            if poignet != 0.0:
+                self._bouger_servo(4, poignet * self.arm_step)
+
+            epaule = self._axe(axes, "stick_gauche_y")
+            if epaule != 0.0:
+                self._bouger_servo(2, epaule * self.arm_step)
+
+            coude = self._axe(axes, "stick_gauche_x")
+            if coude != 0.0:
+                self._bouger_servo(3, coude * self.arm_step)
+
+            if self._presse(boutons, "L"):
+                self._bouger_servo(5, self.arm_step)
+            if self._presse(boutons, "R"):
+                self._bouger_servo(5, -self.arm_step)
+
+            avant = self._axe(axes, "croix_y")
+            droite = self._axe(axes, "croix_x")
+            twist.linear.x = _clamp(avant * self.lin_scale * 0.2, -MAX_LINEAR_MS, MAX_LINEAR_MS)
+            twist.linear.y = _clamp(-droite * self.lin_scale * 0.2, -MAX_LINEAR_MS, MAX_LINEAR_MS)
             twist.angular.z = 0.0
-            
             self.cmd_vel_pub.publish(twist)
 
-        elif self.mode == 2:
-            # ── MODE 2 : Pilotage du robot ────────────────────────────────────
-            ry = self._ax(axes, AX_RY, invert=self.inv_ry)
-            rx = self._ax(axes, AX_RX)
-            lx = self._ax(axes, AX_LX)
-            
-            twist.linear.x  = _clamp(ry * self.lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
-            twist.linear.y  = _clamp(rx * self.lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
-            twist.angular.z = _clamp(lx * self.ang_scale, -MAX_ANGULAR_RS, MAX_ANGULAR_RS)
-            
+        else:
+            avant = self._axe(axes, "stick_droit_y")
+            droite = self._axe(axes, "stick_droit_x")
+            rotation = self._axe(axes, "stick_gauche_x")
+
+            twist.linear.x = _clamp(avant * self.lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
+            # REP-103 : y positif = gauche, donc on inverse
+            twist.linear.y = _clamp(-droite * self.lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
+            # z positif = antihoraire, donc on inverse pour tourner à droite
+            twist.angular.z = _clamp(-rotation * self.ang_scale, -MAX_ANGULAR_RS, MAX_ANGULAR_RS)
             self.cmd_vel_pub.publish(twist)
-            
-            # Rotation du bras (servo 1)
-            if self._btn_just_pressed(buttons, BTN_Y):
-                self._send_servo(1, 180)  # Gauche
-            if self._btn_just_pressed(buttons, BTN_A):
-                self._send_servo(1, 0)    # Droite
-            if self._btn_just_pressed(buttons, BTN_B):
-                self._send_servo(1, 90)   # Avant
-                
-            # Switch position caméra (X)
-            if self._btn_just_pressed(buttons, BTN_X):
+
+            if self._vient_d_etre_presse(boutons, "Y"):
+                self._envoyer_servo(1, 180)
+            if self._vient_d_etre_presse(boutons, "A"):
+                self._envoyer_servo(1, 0)
+            if self._vient_d_etre_presse(boutons, "B"):
+                self._envoyer_servo(1, 90)
+
+            if self._vient_d_etre_presse(boutons, "X"):
                 self.camera_high = not self.camera_high
                 if self.camera_high:
-                    # Position haute
-                    self._send_arm_pose([90, 90, 90, 0, 90])
-                    self.get_logger().info("📷 Caméra: HAUTE")
+                    self._envoyer_pose([90, 90, 90, 0, 90])
+                    self.get_logger().info("📷 Caméra : HAUTE")
                 else:
-                    # Position basse
-                    self._send_arm_pose([90, 180, 0, 0, 90])
-                    self.get_logger().info("📷 Caméra: BASSE")
+                    self._envoyer_pose([90, 180, 0, 0, 90])
+                    self.get_logger().info("📷 Caméra : BASSE")
 
-        self._btn_prev = buttons[:]
+        self._btn_prev = boutons[:]
 
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ClawbotJoyTeleop()
+    try:
+        node = ClawbotJoyTeleop()
+    except SystemExit:
+        rclpy.try_shutdown()
+        return 1
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
         pass
     finally:
-        node.cmd_vel_pub.publish(Twist())   # stop au shutdown
+        node.cmd_vel_pub.publish(Twist())
         node.destroy_node()
-        rclpy.shutdown()
+        rclpy.try_shutdown()
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
