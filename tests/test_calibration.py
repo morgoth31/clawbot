@@ -119,3 +119,61 @@ def test_phase_boutons_marque_absent_apres_delai():
     )
     assert "light" in cal.donnees["absents"]
     assert "délai" in cal.donnees["absents_raisons"]["light"]
+
+
+# ── Phase axes ───────────────────────────────────────────────────────────────
+
+class FauxLecteurAxes:
+    """Rejoue une suite de vecteurs d'axes : chaque etat() rend la scène suivante."""
+
+    def __init__(self, scenes):
+        self.scenes = list(scenes)
+        self.rang = 0
+
+    def lire(self, attente=0.02):
+        return True
+
+    def etat(self):
+        from js_lecteur import Etat
+        scene = self.scenes[min(self.rang, len(self.scenes) - 1)] if self.scenes else [0.0] * 6
+        self.rang += 1
+        return Etat(axes=list(scene), boutons=[0] * 14)
+
+
+def test_phase_axes_centre_debattement_et_sens_horizontal():
+    cal = Calibration(sortie=Path("/dev/null"))
+    scenes = [
+        [0.02, 0.0, 0.0, 0.0, 0.0, 0.0], [0.02, 0.0, 0.0, 0.0, 0.0, 0.0],   # repos
+        [-0.99, 0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0, 0.0],   # balayage
+        [1.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0, 0.0],     # extrême droite
+    ]
+    cal.phase_axes(
+        FauxLecteurAxes(scenes),
+        axes=[("stick_gauche_x", 0, "droite", "le stick gauche à droite")],
+        duree_repos=0.04, duree_balayage=0.04, duree_extreme=0.04,
+        journal=lambda *a, **k: None,
+    )
+    a = cal.donnees["axes"]["stick_gauche_x"]
+    assert a["index"] == 0
+    assert a["centre"] == pytest.approx(0.02)
+    assert a["min"] == pytest.approx(-0.99)
+    assert a["max"] == pytest.approx(1.0)
+    assert a["inverser"] is False        # positive à droite : pas d'inversion
+    assert a["zone_morte"] >= 0.08       # plancher
+
+
+def test_phase_axes_sens_vertical_inverse():
+    """Sur ce pad, le haut donne une valeur NÉGATIVE : la config doit l'enregistrer."""
+    cal = Calibration(sortie=Path("/dev/null"))
+    scenes = [
+        [0.0, -0.01, 0.0, 0.0, 0.0, 0.0], [0.0, -0.01, 0.0, 0.0, 0.0, 0.0],
+        [0.0, -0.99, 0.0, 0.0, 0.0, 0.0], [0.0, 0.99, 0.0, 0.0, 0.0, 0.0],
+        [0.0, -1.0, 0.0, 0.0, 0.0, 0.0], [0.0, -1.0, 0.0, 0.0, 0.0, 0.0],
+    ]
+    cal.phase_axes(
+        FauxLecteurAxes(scenes),
+        axes=[("stick_gauche_y", 1, "haut", "le stick gauche en haut")],
+        duree_repos=0.04, duree_balayage=0.04, duree_extreme=0.04,
+        journal=lambda *a, **k: None,
+    )
+    assert cal.donnees["axes"]["stick_gauche_y"]["inverser"] is True
