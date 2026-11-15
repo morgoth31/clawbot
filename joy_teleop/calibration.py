@@ -235,6 +235,17 @@ class Calibration:
         self.donnees["aliases"][nom] = cible
         self._traitees.add(nom)
 
+    def declarer_reserve(self, nom: str, raison: str) -> None:
+        """Entrée qui existe sans être un bouton du rapport HID (commutateur, etc.)."""
+        self.donnees.setdefault("reserve", {})[nom] = raison
+        self._traitees.add(nom)
+
+    def enregistrer_gachette(self, nom: str, analogique: bool, axes=None) -> None:
+        entree = {"analogique": bool(analogique)}
+        if axes:
+            entree["axes"] = axes
+        self.donnees.setdefault("gachettes", {})[nom] = entree
+
     def marquer_absent(self, nom: str, raison: str) -> None:
         if nom not in self.donnees["absents"]:
             self.donnees["absents"].append(nom)
@@ -351,36 +362,6 @@ class Calibration:
                 "raison": "aucun axe ne bouge pendant l'appui : gâchettes binaires",
             }
 
-    def phase_imu(self, lecteur_imu, chemin: str = "/dev/input/js1",
-                  duree_repos: float = 3.0, duree_retournement: float = 3.0,
-                  journal=None) -> None:
-        """Biais, bruit et norme de gravité, plus un contrôle de signe.
-
-        Les valeurs sont celles de jsdev, normalisées dans [-1, 1] ; ce ne sont pas
-        des m/s². Le contrôle de retournement vérifie que l'axe vertical change de
-        signe : sans lui, rien ne prouve que l'accéléromètre bouge.
-        """
-        journal = journal or print
-        journal("  1) Pose la manette à plat, immobile (3 s)")
-        repos = echantillonner_tout(lecteur_imu, duree_repos)
-        biais = [round(statistics.fmean(colonne), 4) for colonne in zip(*repos)]
-        bruit = [round(statistics.pstdev(colonne), 4) for colonne in zip(*repos)]
-        gravite = round(math.sqrt(sum(v * v for v in biais[:3])), 4)
-
-        journal("  2) Retourne la manette, écran vers le bas, immobile (3 s)")
-        retourne = echantillonner_tout(lecteur_imu, duree_retournement)
-        biais_retourne = [statistics.fmean(colonne) for colonne in zip(*retourne)]
-        verifie = (biais[2] * biais_retourne[2]) < 0
-
-        self.donnees["imu"] = {
-            "chemin": chemin,
-            "biais": biais,
-            "bruit": bruit,
-            "gravite": gravite,
-            "verifie": bool(verifie),
-        }
-        journal(f"     biais={biais} gravite={gravite} retournement_verifie={verifie}")
-
     def phase_actionneurs(self, chemin_ff=None, base_hid=None, demander=None,
                           vibrer=None, journal=None) -> None:
         """Teste ce qui peut être commandé, et enregistre ce que l'opérateur confirme.
@@ -449,6 +430,12 @@ class Calibration:
             raise RuntimeError(
                 f"deux noms logiques revendiquent le même code ({detail}) — "
                 f"séquence probablement décalée, refaire la calibration")
+        for nom, a in self.donnees["axes"].items():
+            debattement = abs(a["max"] - a["min"])
+            if debattement < 0.5:
+                raise RuntimeError(
+                    f"axe {nom!r} : débattement mesuré {debattement:.2f} (min {a['min']}, "
+                    f"max {a['max']}) — l'axe n'a pas été balayé, refaire cette mesure")
         reste = self.non_traitees()
         if reste:
             raise RuntimeError(
@@ -537,7 +524,7 @@ def main(argv: list[str] | None = None) -> int:
                          help="passer outre les garde-fous (téléopération active)")
     args = parseur.parse_args(argv)
 
-    phases = ({"boutons", "axes", "gachettes", "imu", "actionneurs"}
+    phases = ({"boutons", "axes", "gachettes", "actionneurs"}
               if args.seulement == "tout"
               else {p.strip() for p in args.seulement.split(",") if p.strip()})
 
@@ -577,17 +564,6 @@ def main(argv: list[str] | None = None) -> int:
         if "gachettes" in phases and cal.donnees["boutons"]:
             print("\n═══ Gâchettes ═══")
             cal.phase_gachettes(lecteur, delai_s=args.duree_appui)
-        if "imu" in phases:
-            chemin_imu = cal.donnees["appareil"].get("js_imu")
-            if chemin_imu:
-                print("\n═══ IMU ═══")
-                lecteur_imu = LecteurJs(chemin_imu)
-                try:
-                    cal.phase_imu(lecteur_imu, chemin=chemin_imu)
-                finally:
-                    lecteur_imu.fermer()
-            else:
-                print("\n═══ IMU : aucun nœud inertiel, phase ignorée ═══")
         if "actionneurs" in phases:
             print("\n═══ Actionneurs ═══")
             noeud = chemin_pad.rsplit("/", 1)[-1]
