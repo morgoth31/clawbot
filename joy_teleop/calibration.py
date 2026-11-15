@@ -131,6 +131,44 @@ def surveiller_appui(lecteur, index_bouton: int, delai_s: float,
     return ecarts
 
 
+def vider_appuis(lecteur, delai_s: float = 2.0) -> None:
+    """Attend que tous les boutons soient relâchés et JETTE ce qui arrive.
+
+    Sans cette purge, un appui en retard est attribué à l'entrée suivante et toute
+    la collecte se décale — c'est exactement ce qui a produit deux relevés
+    incoherents le 2026-11-15.
+    """
+    depart = time.monotonic()
+    while time.monotonic() - depart < delai_s:
+        if not lecteur.lire(0.02):
+            return
+        if not any(lecteur.etat().boutons):
+            return
+
+
+def attendre_pret(lecteur, delai_s: float = 120.0, journal=None) -> int:
+    """Attend un premier appui « je suis prêt » avant d'énumérer les entrées.
+
+    Sans cette barrière, un opérateur qui commence à appuyer pendant que le premier
+    délai court décale toute la collecte d'un cran : constaté le 2026-11-15, la
+    séquence entière s'est retrouvée décalée d'une entrée et le YAML était faux.
+    """
+    journal = journal or print
+    journal("Appuie sur N'IMPORTE QUEL bouton quand tu es prêt à commencer (120 s max).")
+    index = capturer_appui(lecteur, delai_s)
+    if index is None:
+        raise RuntimeError("aucun appui pour démarrer : séquence non lancée")
+    depart = time.monotonic()
+    while time.monotonic() - depart < 5.0:
+        if not lecteur.lire(0.02):
+            raise RuntimeError("manette déconnectée pendant la préparation")
+        boutons = lecteur.etat().boutons
+        if index >= len(boutons) or not boutons[index]:
+            break
+    journal(f"Prêt — l'appui de démarrage (index {index}) est ignoré.\n")
+    return index
+
+
 def capturer_appui(lecteur, delai_s: float = 25.0) -> int | None:
     """Attend une transition 0→1 sur un bouton et rend son index.
 
@@ -254,15 +292,20 @@ class Calibration:
                     f"zone={zone:.3f} inverser={inverser}")
 
     def phase_boutons(self, lecteur, entrees=None, delai_s: float = 25.0,
-                      journal=None) -> None:
+                      journal=None, demarrage: bool = False,
+                      cadence: float | None = None) -> None:
         """Un appui dicté par entrée ; index mesuré, alias ou absent enregistré."""
         journal = journal or print
         entrees = entrees if entrees is not None else ENTREES_DECLAREES
+        if demarrage:
+            attendre_pret(lecteur, journal=journal)
         total = len(entrees)
         for rang, (nom, description) in enumerate(entrees, 1):
             self.declarer_entree(nom)
             journal(f"[{rang}/{total}] Appuie sur : {description}")
-            index = capturer_appui(lecteur, delai_s)
+            index = capturer_appui(lecteur, cadence if cadence else delai_s)
+            if cadence:
+                vider_appuis(lecteur)
             if index is None:
                 self.marquer_absent(nom, f"délai de {delai_s:.0f} s dépassé sans événement")
                 journal("        ↳ absent : aucun événement")
@@ -389,10 +432,23 @@ class Calibration:
 
     # ── contrôle et écriture ─────────────────────────────────────────────────
 
+    def collisions(self) -> dict[int, list[str]]:
+        """Index revendiqués par plusieurs noms logiques (hors alias explicites)."""
+        par_index: dict[int, list[str]] = {}
+        for nom, index in self.donnees["boutons"].items():
+            par_index.setdefault(int(index), []).append(nom)
+        return {i: noms for i, noms in par_index.items() if len(noms) > 1}
+
     def non_traitees(self) -> list[str]:
         return [n for n in self._declarees if n not in self._traitees]
 
     def _verifier(self) -> None:
+        collisions = self.collisions()
+        if collisions:
+            detail = ", ".join(f"index {i} : {noms}" for i, noms in collisions.items())
+            raise RuntimeError(
+                f"deux noms logiques revendiquent le même code ({detail}) — "
+                f"séquence probablement décalée, refaire la calibration")
         reste = self.non_traitees()
         if reste:
             raise RuntimeError(
@@ -433,6 +489,15 @@ def _teleop_active(lecteur_ps=None) -> bool:
     return "clawbot_joy_teleop.py" in sortie
 
 
+def _lire_reponse(question: str) -> str:
+    """Lit une réponse au clavier ; sans terminal (service, redirection), répond non."""
+    try:
+        return input(question)
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return ""
+
+
 def reponse_booleenne(texte: str) -> bool:
     return str(texte).strip().lower() in ("o", "oui", "y", "yes", "1")
 
@@ -466,6 +531,8 @@ def main(argv: list[str] | None = None) -> int:
                          help="boutons,axes,gachettes,imu,actionneurs (virgules) ou tout")
     parseur.add_argument("--duree-appui", type=float, default=25.0,
                          help="délai par entrée avant de la déclarer absente (s)")
+    parseur.add_argument("--cadence", type=float, default=0.0,
+                         help="rythme imposé : un appui attendu toutes les N secondes")
     parseur.add_argument("--forcer", action="store_true",
                          help="passer outre les garde-fous (téléopération active)")
     args = parseur.parse_args(argv)
@@ -502,7 +569,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if "boutons" in phases:
             print("═══ Boutons ═══")
-            cal.phase_boutons(lecteur, delai_s=args.duree_appui)
+            cal.phase_boutons(lecteur, delai_s=args.duree_appui, demarrage=True,
+                              cadence=(args.cadence or None))
         if "axes" in phases:
             print("\n═══ Axes ═══")
             cal.phase_axes(lecteur)
@@ -527,7 +595,7 @@ def main(argv: list[str] | None = None) -> int:
             cal.phase_actionneurs(
                 chemin_ff=chemin_sysfs(noeud, "ff"),
                 base_hid=base_hid,
-                demander=lambda question: reponse_booleenne(input(question)),
+                demander=lambda question: reponse_booleenne(_lire_reponse(question)),
                 vibrer=lambda: vibrer(noeud),
             )
     except RuntimeError as err:
