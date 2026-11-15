@@ -11,6 +11,7 @@ Type=simple
 User=jetson
 Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
+Environment=MANETTE_CONFIG=/home/jetson/clawbot/config/manette.yaml
 # Attend la manette puis lance le teleop
 ExecStart=/home/jetson/clawbot/joy_teleop/joy_teleop_wait.sh
 # Redémarre si la manette disparaît (déconnexion BT)
