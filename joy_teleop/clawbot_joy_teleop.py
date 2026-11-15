@@ -92,6 +92,13 @@ class ClawbotJoyTeleop(Node):
         self.servo_pub = self.create_publisher(Int32MultiArray, "/servo_ctrl", 10)
         self.create_subscription(Joy, "/joy", self._joy_cb, 10)
 
+        turbo = (self.manette.capacites.get("turbo") or {})
+        if turbo.get("actif"):
+            self.get_logger().warn(
+                f"turbo armé sur le pad ({turbo.get('repetitions')} appuis en "
+                f"{turbo.get('duree_mesure_s')} s sur {turbo.get('reference')}) — "
+                f"les ordres seront répétés, à désactiver avant de piloter")
+
         self.get_logger().info(
             f"✅ ClawbotJoyTeleop prêt — {self.manette.chemin} "
             f"({len(self.manette.boutons)} boutons, {len(self.manette.axes)} axes), "

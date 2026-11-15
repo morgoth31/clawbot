@@ -37,6 +37,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from calibration import (  # noqa: E402
     AXES_DECLARES,
+    compter_appuis,
     ENTREES_DECLAREES,
     ENTREES_GACHETTES,
     SORTIE_DEFAUT,
@@ -154,12 +155,13 @@ def phase_boutons(cal: Calibration, lecteur) -> None:
             raise KeyboardInterrupt
         if genre == "passe":
             if nom == "T":
-                if demander_oui_non("Le bouton T change-t-il de MODE la manette ?"):
+                if demander_oui_non("T est-il la touche TURBO (elle n'agit qu'avec un autre bouton) ?"):
                     cal.declarer_reserve(
-                        "T", "commutateur de mode : aucun code dans le rapport HID")
-                    attention("noté COMMUTATEUR (réservé), pas bouton")
+                        "T", "touche TURBO : aucun code propre, arme une répétition "
+                             "sur un autre bouton (mesuré en phase 1 bis)")
+                    attention("noté TOUCHE TURBO (réservé), pas bouton")
                 else:
-                    cal.marquer_absent("T", "aucun événement, ne commute pas de mode")
+                    cal.marquer_absent("T", "aucun événement, ne sert pas de turbo")
                     attention("noté ABSENT")
             elif nom == "light":
                 cal.marquer_absent("light", "aucun événement : bouton non fonctionnel")
@@ -176,6 +178,43 @@ def phase_boutons(cal: Calibration, lecteur) -> None:
         else:
             ok(f"index {index}")
         attendre_relachement(lecteur, index)
+
+
+# ── 1 bis. Turbo ────────────────────────────────────────────────────────────
+
+def phase_turbo(cal: Calibration, lecteur) -> None:
+    """Caractérise le TURBO : T n'émet rien seul, il arme peut-être un autre bouton.
+
+    Mesure : un bouton maintenu produit UN front 0→1 ; le même bouton en turbo en
+    produit plusieurs par seconde. C'est ce qui distingue « T ne fait rien » de
+    « T arme un turbo », sans supposition.
+    """
+    titre("1 bis/4 — MODE TURBO (bouton T)")
+    print("T seul n'émet aucun code : on vérifie s'il arme une répétition sur un autre bouton.")
+    reference = "A"
+    try:
+        index = cal.bouton(reference)
+    except KeyError:
+        attention("bouton A non mesuré : test turbo ignoré")
+        return
+
+    input(f"\n   Entrée, puis MAINTIENS {reference} appuyé 2 secondes (sans toucher à T)… ")
+    base = compter_appuis(lecteur, index, 2.0)
+    ok(f"référence : {base} appui(s) en 2 s")
+
+    invite("Appuie UNE fois sur T, relâche-le, puis maintiens A 2 secondes")
+    input("   Entrée quand tu es prêt à maintenir A… ")
+    turbo = compter_appuis(lecteur, index, 2.0)
+
+    actif = turbo > base + 1
+    if actif:
+        attention(f"{turbo} appuis en 2 s → TURBO ARMÉ sur {reference}")
+        print("      Pour le couper : refais T puis A, ou maintiens T 5 s (selon le pad).")
+        print("      Un turbo actif ferait répéter les ordres du bras : à désactiver.")
+    else:
+        ok(f"{turbo} appui(s) en 2 s → pas de répétition détectée")
+    cal.enregistrer_turbo(bouton="T", actif=actif, repetitions=turbo,
+                          reference=reference, duree_s=2.0)
 
 
 # ── 2. Axes ─────────────────────────────────────────────────────────────────
@@ -336,6 +375,7 @@ def main(argv=None) -> int:
 
     try:
         phase_boutons(cal, lecteur)
+        phase_turbo(cal, lecteur)
         phase_axes(cal, lecteur)
         phase_gachettes(cal, lecteur)
     except KeyboardInterrupt:
