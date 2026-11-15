@@ -233,6 +233,20 @@ class Calibration:
             "capacites": {},
         }
 
+    def reprendre(self, chemin: str | Path) -> None:
+        """Pré-remplit depuis un YAML existant : seules les phases relancées changent."""
+        chemin = Path(chemin)
+        if not chemin.exists():
+            return
+        precedent = yaml.safe_load(chemin.read_text(encoding="utf-8")) or {}
+        for cle in ("appareil", "boutons", "aliases", "absents", "absents_raisons",
+                    "axes", "gachettes", "capacites", "reserve"):
+            if cle in precedent:
+                self.donnees[cle] = precedent[cle]
+        for nom in list(self.donnees["boutons"]) + list(self.donnees["aliases"]) \
+                + list(self.donnees["absents"]) + list(self.donnees.get("reserve") or {}):
+            self._traitees.add(nom)
+
     # ── déclaration ──────────────────────────────────────────────────────────
 
     def declarer_entree(self, nom: str) -> None:
@@ -262,15 +276,21 @@ class Calibration:
         self._traitees.add(nom)
 
     def enregistrer_turbo(self, bouton: str, actif: bool, repetitions: int,
-                          reference: str, duree_s: float) -> None:
+                          reference: str, duree_s: float,
+                          repetitions_reference: int | None = None) -> None:
         """Trace le turbo : bouton armant, bouton de référence, répétitions mesurées."""
         self.donnees.setdefault("capacites", {})["turbo"] = {
             "bouton": bouton,
             "actif": bool(actif),
             "reference": reference,
             "repetitions": int(repetitions),
+            "repetitions_reference": repetitions_reference,
+            "mesure_valide": bool(repetitions_reference),
             "duree_mesure_s": float(duree_s),
         }
+        if not repetitions_reference:
+            self.donnees["capacites"]["turbo"]["raison"] = (
+                "aucun appui vu pendant la fenêtre de référence : test non concluant")
 
     def enregistrer_gachette(self, nom: str, analogique: bool, axes=None) -> None:
         entree = {"analogique": bool(analogique)}
@@ -477,7 +497,24 @@ class Calibration:
         """Même contrôle que `ecrire()`, sans toucher au disque (tests)."""
         self._verifier()
 
+    def _completer_forme(self) -> None:
+        """Renseigne nb_axes / nb_boutons depuis les mesures.
+
+        À l'ouverture du périphérique, la source n'a pas encore reçu les événements
+        d'initialisation : le compte valait 0 et le contrôle de forme était inerte.
+        """
+        indices_axes = [a["index"] for a in self.donnees["axes"].values()]
+        index_boutons = [int(i) for i in self.donnees["boutons"].values()]
+        for cible in self.donnees["aliases"].values():
+            if cible in self.donnees["boutons"]:
+                index_boutons.append(int(self.donnees["boutons"][cible]))
+        if indices_axes:
+            self.donnees["appareil"]["nb_axes"] = max(indices_axes) + 1
+        if index_boutons:
+            self.donnees["appareil"]["nb_boutons"] = max(index_boutons) + 1
+
     def ecrire(self) -> Path:
+        self._completer_forme()
         self._verifier()
         self.sortie.parent.mkdir(parents=True, exist_ok=True)
         if self.sortie.exists():
