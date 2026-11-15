@@ -276,3 +276,29 @@ def test_actionneurs_led_exposee(tmp_path):
     cap = cal.donnees["capacites"]
     assert cap["vibration"]["disponible"] is False
     assert cap["lumieres"]["disponible"] is True
+
+
+# ── CLI et garde-fous ────────────────────────────────────────────────────────
+
+def test_cli_refuse_si_teleop_active(monkeypatch, tmp_path):
+    import calibration
+    monkeypatch.setattr(calibration, "_teleop_active", lambda *a, **k: True)
+    code = calibration.main(["--sortie", str(tmp_path / "x.yaml"), "--seulement", "axes"])
+    assert code == 3
+    assert not (tmp_path / "x.yaml").exists()
+
+
+def test_cli_refuse_sans_manette(monkeypatch, tmp_path):
+    import calibration
+    monkeypatch.setattr(calibration, "_teleop_active", lambda *a, **k: False)
+    monkeypatch.setattr(calibration, "lister_manettes", lambda: [])
+    code = calibration.main(["--sortie", str(tmp_path / "x.yaml"), "--seulement", "axes"])
+    assert code == 4
+
+
+def test_reponse_oui_est_comprise():
+    import calibration
+    assert calibration.reponse_booleenne("o") is True
+    assert calibration.reponse_booleenne("Oui") is True
+    assert calibration.reponse_booleenne("n") is False
+    assert calibration.reponse_booleenne("") is False
