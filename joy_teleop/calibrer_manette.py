@@ -206,7 +206,9 @@ def phase_turbo(cal: Calibration, lecteur) -> None:
     input("   Entrée quand tu es prêt à maintenir A… ")
     turbo = compter_appuis(lecteur, index, 2.0)
 
-    actif = turbo > base + 1
+    if base == 0:
+        attention("aucun appui vu pendant la fenêtre de référence : test NON CONCLUANT")
+    actif = base > 0 and turbo > base + 1
     if actif:
         attention(f"{turbo} appuis en 2 s → TURBO ARMÉ sur {reference}")
         print("      Pour le couper : refais T puis A, ou maintiens T 5 s (selon le pad).")
@@ -214,7 +216,8 @@ def phase_turbo(cal: Calibration, lecteur) -> None:
     else:
         ok(f"{turbo} appui(s) en 2 s → pas de répétition détectée")
     cal.enregistrer_turbo(bouton="T", actif=actif, repetitions=turbo,
-                          reference=reference, duree_s=2.0)
+                          reference=reference, duree_s=2.0,
+                          repetitions_reference=base)
 
 
 # ── 2. Axes ─────────────────────────────────────────────────────────────────
@@ -296,12 +299,18 @@ def phase_actionneurs(cal: Calibration, chemin_pad: str) -> None:
         event = f"/dev/input/{noeud.replace('js', 'event')}"
         print(f"\n   Le noyau annonce FF_RUMBLE ; envoi d'un effet de 600 ms sur {event}.")
         joue = False
+        raison = None
         try:
             jouer_rumble(event, 600)
             joue = True
             ok("effet chargé, joué et retiré")
+        except PermissionError:
+            raison = (f"ouverture de {event} refusée : droits root requis — "
+                      f"relancer ce script avec sudo pour tester la vibration")
+            attention(raison)
         except OSError as err:
-            attention(f"l'effet n'a pas pu être joué : {err}")
+            raison = f"effet refusé ou non joué : {err}"
+            attention(raison)
         senti = demander_oui_non("As-tu senti la vibration ?")
         cal.donnees["capacites"]["vibration"] = {
             "disponible": True,
@@ -309,6 +318,8 @@ def phase_actionneurs(cal: Calibration, chemin_pad: str) -> None:
             "effet_accepte": joue,
             "verifie": senti,
         }
+        if raison:
+            cal.donnees["capacites"]["vibration"]["raison"] = raison
         if not senti:
             attention("le noyau accepte l'effet mais rien n'est perçu : noté NON vérifié")
     else:
@@ -327,11 +338,20 @@ def phase_actionneurs(cal: Calibration, chemin_pad: str) -> None:
             "entrees": noms,
             "ecriture": "root requis (/sys/class/leds/<nom>/brightness)",
         }
-        joueurs = [n for n in noms if "player" in n]
-        if joueurs and demander_oui_non("Tester les LED maintenant (nécessite sudo) ?"):
-            print("   Relance ce script avec sudo si l'écriture échoue.")
-        if joueurs:
-            ok("les LED de joueur existent : pilotables, non testées ici")
+        joueurs = [led for led in leds if "player" in led.name]
+        if joueurs and demander_oui_non(
+                "Allumer les LED de joueur une par une pour vérifier ? (root requis)"):
+            for led in joueurs:
+                try:
+                    (led / "brightness").write_text("255", encoding="utf-8")
+                    time.sleep(0.5)
+                    (led / "brightness").write_text("0", encoding="utf-8")
+                    ok(f"{led.name.rsplit(':', 1)[-1]} allumée puis éteinte")
+                except OSError as err:
+                    attention(f"{led.name} : écriture refusée ({err}) — relancer avec sudo")
+                    cal.donnees["capacites"]["lumieres"]["ecriture"] = (
+                        f"refusée : {err} — relancer avec sudo")
+                    break
     else:
         cal.donnees["capacites"]["lumieres"] = {
             "disponible": False,
@@ -343,6 +363,9 @@ def main(argv=None) -> int:
     parseur = argparse.ArgumentParser(description="Calibration guidée de la manette")
     parseur.add_argument("--sortie", default=SORTIE_DEFAUT)
     parseur.add_argument("--forcer", action="store_true")
+    parseur.add_argument("--seulement", default="tout",
+                         help="boutons,axes,gachettes,turbo,actionneurs "
+                              "ou une combinaison ; reprend le YAML existant")
     args = parseur.parse_args(argv)
 
     titre("CALIBRATION DE LA MANETTE")
@@ -373,11 +396,22 @@ def main(argv=None) -> int:
     print(f"Sortie  : {args.sortie}")
     print("\nPendant l'attente d'un bouton : Entrée = passer, q + Entrée = abandonner.")
 
+    phases = ({"boutons", "axes", "gachettes", "turbo", "actionneurs"}
+              if args.seulement == "tout"
+              else {p.strip() for p in args.seulement.split(",") if p.strip()})
+    if phases != {"boutons", "axes", "gachettes", "turbo", "actionneurs"}:
+        cal.reprendre(args.sortie)
+        print(f"Reprise de {args.sortie} : seules les phases {sorted(phases)} seront refaites.")
+
     try:
-        phase_boutons(cal, lecteur)
-        phase_turbo(cal, lecteur)
-        phase_axes(cal, lecteur)
-        phase_gachettes(cal, lecteur)
+        if "boutons" in phases:
+            phase_boutons(cal, lecteur)
+        if "turbo" in phases:
+            phase_turbo(cal, lecteur)
+        if "axes" in phases:
+            phase_axes(cal, lecteur)
+        if "gachettes" in phases:
+            phase_gachettes(cal, lecteur)
     except KeyboardInterrupt:
         print("\n\nAbandon : aucun fichier écrit.")
         return 130
@@ -388,7 +422,8 @@ def main(argv=None) -> int:
     finally:
         lecteur.fermer()
 
-    phase_actionneurs(cal, chemin_pad)
+    if "actionneurs" in phases:
+        phase_actionneurs(cal, chemin_pad)
 
     titre("RÉSUMÉ")
     print(surligner_etat(cal))
