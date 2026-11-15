@@ -53,6 +53,26 @@ def lister_manettes() -> list[tuple[str, str]]:
     return manettes
 
 
+def trouver_noeud_imu() -> str | None:
+    """Chemin du premier nœud js dont le nom désigne un capteur inertiel."""
+    nom = None
+    try:
+        with open("/proc/bus/input/devices", encoding="utf-8", errors="replace") as f:
+            for ligne in f:
+                if ligne.startswith("N: Name="):
+                    nom = ligne[len("N: Name="):].strip().strip('"')
+                elif ligne.startswith("H: Handlers="):
+                    for jeton in ligne.split():
+                        if jeton.startswith("js") and jeton[2:].isdigit():
+                            if nom and any(m in nom.upper() for m in EXCLUS):
+                                return f"/dev/input/{jeton}"
+                elif not ligne.strip():
+                    nom = None
+    except OSError:
+        pass
+    return None
+
+
 @dataclass
 class Etat:
     """État complet d'un pad : listes pleines, trous à zéro."""

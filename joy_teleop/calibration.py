@@ -19,6 +19,7 @@ import math
 import os
 import socket
 import statistics
+import subprocess
 import sys
 import time
 from datetime import datetime
@@ -26,7 +27,8 @@ from pathlib import Path
 
 import yaml
 
-from manette_materiel import leds_du_pad, vibration_supportee
+from js_lecteur import LecteurJs, lister_manettes, trouver_noeud_imu
+from manette_materiel import chemin_sysfs, leds_du_pad, vibration_supportee
 
 OUTIL = "joy_teleop/calibration.py"
 SORTIE_DEFAUT = "/home/jetson/clawbot/config/manette.yaml"
@@ -415,19 +417,129 @@ class Calibration:
         return self.sortie
 
 
+BASE_HID = Path("/sys/bus/hid/devices")
+VID = "057E"
+PID = "2009"
+
+
+def _teleop_active(lecteur_ps=None) -> bool:
+    """Vrai si un nœud de téléopération tourne (il commande les servos)."""
+    try:
+        sortie = (lecteur_ps() if lecteur_ps else
+                  subprocess.run(["ps", "-eo", "args"], capture_output=True,
+                                 text=True, timeout=5).stdout)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return "clawbot_joy_teleop.py" in sortie
+
+
+def reponse_booleenne(texte: str) -> bool:
+    return str(texte).strip().lower() in ("o", "oui", "y", "yes", "1")
+
+
+def trouver_base_hid(vid: str = VID, pid: str = PID) -> Path | None:
+    """Répertoire sysfs du périphérique HID du pad (celui qui porte ses LEDs)."""
+    if not BASE_HID.is_dir():
+        return None
+    motif = f"{vid}:{pid}".upper()
+    for candidat in sorted(BASE_HID.iterdir()):
+        if motif in candidat.name.upper():
+            return candidat
+    return None
+
+
+def vibrer(noeud: str, duree_s: int = 6) -> None:
+    """Joue un effet court avec fftest, sans lever si l'outil échoue.
+
+    fftest est interactif : on lui envoie « 1 » pour jouer le premier effet.
+    L'échec n'est pas une erreur de calibration — c'est l'opérateur qui tranche.
+    """
+    event = noeud.replace("js", "event")
+    subprocess.run(["fftest", f"/dev/input/{event}"], input="1\n", text=True,
+                   capture_output=True, timeout=duree_s)
+
+
 def main(argv: list[str] | None = None) -> int:
     parseur = argparse.ArgumentParser(description="Calibration de la manette")
     parseur.add_argument("--sortie", default=SORTIE_DEFAUT)
     parseur.add_argument("--seulement", default="tout",
-                         help="boutons,axes,imu,actionneurs (virgules) ou tout")
+                         help="boutons,axes,gachettes,imu,actionneurs (virgules) ou tout")
+    parseur.add_argument("--duree-appui", type=float, default=25.0,
+                         help="délai par entrée avant de la déclarer absente (s)")
     parseur.add_argument("--forcer", action="store_true",
                          help="passer outre les garde-fous (téléopération active)")
     args = parseur.parse_args(argv)
 
-    print("Procédure de calibration non encore implémentée : seules les phases")
-    print("d'écriture existent à ce stade (Task 5 du plan).")
-    print(f"sortie prévue : {args.sortie}  |  phases : {args.seulement}")
-    return 2
+    phases = ({"boutons", "axes", "gachettes", "imu", "actionneurs"}
+              if args.seulement == "tout"
+              else {p.strip() for p in args.seulement.split(",") if p.strip()})
+
+    # Garde-fou 1 : la téléopération commande les servos à chaque appui. Même
+    # discipline que scripts/read_arm_angles.py face au pilote.
+    if not args.forcer and _teleop_active():
+        print("ERREUR : la téléopération tourne — elle commande les servos à chaque appui.")
+        print("         sudo systemctl stop clawbot-joy-teleop   (ou --forcer)")
+        return 3
+
+    manettes = lister_manettes()
+    if not manettes:
+        print("ERREUR : aucune manette détectée sur un nœud /dev/input/jsN.")
+        print("         sudo bash joy_teleop/pair_procontroller.sh, puis appuyer sur un bouton")
+        return 4
+
+    chemin_pad, nom = manettes[0]
+    cal = Calibration(args.sortie, args.forcer)
+    cal.donnees["appareil"] = {
+        "nom": nom,
+        "js_pad": chemin_pad,
+        "js_imu": trouver_noeud_imu() or "",
+    }
+    print(f"Manette : {nom} sur {chemin_pad}")
+    print(f"Sortie   : {args.sortie}")
+    print(f"Phases   : {', '.join(sorted(phases))}\n")
+
+    lecteur = LecteurJs(chemin_pad)
+    try:
+        if "boutons" in phases:
+            print("═══ Boutons ═══")
+            cal.phase_boutons(lecteur, delai_s=args.duree_appui)
+        if "axes" in phases:
+            print("\n═══ Axes ═══")
+            cal.phase_axes(lecteur)
+        if "gachettes" in phases and cal.donnees["boutons"]:
+            print("\n═══ Gâchettes ═══")
+            cal.phase_gachettes(lecteur, delai_s=args.duree_appui)
+        if "imu" in phases:
+            chemin_imu = cal.donnees["appareil"].get("js_imu")
+            if chemin_imu:
+                print("\n═══ IMU ═══")
+                lecteur_imu = LecteurJs(chemin_imu)
+                try:
+                    cal.phase_imu(lecteur_imu, chemin=chemin_imu)
+                finally:
+                    lecteur_imu.fermer()
+            else:
+                print("\n═══ IMU : aucun nœud inertiel, phase ignorée ═══")
+        if "actionneurs" in phases:
+            print("\n═══ Actionneurs ═══")
+            noeud = chemin_pad.rsplit("/", 1)[-1]
+            base_hid = trouver_base_hid()
+            cal.phase_actionneurs(
+                chemin_ff=chemin_sysfs(noeud, "ff"),
+                base_hid=base_hid,
+                demander=lambda question: reponse_booleenne(input(question)),
+                vibrer=lambda: vibrer(noeud),
+            )
+    except RuntimeError as err:
+        print(f"\nINTERROMPU : {err}")
+        print("Aucun fichier écrit. Réveiller la manette (un appui) et relancer.")
+        return 5
+    finally:
+        lecteur.fermer()
+
+    chemin = cal.ecrire()
+    print(f"\nÉcrit : {chemin}")
+    return 0
 
 
 if __name__ == "__main__":

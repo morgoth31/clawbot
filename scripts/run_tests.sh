@@ -32,7 +32,7 @@ export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
 
 # Un nœud de téléopération vivant publie sur les mêmes topics que les tests et
 # fausse leurs assertions (constaté : un /cmd_vel à 0.06 au lieu de 0.5).
-if ps -eo args | grep -q "[c]lawbot_joy_teleop.py"; then
+if ps -eo args | grep -qE "^python3 /home/jetson/clawbot/joy_teleop/clawbot_joy_teleop\.py"; then
     echo "ERREUR : une téléopération tourne et va polluer /joy et /cmd_vel." >&2
     echo "        Arrêter le service ou les processus de test avant de relancer." >&2
     exit 4
