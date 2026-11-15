@@ -227,28 +227,37 @@ def test_gachette_analogique_detectee():
     assert cap["axes_detectes"]
 
 
-# ── Phase IMU ────────────────────────────────────────────────────────────────
+# ── Validations exigées par la calibration réelle du 2026-11-15 ─────────────
 
-def test_imu_biais_et_gravite():
-    cal = Calibration(sortie=Path("/dev/null"))
-    plat = [0.01, 0.0, 1.0, 0.0, 0.0, 0.0]
-    retourne = [0.01, 0.0, -1.0, 0.0, 0.0, 0.0]
-    cal.phase_imu(FauxLecteurAxes([plat, plat, retourne, retourne]),
-                  duree_repos=0.04, duree_retournement=0.04,
-                  journal=lambda *a, **k: None)
-    imu = cal.donnees["imu"]
-    assert imu["biais"][2] == pytest.approx(1.0, abs=0.05)
-    assert imu["gravite"] == pytest.approx(1.0, abs=0.05)
-    assert imu["verifie"] is True
+def test_axe_jamais_balaye_refuse(tmp_path):
+    """stick_droit_x avait min = max = 0 : l'axe n'avait pas bougé."""
+    cal = Calibration(sortie=tmp_path / "m.yaml")
+    cal.enregistrer_axe("stick_droit_x", index=2, centre=0.0, minimum=0.0,
+                        maximum=0.0, zone_morte=0.08, inverser=False)
+    with pytest.raises(RuntimeError) as err:
+        cal.ecrire()
+    assert "stick_droit_x" in str(err.value)
+    assert not (tmp_path / "m.yaml").exists()
 
 
-def test_imu_sans_retournement_reste_non_verifie():
-    cal = Calibration(sortie=Path("/dev/null"))
-    plat = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
-    cal.phase_imu(FauxLecteurAxes([plat, plat, plat, plat]),
-                  duree_repos=0.04, duree_retournement=0.04,
-                  journal=lambda *a, **k: None)
-    assert cal.donnees["imu"]["verifie"] is False
+def test_reserve_ne_bloque_pas_l_ecriture(tmp_path):
+    """T commute peut-être un mode : ce n'est pas un bouton, mais ce n'est pas un oubli."""
+    cal = Calibration(sortie=tmp_path / "m.yaml")
+    cal.declarer_entree("T")
+    cal.declarer_reserve("T", "aucun événement : commutateur de mode probable")
+    cal.ecrire()
+    contenu = yaml.safe_load((tmp_path / "m.yaml").read_text(encoding="utf-8"))
+    assert contenu["reserve"]["T"].startswith("aucun événement")
+
+
+def test_gachette_enregistree_par_nom(tmp_path):
+    cal = Calibration(sortie=tmp_path / "m.yaml")
+    cal.enregistrer_gachette("ZL", analogique=True, axes={"6": [0.0, 1.0]})
+    cal.enregistrer_gachette("L", analogique=False)
+    cal.ecrire()
+    contenu = yaml.safe_load((tmp_path / "m.yaml").read_text(encoding="utf-8"))
+    assert contenu["gachettes"]["ZL"]["analogique"] is True
+    assert contenu["gachettes"]["L"]["analogique"] is False
 
 
 # ── Phase actionneurs ────────────────────────────────────────────────────────

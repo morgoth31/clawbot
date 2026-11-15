@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 """Calibration guidée de la manette — à lancer soi-même dans son terminal.
 
-Chaque étape attend une ACTION, puis affiche un RETOUR immédiat (« ✅ index 3 »,
+Chaque étape attend une ACTION puis affiche un RETOUR immédiat (« ✅ index 3 »,
 « ⚠ même code que A », « ✅ sens inversé ») avant de passer à la suivante. Aucun
 délai ne court en arrière-plan : rien ne peut se décaler tant que l'opérateur n'a
-pas agi, ou n'a pas validé avec Entrée.
+pas agi, ou validé avec Entrée.
+
+Ce que la première calibration réelle (2026-11-15) a appris et qui est intégré ici :
+  * `T` n'émet rien : il est traité comme un commutateur, pas comme un bouton.
+  * `light` n'émet rien : il est noté absent avec sa raison.
+  * `L` et `R` sont des boutons ; `ZL` et `ZR` ont une course progressive. La
+    procédure le DEMANDE au lieu de le déduire d'un axe qui bouge par accident.
+  * un axe jamais balayé (min = max) rend une fonction morte : la procédure
+    propose de refaire la mesure.
+  * l'IMU n'est plus calibré : il n'apporte rien au pilotage.
 
 Commandes pendant l'attente d'un bouton :
-    Entrée  → passer cette entrée (elle sera notée ABSENTE, avec sa raison)
+    Entrée  → passer cette entrée (notée ABSENTE avec sa raison)
     q       → abandonner sans écrire de fichier
 
 Usage :
@@ -34,15 +43,16 @@ from calibration import (  # noqa: E402
     Calibration,
     echantillonner,
     surveiller_appui,
-    vibrer,
     _teleop_active,
     reponse_booleenne,
     trouver_base_hid,
 )
-from js_lecteur import LecteurJs, lister_manettes, trouver_noeud_imu  # noqa: E402
+from js_lecteur import LecteurJs, lister_manettes  # noqa: E402
 from manette_materiel import chemin_sysfs, leds_du_pad, vibration_supportee  # noqa: E402
+from retour_force import jouer_rumble  # noqa: E402
 
-LARGEUR = 68
+LARGEUR = 70
+DEBATTEMENT_MINIMUM = 0.5
 
 
 def titre(texte: str) -> None:
@@ -63,6 +73,14 @@ def attention(texte: str) -> None:
     print(f"   ⚠️  {texte}")
 
 
+def demander_oui_non(question: str) -> bool:
+    try:
+        return reponse_booleenne(input(f"   {question} (o/n) "))
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return False
+
+
 def attendre_appui(lecteur, rappel_s: float = 12.0):
     """Attend un appui (ou Entrée = passer, ou q = abandonner).
 
@@ -71,8 +89,7 @@ def attendre_appui(lecteur, rappel_s: float = 12.0):
     depart = dernier_rappel = time.monotonic()
     avant = list(lecteur.etat().boutons)
     while True:
-        a_lire = [lecteur.fd, sys.stdin.fileno()]
-        lus, _, _ = select.select(a_lire, [], [], 0.2)
+        lus, _, _ = select.select([lecteur.fd, sys.stdin.fileno()], [], [], 0.2)
         if lecteur.fd in lus:
             if not lecteur.lire(0.0):
                 raise RuntimeError("manette déconnectée")
@@ -84,16 +101,16 @@ def attendre_appui(lecteur, rappel_s: float = 12.0):
             avant = apres
         if sys.stdin.fileno() in lus:
             ligne = sys.stdin.readline()
-            if ligne == "":            # entrée fermée : on ne bloque pas
+            if ligne == "":
                 return "passe", None
             ligne = ligne.strip().lower()
             if ligne.startswith("q"):
                 return "quitter", None
             return "passe", None
         if time.monotonic() - dernier_rappel >= rappel_s:
-            print("   … en attente — Entrée pour passer cette entrée, q pour abandonner")
+            print("   … en attente — Entrée pour passer, q pour abandonner")
             dernier_rappel = time.monotonic()
-        if time.monotonic() - depart > 600:
+        if time.monotonic() - depart > 900:
             return "passe", None
 
 
@@ -108,23 +125,24 @@ def attendre_relachement(lecteur, index: int, delai_s: float = 3.0) -> None:
 
 
 def surligner_etat(cal: Calibration) -> str:
-    """Résumé lisible : ce qui a été mesuré, ce qui manque, ce qui est suspect."""
     lignes = []
-    collisions = cal.collisions()
-    if collisions:
-        for index, noms in collisions.items():
-            lignes.append(f"⚠ index {index} revendiqué par {', '.join(noms)}")
+    for index, noms in cal.collisions().items():
+        lignes.append(f"⚠ index {index} revendiqué par {', '.join(noms)}")
     if cal.donnees["absents"]:
         lignes.append(f"◦ absents : {', '.join(cal.donnees['absents'])}")
+    if cal.donnees.get("reserve"):
+        lignes.append(f"◦ réservés : {', '.join(cal.donnees['reserve'])}")
     if not lignes:
         lignes.append("✓ aucune anomalie de code")
     return "\n".join(lignes)
 
 
+# ── 1. Boutons ──────────────────────────────────────────────────────────────
+
 def phase_boutons(cal: Calibration, lecteur) -> None:
-    titre("1/5 — BOUTONS")
-    print("À chaque ligne : appuie UNE fois sur le bouton demandé.")
-    print("Entrée seule = je passe.  q + Entrée = j'abandonne.")
+    titre("1/4 — BOUTONS")
+    print("Appuie UNE fois sur le bouton demandé, puis relâche.")
+    print("Entrée seule = passer cette entrée.  q + Entrée = abandonner.")
 
     total = len(ENTREES_DECLAREES)
     for rang, (nom, description) in enumerate(ENTREES_DECLAREES, 1):
@@ -135,8 +153,20 @@ def phase_boutons(cal: Calibration, lecteur) -> None:
         if genre == "quitter":
             raise KeyboardInterrupt
         if genre == "passe":
-            cal.marquer_absent(nom, "passée par l'opérateur (Entrée)")
-            attention("passée → notée ABSENTE")
+            if nom == "T":
+                if demander_oui_non("Le bouton T change-t-il de MODE la manette ?"):
+                    cal.declarer_reserve(
+                        "T", "commutateur de mode : aucun code dans le rapport HID")
+                    attention("noté COMMUTATEUR (réservé), pas bouton")
+                else:
+                    cal.marquer_absent("T", "aucun événement, ne commute pas de mode")
+                    attention("noté ABSENT")
+            elif nom == "light":
+                cal.marquer_absent("light", "aucun événement : bouton non fonctionnel")
+                attention("noté ABSENT (non fonctionnel)")
+            else:
+                cal.marquer_absent(nom, "passée par l'opérateur (Entrée)")
+                attention("passée → notée ABSENTE")
             continue
 
         resultat = cal.enregistrer_bouton(nom, index)
@@ -148,20 +178,21 @@ def phase_boutons(cal: Calibration, lecteur) -> None:
         attendre_relachement(lecteur, index)
 
 
-def phase_axes(cal: Calibration, lecteur) -> None:
-    titre("2/5 — AXES (six axes, trois gestes chacun)")
-    for nom, index, direction, description in AXES_DECLARES:
-        print(f"\n───── {nom} (index {index}) ─────")
+# ── 2. Axes ─────────────────────────────────────────────────────────────────
 
-        input(f"   Entrée, puis NE TOUCHE À RIEN pendant 1 seconde… ")
+def mesurer_un_axe(cal: Calibration, lecteur, nom, index, direction, description) -> None:
+    while True:
+        print(f"\n───── {nom} (index {index}) ─────")
+        input("   Entrée, puis NE TOUCHE À RIEN pendant 1 seconde… ")
         repos = echantillonner(lecteur, 1.0, index)
         centre = statistics.fmean(repos)
         bruit = statistics.pstdev(repos) if len(repos) > 1 else 0.0
         ok(f"repos : centre {centre:+.3f}, bruit {bruit:.3f}")
 
-        input(f"   Entrée, puis fais un CERCLE complet avec « {description} »… ")
+        input(f"   Entrée, puis fais un CERCLE COMPLET avec « {description} »… ")
         balayage = echantillonner(lecteur, 3.0, index)
         mini, maxi = min(balayage), max(balayage)
+        debattement = abs(maxi - mini)
         ok(f"débattement : {mini:+.2f} … {maxi:+.2f}")
 
         input(f"   Entrée, puis POUSSE À FOND vers « {direction} » et maintiens… ")
@@ -169,108 +200,99 @@ def phase_axes(cal: Calibration, lecteur) -> None:
         inverser = extreme < centre
         ok(f"valeur {extreme:+.3f} → sens {'INVERSÉ' if inverser else 'direct'}")
 
+        if debattement < DEBATTEMENT_MINIMUM:
+            attention(f"débattement insuffisant ({debattement:.2f}) : cet axe serait MORT")
+            if demander_oui_non("Refaire la mesure de cet axe ?"):
+                continue
         plancher = 0.5 if nom.startswith("croix") else 0.08
         cal.enregistrer_axe(nom, index=index, centre=centre, minimum=mini,
                             maximum=maxi, zone_morte=max(plancher, 4 * bruit),
                             inverser=inverser)
-
-
-def phase_gachettes(cal: Calibration, lecteur) -> None:
-    titre("3/5 — GÂCHETTES (binaire ou analogique ?)")
-    detectes = {}
-    for nom, description in ENTREES_GACHETTES:
-        if nom in cal.donnees["absents"]:
-            print(f"\n── {nom} : déjà notée absente, on passe")
-            continue
-        invite(f"{description} : appuie PROGRESSIVEMENT à fond, puis relâche")
-        try:
-            index = cal.bouton(nom)
-        except KeyError:
-            attention("aucune mesure de bouton pour cette gâchette, on passe")
-            continue
-        ecarts = surveiller_appui(lecteur, index, 60.0)
-        if ecarts:
-            detectes[nom] = {str(i): round(v, 3) for i, v in sorted(ecarts.items())}
-            attention(f"des axes bougent {detectes[nom]} → ANALOGIQUE")
-        else:
-            ok("aucun axe ne bouge → BINAIRE")
-
-    if detectes:
-        cal.donnees["capacites"]["gachettes_analogiques"] = {
-            "disponible": True, "axes_detectes": detectes}
-    else:
-        cal.donnees["capacites"]["gachettes_analogiques"] = {
-            "disponible": False,
-            "raison": "aucun axe ne bouge pendant l'appui : gâchettes binaires"}
-
-
-def phase_imu(cal: Calibration, chemin_imu: str | None) -> None:
-    titre("4/5 — IMU (accéléromètre et gyroscope)")
-    if not chemin_imu:
-        attention("aucun nœud inertiel trouvé → phase ignorée")
-        cal.donnees["imu"] = {"chemin": "", "verifie": False,
-                              "raison": "aucun nœud /dev/input/jsN inertiel"}
         return
 
-    lecteur = LecteurJs(chemin_imu)
-    try:
-        input("\n   Entrée, puis pose la manette À PLAT et immobile 3 secondes… ")
-        temps_fin = time.monotonic() + 3.0
-        releves = []
-        while time.monotonic() < temps_fin:
-            if not lecteur.lire(0.02):
-                break
-            releves.append(list(lecteur.etat().axes))
-        biais = [round(statistics.fmean(c), 4) for c in zip(*releves)]
-        bruit = [round(statistics.pstdev(c), 4) for c in zip(*releves)]
-        ok(f"biais {biais}")
 
-        input("   Entrée, puis RETOURNE la manette écran vers le bas, 3 secondes… ")
-        temps_fin = time.monotonic() + 3.0
-        retournes = []
-        while time.monotonic() < temps_fin:
-            if not lecteur.lire(0.02):
-                break
-            retournes.append(list(lecteur.etat().axes))
-        biais_retourne = [statistics.fmean(c) for c in zip(*retournes)]
-        verifie = (biais[2] * biais_retourne[2]) < 0
-        ok(f"retournement {'confirmé' if verifie else 'NON confirmé'} "
-           f"({biais[2]:+.2f} → {biais_retourne[2]:+.2f})")
+def phase_axes(cal: Calibration, lecteur) -> None:
+    titre("2/4 — AXES (six axes, trois gestes chacun)")
+    for nom, index, direction, description in AXES_DECLARES:
+        mesurer_un_axe(cal, lecteur, nom, index, direction, description)
 
-        gravite = round((sum(v * v for v in biais[:3])) ** 0.5, 4)
-        cal.donnees["imu"] = {"chemin": chemin_imu, "biais": biais, "bruit": bruit,
-                              "gravite": gravite, "verifie": bool(verifie)}
-    finally:
-        lecteur.fermer()
 
+# ── 3. Gâchettes ────────────────────────────────────────────────────────────
+
+def phase_gachettes(cal: Calibration, lecteur) -> None:
+    titre("3/4 — GÂCHETTES")
+    print("Pour chacune : appuie PROGRESSIVEMENT à fond, puis relâche.")
+    for nom, description in ENTREES_GACHETTES:
+        invite(f"{description} : appuie progressivement à fond, puis relâche")
+        axes_bouges = {}
+        try:
+            index = cal.bouton(nom)
+            ecarts = surveiller_appui(lecteur, index, 60.0)
+            if ecarts:
+                axes_bouges = {str(i): round(v, 3) for i, v in sorted(ecarts.items())}
+                ok(f"axes qui bougent : {axes_bouges}")
+            else:
+                ok("aucun axe ne bouge")
+        except KeyError:
+            attention("aucune mesure de bouton pour cette gâchette")
+        analogique = demander_oui_non(
+            "Cette gâchette a-t-elle une course progressive (analogique) ?")
+        if analogique:
+            attention("notée ANALOGIQUE")
+        else:
+            ok("notée BINAIRE")
+        cal.enregistrer_gachette(nom, analogique=analogique, axes=axes_bouges or None)
+
+
+# ── 4. Actionneurs ──────────────────────────────────────────────────────────
 
 def phase_actionneurs(cal: Calibration, chemin_pad: str) -> None:
-    titre("5/5 — ACTIONNEURS (vibration, lumière)")
+    titre("4/4 — CE QUI PEUT ÊTRE COMMANDÉ")
     noeud = chemin_pad.rsplit("/", 1)[-1]
     base_hid = trouver_base_hid()
 
+    # Vibration : effet joué par ioctl, pas par fftest (qui n'envoie rien quand son
+    # entrée est redirigée, et fait conclure à tort que le matériel ne vibre pas).
     if vibration_supportee(chemin_sysfs(noeud, "ff")):
-        print("\n   Le noyau annonce FF_RUMBLE : un effet va être joué.")
+        event = f"/dev/input/{noeud.replace('js', 'event')}"
+        print(f"\n   Le noyau annonce FF_RUMBLE ; envoi d'un effet de 600 ms sur {event}.")
+        joue = False
         try:
-            vibrer(noeud)
-        except Exception as err:               # noqa: BLE001
+            jouer_rumble(event, 600)
+            joue = True
+            ok("effet chargé, joué et retiré")
+        except OSError as err:
             attention(f"l'effet n'a pas pu être joué : {err}")
-        reponse = input("   As-tu senti la vibration ? (o/n) ")
+        senti = demander_oui_non("As-tu senti la vibration ?")
         cal.donnees["capacites"]["vibration"] = {
-            "disponible": True, "methode": "evdev EV_FF (FF_RUMBLE)",
-            "verifie": reponse_booleenne(reponse)}
-        ok(f"vibration confirmée : {reponse_booleenne(reponse)}")
+            "disponible": True,
+            "methode": "evdev EV_FF (ioctl EVIOCSFF)",
+            "effet_accepte": joue,
+            "verifie": senti,
+        }
+        if not senti:
+            attention("le noyau accepte l'effet mais rien n'est perçu : noté NON vérifié")
     else:
         cal.donnees["capacites"]["vibration"] = {
             "disponible": False, "methode": "evdev EV_FF",
             "raison": "le noyau n'annonce pas FF_RUMBLE"}
         attention("le noyau n'annonce pas FF_RUMBLE")
 
+    # Lumière : les LED du pad sont exposées sous /sys/class/leds, en écriture root.
     leds = leds_du_pad(Path(base_hid)) if base_hid else []
     if leds:
+        noms = [p.name for p in leds]
+        ok(f"{len(noms)} entrée(s) LED : {noms}")
         cal.donnees["capacites"]["lumieres"] = {
-            "disponible": True, "entrees": [p.name for p in leds]}
-        ok(f"{len(leds)} entrée(s) LED exposée(s) : {[p.name for p in leds]}")
+            "disponible": True,
+            "entrees": noms,
+            "ecriture": "root requis (/sys/class/leds/<nom>/brightness)",
+        }
+        joueurs = [n for n in noms if "player" in n]
+        if joueurs and demander_oui_non("Tester les LED maintenant (nécessite sudo) ?"):
+            print("   Relance ce script avec sudo si l'écriture échoue.")
+        if joueurs:
+            ok("les LED de joueur existent : pilotables, non testées ici")
     else:
         cal.donnees["capacites"]["lumieres"] = {
             "disponible": False,
@@ -297,14 +319,21 @@ def main(argv=None) -> int:
         return 4
 
     chemin_pad, nom = manettes[0]
+    lecteur = LecteurJs(chemin_pad)
+    etat_initial = lecteur.etat()
     cal = Calibration(args.sortie, args.forcer)
-    cal.donnees["appareil"] = {"nom": nom, "js_pad": chemin_pad,
-                               "js_imu": trouver_noeud_imu() or ""}
+    cal.donnees["appareil"] = {
+        "nom": nom,
+        "js_pad": chemin_pad,
+        "nb_axes": len(etat_initial.axes),
+        "nb_boutons": len(etat_initial.boutons),
+    }
     print(f"\nManette : {nom}  ({chemin_pad})")
+    print(f"Forme   : {len(etat_initial.axes)} axes, {len(etat_initial.boutons)} boutons "
+          f"— un changement de mode invalidera ce fichier")
     print(f"Sortie  : {args.sortie}")
     print("\nPendant l'attente d'un bouton : Entrée = passer, q + Entrée = abandonner.")
 
-    lecteur = LecteurJs(chemin_pad)
     try:
         phase_boutons(cal, lecteur)
         phase_axes(cal, lecteur)
@@ -319,14 +348,14 @@ def main(argv=None) -> int:
     finally:
         lecteur.fermer()
 
-    phase_imu(cal, cal.donnees["appareil"].get("js_imu"))
     phase_actionneurs(cal, chemin_pad)
 
     titre("RÉSUMÉ")
     print(surligner_etat(cal))
-    print(f"\n{len(cal.donnees['boutons'])} boutons mesurés, "
+    print(f"\n{len(cal.donnees['boutons'])} boutons, "
           f"{len(cal.donnees['aliases'])} alias, "
           f"{len(cal.donnees['absents'])} absent(s), "
+          f"{len(cal.donnees.get('gachettes', {}))} gâchettes typées, "
           f"{len(cal.donnees['axes'])} axes.")
 
     try:
@@ -337,8 +366,8 @@ def main(argv=None) -> int:
         return 6
 
     print(f"\n✅ Écrit : {chemin}")
-    print("Vérifie-le, puis lance la téléopération :")
-    print("  ros2 launch joy_teleop/joy_teleop_launch.py")
+    print("Essai à blanc, sans le robot (domaine 98) :")
+    print("  ROS_DOMAIN_ID=98 ros2 launch joy_teleop/joy_teleop_launch.py")
     return 0
 
 

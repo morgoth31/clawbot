@@ -85,6 +85,8 @@ class ClawbotJoyTeleop(Node):
         self.mode = 1                  # 1 : bras, 2 : véhicule
         self.camera_high = False
         self._btn_prev: list[int] = []
+        self._forme_verifiee = False
+        self._forme_invalide = False
 
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
         self.servo_pub = self.create_publisher(Int32MultiArray, "/servo_ctrl", 10)
@@ -138,6 +140,21 @@ class ClawbotJoyTeleop(Node):
     def _joy_cb(self, msg: Joy) -> None:
         axes = msg.axes
         boutons = list(msg.buttons)
+
+        # Une manette à commutateur de mode change de descripteur HID : mêmes codes
+        # numériques, boutons différents. Sans ce contrôle, un changement de mode
+        # produit un pilotage faux sans le moindre message.
+        if not self._forme_verifiee:
+            try:
+                self.manette.verifier_appareil(len(axes), len(boutons))
+            except ConfigInvalide as err:
+                self.get_logger().error(f"forme du pad incompatible — {err}")
+                self._forme_invalide = True
+            self._forme_verifiee = True
+        if self._forme_invalide:
+            self.cmd_vel_pub.publish(Twist())
+            return
+
         if not self._btn_prev:
             self._btn_prev = [0] * len(boutons)
 

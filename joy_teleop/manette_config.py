@@ -64,6 +64,24 @@ class Manette:
         self.imu = donnees.get("imu") or {}
         self.capacites = donnees.get("capacites") or {}
 
+    def verifier_appareil(self, nb_axes: int, nb_boutons: int) -> None:
+        """Refuse de piloter si le pad ne présente pas la même forme qu'à la calibration.
+
+        Une manette à commutateur de mode change de descripteur HID : mêmes codes
+        numériques, boutons différents. Sans ce contrôle, un changement de mode
+        produit un pilotage faux sans le moindre message.
+        """
+        attendu_axes = self.appareil.get("nb_axes")
+        attendu_boutons = self.appareil.get("nb_boutons")
+        if attendu_axes and int(attendu_axes) != int(nb_axes):
+            raise ConfigInvalide(
+                f"{self.chemin} : le pad expose {nb_axes} axes, la calibration en "
+                f"décrit {attendu_axes} — mode changé, recalibrer")
+        if attendu_boutons and int(attendu_boutons) != int(nb_boutons):
+            raise ConfigInvalide(
+                f"{self.chemin} : le pad expose {nb_boutons} boutons, la calibration "
+                f"en décrit {attendu_boutons} — mode changé, recalibrer")
+
     def bouton(self, nom: str) -> int:
         if nom in self.boutons:
             return self.boutons[nom]
@@ -102,6 +120,10 @@ def _lire_axe(nom: str, d: dict) -> Axe:
     manquantes = [c for c in obligatoires if c not in d]
     if manquantes:
         raise ConfigInvalide(f"axe {nom!r} : clés manquantes {manquantes}")
+    if abs(float(d["max"]) - float(d["min"])) < 0.5:
+        raise ConfigInvalide(
+            f"axe {nom!r} : débattement {float(d['max']) - float(d['min']):.2f} "
+            f"(min {d['min']}, max {d['max']}) — axe jamais balayé, refaire la calibration")
     return Axe(
         nom=nom,
         index=int(d["index"]),

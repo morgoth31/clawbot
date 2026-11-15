@@ -84,3 +84,24 @@ def test_nan_vaut_zero():
 def test_valeur_hors_tableau_vaut_zero():
     m = charger(FIXTURE)
     assert m.valeur([], "stick_gauche_x") == 0.0
+
+
+def test_axe_degenere_refuse_au_chargement(tmp_path):
+    chemin = tmp_path / "degenere.yaml"
+    chemin.write_text(
+        "schema: 1\nappareil: {nom: x}\nboutons: {A: 1}\n"
+        "axes:\n  stick_droit_x: {index: 2, centre: 0.0, min: 0.0, max: 0.0, zone_morte: 0.08}\n",
+        encoding="utf-8")
+    with pytest.raises(ConfigInvalide) as err:
+        charger(chemin)
+    assert "stick_droit_x" in str(err.value)
+
+
+def test_appareil_change_de_mode_refuse():
+    m = charger(FIXTURE)
+    m.appareil["nb_axes"] = 6
+    m.appareil["nb_boutons"] = 14
+    m.verifier_appareil(6, 14)                     # même forme : accepté
+    with pytest.raises(ConfigInvalide) as err:
+        m.verifier_appareil(8, 16)                 # descripteur différent
+    assert "mode changé" in str(err.value)
