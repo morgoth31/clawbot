@@ -15,6 +15,7 @@ contrat d'écriture.
 from __future__ import annotations
 
 import argparse
+import statistics
 import os
 import socket
 import sys
@@ -49,6 +50,32 @@ ENTREES_DECLAREES = [
     ("appui_stick_gauche", "un appui vertical sur le stick gauche"),
     ("appui_stick_droit", "un appui vertical sur le stick droit"),
 ]
+
+
+AXES_DECLARES = [
+    ("stick_gauche_x", 0, "droite", "le stick gauche à droite"),
+    ("stick_gauche_y", 1, "haut", "le stick gauche en haut"),
+    ("stick_droit_x", 2, "droite", "le stick droit à droite"),
+    ("stick_droit_y", 3, "haut", "le stick droit en haut"),
+    ("croix_x", 4, "droite", "la croix à droite"),
+    ("croix_y", 5, "haut", "la croix en haut"),
+]
+
+# La croix est un chapeau HID, pas un potentiomètre : ses valeurs sont -1/0/+1 et sa
+# zone morte doit être large, sinon elle clignote au moindre contact.
+PLANCHER_ZONE_CROIX = 0.5
+
+
+def echantillonner(lecteur, duree_s: float, index: int) -> list[float]:
+    """Relève `index` pendant `duree_s` (au moins deux points)."""
+    n = max(2, int(duree_s / 0.02))
+    valeurs = []
+    for _ in range(n):
+        if not lecteur.lire(0.02):
+            raise RuntimeError("manette déconnectée pendant la mesure")
+        axes = lecteur.etat().axes
+        valeurs.append(axes[index] if index < len(axes) else 0.0)
+    return valeurs
 
 
 def capturer_appui(lecteur, delai_s: float = 25.0) -> int | None:
@@ -135,6 +162,43 @@ class Calibration:
         }
 
     # ── phases interactives ──────────────────────────────────────────────────
+
+    def phase_axes(self, lecteur, axes=None, duree_repos: float = 1.2,
+                   duree_balayage: float = 3.0, duree_extreme: float = 0.6,
+                   journal=None) -> None:
+        """Trois mesures par axe : repos, débattement complet, sens.
+
+        Le sens n'est pas une convention : il est observé en poussant dans la
+        direction annoncée. C'est ce qui a coûté trois tours de manipulation le
+        2026-11-15, SDL et jsdev donnant des signes opposés.
+        """
+        journal = journal or print
+        axes = axes if axes is not None else AXES_DECLARES
+        for nom, index, direction, description in axes:
+            journal(f"── axe {nom} (index {index})")
+            journal("  1) Ne touche à rien pendant 1 s (repos et bruit)")
+            repos = echantillonner(lecteur, duree_repos, index)
+            centre = statistics.fmean(repos)
+            bruit = statistics.pstdev(repos) if len(repos) > 1 else 0.0
+
+            journal("  2) Fais tourner le stick d'un cercle complet, doucement")
+            balayage = echantillonner(lecteur, duree_balayage, index)
+            minimum, maximum = min(balayage), max(balayage)
+
+            journal(f"  3) Pousse à fond vers « {direction} » et maintiens 1 s")
+            extreme = statistics.fmean(echantillonner(lecteur, duree_extreme, index))
+            # Règle unique pour tous les axes : si la direction ANNONCÉE produit une
+            # valeur brute inférieure au centre, le décodage doit inverser le signe.
+            # Un axe X droitier donne « droite > centre » (pas d'inversion) ; un axe Y
+            # qui donne -1 vers le haut donne « haut < centre » (inversion).
+            inverser = extreme < centre
+
+            plancher = PLANCHER_ZONE_CROIX if nom.startswith("croix") else 0.08
+            zone = max(plancher, 4 * bruit)
+            self.enregistrer_axe(nom, index=index, centre=centre, minimum=minimum,
+                                 maximum=maximum, zone_morte=zone, inverser=inverser)
+            journal(f"     centre={centre:+.3f} mini={minimum:+.3f} maxi={maximum:+.3f} "
+                    f"zone={zone:.3f} inverser={inverser}")
 
     def phase_boutons(self, lecteur, entrees=None, delai_s: float = 25.0,
                       journal=None) -> None:
