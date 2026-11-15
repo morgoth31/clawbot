@@ -1,0 +1,18 @@
+schema: 1
+genere_le: "2026-11-15T00:00:00+01:00"
+outil: "tests"
+appareil: {nom: "Fixture", vid: "057e", pid: "2009"}
+boutons: {A: 1, B: 0, X: 2, Y: 3, home: 11, ZL: 7, ZR: 8, L: 5, R: 6, plus: 10, moins: 9}
+aliases: {M1: A}
+absents: [T, rond, light]
+axes:
+  stick_gauche_x: {index: 0, centre: 0.0, min: -1.0, max: 1.0, zone_morte: 0.08, inverser: false}
+  stick_gauche_y: {index: 1, centre: 0.0, min: -1.0, max: 1.0, zone_morte: 0.08, inverser: true}
+  stick_droit_x:  {index: 2, centre: 0.0, min: -1.0, max: 1.0, zone_morte: 0.08, inverser: false}
+  stick_droit_y:  {index: 3, centre: 0.0, min: -1.0, max: 1.0, zone_morte: 0.08, inverser: true}
+  croix_x:        {index: 4, centre: 0.0, min: -1.0, max: 1.0, zone_morte: 0.5, inverser: false}
+  croix_y:        {index: 5, centre: 0.0, min: -1.0, max: 1.0, zone_morte: 0.5, inverser: true}
+imu: {chemin: "/dev/input/js1", biais: [0, 0, 0, 0, 0, 0], gravite: 1.0, bruit: [0, 0, 0, 0, 0, 0]}
+capacites:
+  vibration: {disponible: true, methode: "evdev EV_FF", verifie: false}
+  lumieres: {disponible: false, raison: "fixture"}
