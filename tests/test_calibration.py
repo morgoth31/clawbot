@@ -68,3 +68,54 @@ def test_sauvegarde_de_l_ancien_fichier(tmp_path):
     sauvegardes = list(tmp_path.glob("manette.yaml.bak-*"))
     assert len(sauvegardes) == 1
     assert "ancien" in sauvegardes[0].read_text(encoding="utf-8")
+
+
+# ── Phase boutons ────────────────────────────────────────────────────────────
+
+class FauxLecteur:
+    """Rejoue une suite d'états : chaque appel à etat() rend la scène suivante."""
+
+    def __init__(self, scenes):
+        self.scenes = list(scenes)
+        self.rang = 0
+
+    def lire(self, attente=0.02):
+        return True
+
+    def etat(self):
+        from js_lecteur import Etat
+        appuis = self.scenes[min(self.rang, len(self.scenes) - 1)] if self.scenes else []
+        self.rang += 1
+        boutons = [0] * 14
+        for i in appuis:
+            boutons[i] = 1
+        return Etat(axes=[0.0] * 6, boutons=boutons)
+
+
+def test_phase_boutons_mesure_alias_et_home():
+    cal = Calibration(sortie=Path("/dev/null"))
+    # une scène vide sert de référence, puis un appui : A=1, M1=1 (alias), home=11
+    lecteur = FauxLecteur([[], [1], [], [1], [], [11]])
+    cal.phase_boutons(
+        lecteur,
+        entrees=[("A", "le bouton A"), ("M1", "le bouton M1"), ("home", "le bouton Home")],
+        delai_s=1.0,
+        journal=lambda *a, **k: None,
+    )
+    assert cal.donnees["boutons"]["A"] == 1
+    assert cal.donnees["boutons"]["home"] == 11
+    assert cal.donnees["aliases"]["M1"] == "A"
+    assert "M1" not in cal.donnees["boutons"]
+
+
+def test_phase_boutons_marque_absent_apres_delai():
+    cal = Calibration(sortie=Path("/dev/null"))
+    lecteur = FauxLecteur([[]])          # aucun appui, jamais
+    cal.phase_boutons(
+        lecteur,
+        entrees=[("light", "le bouton lumière")],
+        delai_s=0.05,
+        journal=lambda *a, **k: None,
+    )
+    assert "light" in cal.donnees["absents"]
+    assert "délai" in cal.donnees["absents_raisons"]["light"]

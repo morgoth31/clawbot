@@ -18,6 +18,7 @@ import argparse
 import os
 import socket
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -25,6 +26,49 @@ import yaml
 
 OUTIL = "joy_teleop/calibration.py"
 SORTIE_DEFAUT = "/home/jetson/clawbot/config/manette.yaml"
+
+# Entrées déclarées par l'opérateur, dans l'ordre où la procédure les demande.
+# L'ordre suit la main : boutons faciaux, menu, puis gâchettes, puis pouces.
+ENTREES_DECLAREES = [
+    ("A", "le bouton A (à droite)"),
+    ("B", "le bouton B (en bas)"),
+    ("X", "le bouton X (en haut)"),
+    ("Y", "le bouton Y (à gauche)"),
+    ("plus", "le bouton +"),
+    ("moins", "le bouton −"),
+    ("home", "le bouton Home (maison)"),
+    ("T", "le bouton T s'il existe"),
+    ("rond", "le bouton rond s'il existe"),
+    ("light", "le bouton lumière s'il existe"),
+    ("ZL", "la gâchette haute gauche (ZL)"),
+    ("ZR", "la gâchette haute droite (ZR)"),
+    ("L", "la gâchette basse gauche (L)"),
+    ("R", "la gâchette basse droite (R)"),
+    ("M1", "le bouton M1 (palette)"),
+    ("M2", "le bouton M2 (palette)"),
+    ("appui_stick_gauche", "un appui vertical sur le stick gauche"),
+    ("appui_stick_droit", "un appui vertical sur le stick droit"),
+]
+
+
+def capturer_appui(lecteur, delai_s: float = 25.0) -> int | None:
+    """Attend une transition 0→1 sur un bouton et rend son index.
+
+    Rend None si le délai expire (l'entrée sera enregistrée « absente »).
+    Lève RuntimeError si le périphérique disparaît : un pad qui s'endort ne doit
+    pas produire un YAML où toutes les entrées sont déclarées absentes.
+    """
+    depart = time.monotonic()
+    avant = list(lecteur.etat().boutons)
+    while time.monotonic() - depart < delai_s:
+        if not lecteur.lire(0.02):
+            raise RuntimeError("manette déconnectée pendant la capture")
+        apres = list(lecteur.etat().boutons)
+        nouveaux = [i for i, v in enumerate(apres) if v and (i >= len(avant) or not avant[i])]
+        if nouveaux:
+            return nouveaux[0]
+        avant = apres
+    return None
 
 
 class Calibration:
@@ -89,6 +133,29 @@ class Calibration:
             "zone_morte": round(float(zone_morte), 4),
             "inverser": bool(inverser),
         }
+
+    # ── phases interactives ──────────────────────────────────────────────────
+
+    def phase_boutons(self, lecteur, entrees=None, delai_s: float = 25.0,
+                      journal=None) -> None:
+        """Un appui dicté par entrée ; index mesuré, alias ou absent enregistré."""
+        journal = journal or print
+        entrees = entrees if entrees is not None else ENTREES_DECLAREES
+        total = len(entrees)
+        for rang, (nom, description) in enumerate(entrees, 1):
+            self.declarer_entree(nom)
+            journal(f"[{rang}/{total}] Appuie sur : {description}")
+            index = capturer_appui(lecteur, delai_s)
+            if index is None:
+                self.marquer_absent(nom, f"délai de {delai_s:.0f} s dépassé sans événement")
+                journal("        ↳ absent : aucun événement")
+                continue
+            resultat = self.enregistrer_bouton(nom, index)
+            if resultat == "alias":
+                cible = self.donnees["aliases"][nom]
+                journal(f"        ↳ même code que {cible} (index {index}) : enregistré comme alias")
+            else:
+                journal(f"        ↳ index {index}")
 
     # ── contrôle et écriture ─────────────────────────────────────────────────
 
