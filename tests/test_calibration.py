@@ -177,3 +177,102 @@ def test_phase_axes_sens_vertical_inverse():
         journal=lambda *a, **k: None,
     )
     assert cal.donnees["axes"]["stick_gauche_y"]["inverser"] is True
+
+
+# ── Phase gâchettes ──────────────────────────────────────────────────────────
+
+class FauxLecteurGachette:
+    """Scènes (boutons pressés, axes) pour mesurer si un axe bouge pendant l'appui."""
+
+    def __init__(self, scenes):
+        self.scenes = list(scenes)
+        self.rang = 0
+
+    def lire(self, attente=0.02):
+        return True
+
+    def etat(self):
+        from js_lecteur import Etat
+        appuis, axes = self.scenes[min(self.rang, len(self.scenes) - 1)]
+        self.rang += 1
+        boutons = [0] * 14
+        for i in appuis:
+            boutons[i] = 1
+        return Etat(axes=list(axes), boutons=boutons)
+
+
+def test_gachette_binaire_detectee():
+    """Aucun axe ne bouge pendant l'appui : la gâchette est binaire."""
+    cal = Calibration(sortie=Path("/dev/null"))
+    cal.enregistrer_bouton("L", 7)
+    lecteur = FauxLecteurGachette([([], [0.0] * 6), ([7], [0.0] * 6), ([], [0.0] * 6)])
+    cal.phase_gachettes(lecteur, entrees=[("L", "la gâchette L")],
+                        delai_s=0.05, journal=lambda *a, **k: None)
+    assert cal.donnees["capacites"]["gachettes_analogiques"]["disponible"] is False
+    assert "aucun axe" in cal.donnees["capacites"]["gachettes_analogiques"]["raison"]
+
+
+def test_gachette_analogique_detectee():
+    cal = Calibration(sortie=Path("/dev/null"))
+    cal.enregistrer_bouton("L", 7)
+    lecteur = FauxLecteurGachette([
+        ([], [0.0] * 6),
+        ([7], [0.0, 0.0, 0.0, 0.0, 0.9, 0.0]),   # un axe bouge de 0.9
+        ([], [0.0] * 6),
+    ])
+    cal.phase_gachettes(lecteur, entrees=[("L", "la gâchette L")],
+                        delai_s=0.05, journal=lambda *a, **k: None)
+    cap = cal.donnees["capacites"]["gachettes_analogiques"]
+    assert cap["disponible"] is True
+    assert cap["axes_detectes"]
+
+
+# ── Phase IMU ────────────────────────────────────────────────────────────────
+
+def test_imu_biais_et_gravite():
+    cal = Calibration(sortie=Path("/dev/null"))
+    plat = [0.01, 0.0, 1.0, 0.0, 0.0, 0.0]
+    retourne = [0.01, 0.0, -1.0, 0.0, 0.0, 0.0]
+    cal.phase_imu(FauxLecteurAxes([plat, plat, retourne, retourne]),
+                  duree_repos=0.04, duree_retournement=0.04,
+                  journal=lambda *a, **k: None)
+    imu = cal.donnees["imu"]
+    assert imu["biais"][2] == pytest.approx(1.0, abs=0.05)
+    assert imu["gravite"] == pytest.approx(1.0, abs=0.05)
+    assert imu["verifie"] is True
+
+
+def test_imu_sans_retournement_reste_non_verifie():
+    cal = Calibration(sortie=Path("/dev/null"))
+    plat = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+    cal.phase_imu(FauxLecteurAxes([plat, plat, plat, plat]),
+                  duree_repos=0.04, duree_retournement=0.04,
+                  journal=lambda *a, **k: None)
+    assert cal.donnees["imu"]["verifie"] is False
+
+
+# ── Phase actionneurs ────────────────────────────────────────────────────────
+
+def test_actionneurs_sans_led_ni_confirmation(tmp_path):
+    cal = Calibration(sortie=Path("/dev/null"))
+    (tmp_path / "ff").write_text("107030000 0", encoding="utf-8")
+    cal.phase_actionneurs(chemin_ff=tmp_path / "ff", base_hid=tmp_path,
+                          demander=lambda q: False, vibrer=lambda: None,
+                          journal=lambda *a, **k: None)
+    cap = cal.donnees["capacites"]
+    assert cap["vibration"]["disponible"] is True
+    assert cap["vibration"]["verifie"] is False       # l'opérateur n'a rien senti
+    assert cap["lumieres"]["disponible"] is False
+    assert "leds" in cap["lumieres"]["raison"]
+
+
+def test_actionneurs_led_exposee(tmp_path):
+    cal = Calibration(sortie=Path("/dev/null"))
+    (tmp_path / "ff").write_text("0", encoding="utf-8")
+    (tmp_path / "leds" / "nintendo_player1").mkdir(parents=True)
+    cal.phase_actionneurs(chemin_ff=tmp_path / "ff", base_hid=tmp_path,
+                          demander=lambda q: True, vibrer=None,
+                          journal=lambda *a, **k: None)
+    cap = cal.donnees["capacites"]
+    assert cap["vibration"]["disponible"] is False
+    assert cap["lumieres"]["disponible"] is True

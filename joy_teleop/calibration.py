@@ -15,15 +15,18 @@ contrat d'écriture.
 from __future__ import annotations
 
 import argparse
-import statistics
+import math
 import os
 import socket
+import statistics
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
 
 import yaml
+
+from manette_materiel import leds_du_pad, vibration_supportee
 
 OUTIL = "joy_teleop/calibration.py"
 SORTIE_DEFAUT = "/home/jetson/clawbot/config/manette.yaml"
@@ -52,6 +55,13 @@ ENTREES_DECLAREES = [
 ]
 
 
+ENTREES_GACHETTES = [
+    ("L", "la gâchette basse gauche (L)"),
+    ("R", "la gâchette basse droite (R)"),
+    ("ZL", "la gâchette haute gauche (ZL)"),
+    ("ZR", "la gâchette haute droite (ZR)"),
+]
+
 AXES_DECLARES = [
     ("stick_gauche_x", 0, "droite", "le stick gauche à droite"),
     ("stick_gauche_y", 1, "haut", "le stick gauche en haut"),
@@ -76,6 +86,47 @@ def echantillonner(lecteur, duree_s: float, index: int) -> list[float]:
         axes = lecteur.etat().axes
         valeurs.append(axes[index] if index < len(axes) else 0.0)
     return valeurs
+
+
+def echantillonner_tout(lecteur, duree_s: float) -> list[list[float]]:
+    """Relève tous les axes pendant `duree_s` (au moins deux points)."""
+    n = max(2, int(duree_s / 0.02))
+    releves = []
+    for _ in range(n):
+        if not lecteur.lire(0.02):
+            raise RuntimeError("manette déconnectée pendant la mesure")
+        releves.append(list(lecteur.etat().axes))
+    return releves
+
+
+def surveiller_appui(lecteur, index_bouton: int, delai_s: float,
+                     seuil: float = 0.2) -> dict[int, float] | None:
+    """Attend l'appui de `index_bouton` et rend les axes qui ont bougé.
+
+    Rend None si aucun axe n'a bougé de plus de `seuil` pendant l'appui : la
+    gâchette est alors binaire. C'est la seule façon de trancher sans supposer.
+    Lève RuntimeError si le délai expire ou si le périphérique disparaît.
+    """
+    depart = time.monotonic()
+    reference = list(lecteur.etat().axes)
+    ecarts: dict[int, float] = {}
+    vu_appui = False
+    while time.monotonic() - depart < delai_s:
+        if not lecteur.lire(0.02):
+            raise RuntimeError("manette déconnectée pendant la capture")
+        etat = lecteur.etat()
+        for i, valeur in enumerate(etat.axes):
+            ref = reference[i] if i < len(reference) else 0.0
+            if abs(valeur - ref) > seuil:
+                ecarts[i] = max(ecarts.get(i, 0.0), abs(valeur - ref))
+        presse = index_bouton < len(etat.boutons) and bool(etat.boutons[index_bouton])
+        if presse:
+            vu_appui = True
+        elif vu_appui:
+            break
+    if not vu_appui or not ecarts:
+        return None
+    return ecarts
 
 
 def capturer_appui(lecteur, delai_s: float = 25.0) -> int | None:
@@ -220,6 +271,119 @@ class Calibration:
                 journal(f"        ↳ même code que {cible} (index {index}) : enregistré comme alias")
             else:
                 journal(f"        ↳ index {index}")
+
+    def phase_gachettes(self, lecteur, entrees=None, delai_s: float = 25.0,
+                        seuil: float = 0.2, journal=None) -> None:
+        """Tranche « binaire ou analogique » en observant les axes pendant l'appui."""
+        journal = journal or print
+        entrees = entrees if entrees is not None else ENTREES_GACHETTES
+        detectes: dict[str, dict[str, float]] = {}
+        for nom, description in entrees:
+            if nom in self.donnees["absents"]:
+                journal(f"── {nom} : déclarée absente, rien à mesurer")
+                continue
+            try:
+                index = self.bouton(nom)
+            except KeyError:
+                journal(f"── {nom} : aucune mesure de bouton, ignorée")
+                continue
+            journal(f"── {description} (index {index}) : appuie PROGRESSIVEMENT à fond")
+            ecarts = surveiller_appui(lecteur, index, delai_s, seuil)
+            if ecarts:
+                detectes[nom] = {str(i): round(v, 3) for i, v in sorted(ecarts.items())}
+                journal(f"   ↳ axes qui bougent : {detectes[nom]} — analogique")
+            else:
+                journal("   ↳ aucun axe ne bouge — binaire")
+
+        if detectes:
+            self.donnees["capacites"]["gachettes_analogiques"] = {
+                "disponible": True,
+                "axes_detectes": detectes,
+            }
+        else:
+            self.donnees["capacites"]["gachettes_analogiques"] = {
+                "disponible": False,
+                "raison": "aucun axe ne bouge pendant l'appui : gâchettes binaires",
+            }
+
+    def phase_imu(self, lecteur_imu, chemin: str = "/dev/input/js1",
+                  duree_repos: float = 3.0, duree_retournement: float = 3.0,
+                  journal=None) -> None:
+        """Biais, bruit et norme de gravité, plus un contrôle de signe.
+
+        Les valeurs sont celles de jsdev, normalisées dans [-1, 1] ; ce ne sont pas
+        des m/s². Le contrôle de retournement vérifie que l'axe vertical change de
+        signe : sans lui, rien ne prouve que l'accéléromètre bouge.
+        """
+        journal = journal or print
+        journal("  1) Pose la manette à plat, immobile (3 s)")
+        repos = echantillonner_tout(lecteur_imu, duree_repos)
+        biais = [round(statistics.fmean(colonne), 4) for colonne in zip(*repos)]
+        bruit = [round(statistics.pstdev(colonne), 4) for colonne in zip(*repos)]
+        gravite = round(math.sqrt(sum(v * v for v in biais[:3])), 4)
+
+        journal("  2) Retourne la manette, écran vers le bas, immobile (3 s)")
+        retourne = echantillonner_tout(lecteur_imu, duree_retournement)
+        biais_retourne = [statistics.fmean(colonne) for colonne in zip(*retourne)]
+        verifie = (biais[2] * biais_retourne[2]) < 0
+
+        self.donnees["imu"] = {
+            "chemin": chemin,
+            "biais": biais,
+            "bruit": bruit,
+            "gravite": gravite,
+            "verifie": bool(verifie),
+        }
+        journal(f"     biais={biais} gravite={gravite} retournement_verifie={verifie}")
+
+    def phase_actionneurs(self, chemin_ff=None, base_hid=None, demander=None,
+                          vibrer=None, journal=None) -> None:
+        """Teste ce qui peut être commandé, et enregistre ce que l'opérateur confirme.
+
+        Le bit FF_RUMBLE prouve que l'API existe, pas que le moteur tourne : la
+        confirmation humaine est enregistrée séparément dans `verifie`.
+        """
+        journal = journal or print
+        capacites = self.donnees.setdefault("capacites", {})
+
+        disponible = bool(chemin_ff) and vibration_supportee(Path(chemin_ff))
+        verifie = False
+        if disponible:
+            journal("── vibration : lancement d'un effet court")
+            if vibrer:
+                try:
+                    vibrer()
+                except Exception as err:      # noqa: BLE001 — on consigne, on ne masque pas
+                    journal(f"   ↳ l'effet a échoué : {err}")
+            if demander:
+                verifie = bool(demander("As-tu senti la vibration ? [o/n] "))
+            journal(f"   ↳ confirmée par l'opérateur : {verifie}")
+        capacites["vibration"] = {
+            "disponible": disponible,
+            "methode": "evdev EV_FF (FF_RUMBLE)",
+            "verifie": verifie,
+        }
+
+        leds = leds_du_pad(Path(base_hid)) if base_hid else []
+        if leds:
+            capacites["lumieres"] = {
+                "disponible": True,
+                "entrees": [p.name for p in leds],
+            }
+            journal(f"── lumière : {len(leds)} entrée(s) LED exposée(s)")
+        else:
+            capacites["lumieres"] = {
+                "disponible": False,
+                "raison": "aucune entrée /sys/class/leds rattachée au pad",
+            }
+
+    def bouton(self, nom: str) -> int:
+        """Index d'un bouton déjà enregistré (ou de sa cible d'alias)."""
+        if nom in self.donnees["boutons"]:
+            return int(self.donnees["boutons"][nom])
+        if nom in self.donnees["aliases"]:
+            return self.bouton(self.donnees["aliases"][nom])
+        raise KeyError(nom)
 
     # ── contrôle et écriture ─────────────────────────────────────────────────
 
