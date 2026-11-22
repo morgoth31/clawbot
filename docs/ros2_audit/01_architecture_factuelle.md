@@ -206,6 +206,8 @@ Arêtes dynamiques supplémentaires observées sur 5 s de `/tf` [S11] : `odom �
 | `/camera/camera` | 68 (`color_fps`, `color_qos`, `depth_fps`, `depth_qos`, …) | QoS exposé en paramètre | [S06] |
 | `/wrist_camera/camera` | 28 (`image_size`, `pixel_format`, `output_encoding`, `camera_frame_id`, …) | QoS d'image via `*.enable_pub_plugins` | [S06] |
 
+Les paramètres **déclarés dans le code** confirment cette lecture : `grep declare_parameter` ne relève aucune déclaration dans `clawbot_director`, `clawbot_safety` ni `clawbot_sentinel` [S31].
+
 Conséquence directe : **les cinq nœuds maison qui portent la décision ne sont pas paramétrables à chaud**. Changer un seuil impose de modifier un fichier puis de redémarrer l'unité. Les nœuds C++ vendor (EKF, SLAM, lidar, caméra) le sont.
 
 ## 9. Launch files et composition
@@ -270,6 +272,7 @@ QoS effectif lu sur les endpoints, par `ros2 topic info -v` [S07]. Abréviations
 
 **Middleware.**
 - `rmw_fastrtps_cpp` [S17], sans profil chargé [S20] : les transports par défaut de Fast DDS s'appliquent, et `/dev/shm` reste à 12 Mo, ce qui montre qu'aucun segment partagé notable n'est utilisé [S13].
+- **Deux profils QoS seulement sont écrits dans le code maison** : `qos_profile_sensor_data` pour `/scan` et la profondeur (`BEST_EFFORT`), et un `QoSProfile(RELIABLE, TRANSIENT_LOCAL)` pour `/map` dans le service matériel [S29]. Tout le reste utilise les profils par défaut — ce qui explique que 141 endpoints sur 54 topics partagent `RELIABLE`/`VOLATILE` [S07].
 - **Aucun `use_intra_process_comms`** : la composition de nœuds étant absente (§9), l'IPC intra-processus est impossible par construction. `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `grep -rn use_intra_process_comms` sur l'arbre (0 occurrence attendue).
 - **Aucun SHM déclaré** : le profil du dépôt ([S40]) ne déclare que `UDPv4` et `useBuiltinTransports=false` ; il n'est pas chargé, donc le transport effectif est celui par défaut de Fast DDS sur UDPv4.
 - **Deux sérialisations différentes coexistent pour la même donnée** : `sensor_msgs/Image` brut (`/wrist_camera/image_raw`) et `CompressedImage` (`/wrist_camera/image_raw/compressed`), plus `theora` et `compressedDepth` publiés par la même caméra [S03], [S07]. De même pour la profondeur : `Image` et `PointCloud2` [S03].

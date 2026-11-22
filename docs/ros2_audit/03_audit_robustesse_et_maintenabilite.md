@@ -60,7 +60,7 @@ L'exception est levée par `rclpy.spin` sur un `SIGTERM` : c'est un **arrêt nor
 
 ### 1.4 État global du poste
 
-`systemctl --failed` renvoie deux unités, **aucune du robot** : `apport-autoreport.service` et `logrotate.service` [S34]. L'état `degraded` du poste n'est donc pas imputable à la pile ROS, mais il prive l'opérateur d'un signal global fiable : un `systemctl is-system-running` qui répond `degraded` ne dit rien de l'état du robot.
+`systemctl --failed` renvoie deux unités, **aucune du robot** : `apport-autoreport.service` et `logrotate.service` [S34]. Les 40 dernières lignes de journal de chaque unité robot active ne contiennent, elles, qu'un incident : l'arrêt `ExternalShutdownException` de `clawbot-sentinel` (§1.2) et des avertissements de rendu MkDocs [S18]. L'état `degraded` du poste n'est donc pas imputable à la pile ROS, mais il prive l'opérateur d'un signal global fiable : un `systemctl is-system-running` qui répond `degraded` ne dit rien de l'état du robot.
 
 ## 2. Points uniques de défaillance
 
