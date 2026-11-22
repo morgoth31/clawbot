@@ -1,0 +1,4 @@
+string mission_id          # vide : la dernière mission
+---
+bool found
+string report_json         # état, étapes, rapport d'échec, décisions, budget restant

@@ -1,0 +1,2 @@
+---
+string capabilities_json   # [{"name","state","units":[...],"requires":[...],"conflicts":[...],"stale_flows":[...]}]

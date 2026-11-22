@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawbot.director_command/1",
+  "title": "Contrat de DirectorCommand.request_json (façade du directeur)",
+  "description": "Un op par branche. Les champs supplémentaires restent tolérés : trois appelants (pont HTTP, MCP, sentinel) ne sont pas modifiables dans ce lot.",
+  "type": "object",
+  "required": ["op"],
+  "oneOf": [
+    {
+      "properties": {
+        "op": {"const": "start_skill"},
+        "skill": {"type": "string", "minLength": 1},
+        "args": {"type": "object"}
+      },
+      "required": ["op", "skill"]
+    },
+    {
+      "properties": {
+        "op": {"const": "start_sequence"},
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["skill"],
+            "properties": {
+              "skill": {"type": "string", "minLength": 1},
+              "args": {"type": "object"}
+            }
+          }
+        }
+      },
+      "required": ["op", "steps"]
+    },
+    {
+      "properties": {
+        "op": {"const": "get_task"},
+        "task_id": {"type": "string"}
+      },
+      "required": ["op"]
+    },
+    {
+      "properties": {
+        "op": {"const": "cancel_task"},
+        "task_id": {"type": "string"},
+        "reason": {"type": "string"}
+      },
+      "required": ["op"]
+    },
+    {
+      "properties": {
+        "op": {"const": "confirm"},
+        "accepte": {"type": "boolean"}
+      },
+      "required": ["op", "accepte"]
+    }
+  ]
+}

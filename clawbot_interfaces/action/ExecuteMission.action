@@ -1,0 +1,24 @@
+# Goal
+string mission_id          # vide : généré
+string objective           # objectif en langage naturel, recopié dans le journal
+string steps_json          # [{"skill": "...", "params": {...}, "timeout_s": 0}] ; 1 à 20 étapes
+uint8 max_escalations      # 0 : défaut 3
+float32 max_duration_s     # 0 : défaut 600
+---
+# Result
+uint8 OUTCOME_SUCCEEDED=0
+uint8 OUTCOME_FAILED=1
+uint8 OUTCOME_CANCELED=2
+uint8 OUTCOME_REJECTED=3
+uint8 outcome              # mêmes constantes que ExecuteSkill
+string mission_id
+string state               # état final (§6.4)
+string failure_report_json
+string summary_json        # étapes réalisées, durées
+---
+# Feedback
+uint16 step_index
+uint16 step_count
+string state
+string current_skill
+float32 progress

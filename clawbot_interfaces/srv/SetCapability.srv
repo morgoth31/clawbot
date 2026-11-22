@@ -1,0 +1,7 @@
+string name
+bool active
+float32 timeout_s          # 0 : 30 s
+---
+bool success
+string state               # INACTIVE | STARTING | ACTIVE | DEGRADED | STOPPING | FAILED
+string message
