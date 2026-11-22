@@ -22,6 +22,9 @@ from types import SimpleNamespace
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+# La logique a déménagé dans clawbot_common (P13) : sans ce chemin, la version
+# installée, plus ancienne, gagne et le module `preconditions` est introuvable.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "clawbot_common"))
 
 from clawbot_director import preconditions as regles  # noqa: E402
 
