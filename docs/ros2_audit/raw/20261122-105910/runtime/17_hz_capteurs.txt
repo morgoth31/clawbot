@@ -1,0 +1,17 @@
+=== /scan
+average rate: 10.125
+	min: 0.095s max: 0.102s std dev: 0.00113s window: 45
+=== /camera/color/image_raw
+average rate: 30.004
+	min: 0.028s max: 0.041s std dev: 0.00257s window: 154
+=== /camera/depth/image_raw
+=== /wrist_camera/image_raw
+	min: 0.030s max: 0.037s std dev: 0.00209s window: 92
+failed to shutdown: rcl_shutdown already called on the given context, at ./src/rcl/init.c:241
+=== /camera/depth/points
+=== /point_cloud
+average rate: 10.110
+	min: 0.096s max: 0.104s std dev: 0.00168s window: 45
+=== /camera/depth/image_raw (12 s)
+=== /camera/depth/points (12 s)
+=== /map (12 s)

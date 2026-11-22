@@ -1,0 +1,22 @@
+Nov 22 10:14:06 yahboom systemd[1]: Stopping Sentinel S1 - attention, mots d'arret, reveil S2...
+Nov 22 10:14:06 yahboom bash[1354]: Traceback (most recent call last):
+Nov 22 10:14:06 yahboom bash[1354]:   File "<string>", line 1, in <module>
+Nov 22 10:14:06 yahboom bash[1354]:   File "/home/jetson/clawbot/install/clawbot_sentinel/lib/python3.10/site-packages/clawbot_sentinel/sentinel_node.py", line 285, in main
+Nov 22 10:14:06 yahboom bash[1354]:     rclpy.spin(node)
+Nov 22 10:14:06 yahboom bash[1354]:   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 229, in spin
+Nov 22 10:14:06 yahboom bash[1354]:     executor.spin_once()
+Nov 22 10:14:06 yahboom bash[1354]:   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 776, in spin_once
+Nov 22 10:14:06 yahboom bash[1354]:     self._spin_once_impl(timeout_sec)
+Nov 22 10:14:06 yahboom bash[1354]:   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 765, in _spin_once_impl
+Nov 22 10:14:06 yahboom bash[1354]:     handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+Nov 22 10:14:06 yahboom bash[1354]:   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 748, in wait_for_ready_callbacks
+Nov 22 10:14:06 yahboom bash[1354]:     return next(self._cb_iter)
+Nov 22 10:14:06 yahboom bash[1354]:   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 649, in _wait_for_ready_callbacks
+Nov 22 10:14:06 yahboom bash[1354]:     raise ExternalShutdownException()
+Nov 22 10:14:06 yahboom bash[1354]: rclpy.executors.ExternalShutdownException
+Nov 22 10:14:06 yahboom systemd[1]: clawbot-sentinel.service: Main process exited, code=exited, status=1/FAILURE
+Nov 22 10:14:06 yahboom systemd[1]: clawbot-sentinel.service: Failed with result 'exit-code'.
+Nov 22 10:14:06 yahboom systemd[1]: Stopped Sentinel S1 - attention, mots d'arret, reveil S2.
+Nov 22 10:14:06 yahboom systemd[1]: clawbot-sentinel.service: Consumed 10h 33min 48.962s CPU time.
+Nov 22 10:16:50 yahboom systemd[1]: Started Sentinel S1 - attention, mots d'arret, reveil S2.
+Nov 22 10:16:52 yahboom bash[3805281]: [INFO] [1795339012.393876693] [sentinel]: sentinel pret
