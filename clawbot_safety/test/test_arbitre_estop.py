@@ -19,6 +19,7 @@ from soutien_arbitre import capteurs_sains, contexte, fermer, twist  # noqa: E40
 def arbitre():
     ctx = contexte()
     node = arbitrator.Arbitrator(context=ctx)
+    node._now = lambda: 1000.0          # horloge simulée dès la construction
     yield node
     fermer(node, ctx)
 
