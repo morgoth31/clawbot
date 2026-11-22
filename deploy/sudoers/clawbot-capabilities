@@ -1,6 +1,6 @@
 # Généré par scripts/gen_capability_auth.py — NE PAS ÉDITER À LA MAIN.
 # Source : clawbot_capabilities/config/capabilities.yaml
-# Capacités pilotables : base, lidar, mapping, navigation, arm, wrist_vision, detection
+# Capacités pilotables : base, lidar, mapping, navigation, arm, wrist_vision
 # Chaque unité est nommée : aucun joker, aucune commande arbitraire.
 
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start clawbot-arm-controller.service
@@ -17,8 +17,6 @@ jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start clawbot-wrist-camera.servic
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl stop clawbot-wrist-camera.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start ros2-driver-node.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl stop ros2-driver-node.service
-jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start yolo-inference.service
-jetson ALL=(root) NOPASSWD: /usr/bin/systemctl stop yolo-inference.service
 
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl is-active --quiet *
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl is-active *

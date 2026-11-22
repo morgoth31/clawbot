@@ -26,7 +26,7 @@ class SondeTopic:
         self.horodatages: deque[float] = deque(maxlen=200)
         self._abonnement = None
         self._type: str | None = None
-        self._echec: str | None = None
+        self._classe = None
 
     def _type_du_topic(self) -> str | None:
         for nom, types in self.node.get_topic_names_and_types():
@@ -35,30 +35,35 @@ class SondeTopic:
         return None
 
     def _ouvrir(self) -> bool:
+        """Ouvre l'abonnement, ou réessaie au tick suivant.
+
+        Un échec de découverte n'est **pas** mémorisé : au démarrage du
+        gestionnaire, la découverte DDS peut être incomplète (c'est ce qui a
+        condamné `lidar` en FAILED alors que /scan publiait à 10 Hz).
+        """
         if self._abonnement is not None:
             return True
-        if self._echec is not None:
-            return False
-        self._type = self._type_du_topic()
         if self._type is None:
-            self._echec = f"aucun éditeur sur {self.topic}"
-            return False
+            self._type = self._type_du_topic()
+            if self._type is None:
+                return False                     # pas encore visible : on réessaiera
+        if self._classe is None:
+            from rosidl_runtime_py.utilities import get_message
+
+            try:
+                self._classe = get_message(self._type)
+            except (AttributeError, ModuleNotFoundError, ValueError):
+                return False
         from rclpy.qos import HistoryPolicy, QoSProfile, ReliabilityPolicy
-        from rosidl_runtime_py.utilities import get_message
 
         qos = QoSProfile(depth=QOS_SONDE, history=HistoryPolicy.KEEP_LAST,
                          reliability=ReliabilityPolicy.BEST_EFFORT)
-        try:
-            classe = get_message(self._type)
-        except (AttributeError, ModuleNotFoundError, ValueError) as exc:
-            self._echec = f"type {self._type} non résoluble ({exc})"
-            return False
-        # rclpy n'a pas de `create_generic_subscription` (c'est une API rclcpp) :
-        # la sonde s'abonne typé. Elle vit le temps de l'activation seulement, donc
-        # la copie des messages reste bornée à cette fenêtre (cf. P05).
-        # L'abonnement est conservé : sans référence, il est collecté et ne reçoit rien.
+        # rclpy n'a pas de `create_generic_subscription` (API rclcpp) : la sonde
+        # s'abonne typé. Elle ne vit que la fenêtre d'activation, donc la copie des
+        # messages reste bornée (cf. P05). L'abonnement est conservé : sans
+        # référence, il est collecté et ne reçoit rien.
         self._abonnement = self.node.create_subscription(
-            classe, self.topic, self._sur_message, qos)
+            self._classe, self.topic, self._sur_message, qos)
         return True
 
     def _sur_message(self, _charge) -> None:

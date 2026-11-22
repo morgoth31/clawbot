@@ -185,6 +185,15 @@ class HardwareNode(Node):
         self.map_data  = msg
         self.map_stamp = time.time()
 
+    def _sur_capacites(self, msg: String) -> None:
+        """Cache l'état des capacités publié par le gestionnaire (REQ-CAPA-006)."""
+        try:
+            charge = json.loads(msg.data)
+        except (ValueError, TypeError):
+            return
+        for entree in charge.get("capabilities", []):
+            self.capacites[entree.get("name", "")] = entree
+
     def _yolo_img_cb(self, msg: CompressedImage) -> None:
         """Cache latest YOLO annotated image from /camera/detection_image."""
         self.yolo_frame_bytes = bytes(msg.data)
