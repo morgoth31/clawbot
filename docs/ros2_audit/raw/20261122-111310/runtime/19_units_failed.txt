@@ -1,0 +1,2 @@
+● apport-autoreport.service loaded failed failed Process error reports when automatic reporting is enabled
+● logrotate.service         loaded failed failed Rotate log files
