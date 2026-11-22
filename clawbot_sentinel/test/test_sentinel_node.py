@@ -30,7 +30,8 @@ rclpy = pytest.importorskip('rclpy')
 from geometry_msgs.msg import Twist  # noqa: E402
 from rclpy.executors import MultiThreadedExecutor  # noqa: E402
 from rclpy.node import Node  # noqa: E402
-from std_msgs.msg import String  # noqa: E402
+from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy  # noqa: E402
+from std_msgs.msg import Bool, String  # noqa: E402
 
 from clawbot_interfaces.srv import DirectorCommand  # noqa: E402
 from clawbot_sentinel.attention import ENGAGED, IDLE  # noqa: E402
@@ -69,8 +70,13 @@ def monde():
     faux = FauxDirecteur(sonde)
     pub_transcript = sonde.create_publisher(String, '/sentinel/transcript', 10)
     pub_directeur = sonde.create_publisher(String, '/director/state', 10)
-    vitesses = []
+    vitesses = []          # doit rester vide : la sentinelle n'édite plus la vitesse
     sonde.create_subscription(Twist, '/cmd_vel', lambda m: vitesses.append(m), 50)
+    estops = []
+    sonde.create_subscription(
+        Bool, '/safety/estop', lambda m: estops.append(m),
+        QoSProfile(depth=1, reliability=ReliabilityPolicy.RELIABLE,
+                   durability=DurabilityPolicy.TRANSIENT_LOCAL))
     etats = []
     sonde.create_subscription(String, '/sentinel/state',
                               lambda m: etats.append(json.loads(m.data)), 10)
@@ -79,7 +85,8 @@ def monde():
         assert _attendre(lambda: pub_transcript.get_subscription_count() > 0, timeout=5.0)
         yield SimpleNamespace(node=node, observations=observations, reveils=reveils,
                               directeur=faux, pub_transcript=pub_transcript,
-                              pub_directeur=pub_directeur, vitesses=vitesses, etats=etats)
+                              pub_directeur=pub_directeur, vitesses=vitesses,
+                              estops=estops, etats=etats)
     finally:
         executeur.shutdown()
         node.destroy_node()
@@ -120,15 +127,22 @@ def test_une_personne_lointaine_n_engage_pas(monde):
     assert monde.reveils == []
 
 
-def test_un_mot_d_arret_annule_la_tache_et_met_la_base_a_zero(monde):
+def test_un_mot_d_arret_annule_la_tache_et_pose_l_estop(monde):
+    """Mot d'arrêt : la tâche est annulée et l'e-stop est posé (REQ-SAFETY-016).
+
+    Avant P04 la sentinelle publiait un Twist nul sur /cmd_vel : c'était une
+    troisième source de vitesse, et un zéro n'est pas un verrou — la consigne
+    suivante repartait. Désormais elle publie Bool(True) sur /safety/estop.
+    """
     monde.pub_transcript.publish(String(data='Arrête-toi !'))
 
     assert _attendre(lambda: monde.directeur.requetes, timeout=3.0)
     requete = monde.directeur.requetes[0]
     assert requete['op'] == 'cancel_task'
     assert requete['reason'] == 'voix_arret'
-    assert _attendre(lambda: monde.vitesses, timeout=2.0)
-    assert monde.vitesses[-1].linear.x == 0.0 and monde.vitesses[-1].angular.z == 0.0
+    assert _attendre(lambda: monde.estops, timeout=2.0), 'aucun e-stop publie'
+    assert monde.estops[-1].data is True
+    assert monde.vitesses == [], 'la sentinelle ne doit plus rien publier sur /cmd_vel'
 
 
 def test_oui_hors_attente_de_confirmation_n_est_pas_consomme(monde):

@@ -22,12 +22,12 @@ import urllib.error
 import urllib.request
 
 import rclpy
-from geometry_msgs.msg import Twist
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import (DurabilityPolicy, QoSProfile, ReliabilityPolicy,
+                       qos_profile_sensor_data)
 from sensor_msgs.msg import Image
-from std_msgs.msg import String
+from std_msgs.msg import Bool, String
 
 from clawbot_interfaces.srv import DirectorCommand
 
@@ -64,7 +64,12 @@ class SentinelNode(Node):
 
         self.pub_state = self.create_publisher(String, "/sentinel/state", 10)
         self.pub_event = self.create_publisher(String, "/sentinel/event", 10)
-        self.pub_cmd = self.create_publisher(Twist, "/cmd_vel", 10)
+        # Arrêt d'urgence : la sentinelle est un capteur d'arrêt, pas un éditeur de
+        # vitesse (REQ-SAFETY-016). TRANSIENT_LOCAL : l'arbitre doit voir le verrou
+        # même s'il démarre après le signal.
+        qos_estop = QoSProfile(depth=1, reliability=ReliabilityPolicy.RELIABLE,
+                               durability=DurabilityPolicy.TRANSIENT_LOCAL)
+        self.pub_estop = self.create_publisher(Bool, "/safety/estop", qos_estop)
         self.create_subscription(String, "/sentinel/transcript", self.on_transcript, 10)
         self.create_subscription(String, "/director/state", self.on_director_state, 10)
         self.create_subscription(Image, "/camera/depth/image_raw", self.on_profondeur,
@@ -157,7 +162,7 @@ class SentinelNode(Node):
                 f"« {msg.data[:40]} » laisse a S2 : le directeur n attend pas de confirmation")
 
     def arreter_localement(self, motif: str):
-        self.pub_cmd.publish(Twist())      # priorite 0,5 : même effet qu'un opérateur
+        self.pub_estop.publish(Bool(data=True))   # verrou jusqu'au réarmement humain
         self.appeler_directeur({"op": "cancel_task", "reason": motif}, motif)
         self.publier_evenement({"type": "ARRET_LOCAL", "motif": motif,
                                 "at": round(time.time(), 3)})
