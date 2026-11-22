@@ -72,7 +72,9 @@ requirements:
     title: Aucune désérialisation des flux surveillés
     statement: >
       Le moniteur doit s'abonner à chaque flux en mode brut (raw=True), QoS
-      BEST_EFFORT profondeur 1, sans désérialiser les messages.
+      BEST_EFFORT profondeur 1, sans désérialiser les messages. Seule exception :
+      un flux dont la valeur est publiée dans RobotHealth (aujourd'hui /voltage)
+      reçoit un unique abonnement typé, qui alimente aussi l'estimateur.
     rationale: >
       Surveiller /camera/color/image_raw en désérialisant coûterait la bande
       passante et le CPU d'un second consommateur d'images ; un abonné BEST_EFFORT
@@ -83,7 +85,8 @@ requirements:
     level: unit
     criterion: >
       clawbot_health/test/test_abonnements_bruts.py::test_chaque_flux_brut_en_best_effort
-      (create_subscription enveloppé, raw=True et QoS vérifiés par flux).
+      et ::test_manifeste_reel_un_seul_abonnement_par_topic (un seul abonnement par
+      topic du manifeste réel, raw=True sauf /voltage typé).
     evidence: null
     status: implemented
     approved_by: null
