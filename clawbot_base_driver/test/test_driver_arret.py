@@ -21,13 +21,16 @@ from soutien_pilote import (FausseHorloge, FauxJournal, FauxRosmaster, arreter, 
 
 
 @pytest.fixture
-def pilote():
+def pilote(tmp_path, monkeypatch):
+    # le pilote en service tient /run/lock/clawbot-mcu.lock : verrou temporaire
+    monkeypatch.setattr(base_driver, "chemin_verrou",
+                        lambda: str(tmp_path / "clawbot-mcu.lock"))
     faux = FauxRosmaster()
     horloge = FausseHorloge()
     journal = FauxJournal()
-    node = instancier(base_driver, faux, horloge, journal)
+    node, contexte = instancier(base_driver, faux, horloge, journal)
     yield node, faux, horloge, journal
-    arreter(node)
+    arreter(node, contexte)
 
 
 def _consigne(node, vx):

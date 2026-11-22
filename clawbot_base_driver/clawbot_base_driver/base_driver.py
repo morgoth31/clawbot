@@ -40,8 +40,8 @@ car_type_dic={
     'NONE':-1
 }
 class yahboomcar_driver(Node):
-	def __init__(self, name, rosmaster_factory=None):
-		super().__init__(name)
+	def __init__(self, name, rosmaster_factory=None, context=None):
+		super().__init__(name, context=context)
 		global car_type_dic
 		self.RA2DE = 180 / pi
 		# Port serie nomme (REQ-DRV-003) et delai d'arret (REQ-DRV-002), declares avant
