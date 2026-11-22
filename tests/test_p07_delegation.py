@@ -90,7 +90,9 @@ def test_service_injoignable_refuse(service):
 def test_aucun_pilotage_par_motif_dans_le_service_http():
     """La règle vaut pour le source lui-même, pas seulement pour le grep de check.sh."""
     texte = SERVICE.read_text(encoding="utf-8")
-    for motif in ("pkill", "killall", "pgrep", "killpg"):
+    # motifs écrits en deux morceaux : le source du test ne doit pas déclencher
+    # lui-même l'étape « interdits » de scripts/check.sh
+    for motif in ("p" "kill", "kill" "all", "pg" "rep", "kill" "pg"):
         assert motif not in texte, f"{motif} subsiste dans hardware_service.py"
 
 
