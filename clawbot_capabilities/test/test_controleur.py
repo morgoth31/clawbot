@@ -173,6 +173,35 @@ def test_capacite_non_geree_refusee():
 
 
 @pytest.mark.req("REQ-CAPA-002")
+def test_sonde_non_decouverte_reessaie_au_tick_suivant():
+    """Découverte DDS incomplète au démarrage : STARTING, pas FAILED définitif.
+
+    Défaut trouvé au déploiement : la sonde mémorisait « aucun éditeur sur /scan »,
+    si bien que `lidar` restait FAILED même une fois le topic visible.
+    """
+    from clawbot_capabilities.sondes import SondeTopic
+
+    class FauxNoeud:
+        def __init__(self):
+            self.visible = False
+            self.abonnements = []
+
+        def get_topic_names_and_types(self):
+            return [("/scan", ["sensor_msgs/msg/LaserScan"])] if self.visible else []
+
+        def create_subscription(self, classe, topic, cb, qos):
+            self.abonnements.append(topic)
+            return object()
+
+    noeud = FauxNoeud()
+    sonde = SondeTopic(noeud, "/scan", min_hz=9.0)
+    assert sonde.preter() is False          # rien de visible : on réessaiera
+    noeud.visible = True
+    assert sonde._ouvrir() is True          # la découverte est retentée
+    assert noeud.abonnements == ["/scan"]
+
+
+@pytest.mark.req("REQ-CAPA-002")
 def test_unite_en_echec_donne_failed():
     ctl, _ = controleur(en_echec=["clawbot-nav2.service"])
     resultat = ctl.demander("navigation", actif=True)

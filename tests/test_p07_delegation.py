@@ -96,6 +96,26 @@ def test_aucun_pilotage_par_motif_dans_le_service_http():
         assert motif not in texte, f"{motif} subsiste dans hardware_service.py"
 
 
+def test_le_noeud_se_construit_avec_ses_abonnements(service):
+    """Le défaut trouvé au déploiement : l'abonnement citait une méthode absente.
+
+    Le module se chargeait très bien sans instancier le nœud ; seul le démarrage
+    du service a révélé l'`AttributeError`. Ce test construit le nœud pour de vrai.
+    """
+    import rclpy
+
+    if not rclpy.ok():
+        rclpy.init()
+    noeud = service.HardwareNode()
+    try:
+        assert callable(getattr(noeud, "_sur_capacites", None))
+        assert isinstance(noeud.capacites, dict)
+        if service.SetCapability is not None:
+            assert noeud.cli_capacite is not None
+    finally:
+        noeud.destroy_node()
+
+
 def test_les_routes_slam_passent_par_la_capacite():
     texte = SERVICE.read_text(encoding="utf-8")
     assert 'CAPACITE_SLAM = "mapping"' in texte
