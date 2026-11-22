@@ -24,3 +24,111 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P00
+
+  - id: REQ-ARCH-010
+    title: Interfaces typées du référentiel §3
+    statement: >
+      clawbot_interfaces doit fournir ExecuteSkill, ExecuteMission, ListCapabilities,
+      SetCapability, GetMissionReport, SubmitDecision, RobotHealth et MissionEvent,
+      conformes au §3 du référentiel.
+    rationale: >
+      DirectorCommand était un service à charge utile JSON opaque (S38, Q13) : aucun
+      outil ne pouvait vérifier un champ, et P07 à P10 ont besoin de ces contrats.
+    sources: [S38, Q13, C11]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_interfaces_p06.py vérifie par introspection
+      (get_fields_and_field_types) que les huit types existent avec les champs et
+      types du §3, et ros2 interface show les affiche après construction.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P06
+
+  - id: REQ-ARCH-011
+    title: Table d'erreurs unique, exportée en JSON
+    statement: >
+      La table d'erreurs du §6.1 doit exister en un seul endroit
+      (clawbot_common.errors) et être exportée en JSON identique dans
+      share/clawbot_common/errors.json.
+    rationale: >
+      Trois formats d'erreur coexistent (03 §3) : sans table unique, le LLM et le
+      serveur MCP interprètent différemment le même échec.
+    sources: [S38, 03 §3]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_common/test/test_errors.py::test_errors_json_egale_le_module compare
+      le module et le fichier installé, champ par champ.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P06
+
+  - id: REQ-ARCH-012
+    title: Catégorie, relance et décisions par code
+    statement: >
+      Chaque code du §6.1 doit porter une catégorie, une règle de relance
+      automatique et une liste non vide de décisions autorisées.
+    rationale: >
+      Les décisions autorisées bornent ce que le LLM peut demander : un code sans
+      liste laisserait toute décision passer, y compris sur un e-stop.
+    sources: [§6.1, §6.3]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_common/test/test_errors.py : unicité des codes, catégorie dans
+      l'ensemble autorisé, décisions non vides et incluses dans
+      {RETRY_STEP, RETRY_WITH_PARAMS, SKIP_STEP, REPLACE_REMAINING, ABORT},
+      relance à 0 ou 1 avec un délai pour les codes relancés.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P06
+
+  - id: REQ-ARCH-013
+    title: Schéma du contrat du directeur
+    statement: >
+      Le schéma director_command.schema.json doit accepter toutes les requêtes que
+      le directeur sait traiter aujourd'hui et refuser une requête sans op connu.
+    rationale: >
+      Le contrat réel n'était écrit nulle part : il fallait lire director_node.py
+      pour savoir quels op existent et quels paramètres ils exigent.
+    sources: [S38, 03 §3]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_director/test/test_director_schema.py::test_corpus_valide : chaque
+      requête de clawbot_director/test/corpus/*.json (collectée chez les appelants
+      réels) est valide ; ::test_requetes_invalides_refusees : les trois cas
+      (sans op, op inconnu, paramètre de mauvais type) sont refusés.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P06
+
+  - id: REQ-ARCH-014
+    title: Validation à la frontière, modes warn et enforce
+    statement: >
+      En mode enforce, une requête invalide doit recevoir
+      {"ok": false, "error_code": "INVALID_PARAMS", "message": …} ; en mode warn,
+      elle est traitée comme avant et journalisée.
+    rationale: >
+      Le directeur est déjà utilisé par trois appelants qu'on ne peut pas modifier
+      dans ce lot (C11) : refuser trop tôt casserait le pont.
+    sources: [C11, Q13]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_director/test/test_director_schema.py::test_mode_enforce_refuse et
+      ::test_mode_warn_laisse_passer (sans ROS, sur la fonction de traitement).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P06
