@@ -165,13 +165,18 @@ développement : reconstruction à chaque requête, watcher de fichiers).
 | B. Statu quo (`mkdocs serve`) | rien à faire | processus de développement en production |
 | C. Retirer le service | −1 unité | documentation consultable seulement en local par `mkdocs build` manuel |
 
-## 10. Ce qui est demandé avant toute action
+## 10. Décisions de l'opérateur — 2026-11-22
 
-1. **Valider cet inventaire** (unités → lancement, liste `attic/`, suppressions).
-2. **Q11** : A (retirer), B (lier à 127.0.0.1) ou C (statu quo).
-3. **Q12** : A (build statique local), B (statu quo) ou C (retirer).
-4. **Définition de O11** : 15 hors infrastructure et hors rosbridge, ou un autre compte.
-5. Confirmer la suppression de `bridge_mcp` et de `ros2_llm_bridge` (python), qui ne sont
-   plus déployés mais dont `clawbot-health` (oneshot Telegram) dépend encore.
+| Question | Décision |
+|---|---|
+| Inventaire | **validé en l'état** (21 unités → `clawbot_bringup`, 2 hors cible, 4 supprimées, 29 paquets sous `attic/`) |
+| REQ-OPS-044 (sûreté) | **approuvée** : l'entrée `legacy` `/cmd_vel` quitte l'arbitre, après vérification qu'aucun éditeur ne subsiste |
+| Q11 rosbridge | **retiré** du démarrage (−3 nœuds, −9,9 % CPU) |
+| Q12 documentation | **`mkdocs build` + serveur statique sur 127.0.0.1** |
+| O11 | **15 applicatifs** hors infrastructure et hors rosbridge |
+| `bridge_mcp` | **supprimé après rebranchement** de l'alerte Telegram (`clawbot-health`) sur `clawbot_mcp` |
+| `ros2_llm_bridge` (python) | supprimé avec ses variantes d'`api_server.py` |
 
-Rien n'est déplacé, supprimé ni déployé tant que ces cinq points ne sont pas tranchés.
+Ces décisions lèvent la porte de l'étape 1 du prompt. Le déplacement des paquets sous
+`attic/`, les suppressions et le déploiement restent des étapes distinctes, chacune
+laissant sa preuve.

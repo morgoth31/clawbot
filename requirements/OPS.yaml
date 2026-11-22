@@ -267,8 +267,12 @@ requirements:
       l'arbitre démarre et publie `/safety/state` avec trois entrées ; au déploiement,
       `ros2 topic info /cmd_vel` annonce zéro éditeur avant et après le retrait.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      Approuvée avec l'inventaire du démarrage (question du 2026-11-22) :
+      « Oui, inventaire validé et REQ-OPS-044 approuvée ». Le retrait de l'entrée
+      `legacy` reste conditionné à la vérification qu'aucun éditeur ne subsiste.
     prompt: P14
 
   - id: REQ-OPS-045
@@ -286,8 +290,10 @@ requirements:
     criterion: >
       Au déploiement : `ros2 node list` filtré des nœuds d'infrastructure
       (`robot_state_publisher`, `joint_state_publisher`, `transform_listener_impl*`,
-      `launch_ros_*`) et de rosbridge s'il est conservé, ≤ 15. Mesure consignée dans le
-      journal de déploiement P14.
+      `launch_ros_*`) et de rosbridge s'il est conservé, ≤ 15. Définition retenue par
+      l'opérateur le 2026-11-22 : « 15 hors infrastructure et hors rosbridge » ; mesure
+      du même jour : 23 entrées, 6 d'infrastructure, 3 de rosbridge, **15 applicatifs**.
+      Mesure consignée dans le journal de déploiement P14.
     evidence: deploy/journal/2026-11-22_p14_demarrage.md
     status: draft
     approved_by: null
