@@ -1,0 +1,184 @@
+# Exigences d'exécution — serveur de skills (P08).
+# Format et règles : requirements/README.md.
+#
+# ÉTAT : bornes validées et exigences SAFETY approuvées par l'opérateur le 2026-11-22.
+#   - Bornes retenues : move_relative ≤ 2,0 m et ≤ 0,2 m/s ; rotate ≤ 2π et ≤ 0,8 rad/s
+#     (5× et 6× sous les limites du pilote : 1,0 / 1,0 / 5,0).
+#   - REQ-EXEC-003 et REQ-EXEC-004 : `approved`, décision citée dans leur note.
+
+domain: EXEC
+requirements:
+  - id: REQ-EXEC-001
+    title: Paramètres refusés avant tout mouvement
+    statement: >
+      Un goal dont les paramètres ne valident pas le schéma du skill est rejeté
+      (outcome REJECTED, code INVALID_PARAMS) sans qu'aucune consigne de vitesse
+      ne soit publiée.
+    rationale: >
+      Les paramètres viennent d'un LLM : bornes et types doivent être vérifiés au
+      serveur, pas supposés corrects côté appelant.
+    sources: [S05, §7]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_validation_goal.py et
+      clawbot_executive/test/test_serveur_skills.py::test_parametres_invalides_rejetes
+      (aucune publication sur /cmd_vel/skill).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P08
+
+  - id: REQ-EXEC-002
+    title: Capacité inactive bloque avant mouvement
+    statement: >
+      Un skill dont une capacité requise n'est pas ACTIVE échoue avec
+      CAPABILITY_INACTIVE avant toute publication de vitesse.
+    rationale: >
+      Naviguer sans lidar ni odomètre est une faute de précondition, pas une
+      erreur d'exécution : le code d'erreur doit le dire (P07 publie l'état).
+    sources: [S05, §3.5]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_exec_preconditions.py::test_capacite_inactive_refuse
+      et ::test_capacite_active_autorise.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P08
+
+  - id: REQ-EXEC-003
+    title: Vitesses bornées, un seul topic de sortie
+    statement: >
+      Un skill de déplacement ne publie que sur /cmd_vel/skill, à 20 Hz, avec des
+      vitesses bornées par le registre (≤ 0,2 m/s en translation, ≤ 0,8 rad/s en
+      rotation) quelle que soit la consigne demandée.
+    rationale: >
+      INV-01 : seul l'arbitre publie /cmd_vel_safe. Un skill qui dépasserait les
+      bornes du registre contournerait la table de priorités de P04.
+    sources: [INV-01, §4, §7]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_controleur_deplacement.py::test_vitesse_saturee
+      et ::test_cadence_20_hz ; clawbot_executive/test/test_serveur_skills.py::
+      test_aucune_publication_hors_cmd_vel_skill.
+    evidence: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      APPROUVÉE : bornes validées par l'opérateur le 2026-11-22 : « 0,2 m/s et 0,8 rad/s, 2 m et
+      2π, telles que proposées » — 5× et 6× sous les limites du pilote
+      (xlinear_limit 1,0, ylinear_limit 1,0, angular_limit 5,0). La variante plus
+      prudente (0,1 m/s) a été écartée par l'opérateur.
+    prompt: P08
+
+  - id: REQ-EXEC-004
+    title: Arrêt immédiat sur hold, capteur périmé ou e-stop
+    statement: >
+      Pendant un déplacement, si /safety/state indique un maintien, un capteur
+      périmé ou l'e-stop verrouillé, le skill publie une consigne nulle et échoue
+      avec SAFETY_HOLD, SENSOR_STALE ou ESTOP_LATCHED en moins de 100 ms.
+    rationale: >
+      L'arbitre coupe la sortie, mais un skill qui continue à publier garde
+      l'intention de mouvement : la boucle doit s'arrêter d'elle-même et le
+      résultat doit nommer la cause.
+    sources: [INV-05, §6.1, O03]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_controleur_deplacement.py::test_arret_sur_hold,
+      ::test_arret_sur_capteur_perime, ::test_arret_sur_estop (horloge simulée,
+      mesure du délai) ; tests/integration/test_skills.py en domaine 99.
+    evidence: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      « REQ-EXEC-004 (consigne nulle et SAFETY_HOLD / SENSOR_STALE / ESTOP_LATCHED en
+      moins de 100 ms) est approuvée telle qu'écrite. » Décision de l'opérateur du
+      2026-11-22, avec REQ-EXEC-003.
+    prompt: P08
+
+  - id: REQ-EXEC-005
+    title: Annulation en moins de 200 ms
+    statement: >
+      Une annulation arrête le skill, publie une consigne nulle et termine en
+      CANCELED en moins de 200 ms.
+    rationale: >
+      Sans annulation, une tâche longue ne peut être interrompue que par l'e-stop.
+    sources: [S05]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_serveur_skills.py::test_annulation_arrete_et_consigne_nulle.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P08
+
+  - id: REQ-EXEC-006
+    title: Un seul skill à la fois, stop préempte
+    statement: >
+      Un seul skill s'exécute à la fois ; un nouveau goal est rejeté pendant une
+      exécution, sauf stop qui préempte le skill en cours.
+    rationale: >
+      Deux boucles de vitesse concurrentes se contrediraient ; stop doit toujours
+      passer, y compris quand le serveur est occupé.
+    sources: [S05, §7]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_serveur_skills.py::test_deuxieme_goal_rejete et
+      ::test_stop_preempte.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P08
+
+  - id: REQ-EXEC-007
+    title: Précision de déplacement
+    statement: >
+      move_relative atteint sa cible à ±5 cm et rotate à ±5° en simulation ; sur
+      le robot, l'erreur mesurée est consignée dans la procédure matérielle.
+    rationale: >
+      La précision dépend de l'odométrie de l'EKF et du contrôleur proportionnel :
+      elle se mesure, elle ne se suppose pas.
+    sources: [§7, C12]
+    safety: false
+    method: test
+    level: integration
+    criterion: >
+      tests/integration/test_skills.py::test_move_relative_atteint_la_cible et
+      ::test_rotate_atteint_l_angle (±5 cm / ±5°) sur clawbot_sim ;
+      mesure au sol : tests/hardware/HW-EXEC-001.md.
+    evidence: tests/hardware/HW-EXEC-001.md
+    status: implemented
+    approved_by: null
+    prompt: P08
+
+  - id: REQ-EXEC-008
+    title: Rapport d'échec conforme
+    statement: >
+      Tout résultat d'échec contient un failure_report_json valide contre
+      failure_report.schema.json.
+    rationale: >
+      L'exécutif (P09) décide d'un repli à partir de ce rapport : un rapport
+      incomplet rend la décision impossible.
+    sources: [§6.2]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_rapport_echec.py (validation jsonschema du
+      rapport produit pour chaque famille de codes).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P08

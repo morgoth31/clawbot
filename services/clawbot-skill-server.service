@@ -1,0 +1,36 @@
+[Unit]
+Description=Serveur de skills (action /clawbot/execute_skill) - Clawbot X3 Plus
+Documentation=file:///home/jetson/clawbot/docs/architecture/cible.md
+After=network.target clawbot-safety-arbitrator.service clawbot-capability-manager.service
+Wants=clawbot-safety-arbitrator.service clawbot-capability-manager.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+Environment=ROS_DOMAIN_ID=28
+Environment=HOME=/home/jetson
+# ProtectHome=read-only interdit ~/.ros : les journaux rclpy vont dans l'état du service
+Environment=ROS_LOG_DIR=/var/lib/clawbot/ros-log
+WorkingDirectory=/home/jetson/clawbot
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec /home/jetson/clawbot/install/clawbot_executive/lib/clawbot_executive/skill_server"
+# Le serveur publie uniquement /cmd_vel/skill : l'arbitre décide de /cmd_vel_safe.
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+KillSignal=SIGINT
+
+# Durcissement : aucun privilège, rien d'écrivable hors des instantanés.
+# systemd crée /var/lib/clawbot (et le supprime au désinstall), d'où ReadWritePaths ensuite
+StateDirectory=clawbot
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/var/lib/clawbot
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=multi-user.target

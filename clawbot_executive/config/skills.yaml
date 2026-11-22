@@ -1,0 +1,90 @@
+# Registre des skills (référentiel §7, bornes validées par l'opérateur le 2026-11-22).
+#
+# Le schéma JSON et les bornes vivent ici : le serveur refuse un goal hors schéma
+# (INVALID_PARAMS) et la boucle de déplacement sature à `bornes`, quoi que demande
+# l'appelant. Limites du pilote pour comparaison : xlinear_limit 1,0 m/s,
+# ylinear_limit 1,0 m/s, angular_limit 5,0 rad/s — les bornes ci-dessous sont 5× et
+# 6× plus basses.
+
+skills:
+  stop:
+    description: "Arrête immédiatement le robot : consigne nulle sur /cmd_vel/skill."
+    params_schema: {type: object, additionalProperties: false, properties: {}}
+    requires: []
+    timeout_s: 2.0
+
+  wait:
+    description: "Attend un nombre de secondes borné (utile pour synchroniser)."
+    params_schema:
+      type: object
+      additionalProperties: false
+      required: [seconds]
+      properties:
+        seconds: {type: number, exclusiveMinimum: 0, maximum: 30}
+    requires: []
+    timeout_s: 31.0
+
+  move_relative:
+    description: >
+      Avance d'une distance relative en ligne droite (dx, dy en mètres du repère
+      robot), sans réorientation.
+    params_schema:
+      type: object
+      additionalProperties: false
+      required: [dx_m]
+      properties:
+        dx_m: {type: number, minimum: -2.0, maximum: 2.0}
+        dy_m: {type: number, minimum: -2.0, maximum: 2.0, default: 0.0}
+        max_speed_mps: {type: number, exclusiveMinimum: 0, maximum: 0.2, default: 0.2}
+    requires: [base, lidar]
+    timeout_s: 30.0
+    bornes: {max_speed_mps: 0.2, max_distance_m: 2.0}
+
+  rotate:
+    description: "Tourne sur place d'un angle relatif en radians (sens trigonométrique positif)."
+    params_schema:
+      type: object
+      additionalProperties: false
+      required: [angle_rad]
+      properties:
+        angle_rad: {type: number, minimum: -6.283185307179586, maximum: 6.283185307179586}
+        max_speed_rps: {type: number, exclusiveMinimum: 0, maximum: 0.8, default: 0.8}
+    requires: [base, lidar]
+    timeout_s: 20.0
+    bornes: {max_speed_rps: 0.8, max_angle_rad: 6.283185307179586}
+
+  capture_image:
+    description: "Enregistre une image de la caméra demandée (poignet ou Astra) en JPEG."
+    params_schema:
+      type: object
+      additionalProperties: false
+      required: [camera]
+      properties:
+        camera: {type: string, enum: [wrist, astra]}
+    requires: [wrist_vision]
+    timeout_s: 5.0
+
+  navigate_to:
+    description: "Va à une pose du plan (x, y, yaw) — refusé tant que la capacité navigation n'est pas servie."
+    params_schema:
+      type: object
+      additionalProperties: false
+      required: [x, y]
+      properties:
+        x: {type: number}
+        y: {type: number}
+        yaw: {type: number, default: 0.0}
+        frame: {const: map}
+    requires: [navigation]
+    timeout_s: 120.0
+
+  save_map:
+    description: "Enregistre la carte courante sous un nom — refusé tant que la capacité mapping n'est pas servie."
+    params_schema:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name: {type: string, pattern: "^[a-z0-9_-]{1,32}$"}
+    requires: [mapping]
+    timeout_s: 20.0
