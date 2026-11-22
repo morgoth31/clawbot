@@ -132,3 +132,23 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P04
+
+  - id: REQ-OPS-030
+    title: Aucun pilotage de processus par motif
+    statement: >
+      Aucun code du dépôt ne doit appeler pkill, killall ou pgrep -f (INV-08).
+    rationale: >
+      Un motif peut tuer un processus qui n'était pas la cible (S33) ; le contrôle
+      de processus passe par systemd, sur liste blanche.
+    sources: [S33, INV-08]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      scripts/check.sh, étape « interdits » : grep des motifs sur le dépôt, code de
+      sortie non nul si un usage subsiste. Exception nommée :
+      joy_teleop/clawbot_restart_teleop.sh, outil manuel hors périmètre P07.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P07

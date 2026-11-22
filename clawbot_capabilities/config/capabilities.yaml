@@ -1,0 +1,83 @@
+# Manifeste des capacités (référentiel `docs/architecture/cible.md` §5.1).
+#
+# Chaque capacité décrit ce qui la rend disponible (`ready_when`), ce dont elle
+# dépend (`requires`) et ce qu'elle interdit (`conflicts`). Le gestionnaire ne
+# démarre ou n'arrête que des unités listées ici : c'est la liste blanche
+# (REQ-CAPA-001). `managed: false` = décrite mais non pilotable à ce stade.
+#
+# Écarts au §5.1, motivés en P07 :
+#   - `mapping` : `clawbot-slam.service` (une unité), pas `ros2 launch slam_launch.py`
+#     lancé par le service HTTP : INV-08 interdit le pilotage hors systemd.
+#   - `detection` : `yolo-inference.service` est l'unité installée sur ce poste.
+#   - `depth_vision` : aucune unité dédiée pour l'Astra (`orbbec-camera.service`
+#     porte la caméra couleur) ; `managed: false` jusqu'à P11.
+
+capacites:
+  base:
+    units: [ros2-driver-node.service]
+    always_on: true
+    managed: true
+    ready_when:
+      - {topic: /odom, min_hz: 8.0}
+      - {topic: /cmd_vel_safe, min_hz: 18.0}
+    timeout_s: 30.0
+
+  lidar:
+    units: [clawbot-lidar.service]
+    requires: [base]
+    always_on: true
+    managed: true
+    ready_when: [{topic: /scan, min_hz: 9.0}]
+    timeout_s: 30.0
+
+  mapping:
+    units: [clawbot-slam.service]
+    requires: [base, lidar]
+    conflicts: [navigation]
+    managed: true
+    ready_when: [{topic: /map, max_age_s: 30.0}]
+    timeout_s: 60.0
+
+  navigation:
+    units: [clawbot-nav2.service]
+    requires: [base, lidar]
+    conflicts: [mapping]
+    managed: true
+    ready_when: [{action: /navigate_to_pose}]
+    timeout_s: 90.0
+
+  arm:
+    units: [clawbot-arm-controller.service, clawbot-move-group.service]
+    requires: [base]
+    managed: true
+    ready_when:
+      - {action: /arm_controller/follow_joint_trajectory}
+      - {topic: /arm/joint_states, min_hz: 8.0}
+    timeout_s: 45.0
+
+  wrist_vision:
+    units: [clawbot-wrist-camera.service]
+    requires: [base]
+    managed: true
+    ready_when: [{topic: /wrist_camera/image_raw, min_hz: 8.0}]
+    timeout_s: 30.0
+
+  depth_vision:
+    units: [orbbec-camera.service]
+    requires: [base]
+    managed: false
+    ready_when: [{topic: /camera/depth/image_raw, min_hz: 10.0}]
+    timeout_s: 30.0
+
+  detection:
+    units: [yolo-inference.service]
+    requires: [base]
+    managed: true
+    ready_when: [{topic: /detections, min_hz: 1.0}]
+    timeout_s: 60.0
+
+  voice:
+    units: []
+    managed: false
+    ready_when: [{topic: /voice/command, min_hz: 0.2}]
+    timeout_s: 30.0
