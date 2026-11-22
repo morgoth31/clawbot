@@ -1,0 +1,94 @@
+=== /Buzzer
+=== /RGBLight
+WARNING: topic [/RGBLight] does not appear to be published yet
+=== /arm/joint_states
+=== /arm/servo_angles
+	min: 0.000s max: 0.366s std dev: 0.04814s window: 43
+average rate: 10.016
+	min: 0.000s max: 0.366s std dev: 0.04324s window: 54
+=== /client_count
+=== /cmd_vel
+=== /cmd_vel_safe
+	min: 0.047s max: 0.053s std dev: 0.00076s window: 84
+average rate: 20.001
+	min: 0.047s max: 0.053s std dev: 0.00070s window: 105
+=== /connected_clients
+=== /detections
+=== /diagnostics
+	min: 0.223s max: 0.777s std dev: 0.24786s window: 5
+average rate: 1.936
+	min: 0.190s max: 0.843s std dev: 0.27918s window: 8
+=== /director/state
+	min: 0.200s max: 0.200s std dev: 0.00026s window: 12
+average rate: 4.999
+	min: 0.200s max: 0.200s std dev: 0.00023s window: 18
+=== /edition
+	min: 0.081s max: 0.113s std dev: 0.00833s window: 34
+average rate: 9.986
+	min: 0.081s max: 0.113s std dev: 0.00868s window: 44
+=== /imu/data_raw
+	min: 0.094s max: 0.101s std dev: 0.00145s window: 22
+average rate: 10.019
+	min: 0.094s max: 0.101s std dev: 0.00123s window: 32
+=== /imu/mag
+	min: 0.099s max: 0.101s std dev: 0.00047s window: 33
+average rate: 9.999
+	min: 0.099s max: 0.101s std dev: 0.00043s window: 44
+=== /joint_states
+	min: 0.049s max: 0.051s std dev: 0.00035s window: 63
+average rate: 20.000
+	min: 0.049s max: 0.051s std dev: 0.00031s window: 84
+=== /map
+=== /map_metadata
+=== /odom
+	min: 0.100s max: 0.100s std dev: 0.00013s window: 44
+average rate: 10.001
+	min: 0.100s max: 0.100s std dev: 0.00014s window: 55
+=== /odom_raw
+	min: 0.099s max: 0.101s std dev: 0.00028s window: 42
+average rate: 9.998
+	min: 0.099s max: 0.101s std dev: 0.00038s window: 52
+=== /parameter_events
+=== /point_cloud
+	min: 0.097s max: 0.102s std dev: 0.00125s window: 34
+average rate: 10.114
+	min: 0.095s max: 0.102s std dev: 0.00133s window: 45
+=== /pose
+WARNING: topic [/pose] does not appear to be published yet
+=== /robot_description
+=== /rosout
+=== /safety/hold
+	min: 0.047s max: 0.053s std dev: 0.00100s window: 43
+average rate: 20.000
+	min: 0.047s max: 0.053s std dev: 0.00085s window: 63
+=== /safety/state
+	min: 0.046s max: 0.053s std dev: 0.00070s window: 82
+average rate: 20.000
+	min: 0.046s max: 0.053s std dev: 0.00063s window: 102
+=== /sentinel/event
+=== /sentinel/state
+	min: 0.500s max: 0.500s std dev: 0.00020s window: 6
+average rate: 2.000
+	min: 0.500s max: 0.500s std dev: 0.00018s window: 9
+=== /sentinel/transcript
+=== /servo_ctrl
+=== /set_pose
+WARNING: topic [/set_pose] does not appear to be published yet
+=== /slam_toolbox/feedback
+=== /slam_toolbox/graph_visualization
+=== /slam_toolbox/update
+WARNING: topic [/slam_toolbox/update] does not appear to be published yet
+=== /tf
+	min: 0.001s max: 0.418s std dev: 0.04612s window: 104
+average rate: 25.959
+	min: 0.001s max: 0.418s std dev: 0.04272s window: 135
+=== /tf_static
+=== /vel_raw
+	min: 0.085s max: 0.100s std dev: 0.00308s window: 23
+average rate: 10.047
+	min: 0.085s max: 0.100s std dev: 0.00260s window: 33
+=== /voltage
+	min: 0.080s max: 0.114s std dev: 0.00888s window: 43
+average rate: 10.015
+	min: 0.080s max: 0.114s std dev: 0.00880s window: 54
+=== /ydlidar_ros2_driver_node/transition_event

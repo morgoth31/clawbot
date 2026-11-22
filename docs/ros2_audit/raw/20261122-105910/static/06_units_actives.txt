@@ -1,0 +1,63 @@
+  accounts-daemon.service           loaded active running Accounts Service
+  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack
+  bluetooth.service                 loaded active running Bluetooth service
+  clawbot-description.service       loaded active running Clawbot X3 Plus - modele geometrique (/robot_description, /tf, /tf_static)
+  clawbot-director.service          loaded active running Directeur S1 - Clawbot X3 Plus
+  clawbot-docs.service              loaded active running Clawbot documentation site (MkDocs Material, port 8080)
+  clawbot-ekf.service               loaded active running Filtre EKF (robot_localization) - /odom et TF odom -> base_link
+  clawbot-lidar.service             loaded active running Clawbot Lidar YDLIDAR TG30 (/scan)
+  clawbot-safety-arbitrator.service loaded active running Arbitre reflexe S1 - Clawbot X3 Plus
+  clawbot-sentinel.service          loaded active running Sentinel S1 - attention, mots d'arret, reveil S2
+  clawbot-slam.service              loaded active running SLAM Toolbox (cartographie) - Clawbot X3 Plus
+  clawbot-wrist-camera.service      loaded active running Caméra du poignet (USB 0c45:6340) dans ROS 2 - /wrist_camera/image_raw
+  colord.service                    loaded active running Manage, Install and Generate Color Profiles
+  containerd.service                loaded active running containerd container runtime
+  cron.service                      loaded active running Regular background program processing daemon
+  dbus.service                      loaded active running D-Bus System Message Bus
+  docker.service                    loaded active running Docker Application Container Engine
+  gdm.service                       loaded active running GNOME Display Manager
+  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm
+  jtop.service                      loaded active running jtop service
+  jupyterlab.service                loaded active running jupyterlab
+  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures
+  ModemManager.service              loaded active running Modem Manager
+  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd
+  NetworkManager.service            loaded active running Network Manager
+  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant
+  nvargus-daemon.service            loaded active running Argus daemon
+  nvfancontrol.service              loaded active running nvfancontrol service
+  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists
+  nvphs.service                     loaded active running PHS daemon
+  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon
+  ollama.service                    loaded active running Ollama Service
+  orbbec-camera.service             loaded active running Clawbot Orbbec Astra Pro+ Camera (depth + RGB → ROS2 topics)
+  packagekit.service                loaded active running PackageKit Daemon
+  polkit.service                    loaded active running Authorization Manager
+  power-profiles-daemon.service     loaded active running Power Profiles daemon
+  ros2-driver-node.service          loaded active running Clawbot ROS2 Driver Node (Mcnamu_driver_X3 — cmd_vel → serial)
+  ros2-hardware-service.service     loaded active running Clawbot Hardware Service (ROS2 bridge — no serial conflict)
+  ros2-llm-bridge-cpp.service       loaded active running Clawbot C++ LLM Bridge (port 8000)
+  rosbridge.service                 loaded active running Clawbot ROS2 WebSocket Bridge (Foxglove / rosbridge port 9090)
+  rpcbind.service                   loaded active running RPC bind portmap service
+  rsyslog.service                   loaded active running System Logging Service
+  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service
+  seatd.service                     loaded active running Seat management daemon
+  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0
+  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0
+  snap.cups.cups-browsed.service    loaded active running Service for snap application cups.cups-browsed
+  snap.cups.cupsd.service           loaded active running Service for snap application cups.cupsd
+  snapd.service                     loaded active running Snap Daemon
+  ssh.service                       loaded active running OpenBSD Secure Shell server
+  switcheroo-control.service        loaded active running Switcheroo Control Proxy service
+  systemd-journald.service          loaded active running Journal Service
+  systemd-logind.service            loaded active running User Login Management
+  systemd-resolved.service          loaded active running Network Name Resolution
+  systemd-timesyncd.service         loaded active running Network Time Synchronization
+  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files
+  tailscaled.service                loaded active running Tailscale node agent
+  udisks2.service                   loaded active running Disk Manager
+  upower.service                    loaded active running Daemon for power management
+  user@1000.service                 loaded active running User Manager for UID 1000
+  wpa_supplicant.service            loaded active running WPA supplicant
+  yahboom_oled.service              loaded active running transbot_oled start service
+  yolo-inference.service            loaded active running Clawbot YOLO Inference Service (port 8003, CUDA)

@@ -1,0 +1,21 @@
+00_meta.txt	289	collecte=runtime
+01_nodes.txt	388	/camera/camera
+02_node_info.txt	22161	=== /camera/camera
+03_topics_types.txt	2492	/Buzzer [std_msgs/msg/Bool]
+04_services.txt	12255	/camera/camera/describe_parameters [rcl_interfaces/srv/DescribeParameters]
+05_actions.txt	0	
+06_params_liste.txt	8251	/camera/camera:
+07_topics_info_v.txt	59552	=== /Buzzer
+08_topics_hz.txt	3154	=== /Buzzer
+09_tf_cadres.txt	388	    frame_id: base_link
+09_tf_dynamique.txt	301	transforms:
+09_tf_static.txt	1738	transforms:
+10_processus.txt	22681	    PID    PPID %CPU %MEM   RSS ELAPSED COMMAND         COMMAND
+11_disque_shm.txt	136	Filesystem      Size  Used Avail Use% Mounted on
+12_net.txt	4483	1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+12_udp_rtps.txt	474	UNCONN 0      0                         0.0.0.0:7400       0.0.0.0:*          
+13_interrupts.txt	20217	           CPU0       CPU1       CPU2       CPU3       CPU4       CPU5       CPU6       CPU7       
+14_tegrastats.txt	1801	11-22-2026 11:05:34 RAM 7092/15656MB (lfb 27x4MB) SWAP 10/16020MB (cached 0MB) CPU [35%@729,30%@1190,24%@1190,20%@1190,25%@729,32%@729,29%@729,27%@729] GR3D_FREQ 0% cv0@48.937C cpu@53.531C soc2@46.343C soc0@48.312C cv1@48.468C gpu@50.906C tj@53.531C soc1@47.562C cv2@45.187C VDD_IN 6090mW/6090mW VDD_CPU_GPU_CV 1331mW/1331mW VDD_SOC 1711mW/1711mW
+15_doctor.txt	56497	WARNING: Package name "yahboomcar_KCFTracker" does not follow the naming conventions. It should start with a lower case letter and only contain lower case letters, digits, underscores, and dashes.
+16_journal_noyau.txt	336	Nov 22 05:54:04 yahboom kernel: ACK 04 d4
+16_journaux.txt	33009	=== clawbot-description.service

@@ -1,0 +1,6 @@
+Nov 22 05:54:04 yahboom kernel: ACK 04 d4
+Nov 22 05:54:04 yahboom kernel: ACK 04 d4
+Nov 22 05:56:31 yahboom kernel: ACK 04 d4
+Nov 22 05:56:31 yahboom kernel: ACK 04 d4
+Nov 22 07:38:19 yahboom kernel: tegra-xusb 3610000.usb: ERROR unknown event type 37
+Nov 22 10:02:36 yahboom kernel: tegra-xusb 3610000.usb: ERROR unknown event type 37

@@ -1,0 +1,155 @@
+=== clawbot-description.service
+Restart=on-failure
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash && exec ros2 launch /home/jetson/clawbot/launch/robot_description.launch.py ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28 CLAWBOT_URDF=/home/jetson/clawbot/urdf/clawbot_x3plus.urdf
+WorkingDirectory=/home/jetson/clawbot
+User=jetson
+Id=clawbot-description.service
+Requires=sysinit.target -.mount system.slice
+Conflicts=shutdown.target
+After=-.mount systemd-journald.socket sysinit.target basic.target system.slice network.target
+FragmentPath=/etc/systemd/system/clawbot-description.service
+=== clawbot-director.service
+Restart=always
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash && source install/setup.bash && exec python3 -c 'from clawbot_director.director_node import main; main()' ; ignore_errors=no ; start_time=[Sun 2026-11-22 10:16:50 CET] ; stop_time=[n/a] ; pid=3805276 ; code=(null) ; status=0/0 }
+ExecStop={ path=/bin/bash ; argv[]=/bin/bash /home/jetson/clawbot/scripts/annuler_tache_service.sh ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28 HOME=/home/jetson
+WorkingDirectory=/home/jetson/clawbot
+User=jetson
+Id=clawbot-director.service
+Requires=system.slice -.mount sysinit.target clawbot-safety-arbitrator.service
+Conflicts=shutdown.target
+After=system.slice clawbot-safety-arbitrator.service -.mount basic.target systemd-journald.socket network.target sysinit.target
+FragmentPath=/etc/systemd/system/clawbot-director.service
+=== clawbot-docs.service
+Restart=on-failure
+ExecStart={ path=/home/jetson/.local/bin/mkdocs ; argv[]=/home/jetson/.local/bin/mkdocs serve --dev-addr 0.0.0.0:8080 ; ignore_errors=no ; start_time=[Sun 2026-11-22 10:47:44 CET] ; stop_time=[n/a] ; pid=3883819 ; code=(null) ; status=0/0 }
+Environment=PATH=/home/jetson/.local/bin:/usr/local/bin:/usr/bin:/bin
+WorkingDirectory=/home/jetson/clawbot
+User=jetson
+Id=clawbot-docs.service
+Requires=system.slice -.mount sysinit.target
+Conflicts=shutdown.target
+After=systemd-journald.socket -.mount basic.target system.slice network.target sysinit.target
+FragmentPath=/etc/systemd/system/clawbot-docs.service
+=== clawbot-ekf.service
+Restart=on-failure
+ExecStart={ path=/home/jetson/yahboomcar_ros2_ws/software/library_ws/install/robot_localization/lib/robot_localization/ekf_node ; argv[]=/home/jetson/yahboomcar_ros2_ws/software/library_ws/install/robot_localization/lib/robot_localization/ekf_node --ros-args --params-file /home/jetson/clawbot/config/ekf.yaml -r __node:=ekf_filter_node -r odometry/filtered:=odom ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28 HOME=/home/jetson LD_LIBRARY_PATH=/home/jetson/yahboomcar_ros2_ws/software/library_ws/install/robot_localization/lib:/opt/ros/humble/lib:/opt/ros/humble/lib/aarch64-linux-gnu
+WorkingDirectory=
+User=jetson
+Id=clawbot-ekf.service
+Requires=ros2-driver-node.service system.slice sysinit.target
+Conflicts=shutdown.target
+After=systemd-journald.socket sysinit.target network.target ros2-driver-node.service basic.target system.slice
+FragmentPath=/etc/systemd/system/clawbot-ekf.service
+=== clawbot-lidar.service
+Restart=on-failure
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash &&    source install/setup.bash &&    exec ros2 launch ydlidar_ros2_driver ydlidar_raw_launch.py ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28
+WorkingDirectory=/home/jetson/yahboomcar_ros2_ws/software/library_ws
+User=jetson
+Id=clawbot-lidar.service
+Requires=sysinit.target system.slice -.mount
+Conflicts=shutdown.target
+After=sysinit.target system.slice systemd-journald.socket network.target basic.target -.mount
+FragmentPath=/etc/systemd/system/clawbot-lidar.service
+=== clawbot-safety-arbitrator.service
+Restart=always
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash && source install/setup.bash && exec python3 -c 'from clawbot_safety.arbitrator import main; main()' ; ignore_errors=no ; start_time=[Sun 2026-11-22 10:16:50 CET] ; stop_time=[n/a] ; pid=3805273 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28 HOME=/home/jetson
+WorkingDirectory=/home/jetson/clawbot
+User=jetson
+Id=clawbot-safety-arbitrator.service
+Requires=sysinit.target system.slice -.mount ros2-driver-node.service
+Conflicts=shutdown.target
+After=-.mount sysinit.target ros2-driver-node.service system.slice systemd-journald.socket basic.target network.target
+FragmentPath=/etc/systemd/system/clawbot-safety-arbitrator.service
+=== clawbot-sentinel.service
+Restart=always
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash && source install/setup.bash && exec python3 -c 'from clawbot_sentinel.sentinel_node import main; main()' ; ignore_errors=no ; start_time=[Sun 2026-11-22 10:16:50 CET] ; stop_time=[n/a] ; pid=3805281 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28 HOME=/home/jetson
+WorkingDirectory=/home/jetson/clawbot
+User=jetson
+Id=clawbot-sentinel.service
+Requires=sysinit.target -.mount system.slice clawbot-director.service
+Conflicts=shutdown.target
+After=network.target system.slice orbbec-camera.service -.mount basic.target systemd-journald.socket sysinit.target clawbot-director.service
+FragmentPath=/etc/systemd/system/clawbot-sentinel.service
+=== clawbot-slam.service
+Restart=on-failure
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash && exec ros2 run slam_toolbox async_slam_toolbox_node --ros-args -p base_frame:=base_link -p odom_frame:=odom -p map_frame:=map -p scan_topic:=/scan -p mode:=mapping -p use_sim_time:=false -p resolution:=0.05 -p minimum_travel_distance:=0.2 -p minimum_travel_heading:=0.2 -p map_update_interval:=2.0 ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28 HOME=/home/jetson
+WorkingDirectory=
+User=jetson
+Id=clawbot-slam.service
+Requires=sysinit.target ros2-driver-node.service system.slice
+Conflicts=shutdown.target clawbot-nav2.service
+After=ros2-driver-node.service network.target basic.target system.slice sysinit.target systemd-journald.socket clawbot-ekf.service
+FragmentPath=/etc/systemd/system/clawbot-slam.service
+=== clawbot-wrist-camera.service
+Restart=on-failure
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash && exec ros2 run v4l2_camera v4l2_camera_node --ros-args -r __ns:=/wrist_camera -r __node:=camera -p video_device:=/dev/v4l/by-id/usb-Sonix_Technology_Co.__Ltd._USB_2.0_Camera-video-index0 -p image_size:='[640, 480]' -p time_per_frame:='[1, 15]' -p pixel_format:=YUYV -p output_encoding:=yuv422_yuy2 -p camera_frame_id:=wrist_camera_optical_frame -p brightness:=0 -p gain:=0 -p camera_info_url:=file:///home/jetson/clawbot/config/wrist_camera_info.yaml ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28 HOME=/home/jetson
+WorkingDirectory=
+User=jetson
+Id=clawbot-wrist-camera.service
+Requires=system.slice sysinit.target
+Conflicts=shutdown.target
+After=system.slice clawbot-description.service sysinit.target basic.target network.target systemd-journald.socket
+FragmentPath=/etc/systemd/system/clawbot-wrist-camera.service
+=== ros2-driver-node.service
+Restart=on-failure
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash &&    source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash &&    ros2 run yahboomcar_bringup Mcnamu_driver_X3 ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28
+WorkingDirectory=/home/jetson/yahboomcar_ros2_ws/yahboomcar_ws
+User=jetson
+Id=ros2-driver-node.service
+Requires=ros2-hardware-service.service system.slice -.mount sysinit.target
+Conflicts=shutdown.target
+After=-.mount system.slice ros2-hardware-service.service basic.target network.target systemd-journald.socket sysinit.target
+FragmentPath=/etc/systemd/system/ros2-driver-node.service
+=== ros2-hardware-service.service
+Restart=on-failure
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash &&    source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash &&    python3 /home/jetson/clawbot/ros2_llm_bridge/hardware_service.py ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28 WORKSPACE_PATH=/home/jetson/clawbot/workspace CAMERA_FRONT_INDEX=0 CAMERA_CLAW_INDEX=0 HARDWARE_SERVICE_PORT=8001 MAX_LINEAR_MS=0.06 MAX_ANGULAR_RS=0.25 MOTION_WATCHDOG_S=1.5 LIDAR_SAFETY_REQUIRED=false
+WorkingDirectory=/home/jetson/clawbot/ros2_llm_bridge
+User=jetson
+Id=ros2-hardware-service.service
+Requires=-.mount system.slice sysinit.target
+Conflicts=shutdown.target
+After=-.mount network.target system.slice sysinit.target systemd-journald.socket basic.target
+FragmentPath=/etc/systemd/system/ros2-hardware-service.service
+=== ros2-llm-bridge-cpp.service
+Restart=on-failure
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash &&    source /home/jetson/clawbot/install/setup.bash &&    export ROS_DOMAIN_ID=28 &&    export HARDWARE_SERVICE_URL=http://localhost:8001 &&    export YOLO_SERVICE_URL=http://localhost:8003 &&    export BRIDGE_PORT=8000 &&    /home/jetson/clawbot/install/ros2_llm_bridge_cpp/lib/ros2_llm_bridge_cpp/api_server ; ignore_errors=no ; start_time=[Sun 2026-11-22 10:16:50 CET] ; stop_time=[n/a] ; pid=3805272 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28 HARDWARE_SERVICE_URL=http://localhost:8001 YOLO_SERVICE_URL=http://localhost:8003 BRIDGE_PORT=8000
+WorkingDirectory=/home/jetson/clawbot
+User=jetson
+Id=ros2-llm-bridge-cpp.service
+Requires=-.mount system.slice sysinit.target ros2-hardware-service.service
+Conflicts=shutdown.target
+After=basic.target systemd-journald.socket ros2-hardware-service.service sysinit.target system.slice network.target -.mount
+FragmentPath=/etc/systemd/system/ros2-llm-bridge-cpp.service
+=== yahboom_oled.service
+Restart=no
+ExecStart={ path=/bin/sh ; argv[]=/bin/sh -c python3 /home/jetson/oled_yahboom/yahboom_oled.pyc ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=
+WorkingDirectory=/home/jetson
+User=jetson
+Id=yahboom_oled.service
+Requires=system.slice sysinit.target -.mount
+Conflicts=shutdown.target
+After=-.mount multi-user.target sysinit.target basic.target system.slice systemd-journald.socket
+FragmentPath=/etc/systemd/system/yahboom_oled.service
+=== yolo-inference.service
+Restart=on-failure
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash && exec /home/jetson/yolov5_env/bin/python3 /home/jetson/clawbot/yolo_service.py --port 8003 ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=CAMERA_FRONT_INDEX=0 CAMERA_CLAW_INDEX=0 CAMERA_CLAW_SOURCE=ros CAMERA_CLAW_ROS_TOPIC=/wrist_camera/image_raw ROS_DOMAIN_ID=28 HOME=/home/jetson YOLO_MODEL_PATH=/home/jetson/software/yolov5-7.0/yolov5s.pt WORKSPACE_PATH=/home/jetson/clawbot/workspace
+WorkingDirectory=
+User=jetson
+Id=yolo-inference.service
+Requires=system.slice sysinit.target
+Conflicts=shutdown.target
+After=network.target sysinit.target basic.target system.slice systemd-journald.socket
+FragmentPath=/etc/systemd/system/yolo-inference.service

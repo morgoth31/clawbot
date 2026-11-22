@@ -1,0 +1,10 @@
+collecte=static
+horodatage=2026-11-22T10:59:18+01:00
+host=yahboom
+kernel=5.15.148-tegra
+user=jetson
+ws=/home/jetson/clawbot
+git_head=4b8d2882a13bbdec41491e2bc6bb336e90e185eb
+git_branche=docs/site-okf-merge
+git_fichiers_modifies=82
+ros_distro=humble

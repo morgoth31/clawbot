@@ -1,0 +1,10 @@
+./clawbot_interfaces/srv/DirectorCommand.srv
+./pkg_interfaces/action/Progress.action
+./pkg_interfaces/msg/Person.msg
+./pkg_interfaces/srv/Add.srv
+./yahboomcar_msgs/msg/ImageMsg.msg
+./yahboomcar_msgs/msg/PointArray.msg
+./yahboomcar_msgs/msg/Position.msg
+./yahboomcar_msgs/msg/TargetArray.msg
+./yahboomcar_msgs/msg/Target.msg
+./yahboom_web_savmap_interfaces/src/srv/WebSaveMap.srv
