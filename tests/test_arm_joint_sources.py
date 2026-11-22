@@ -38,8 +38,9 @@ def test_le_pilote_ne_declare_aucun_editeur_sur_joint_states():
 @pytest.mark.req("REQ-ARM-001")
 def test_joint_state_publisher_est_la_seule_source_du_bras():
     source = LAUNCH.read_text(encoding="utf-8")
-    assert '"source_list": ["/arm/joint_states"]' in source
-    assert '"rate": 20.0' in source
+    # Le fichier de lancement passe les parametres par un dict Python.
+    assert 'source_list=["/arm/joint_states"]' in source
+    assert "rate=20.0" in source
     # Deux éditeurs sur /joint_states se contrediraient : le launch ne doit lancer que
     # robot_state_publisher et joint_state_publisher.
     assert source.count('executable="robot_state_publisher"') == 1

@@ -79,8 +79,12 @@ requirements:
       radians, reste dans les limites de `urdf/clawbot_x3plus.urdf` ; le SRDF de
       MoveIt expose exactement les poses de la liste, avec les mêmes positions.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      Approuvée le 2026-11-22, avec la question de sortie P14 : « Oui, j'approuve
+      REQ-ARM-003 et REQ-ARM-004 ». Les poses `home` et `ready` restent à valider sur
+      le robot (HW-ARM-001) et n'entrent pas dans la liste par cette approbation.
     prompt: P13
 
   - id: REQ-ARM-004
@@ -103,8 +107,12 @@ requirements:
       aucune consigne sur `/cmd_vel/skill` ; les mêmes skills passent quand les cinq
       angles sont dans la bande.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      Approuvée le 2026-11-22, avec la question de sortie P14 : « Oui, j'approuve
+      REQ-ARM-003 et REQ-ARM-004 ». Les poses `home` et `ready` restent à valider sur
+      le robot (HW-ARM-001) et n'entrent pas dans la liste par cette approbation.
     prompt: P13
 
   - id: REQ-ARM-005

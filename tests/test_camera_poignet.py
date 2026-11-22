@@ -108,15 +108,16 @@ def test_l_unite_utilise_le_chemin_by_id_et_pas_un_index(unite_camera):
 
 
 def test_l_unite_declare_le_domaine_et_un_seul_proprietaire(unite_camera):
-    assert "ROS_DOMAIN_ID=28" in (REPO / "deploy" / "env" / "clawbot.env").read_text()
-    assert "User=jetson" in unite_camera
-    assert "wrist_camera" in unite_camera and "Conflicts=" not in unite_camera, \
+    assert "ROS_DOMAIN_ID=28" in (RACINE / "deploy" / "env" / "clawbot.env").read_text()
+    unite = (RACINE / "services" / "clawbot-wrist-camera.service").read_text(encoding="utf-8")
+    assert "User=jetson" in unite
+    assert "wrist_camera" in unite_camera and "Conflicts=" not in unite, \
         "la caméra appartient à une seule unité : ce n'est pas un conflit, c'est une propriété"
 
 
 def test_l_unite_ne_convertit_pas_l_image_dans_le_noeud(unite_camera):
     """La conversion par image coûtait 60 ms et divisait la cadence : elle est faite à la demande."""
-    assert "output_encoding:=yuv422_yuy2" in unite_camera
+    assert '"output_encoding": "yuv422_yuy2"' in unite_camera
 
 
 # ── service YOLO : la caméra lui est donnée par le topic ──────────────────────
@@ -125,10 +126,10 @@ def test_le_service_yolo_lit_la_camera_par_le_topic(unite_yolo, unite_camera):
     # profondeur 1) : elle n'ouvre aucun /dev/video* et ne porte donc plus d'index V4L.
     assert "yolo_node.noeud" in unite_yolo
     assert "CAMERA_CLAW_INDEX" not in unite_yolo and "CAMERA_FRONT_INDEX" not in unite_yolo
-    assert "Environment=ROS_DOMAIN_ID=28" in unite_yolo, \
+    assert "ROS_DOMAIN_ID=28" in (RACINE / "deploy" / "env" / "clawbot.env").read_text(), \
         "sans domaine, le nœud du service vit en domaine 0 : abonnement muet, sans erreur"
     # le topic écouté doit être celui que la caméra publie (même espace de noms)
-    assert "__ns:=/wrist_camera" in unite_camera
+    assert 'namespace="wrist_camera"' in unite_camera
 
 
 def test_le_contrat_d_image_est_lisible_par_le_service():

@@ -194,7 +194,10 @@ from pathlib import Path
 
 strict = sys.argv[1] == "1"
 racine = Path(".")
-exclus = {"install", "build", "log", ".git", "__pycache__", ".pytest_cache", "site", "manual"}
+# `attic` : paquets archives, ni construits ni deployes (P14) — un doublon y est
+# sans consequence, la regle « aucun code recopie » porte sur le code vivant.
+exclus = {"install", "build", "log", ".git", "__pycache__", ".pytest_cache", "site",
+          "manual", "attic"}
 
 empreintes = {}
 for chemin in racine.rglob("*.py"):

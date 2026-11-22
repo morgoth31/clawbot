@@ -20,7 +20,7 @@ from clawbot_director import waypoints  # noqa: E402
 
 RACINE = Path(__file__).resolve().parents[2]
 PARAMS = RACINE / "config" / "nav2_clawbot.yaml"
-LAUNCH = RACINE / "launch" / "navigation.launch.py"
+LAUNCH = RACINE / "clawbot_bringup" / "launch" / "navigation.launch.py"
 
 # Mesures de la session du 2026-11-11 (ETAT-PROJET.md §2) : consigne 0,10 m/s -> 0,102 m/s.
 VITESSE_LINEAIRE_MESUREE = 0.10
