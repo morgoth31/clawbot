@@ -152,3 +152,77 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P07
+
+  - id: REQ-OPS-050
+    title: L'arbre de production est une étiquette figée
+    statement: >
+      L'arbre /home/jetson/clawbot doit être détaché sur un tag `prod-*` et ne porter
+      aucune modification suivie.
+    rationale: >
+      Les unités de /etc/systemd/system sont des liens vers cet arbre : y changer de
+      branche change les fichiers d'unité, donc l'état de démarrage du robot, sans
+      qu'aucun contrôle ne le dise (C01, phase A : 4 liens pendants, 21 unités en
+      NeedDaemonReload, 2 cibles ExecStart supprimées par P14 alors que les processus
+      tournaient encore). Un arbre de production figé sur une étiquette rend l'écart
+      entre ce qui tourne et ce qui est écrit visible en une commande.
+    sources: [D01, D31, C01]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      `git -C /home/jetson/clawbot describe --tags --exact-match` renvoie un tag
+      `prod-*` ; `git status --porcelain` ne renvoie aucune modification suivie ;
+      `smoke_check.sh` affiche « production sur le tag prod-… » et « arbre de
+      production sans modification suivie ».
+    evidence: deploy/journal/2026-11-22_C01_stabilisation.md
+    status: implemented
+    approved_by: "opérateur 2026-11-22"
+    prompt: C01
+
+  - id: REQ-OPS-051
+    title: Aucun lien d'unité pendant, aucune cible absente
+    statement: >
+      Aucun lien de /etc/systemd/system vers le dépôt ne doit être pendant, et toute
+      cible citée par l'ExecStart d'une unité du robot doit exister.
+    rationale: >
+      Un service peut tourner sur un fichier supprimé et ne pas redémarrer : c'était le
+      cas de `ros2-hardware-service` (script `ros2_llm_bridge/hardware_service.py`
+      supprimé par P14) et de `clawbot-description`
+      (`launch/robot_description.launch.py` rangé sous `attic/`), plus quatre liens
+      pendants. Rien ne le signalait avant la panne.
+    sources: [C01, D31]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      `find /etc/systemd/system -maxdepth 1 -xtype l` ne renvoie rien ; pour chaque
+      unité du robot, chaque chemin cité par l'ExecStart chargé existe ;
+      `smoke_check.sh` affiche « aucun lien d'unité pendant » et « toutes les cibles
+      ExecStart existent ».
+    evidence: deploy/journal/2026-11-22_C01_stabilisation.md
+    status: implemented
+    approved_by: "opérateur 2026-11-22"
+    prompt: C01
+
+  - id: REQ-OPS-052
+    title: Deux arbres, un seul écrivain sur la production
+    statement: >
+      Tout développement doit se faire dans /home/jetson/clawbot-dev ; l'arbre de
+      production ne change que par le skill `clawbot-deploy`.
+    rationale: >
+      Le même arbre servait aux deux usages : 29 fichiers d'unité écrits par P14 sur
+      disque alors que les services tournaient la version d'avant, et 58 suppressions
+      non commitées d'origine inconnue dans l'arbre de production. Séparer les arbres
+      supprime la classe entière de ces incidents.
+    sources: [C01, D01]
+    safety: false
+    method: inspection
+    level: hardware
+    criterion: >
+      `deploy/README.md` décrit les deux arbres et l'interdiction d'écrire dans la
+      production hors déploiement ; `/home/jetson/clawbot-dev` existe comme worktree du
+      même dépôt ; la production est détachée sur un tag `prod-*` (REQ-OPS-050).
+    evidence: deploy/README.md
+    status: implemented
+    approved_by: "opérateur 2026-11-22"
+    prompt: C01
