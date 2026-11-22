@@ -93,6 +93,10 @@ class Banc:
             self.executeur.spin_once(timeout_sec=0.02)
 
     def fermer(self) -> None:
+        # Détruire l'éditeur avant les nœuds : un éditeur encore vivant au démontage
+        # laisse rclpy signaler « cannot use Destroyable because destruction was
+        # requested » après la session, sans rapport avec les tests.
+        self.espion.destroy_publisher(self.pub_angles)
         self.serveur.destroy_node()
         for noeud in (self.arbitre, self.base, self.entrees, self.espion):
             noeud.destroy_node()
