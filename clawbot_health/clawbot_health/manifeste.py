@@ -1,6 +1,7 @@
 """Manifeste des flux attendus (référentiel §8)."""
 from __future__ import annotations
 
+import importlib
 import os
 from pathlib import Path
 
@@ -20,6 +21,14 @@ def chemin_par_defaut() -> str:
         return str(Path(__file__).resolve().parents[1] / "config" / NOM)
 
 
+def type_message(nom: str):
+    """« sensor_msgs/msg/LaserScan » -> la classe Python correspondante."""
+    paquet, separateur, classe = nom.partition("/msg/")
+    if not separateur or not classe:
+        raise ValueError(f"type de message invalide : {nom!r} (attendu pkg/msg/Type)")
+    return getattr(importlib.import_module(f"{paquet}.msg"), classe)
+
+
 def charger(chemin: str) -> list[Flux]:
     """Lit le manifeste et refuse une entrée incomplète plutôt que de l'ignorer."""
     document = yaml.safe_load(Path(chemin).read_text(encoding="utf-8")) or {}
@@ -29,10 +38,11 @@ def charger(chemin: str) -> list[Flux]:
 
     flux = []
     for entree in entrees:
-        manquants = {"topic", "min_hz", "max_age_s", "capability", "critical"} - set(entree)
+        manquants = {"topic", "type", "min_hz", "max_age_s", "capability", "critical"} - set(entree)
         if manquants:
             raise ValueError(f"{chemin}: entrée incomplète {sorted(manquants)} : {entree}")
         flux.append(Flux(topic=str(entree["topic"]),
+                         type_msg=str(entree["type"]),
                          min_hz=float(entree["min_hz"]),
                          max_age_s=float(entree["max_age_s"]),
                          capability=str(entree["capability"]),

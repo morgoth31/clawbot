@@ -65,7 +65,9 @@ class HealthMonitor(Node):
         for flux in self._flux:
             if flux.topic in FLUX_TYPES:
                 continue        # abonnement typé plus bas, il alimente aussi l'estimateur
-            self.create_subscription(String, flux.topic,
+            # type réel du topic : raw=True évite la désérialisation, il ne dispense
+            # pas de déclarer le bon type (DDS n'apparie que des types identiques).
+            self.create_subscription(manifeste.type_message(flux.type_msg), flux.topic,
                                      lambda _msg, topic=flux.topic: self._on_flux(topic),
                                      qos_brut, raw=True)
 

@@ -71,8 +71,10 @@ requirements:
   - id: REQ-HEALTH-004
     title: Aucune désérialisation des flux surveillés
     statement: >
-      Le moniteur doit s'abonner à chaque flux en mode brut (raw=True), QoS
-      BEST_EFFORT profondeur 1, sans désérialiser les messages. Seule exception :
+      Le moniteur doit s'abonner à chaque flux en mode brut (raw=True), avec le
+      type ROS réel du topic, QoS BEST_EFFORT profondeur 1, sans désérialiser les
+      messages. `raw=True` n'exempte pas du type : DDS n'apparie que des types
+      identiques. Seule exception :
       un flux dont la valeur est publiée dans RobotHealth (aujourd'hui /voltage)
       reçoit un unique abonnement typé, qui alimente aussi l'estimateur.
     rationale: >
@@ -85,8 +87,10 @@ requirements:
     level: unit
     criterion: >
       clawbot_health/test/test_abonnements_bruts.py::test_chaque_flux_brut_en_best_effort
-      et ::test_manifeste_reel_un_seul_abonnement_par_topic (un seul abonnement par
-      topic du manifeste réel, raw=True sauf /voltage typé).
+      ::test_manifeste_reel_un_seul_abonnement_par_topic (un seul abonnement par
+      topic du manifeste réel, sauf /voltage typé) et
+      ::test_abonnement_avec_le_type_reel_du_flux (LaserScan, Odometry, Twist, Imu,
+      Image sur les flux correspondants).
     evidence: null
     status: implemented
     approved_by: null
@@ -105,8 +109,10 @@ requirements:
     method: demonstration
     level: hardware
     criterion: >
-      pidstat 2 10 sur le processus du moniteur, robot en fonctionnement :
-      %CPU < 5 %. Consigné dans deploy/journal/2026-11-22_p05_sante.md.
+      Mesure du CPU du processus du moniteur, robot en fonctionnement :
+      %CPU < 5 %. Mesure du 2026-11-22 sur le robot : 39,5 % à 43,4 % (manifeste
+      complet) et 16,0 % sans les flux image — exigence NON tenue, voir
+      deploy/journal/2026-11-22_p05_sante.md. Décision de conception attendue.
     evidence: deploy/journal/2026-11-22_p05_sante.md
     status: implemented
     approved_by: null

@@ -33,7 +33,7 @@ from clawbot_health.health_monitor import HealthMonitor  # noqa: E402
 pytestmark = [pytest.mark.integration, pytest.mark.req("REQ-HEALTH-001")]
 
 MANIFESTE = """flows:
-  - {topic: /test_flux, min_hz: 5.0, max_age_s: 1.0, capability: base, critical: false}
+  - {topic: /test_flux, type: std_msgs/msg/String, min_hz: 5.0, max_age_s: 1.0, capability: base, critical: false}
 """
 
 

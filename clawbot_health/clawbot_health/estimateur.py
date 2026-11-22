@@ -17,12 +17,18 @@ LEVEL_ERROR = 2
 
 @dataclass(frozen=True)
 class Flux:
-    """Une entrée du manifeste `expected_flows.yaml`."""
+    """Une entrée du manifeste `expected_flows.yaml`.
+
+    `type_msg` est le type ROS **réel** du topic (« pkg/msg/Type ») : même avec
+    `raw=True`, rclpy déclare ce type sur le fil et DDS n'apparie que des types
+    identiques. Déclarer `String` sur /scan ne reçoit jamais rien.
+    """
     topic: str
     min_hz: float
     max_age_s: float
     capability: str
     critical: bool
+    type_msg: str = "std_msgs/msg/String"
 
 
 @dataclass(frozen=True)

@@ -100,3 +100,31 @@ def test_manifeste_reel_un_seul_abonnement_par_topic():
     finally:
         node.destroy_node()
         rclpy.shutdown(context=ctx)
+
+
+@pytest.mark.req("REQ-HEALTH-004")
+def test_abonnement_avec_le_type_reel_du_flux():
+    """Chaque flux est abonné avec son type ROS réel, pas un type générique.
+
+    Défaut constaté en production : les abonnements étaient tous déclarés `String`
+    alors que `raw=True` ne dispense pas du bon type — DDS n'apparie que des types
+    identiques, donc /scan (LaserScan), /odom (Odometry) et /cmd_vel_safe (Twist)
+    ne recevaient jamais rien et étaient signalés périmés à tort.
+    """
+    from rclpy.parameter import Parameter as P
+
+    ctx = rclpy.Context()
+    rclpy.init(context=ctx)
+    node = MoniteurEspion(context=ctx, parameter_overrides=[
+        P("flows_file", value=str(MANIFESTE_REEL)),
+        P("assume_active_capabilities", value=["base", "lidar", "depth_vision"]),
+    ])
+    try:
+        attendus = {"/scan": "LaserScan", "/odom": "Odometry", "/cmd_vel_safe": "Twist",
+                    "/imu/data_raw": "Imu", "/camera/depth/image_raw": "Image"}
+        vus = {c[0]: c[1].__name__ for c in node.captures}
+        for topic, classe in attendus.items():
+            assert vus.get(topic) == classe, f"{topic} abonné en {vus.get(topic)}, attendu {classe}"
+    finally:
+        node.destroy_node()
+        rclpy.shutdown(context=ctx)
