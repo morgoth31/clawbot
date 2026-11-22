@@ -23,13 +23,14 @@ TimeoutStopSec=15
 KillSignal=SIGINT
 
 # Durcissement : aucun privilège, rien d'écrivable hors des instantanés.
-# systemd crée /var/lib/clawbot (et le supprime au désinstall), d'où ReadWritePaths ensuite
+# systemd crée /var/lib/clawbot avec le bon propriétaire. ReadWritePaths faisait
+# doublon et faisait échouer le démarrage avant la création (226/NAMESPACE,
+# 2026-11-22 16:54 — REQ-EXEC-022).
 StateDirectory=clawbot
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=full
 ProtectHome=read-only
-ReadWritePaths=/var/lib/clawbot
 RestrictSUIDSGID=yes
 
 [Install]

@@ -282,6 +282,7 @@ Les noms d'action et de topic de `navigation` et `arm` sont à confirmer par Her
 | PRECONDITION | `CAPABILITY_CONFLICT` | non | `REPLACE_REMAINING` (désactiver l'autre capacité d'abord), `ABORT` |
 | PRECONDITION | `ARM_NOT_AT_REST` | non | `REPLACE_REMAINING` (insérer `arm_rest`), `ABORT` |
 | PRECONDITION | `MAP_MISSING` | non | `REPLACE_REMAINING`, `ABORT` |
+| PRECONDITION | `SKILL_SERVER_UNAVAILABLE` | non | `RETRY_STEP` (serveur revenu), `ABORT` |
 | SENSOR | `SENSOR_STALE` | 1 fois après 2 s | `RETRY_STEP`, `REPLACE_REMAINING` (mode dégradé), `ABORT` |
 | SENSOR | `DEPTH_UNAVAILABLE` | non | `REPLACE_REMAINING` (sans profondeur), `ABORT` |
 | SAFETY | `SAFETY_HOLD` | non | `RETRY_STEP` une fois si la cause est levée, `REPLACE_REMAINING`, `ABORT` |

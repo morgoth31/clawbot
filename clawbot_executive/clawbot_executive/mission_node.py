@@ -51,6 +51,8 @@ class MissionExecutive(Node):
         self._mission: Mission | None = None
         self._derniere: Mission | None = None
         self._verrou = threading.Lock()
+        # Code du dernier refus de goal, lu par les tests et le journal (REQ-EXEC-021).
+        self.dernier_refus = ""
         # Le service ne modifie jamais la mission : il dépose un ordre, le fil qui fait
         # avancer la mission l'applique. Un seul propriétaire de l'état, donc aucun
         # croisement entre la décision et la boucle d'exécution.
@@ -106,7 +108,7 @@ class MissionExecutive(Node):
     # ── appel d'un skill ─────────────────────────────────────────────────────
     def appeler_skill(self, etape: Etape, timeout_s: float = 60.0) -> Issue:
         if not self.cli_skills.wait_for_server(timeout_sec=10.0):
-            return Issue(ok=False, error_code="UNKNOWN_SKILL",
+            return Issue(ok=False, error_code="SKILL_SERVER_UNAVAILABLE",
                          message="/clawbot/execute_skill injoignable")
         goal = ExecuteSkill.Goal()
         goal.mission_id = self._mission.mission_id if self._mission else ""
@@ -162,7 +164,25 @@ class MissionExecutive(Node):
         with self._verrou:
             if self._mission is not None and self._mission.etat not in TERMINAUX:
                 return GoalResponse.REJECT
+            # Sans serveur de skills, aucune mission ne peut aboutir : on refuse au lieu
+            # d'accepter puis d'échouer étape par étape (REQ-EXEC-021). Le test est non
+            # bloquant et se refait à chaque goal : dès que le serveur revient, la mission
+            # suivante est acceptée, sans relance automatique.
+            if not self._serveur_de_skills_pret():
+                self.dernier_refus = "SKILL_SERVER_UNAVAILABLE"
+                self.get_logger().warning(
+                    "mission refusee : /clawbot/execute_skill absent "
+                    "(SKILL_SERVER_UNAVAILABLE)")
+                return GoalResponse.REJECT
+            self.dernier_refus = ""
             return GoalResponse.ACCEPT
+
+    def _serveur_de_skills_pret(self) -> bool:
+        """Présence du serveur de skills, sans attente et sans lever d'exception."""
+        try:
+            return bool(self.cli_skills.server_is_ready())
+        except Exception:  # noqa: BLE001 — un client factice peut ne pas l'implémenter
+            return False
 
     def _executer_mission(self, goal_handle):
         requete = goal_handle.request

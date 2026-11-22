@@ -105,3 +105,39 @@ def test_aucune_commande_de_masse(fichier):
     texte = fichier.read_text(encoding="utf-8")
     for interdit in ("pkill", "killall", "pgrep -f"):
         assert interdit not in texte, f"{fichier.name} contient {interdit!r}"
+
+
+# ── C03 : dépendances et dossier d'état ──────────────────────────────────────
+
+@pytest.mark.req("REQ-EXEC-020")
+def test_l_executif_de_mission_ne_depend_pas_du_serveur_de_skills():
+    """Un plantage du serveur de skills ne doit pas arrêter l'exécutif de mission."""
+    cp = _lire("clawbot-mission-executive.service")
+    for cle in ("Requires", "BindsTo", "PartOf"):
+        valeur = cp.get("Unit", cle, fallback="")
+        assert "clawbot-skill-server" not in valeur, (
+            f"{cle}= cite le serveur de skills ({valeur}) : un arrêt du serveur "
+            "arrêterait l'exécutif et rien ne le relancerait")
+    assert "clawbot-skill-server" in cp.get("Unit", "Wants", fallback=""), (
+        "Wants= doit conserver l'ordonnancement sans propager l'arrêt")
+    assert "clawbot-skill-server" in cp.get("Unit", "After", fallback="")
+
+
+@pytest.mark.req("REQ-EXEC-022")
+@pytest.mark.parametrize("nom", [
+    "clawbot-skill-server.service",
+    "clawbot-mission-executive.service",
+    "clawbot-yolo.service",
+])
+def test_les_unites_qui_ecrivent_dans_var_lib_declarent_leur_etat(nom):
+    """StateDirectory crée le dossier ; ReadWritePaths le supposait déjà présent."""
+    chemin = _chemin(nom)
+    texte = chemin.read_text(encoding="utf-8")
+    assert "/var/lib/clawbot" in texte, f"{nom} doit citer /var/lib/clawbot"
+    cp = _lire(nom)
+    assert cp.get("Service", "StateDirectory", fallback=None) == "clawbot", (
+        f"{nom} : StateDirectory=clawbot attendu")
+    chemins = cp.get("Service", "ReadWritePaths", fallback="").strip()
+    assert chemins == "", (
+        f"{nom} : ReadWritePaths={chemins} fait doublon avec StateDirectory et fait "
+        "échouer le démarrage avant la création du dossier (226/NAMESPACE)")

@@ -17,12 +17,15 @@ DECISIONS_AUTORISEES = {"RETRY_STEP", "RETRY_WITH_PARAMS", "SKIP_STEP",
 CATEGORIES = {"PRECONDITION", "SENSOR", "SAFETY", "EXECUTION", "HARDWARE",
               "INTERFACE", "INTERNAL"}
 
-# Le §6.1 du référentiel, recopié : 19 codes, catégorie, relance, décisions.
+# Le §6.1 du référentiel, recopié : 20 codes, catégorie, relance, décisions.
 ATTENDUS = {
     "CAPABILITY_INACTIVE": ("PRECONDITION", 0, {"RETRY_STEP", "REPLACE_REMAINING", "ABORT"}),
     "CAPABILITY_CONFLICT": ("PRECONDITION", 0, {"REPLACE_REMAINING", "ABORT"}),
     "ARM_NOT_AT_REST": ("PRECONDITION", 0, {"REPLACE_REMAINING", "ABORT"}),
     "MAP_MISSING": ("PRECONDITION", 0, {"REPLACE_REMAINING", "ABORT"}),
+    # C03 (REQ-EXEC-021), approuvé par l'opérateur : pas de relance automatique, le
+    # serveur de skills peut revenir à tout moment.
+    "SKILL_SERVER_UNAVAILABLE": ("PRECONDITION", 0, {"RETRY_STEP", "ABORT"}),
     "SENSOR_STALE": ("SENSOR", 1, {"RETRY_STEP", "REPLACE_REMAINING", "ABORT"}),
     "DEPTH_UNAVAILABLE": ("SENSOR", 0, {"REPLACE_REMAINING", "ABORT"}),
     "SAFETY_HOLD": ("SAFETY", 0, {"RETRY_STEP", "REPLACE_REMAINING", "ABORT"}),
