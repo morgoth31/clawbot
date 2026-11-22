@@ -26,3 +26,176 @@ requirements:
     status: approved
     approved_by: "opérateur 2026-11-22"
     prompt: P02
+
+  - id: REQ-SAFETY-010
+    title: Sélection de l'entrée par priorité
+    statement: >
+      L'arbitre doit retenir, parmi les entrées non expirées, celle de plus haute
+      priorité, selon la table §4 du référentiel.
+    rationale: >
+      /cmd_vel a trois éditeurs sans priorité déclarée (S07, Q06) : l'ordre
+      d'arrivée décidait du mouvement.
+    sources: [S07, Q06, R04]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      clawbot_safety/test/test_arbitre_multiplexeur.py::test_priorite_entre_entrees,
+      paramétré sur toutes les paires (teleop 100 > nav 50 > skill 40 > legacy 10),
+      plus ::test_entree_plus_prioritaire_gagne_apres_une_autre.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P04
+
+  - id: REQ-SAFETY-011
+    title: Entrée expirée ignorée, sortie nulle sans entrée valide
+    statement: >
+      Une entrée sans message depuis son timeout_s doit être ignorée ; sans
+      aucune entrée valide, la sortie est nulle.
+    rationale: >
+      Une consigne périmée ne doit pas se perpétuer : c'est déjà le sens de
+      CMD_TIMEOUT_S = 0,5 s aujourd'hui, désormais appliqué par entrée.
+    sources: [S07, S46]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      ::test_entree_expiree_bascule_sur_la_suivante et ::test_aucune_entree_valide_sortie_nulle
+      (horloge simulée, timeout 0,5 s) sortent verts.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P04
+
+  - id: REQ-SAFETY-012
+    title: Arrêt d'urgence verrouillé
+    statement: >
+      Un true reçu sur /safety/estop doit annuler la sortie au plus au tick
+      suivant (≤ 50 ms) et rester verrouillé même si /safety/estop repasse à
+      false.
+    rationale: >
+      L'arrêt d'urgence ne doit pas pouvoir être annulé par le retour au repos de
+      son propre signal, sinon un appui bref serait sans effet.
+    sources: [S07, R16]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      ::test_estop_annule_au_tick_suivant (sortie nulle au tick qui suit) et
+      ::test_verrou_survit_a_estop_false. Démonstration :
+      tests/hardware/HW-SAF-001.md, points (b) et (c).
+    evidence: tests/hardware/HW-SAF-001.md
+    status: draft
+    approved_by: null
+    prompt: P04
+
+  - id: REQ-SAFETY-013
+    title: Réarmement par service, et seulement si le signal est retombé
+    statement: >
+      Le verrou ne doit se lever que par /safety/reset_estop (std_srvs/Trigger),
+      et seulement si la dernière valeur de /safety/estop est false.
+    rationale: >
+      Le réarmement est un geste humain ; il ne doit pas être possible tant que
+      le bouton est encore enfoncé.
+    sources: [R16, S07]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      ::test_rearmement_refuse_tant_que_estop_est_true,
+      ::test_rearmement_accepte_apres_retour_a_false et
+      ::test_service_sans_estop_actif_repond_false sortent verts.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P04
+
+  - id: REQ-SAFETY-014
+    title: Garde-fous de decide() inchangés
+    statement: >
+      Les garde-fous existants de decide() (capteur périmé, délai de consigne,
+      obstacle, tension, enveloppe du bras) doivent produire les mêmes sorties
+      qu'avant pour les mêmes entrées.
+    rationale: >
+      La refonte porte sur l'entrée du multiplexeur, pas sur la décision
+      réflexe : la remplacer sans filet ferait perdre les protections acquises.
+    sources: [S45, S46]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      clawbot_safety/test/test_decide_caracterisation.py : 19 cas figés (scan
+      frais et périmé, consigne nulle, obstacle, lidar muet, inclinaison hold /
+      drop_torque / freeze, servo hors bornes, tension basse et pic, combinaisons)
+      passent sur le code d'origine puis après refonte.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P04
+
+  - id: REQ-SAFETY-015
+    title: État de sécurité enrichi sans perte
+    statement: >
+      /safety/state doit contenir les champs existants plus source,
+      estop_latched, max_callback_ms.
+    rationale: >
+      Le directeur lit cet état pour autoriser ou annuler une tâche ; il doit
+      continuer à y trouver l'état, et l'opérateur doit pouvoir voir qui commande
+      et si le verrou est actif.
+    sources: [S07, S45]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      ::test_etat_contient_les_champs_anciens_et_nouveaux : la charge JSON de
+      /safety/state porte « state » (valeur inchangée : OK, STOP, …), « source »
+      (nom de l'entrée retenue ou null), « estop_latched » (bool) et
+      « max_callback_ms » (float) ; le directeur sait encore lire l'état.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P04
+
+  - id: REQ-SAFETY-016
+    title: La sentinelle ne commande plus la vitesse
+    statement: >
+      sentinel ne doit plus publier sur /cmd_vel* ; ses mots d'arrêt doivent
+      publier true sur /safety/estop.
+    rationale: >
+      La sentinelle est un capteur d'arrêt, pas un éditeur de vitesse : elle
+      court-circuitait le multiplexeur et la priorité.
+    sources: [S07, P01-M09]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      clawbot_sentinel/test/test_sentinel_estop.py::test_mot_arret_publie_estop_sans_twist :
+      sur un mot d'arrêt simulé, un Bool(data=True) part sur /safety/estop et
+      aucun Twist n'est publié sur /cmd_vel, /cmd_vel/teleop, /cmd_vel/nav ou
+      /cmd_vel/skill.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P04
+
+  - id: REQ-SAFETY-017
+    title: Aucun callback de l'arbitre au-delà de 20 ms
+    statement: >
+      La durée maximale d'un callback de l'arbitre doit rester sous 20 ms en
+      fonctionnement (O03).
+    rationale: >
+      L'arbitre est mono-thread à 20 Hz : un callback plus long que la période
+      fait dériver la boucle de sécurité.
+    sources: [O03, S45]
+    safety: true
+    method: demonstration
+    level: hardware
+    criterion: >
+      max_callback_ms publié dans /safety/state reste < 20 sur 10 minutes de
+      fonctionnement ; relevé consigné dans tests/hardware/HW-SAF-001.md et dans
+      le journal de déploiement.
+    evidence: tests/hardware/HW-SAF-001.md
+    status: draft
+    approved_by: null
+    prompt: P04
