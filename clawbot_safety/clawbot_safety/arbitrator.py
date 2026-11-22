@@ -9,6 +9,7 @@ import time
 
 import rclpy
 from geometry_msgs.msg import Twist
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import Imu, LaserScan
@@ -111,6 +112,21 @@ class Arbitrator(Node):
         if self._n % 100 == 0:
             self.get_logger().info(f"tick {self._n} etat={etat} cmd={vx:.3f}")
 
+    def on_shutdown(self):
+        """Laisse trois consignes nulles derrière soi.
+
+        Le pilote n'a aucun arrêt sur silence (P01-M04) : le MCU garde la
+        dernière trame reçue. Un contexte rclpy déjà fermé fait échouer
+        `publish` ; on le journalise sans propager, l'arrêt doit aboutir.
+        """
+        for _ in range(3):
+            try:
+                self.pub_safe.publish(Twist())
+            except Exception as exc:  # contexte invalidé par SIGINT/SIGTERM
+                self.get_logger().warn(f"consigne nulle non publiee : {exc}")
+                return
+            time.sleep(0.02)
+
 
 def main():
     rclpy.init()
@@ -118,8 +134,10 @@ def main():
     node.get_logger().info("arbitre pret, entree dans spin")
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):
         pass
     finally:
+        node.on_shutdown()
         node.destroy_node()
         rclpy.try_shutdown()   # SIGINT a déjà pu fermer le contexte
+    return 0
