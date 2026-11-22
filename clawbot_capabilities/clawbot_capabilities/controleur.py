@@ -94,6 +94,43 @@ class Controleur:
             self._etats[nom] = etat
             self.changements += 1
 
+    # ── réconciliation ───────────────────────────────────────────────────────
+    def reconcilier(self) -> list[str]:
+        """Recalcule les états depuis systemd et les sondes ; ne démarre rien.
+
+        C'est la correction de l'écart constaté en C04 : `mapping` était publiée
+        INACTIVE alors que `clawbot-slam.service` tournait, parce que l'état ne venait
+        que de l'historique des demandes. Rend la liste des capacités dont l'état a
+        changé sans demande (REQ-CAPA-013).
+        """
+        changements: list[str] = []
+        for nom, capacite in self.manifeste.items():
+            ancien = self._etats[nom]
+            if not capacite.units:
+                # Capacité décrite sans unité (voice) : rien à observer, reste INACTIVE.
+                nouvel = Etat.INACTIVE
+            elif self.backend is None:
+                continue
+            else:
+                etats = [self.backend.est_actif(u) for u in capacite.units]
+                echecs = [u for u in capacite.units
+                          if getattr(self.backend, "est_en_echec", lambda _u: False)(u)]
+                if echecs:
+                    nouvel = Etat.FAILED
+                elif not all(etats):
+                    nouvel = Etat.INACTIVE
+                else:
+                    sondes = self._sondes.get(nom)
+                    if sondes is None:
+                        sondes = self.fabrique_sondes(capacite)
+                        self._sondes[nom] = sondes
+                    pret = all(s.preter() for s in sondes) if sondes else True
+                    nouvel = Etat.ACTIVE if pret else Etat.DEGRADED
+            if nouvel != ancien:
+                self._poser(nom, nouvel)
+                changements.append(nom)
+        return changements
+
     # ── demandes ─────────────────────────────────────────────────────────────
     def demander(self, nom: str, actif: bool, timeout_s: float | None = None) -> Resultat:
         if nom not in self.manifeste:

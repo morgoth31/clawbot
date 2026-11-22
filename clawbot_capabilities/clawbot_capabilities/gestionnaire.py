@@ -36,6 +36,8 @@ class GestionnaireCapacites(Node):
         self.declare_parameter("backend", "systemd")
         self.declare_parameter("autostart_always_on", True)
         self.declare_parameter("periode_etat_s", 0.2)
+        # 0,2 Hz : la reconciliation lit systemd, elle n'a pas besoin d'aller plus vite.
+        self.declare_parameter("periode_reconciliation_s", 5.0)
 
         chemin = self.get_parameter("manifest_path").value
         manifeste = charger(chemin)
@@ -49,6 +51,8 @@ class GestionnaireCapacites(Node):
         self.create_service(SetCapability, "/clawbot/capabilities/set", self._sur_set)
         self.create_service(ListCapabilities, "/clawbot/capabilities/list", self._sur_list)
         self.create_timer(float(self.get_parameter("periode_etat_s").value), self._sur_timer)
+        self.create_timer(float(self.get_parameter("periode_reconciliation_s").value),
+                          self._sur_reconciliation)
 
         self.get_logger().info(
             f"gestionnaire pret : {len(manifeste)} capacites, backend {mode}, "
@@ -90,6 +94,20 @@ class GestionnaireCapacites(Node):
             for nom, champs in self.controleur.instantane().items():
                 if champs["state"] not in ("INACTIVE",):
                     self.get_logger().debug(f"{nom} = {champs['state']}")
+
+    def _sur_reconciliation(self):
+        """Recalcule l'etat depuis systemd (REQ-CAPA-010) et signale les ecarts."""
+        try:
+            changements = self.controleur.reconcilier()
+        except Exception as exc:  # noqa: BLE001 — la reconciliation ne doit pas tuer le noeud
+            self.get_logger().error(f"reconciliation impossible : {exc}")
+            return
+        for nom in changements:
+            self.get_logger().warning(
+                f"etat de {nom} constate sans demande : "
+                f"{self.controleur.etiquette(nom).value}")
+        if changements:
+            self.publier_etat()
 
     def _sur_timer(self):
         self.controleur.rafraichir()

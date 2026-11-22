@@ -16,7 +16,10 @@
 
 capacites:
   base:
-    units: [ros2-driver-node.service]
+    # Decision operateur C04 : la capacite `base` n'a de sens que si l'EKF et l'arbitre
+    # tournent (odometrie fusionnee et consigne de vitesse filtree). Le manifeste est
+    # aligne sur le referentiel §5.1.
+    units: [ros2-driver-node.service, clawbot-ekf.service, clawbot-safety-arbitrator.service]
     always_on: true
     managed: true
     ready_when:
@@ -93,6 +96,9 @@ capacites:
     timeout_s: 30.0
 
   voice:
+    # Decision operateur C04 : capacite conservee mais non pilotable. Aucune unite vocale
+    # n'existe sur ce poste ; la sonde documente l'interface attendue si elle est ajoutee.
+    # `managed: false` : le gestionnaire ne peut ni la demarrer ni l'arreter.
     units: []
     managed: false
     ready_when: [{topic: /voice/command, min_hz: 0.2}]
