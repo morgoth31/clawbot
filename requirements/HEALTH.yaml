@@ -108,12 +108,21 @@ requirements:
     level: hardware
     criterion: >
       Mesure du CPU du processus du moniteur, robot en fonctionnement :
-      %CPU < 5 %. Mesures du 2026-11-22 sur le robot : version Python 39,5–43,4 %
-      (9 flux) et 15,78 % (sans images) ; version C++ 14,3–15,7 % (9 flux) et
-      **2,56 %** (sans images). Exigence NON tenue : il ne reste que le coût de
-      recopie des trois flux image. Voir deploy/journal/2026-11-22_p05_sante.md.
+      %CPU < 5 % en régime établi.
+      Démonstration mesurée sur le robot le 2026-11-22 — budget NON atteint :
+      version Python 39,5–43,4 % (9 flux) et 15,78 % (6 flux sans image) ;
+      version C++ 14,32–15,68 % (9 flux) et 2,56 % (6 flux sans image).
+      Cause : les trois flux image (/camera/color/image_raw, /camera/depth/image_raw,
+      /wrist_camera/image_raw, ≈ 52 messages/s de 0,6 à 1,2 Mo) coûtent ~12 points
+      par recopie de la charge utile ; aucune zéro-copie n'est exploitable sur cette
+      pile (Humble, éditeurs standard), et un abonnement brut recopie quand même.
+      Pistes restantes, à trancher par l'opérateur : (1) budget révisé ; (2) prêts
+      DDS zéro-copie (éditeurs compatibles requis) ; (3) surveillance des images
+      portée par le nœud de perception en P12.
+      Voir deploy/journal/2026-11-22_p05_rapport.md §5 et le journal de déploiement.
     evidence: deploy/journal/2026-11-22_p05_sante.md
     status: implemented
+    demonstration: "mesurée — budget non atteint (14,3–15,7 % pour 5 %) — à trancher par l'opérateur"
     approved_by: null
     prompt: P05
 
