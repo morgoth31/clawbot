@@ -1,6 +1,8 @@
 [Unit]
 Description=Clawbot YOLO Inference Service (port 8003, CUDA)
 After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -11,7 +13,7 @@ Group=jetson
 # par le topic au lieu d'ouvrir /dev/video0 en concurrent (V4L2 exclusif).
 ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec /home/jetson/yolov5_env/bin/python3 /home/jetson/clawbot/yolo_service.py --port 8003"
 Restart=on-failure
-RestartSec=5
+RestartSec=2
 Environment=CAMERA_FRONT_INDEX=0
 # La caméra du bras est le seul périphérique UVC du bus : elle produit /dev/video0
 # (0c45:6340, port 1-2.2.1). L'index 2 n'existe pas — c'est pourquoi l'outil « claw »
@@ -26,6 +28,7 @@ Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
 Environment=YOLO_MODEL_PATH=/home/jetson/software/yolov5-7.0/yolov5s.pt
 Environment=WORKSPACE_PATH=/home/jetson/clawbot/workspace
+TimeoutStopSec=10
 
 [Install]
 WantedBy=multi-user.target

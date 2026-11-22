@@ -2,6 +2,8 @@
 Description=Filtre EKF (robot_localization) - /odom et TF odom -> base_link
 After=network.target ros2-driver-node.service
 Requires=ros2-driver-node.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -17,7 +19,8 @@ ExecStart=/home/jetson/yahboomcar_ros2_ws/software/library_ws/install/robot_loca
   --ros-args --params-file /home/jetson/clawbot/config/ekf.yaml -r __node:=ekf_filter_node \
   -r odometry/filtered:=odom
 Restart=on-failure
-RestartSec=5
+RestartSec=2
+TimeoutStopSec=10
 
 [Install]
 WantedBy=multi-user.target

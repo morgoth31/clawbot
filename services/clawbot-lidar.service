@@ -13,6 +13,8 @@
 Description=Clawbot Lidar YDLIDAR TG30 (/scan)
 Documentation=file:///home/jetson/clawbot/docs/knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-001_absence_topic_scan.md
 After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -24,7 +26,7 @@ ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
   source install/setup.bash && \
   exec ros2 launch ydlidar_ros2_driver ydlidar_raw_launch.py"
 Restart=on-failure
-RestartSec=5
+RestartSec=2
 TimeoutStopSec=10
 
 [Install]
