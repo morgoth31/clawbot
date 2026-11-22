@@ -166,6 +166,7 @@ nav:
       - Compte rendu Bluetooth (SRS-XB100): knowledge-base/03_Operations/2026-11-11_compte_rendu_bluetooth_srs_xb100.md
       - Essai de préhension d'un stylo: knowledge-base/03_Operations/2026-11-11_essai_prehen_stylo.md
       - Procédure firmware carte Rosmaster: knowledge-base/03_Operations/mise_a_jour_firmware_carte_rosmaster.md
+      - Audit d'inventaire et nettoyage (2026-11-22): knowledge-base/03_Operations/2026-11-22_audit_inventaire_poste.md
       - Traces d'erreurs:
           - ERR-001 absence de scan laser: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-001_absence_topic_scan.md
           - ERR-002 espace disque critique: knowledge-base/03_Operations/errors_traces/ERR-2026-11-10-002_espace_disque_critique.md
