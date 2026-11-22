@@ -72,10 +72,15 @@ done
 
 echo "[joy-teleop] Manette trouvée sur $JSDEV (ROS_DOMAIN_ID=$ROS_DOMAIN_ID)"
 
+# Les setup.bash de ROS lisent des variables non definies (AMENT_TRACE_SETUP_FILES) et
+# meurent sous `set -u` : l'unite bouclait en status=1/FAILURE le 2026-11-23 a 00:31.
+# Tout `source` est donc encadre par `set +u` / `set -u` (REQ-OPS-053).
+set +u
 # shellcheck disable=SC1091
 source /opt/ros/humble/setup.bash
 # shellcheck disable=SC1091
 source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash
+set -u
 export ROS_DOMAIN_ID=$ROS_DOMAIN_ID
 
 exec ros2 launch /home/jetson/clawbot/joy_teleop/joy_teleop_launch.py \
