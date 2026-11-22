@@ -1,14 +1,23 @@
-"""Envoi des trajectoires du bras : action FollowJointTrajectory (P13).
+"""Exécution des poses du bras par MoveIt 2 (P13, décision opérateur du 2026-11-22).
 
-Un seul chemin d'exécution : l'action du contrôleur de trajectoire
-(`clawbot_arm_controller`). Les poses nommées sont des configurations articulaires
-fixes, il n'y a rien à planifier ; passer par MoveIt ajouterait une planification et
-un état courant dont le bras n'a pas besoin.
+Une pose nommée est une configuration articulaire fixe : MoveIt la reçoit comme une
+contrainte d'articulation (position ± tolérance validée), planifie avec le pipeline
+`ompl` et exécute la trajectoire sur `arm_controller` — le serveur d'action que
+`moveit_controllers.yaml` déclare, qui publie sur `/servo_ctrl`.
 
-La surveillance du retour servo s'exécute pendant la trajectoire : dès qu'un servo ne
-répond plus depuis plus de 0,5 s, le goal est annulé et le skill échoue
-`SERVO_NO_FEEDBACK` (REQ-ARM-005). Un servo muet ne doit pas se terminer en
-`SUCCEEDED` sur une consigne supposée appliquée.
+Pourquoi MoveIt et pas l'action du contrôleur directement : c'est lui qui porte les
+poses (`group_state` du SRDF, générées depuis `config/arm_poses.yaml`), la vérification
+de collision et les limites de vitesse du modèle. L'exécutif ne calcule aucun angle :
+il transmet une pose validée.
+
+Deux choses que MoveIt ne fait pas à notre place :
+
+  - **la pince** : un seul axe, deux butées validées, aucune planification utile ;
+    elle est commandée directement sur `grip_controller` ;
+  - **la preuve du mouvement** : le contrôleur ne reçoit aucun retour de position, ses
+    `/arm/joint_states` sont des consignes. La vérification finale se fait sur
+    `/arm/servo_angles` (REQ-ARM-006), et la surveillance d'un servo muet pendant la
+    trajectoire annule le goal (REQ-ARM-005).
 """
 
 from __future__ import annotations
@@ -17,90 +26,158 @@ import time
 
 from builtin_interfaces.msg import Duration
 from control_msgs.action import FollowJointTrajectory
+from moveit_msgs.action import MoveGroup
+from moveit_msgs.msg import Constraints, JointConstraint
 from rclpy.action import ActionClient
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 from .bras import Issue
 
-# groupe -> (nom d'action, articulations attendues par le serveur)
-GROUPES = {
-    "arm": ("/arm_controller/follow_joint_trajectory",
-            ["arm_joint1", "arm_joint2", "arm_joint3", "arm_joint4", "arm_joint5"]),
-    "grip": ("/grip_controller/follow_joint_trajectory", ["grip_joint"]),
-}
+MOVE_ACTION = "/move_action"
+GROUPE_BRAS = "arm"
+ACTION_PINCE = "/grip_controller/follow_joint_trajectory"
+JOINTS_PINCE = ["grip_joint"]
 
 ATTENTE_SERVEUR_S = 3.0
 PERIODE_SURVEILLANCE_S = 0.05
-MARGE_ECHEC_S = 5.0
+MARGE_ECHEC_S = 10.0
+MAX_PLANIFICATION_S = 5.0
+
+SUCCES_MOVEIT = 1
+CONTROLE_ECHOUE = -4
+DELAI_DEPASSE = -6
 
 
-class ExecuteurActions:
-    """Client d'action du bras et de la pince, avec surveillance du retour servo."""
+class ExecuteurMoveIt:
+    """Planie et exécute une pose validée par MoveIt, et commande la pince."""
 
     def __init__(self, node, etats=None):
         self.node = node
         self.etats = etats
-        self.clients = {
-            groupe: ActionClient(node, FollowJointTrajectory, action)
-            for groupe, (action, _joints) in GROUPES.items()
-        }
+        self.client_move = ActionClient(node, MoveGroup, MOVE_ACTION)
+        self.client_pince = ActionClient(node, FollowJointTrajectory, ACTION_PINCE)
         self._annulations: list = []
 
     def prets(self) -> bool:
-        return all(client.server_is_ready() for client in self.clients.values())
+        return self.client_move.server_is_ready() and self.client_pince.server_is_ready()
 
-    def executer(self, groupe, positions, duree_s, timeout_s, surveillance=None) -> Issue:
-        if groupe not in GROUPES:
-            return Issue(False, "INVALID_PARAMS", f"groupe inconnu : {groupe!r}")
-        action, joints = GROUPES[groupe]
-        if len(positions) != len(joints):
-            return Issue(False, "INVALID_PARAMS",
-                         f"{groupe} : {len(positions)} positions pour {len(joints)} articulations")
-        client = self.clients[groupe]
-        if not client.wait_for_server(timeout_sec=ATTENTE_SERVEUR_S):
-            return Issue(False, "CAPABILITY_INACTIVE", f"serveur d'action {action} injoignable")
+    # ── pose du bras, par MoveIt ─────────────────────────────────────────────
+    @staticmethod
+    def objectif_moveit(contraintes) -> MoveGroup.Goal:
+        """Objectif MoveGroup pour une liste de (articulation, position, tolérance)."""
+        objectif = MoveGroup.Goal()
+        requete = objectif.request
+        requete.group_name = GROUPE_BRAS
+        requete.num_planning_attempts = 3
+        requete.allowed_planning_time = MAX_PLANIFICATION_S
+        requete.max_velocity_scaling_factor = 1.0
+        requete.max_acceleration_scaling_factor = 1.0
+
+        but = Constraints()
+        for joint, position, tolerance in contraintes:
+            contrainte = JointConstraint()
+            contrainte.joint_name = joint
+            contrainte.position = float(position)
+            contrainte.tolerance_above = float(tolerance)
+            contrainte.tolerance_below = float(tolerance)
+            contrainte.weight = 1.0
+            but.joint_constraints.append(contrainte)
+        requete.goal_constraints = [but]
+
+        objectif.planning_options.plan_only = False
+        objectif.planning_options.replan = False
+        return objectif
+
+    def executer_pose(self, contraintes, timeout_s, surveillance=None) -> Issue:
+        if not self.client_move.wait_for_server(timeout_sec=ATTENTE_SERVEUR_S):
+            return Issue(False, "CAPABILITY_INACTIVE",
+                         f"planificateur {MOVE_ACTION} injoignable (move_group arrêté ?)")
+
+        envoi = self.client_move.send_goal_async(self.objectif_moveit(contraintes))
+        handle = self._attendre(envoi, min(ATTENTE_SERVEUR_S, max(1.0, timeout_s)))
+        if handle is None:
+            return Issue(False, "TIMEOUT", f"{MOVE_ACTION} : envoi du goal sans réponse")
+        if not handle.accepted:
+            return Issue(False, "PLANNING_FAILED", "move_group a refusé le goal")
+
+        resultat = handle.get_result_async()
+        issue = self._suivre(resultat, handle, timeout_s + MAX_PLANIFICATION_S, surveillance)
+        if issue is not None:
+            return issue
+        return self._lire_resultat_moveit(resultat.result())
+
+    # ── pince, par le contrôleur ─────────────────────────────────────────────
+    def executer_pince(self, position_rad, duree_s, timeout_s, surveillance=None) -> Issue:
+        if not self.client_pince.wait_for_server(timeout_sec=ATTENTE_SERVEUR_S):
+            return Issue(False, "CAPABILITY_INACTIVE",
+                         f"serveur d'action {ACTION_PINCE} injoignable")
 
         trajectoire = JointTrajectory()
-        trajectoire.joint_names = list(joints)
+        trajectoire.joint_names = list(JOINTS_PINCE)
         point = JointTrajectoryPoint()
-        point.positions = [float(q) for q in positions]
+        point.positions = [float(position_rad)]
         secondes = max(0.0, float(duree_s))
         point.time_from_start = Duration(
             sec=int(secondes), nanosec=int(round((secondes - int(secondes)) * 1e9)))
         trajectoire.points = [point]
-
         objectif = FollowJointTrajectory.Goal()
         objectif.trajectory = trajectoire
 
-        envoi = client.send_goal_async(objectif)
+        envoi = self.client_pince.send_goal_async(objectif)
         handle = self._attendre(envoi, min(ATTENTE_SERVEUR_S, max(1.0, timeout_s)))
         if handle is None:
-            return Issue(False, "TIMEOUT", f"{action} : envoi du goal sans réponse")
+            return Issue(False, "TIMEOUT", f"{ACTION_PINCE} : envoi du goal sans réponse")
         if not handle.accepted:
-            return Issue(False, "ARM_GOAL_REFUSED", f"{action} a refusé le goal")
+            return Issue(False, "INVALID_PARAMS", f"{ACTION_PINCE} a refusé le goal")
 
         resultat = handle.get_result_async()
+        issue = self._suivre(resultat, handle, timeout_s + MARGE_ECHEC_S, surveillance)
+        if issue is not None:
+            return issue
+        retour = resultat.result().result
+        if getattr(retour, "error_code", 0) != 0:
+            return Issue(False, "GOAL_UNREACHABLE",
+                         f"{ACTION_PINCE} : {retour.error_string or 'échec'}")
+        return Issue(True)
+
+    # ── outillage ────────────────────────────────────────────────────────────
+    def _suivre(self, resultat, handle, budget_s, surveillance):
+        """Attend le résultat en surveillant le retour servo ; None si abouti."""
         debut = time.monotonic()
         while not resultat.done():
-            if time.monotonic() - debut > timeout_s + MARGE_ECHEC_S:
-                self._annuler(handle)
-                self._attendre(resultat, 2.0)     # laisse le goal se poser avant de rendre
-                return Issue(False, "TIMEOUT", f"{action} : trajectoire non terminée")
+            if time.monotonic() - debut > budget_s:
+                self._annuler(handle, resultat)
+                return Issue(False, "TIMEOUT", "trajectoire non terminée dans le budget")
             if surveillance is not None:
                 code = surveillance()
                 if code:
-                    self._annuler(handle)
+                    self._annuler(handle, resultat)
                     return Issue(False, code, "retour servo invalide : trajectoire annulée")
             time.sleep(PERIODE_SURVEILLANCE_S)
+        return None
 
-        issue = resultat.result()
-        resultat_action = getattr(issue, "result", None)
-        if resultat_action is not None and getattr(resultat_action, "error_code", 0) != 0:
-            return Issue(False, "ARM_TRAJECTORY_FAILED",
-                         f"{action} : {resultat_action.error_string or 'échec'}")
-        if getattr(issue, "status", None) not in (4, None):     # 4 = STATUS_SUCCEEDED
-            return Issue(False, "ARM_TRAJECTORY_FAILED", f"{action} : goal non abouti")
-        return Issue(True)
+    def _annuler(self, handle, resultat) -> None:
+        """Annule le goal en gardant les futures : sinon rclpy les libère et rapporte
+        leur exception plus tard, hors contexte (« cannot use Destroyable… »)."""
+        futur = handle.cancel_goal_async()
+        self._annulations.append(futur)
+        futur.add_done_callback(lambda f: f.exception() if not f.cancelled() else None)
+        self._attendre(resultat, 2.0)                 # laisse le goal se poser
+
+    @staticmethod
+    def _lire_resultat_moveit(issue) -> Issue:
+        resultat = getattr(issue, "result", None)
+        code = getattr(getattr(resultat, "error_code", None), "val", None)
+        if code == SUCCES_MOVEIT:
+            return Issue(True)
+        if code == CONTROLE_ECHOUE:
+            return Issue(False, "GOAL_UNREACHABLE",
+                         f"le contrôleur n'a pas exécuté le plan (code MoveIt {code})")
+        if code == DELAI_DEPASSE:
+            return Issue(False, "TIMEOUT", f"planification hors délai (code MoveIt {code})")
+        return Issue(False, "PLANNING_FAILED",
+                     f"aucun plan exécutable (code MoveIt {code}) : "
+                     "pose en collision, hors limites ou non atteignable")
 
     @staticmethod
     def _attendre(future, timeout_s: float):
@@ -113,14 +190,3 @@ class ExecuteurActions:
             return future.result()
         except Exception:                                     # noqa: BLE001
             return None
-
-    def _annuler(self, handle) -> None:
-        """Annule le goal en gardant la référence du future.
-
-        Sans référence, rclpy libère le future d'annulation et l'exception qu'il porte
-        (« 'NoneType' object has no attribute 'trigger' ») est rapportée plus tard,
-        hors contexte, comme exception jamais récupérée.
-        """
-        futur = handle.cancel_goal_async()
-        self._annulations.append(futur)
-        futur.add_done_callback(lambda f: f.exception() if not f.cancelled() else None)

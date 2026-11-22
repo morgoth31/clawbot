@@ -29,7 +29,7 @@ from clawbot_interfaces.action import ExecuteSkill
 
 from . import bras
 from .etats import Etats
-from .executeur_bras import ExecuteurActions
+from .executeur_bras import ExecuteurMoveIt
 from .registre import Definition, charger, valider_parametres
 from .skills import (CANCELED, FAILED, REJECTED, SUCCEEDED, Resultat, construire)
 
@@ -95,9 +95,16 @@ class Contexte:
     def duree_invalide(self, maintenant=None):
         return self.serveur.etats.duree_invalide(maintenant)
 
-    def executer_bras(self, groupe, positions, duree_s, timeout_s, surveillance=None):
-        return self.serveur.executeur_bras.executer(
-            groupe, positions, duree_s, timeout_s, surveillance)
+    def executer_pose(self, pose, timeout_s, surveillance=None):
+        """Confie la pose validée à MoveIt (contraintes articulaires + exécution)."""
+        from .bras import contraintes_articulaires
+
+        return self.serveur.executeur_bras.executer_pose(
+            contraintes_articulaires(pose), timeout_s, surveillance)
+
+    def executer_pince(self, position_rad, duree_s, timeout_s, surveillance=None):
+        return self.serveur.executeur_bras.executer_pince(
+            position_rad, duree_s, timeout_s, surveillance)
 
     @property
     def periode(self) -> float:
@@ -212,7 +219,7 @@ class ServeurSkills(Node):
                                  self._sur_servo_angles, 10,
                                  callback_group=groupe_etats)
 
-        self.executeur_bras = executeur_bras or ExecuteurActions(self, self.etats)
+        self.executeur_bras = executeur_bras or ExecuteurMoveIt(self, self.etats)
 
         self._images: dict[str, object] = {}
         self._images_lock = threading.Lock()

@@ -56,7 +56,11 @@ capacites:
     units: [clawbot-arm-controller.service, clawbot-move-group.service]
     requires: [base]
     managed: true
+    # Les skills du bras passent par MoveIt (decision operateur du 2026-11-22) : la
+    # capacite n'est active que si move_group sert /move_action. Le controleur et la
+    # pince restent sondes : ce sont eux qui executent reellement.
     ready_when:
+      - {action: /move_action}
       - {action: /arm_controller/follow_joint_trajectory}
       - {action: /grip_controller/follow_joint_trajectory}
       - {topic: /arm/joint_states, min_hz: 8.0}

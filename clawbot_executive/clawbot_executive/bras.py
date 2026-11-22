@@ -243,3 +243,15 @@ def surveillance_servo(source, maintenant=None, seuil_s: float = SEUIL_SERVO_INV
     if duree is not None and duree > seuil_s:
         return "SERVO_NO_FEEDBACK"
     return None
+
+
+def contraintes_articulaires(pose: Pose) -> list[tuple[str, float, float]]:
+    """Contraintes MoveIt d'une pose : (articulation, position rad, tolérance rad).
+
+    MoveIt ne connaît pas les degrés de servo : la pose validée est convertie une
+    seule fois, ici, par la table du contrôleur. La tolérance est celle que
+    l'opérateur a validée, convertie de la même façon.
+    """
+    radians = pose.positions_arm_rad()
+    tolerances = [math.radians(marge) for marge in pose.tolerance_deg[:5]]
+    return list(zip(JOINTS[:5], radians, tolerances))

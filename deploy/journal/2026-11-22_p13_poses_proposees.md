@@ -71,9 +71,12 @@ consignées dans `docs/knowledge-base/03_Operations/`.
 ## 5. Ce que le code garantit déjà (sans la validation)
 
 - `arm_named_pose` refuse `INVALID_PARAMS` toute pose absente de `poses`, sans envoyer
-  de trajectoire (`clawbot_executive/test/test_arm_skills.py`).
+  ni planification ni trajectoire (`clawbot_executive/test/test_arm_skills.py`).
 - Une entrée de `poses` sans `validated_by` ou `validated_at` fait refuser le fichier au
   démarrage du serveur de skills (`bras.PosesInvalides`).
 - Les six valeurs de chaque pose validée sont vérifiées contre les bornes servo et les
   limites URDF (même fichier de test).
+- Le SRDF de MoveIt ne contient que les poses validées : `generate_srdf.py --poses-only`
+  le régénère depuis ce YAML, et un test échoue si les deux divergent. Ajouter une pose
+  dans MoveIt sans la faire valider casserait la vérification.
 - Aucune pose n'est commandée par Hermes dans le domaine 28 : l'essai est opérateur.
