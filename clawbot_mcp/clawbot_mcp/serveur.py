@@ -68,7 +68,8 @@ class ClawbotMCP(Node):
         from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
         from std_msgs.msg import Bool, String
 
-        self.clients = {
+        # nom volontairement distinct : `clients` est une propriété de rclpy.Node
+        self.clients_services = {
             "capacites_list": self.create_client(ListCapabilities, "/clawbot/capabilities/list"),
             "capacites_set": self.create_client(SetCapability, "/clawbot/capabilities/set"),
             "mission_report": self.create_client(GetMissionReport, "/clawbot/mission/report"),
@@ -84,11 +85,49 @@ class ClawbotMCP(Node):
         self.create_subscription(String, "/clawbot/health", self._sur_sante, 10)
         self.actions = {"mission": ActionClient(self, ExecuteMission, "/clawbot/execute_mission")}
         self.missions: dict[str, dict] = {}
+        self.handles: dict[str, object] = {}
+        # Suivi par événements (§5.3 du prompt) : l'exécutif publie chaque transition.
+        try:
+            from clawbot_interfaces.msg import MissionEvent
+
+            self.create_subscription(MissionEvent, "/clawbot/mission/events",
+                                     self._sur_evenement, 50)
+        except ImportError:                        # pragma: no cover
+            self.get_logger().warn("MissionEvent absent : suivi par résultat seulement")
 
         from clawbot_executive.registre import charger
         chemin = str(registre or REGISTRE_PAR_DEFAUT)
         self.registre = charger(chemin)
         self.get_logger().info(f"clawbot_mcp pret : {len(OUTILS)} outils")
+
+    def _sur_evenement(self, message) -> None:
+        suivi = self.missions.setdefault(message.mission_id,
+                                         {"mission_id": message.mission_id, "state": "PENDING",
+                                          "step_index": 0, "step_count": 0, "progress": 0.0,
+                                          "error_code": ""})
+        evenement = message.event
+        if evenement == "STARTED":
+            suivi["state"] = "RUNNING"
+        elif evenement == "STEP_STARTED":
+            try:
+                detail = json.loads(message.detail_json or "{}")
+            except ValueError:
+                detail = {}
+            suivi["step_index"] = int(detail.get("index", 0))
+            suivi["state"] = "RUNNING"
+        elif evenement == "STEP_SUCCEEDED":
+            suivi["step_index"] = suivi.get("step_index", 0) + 1
+        elif evenement == "WAITING_DECISION":
+            suivi["state"] = "WAITING_DECISION"
+            try:
+                suivi["error_code"] = json.loads(message.detail_json or "{}").get(
+                    "error_code", "")
+            except ValueError:
+                suivi["error_code"] = ""
+        elif evenement in ("SUCCEEDED", "FAILED", "ABORTED", "CANCELED"):
+            suivi["state"] = evenement
+        suivi["progress"] = (suivi["step_index"] / suivi["step_count"]
+                             if suivi.get("step_count") else 0.0)
 
     def _sur_sante(self, message) -> None:
         try:
@@ -104,12 +143,18 @@ class Contexte:
     def __init__(self, node: ClawbotMCP | None = None, registre: dict | None = None,
                  clients: dict | None = None, editeur=None, horloge=time.monotonic):
         self.node = node
-        self.clients = clients if clients is not None else (node.clients if node else {})
+        self.clients = clients if clients is not None else (
+            node.clients_services if node else {})
         self.types = node.types if node else {}
         self.registre = registre or (node.registre if node else {})
         self.editeur = editeur if editeur is not None else (node.pub_estop if node else None)
         self.horloge = horloge
-        self.missions: dict[str, dict] = {}
+        if node is not None:
+            self.missions = node.missions
+            self.handles = node.handles
+        else:
+            self.missions = {}
+            self.handles = {}
 
     # ── accès bas niveau ─────────────────────────────────────────────────────
     def client(self, nom: str):
@@ -145,8 +190,10 @@ class Contexte:
         client = self.node.actions["mission"] if self.node else None
         if client is None or not client.wait_for_server(timeout_sec=2.0):
             return outils.erreur("TIMEOUT", "exécutif de mission injoignable")
+        import uuid
+
         goal = ExecuteMission.Goal()
-        goal.mission_id = ""
+        goal.mission_id = str(uuid.uuid4())       # le même identifiant dans les événements
         goal.objective = objective
         goal.steps_json = json.dumps(etapes, ensure_ascii=False)
         goal.max_duration_s = float(max_duration_s or 0.0)
@@ -156,12 +203,11 @@ class Contexte:
         handle = futur.result()
         if not handle.accepted:
             return outils.erreur("CAPABILITY_CONFLICT", "une mission est déjà en cours")
-        mission_id = str(handle.goal_id.uuid)
+        mission_id = goal.mission_id
         self.missions[mission_id] = {"mission_id": mission_id, "state": "RUNNING",
                                      "step_index": 0, "step_count": len(etapes),
                                      "progress": 0.0, "error_code": ""}
-        handle.get_result_async().add_done_callback(
-            lambda f, mid=mission_id: self._mission_finie(mid, f))
+        self.handles[mission_id] = handle
         return outils.ok(mission_id=mission_id)
 
     def _mission_finie(self, mission_id: str, futur) -> None:
@@ -185,10 +231,19 @@ class Contexte:
         return None
 
     def annuler(self, mission_id: str) -> bool:
-        # L'annulation passe par l'exécutif (service de décision ABORT) : pas de shell.
-        return self.missions.get(mission_id, {}).get("state") in (
-            "RUNNING", "WAITING_DECISION") and self.missions[mission_id].update(
-            {"state": "CANCELED"}) is None
+        """Annule le goal côté exécutif ; repli local si le handle a disparu."""
+        handle = (self.node.handles.get(mission_id)
+                  if self.node is not None else self.handles.get(mission_id))
+        if handle is not None:
+            try:
+                handle.cancel_goal_async()
+                return True
+            except Exception:                       # noqa: BLE001
+                pass
+        if mission_id in self.missions:
+            self.missions[mission_id]["state"] = "CANCELED"
+            return True
+        return False
 
     # ── image ────────────────────────────────────────────────────────────────
     def capture(self, camera: str) -> dict:
