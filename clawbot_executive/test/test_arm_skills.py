@@ -1,18 +1,21 @@
-"""Skills du bras : liste blanche des poses, exécution, retour servo (P13).
+"""Skills du bras : liste blanche des poses, exécution MoveIt, retour servo (P13).
 
-Sans ROS : les skills reçoivent un contexte factice qui enregistre les trajectoires
-demandées et rend les angles de servo simulés. Ce que ces tests prouvent :
+Sans ROS : les skills reçoivent un contexte factice qui enregistre les poses confiées
+au planificateur et rend les angles de servo simulés. Ce que ces tests prouvent :
 
   - la liste `config/arm_poses.yaml` ne contient que des poses validées, converties
-    dans les limites de l'URDF ;
-  - une pose inconnue ou non validée est refusée `INVALID_PARAMS` sans trajectoire ;
-  - `arm_rest` commande la pose de repos puis vérifie la mesure avant de réussir ;
+    dans les limites de l'URDF, et le SRDF de MoveIt les expose à l'identique ;
+  - une pose inconnue ou non validée est refusée `INVALID_PARAMS` sans planification ;
+  - la pose validée devient une contrainte d'articulation MoveIt (position ± tolérance),
+    sans aucun angle libre ;
+  - `arm_rest` vérifie la mesure avant de réussir ;
   - un retour servo invalide pendant plus de 0,5 s fait échouer le skill en cours
     `SERVO_NO_FEEDBACK` en moins d'une seconde.
 """
 
 from __future__ import annotations
 
+import math
 import sys
 import time
 import xml.etree.ElementTree as ET
@@ -35,26 +38,25 @@ from clawbot_executive.skills import FAILED, REJECTED, SUCCEEDED, construire  # 
 
 POSES = RACINE / "config" / "arm_poses.yaml"
 URDF = RACINE / "urdf" / "clawbot_x3plus.urdf"
+SRDF = RACINE / "clawbot_moveit_config" / "config" / "clawbot_x3plus.srdf"
 PRECONDITIONS = RACINE / "config" / "preconditions.yaml"
 
 
 # ── outillage ────────────────────────────────────────────────────────────────
 
-class FauxExecuteur:
-    """Enregistre les trajectoires ; rend l'issue et les angles qu'on lui donne."""
+class FauxMoveIt:
+    """Enregistre les poses confiées au planificateur et les ordres de pince."""
 
-    def __init__(self, issue=None, angles=None, etats=None):
-        self.trajectoires = []
+    def __init__(self, issue=None, etats=None):
+        self.appels = []          # ("pose", contraintes) ou ("pince", radians)
         self.issue = issue
-        self.angles = angles
         self.etats = etats
 
-    def executer(self, groupe, positions, duree_s, timeout_s, surveillance=None):
-        self.trajectoires.append((groupe, list(positions), duree_s))
+    def executer_pose(self, contraintes, timeout_s, surveillance=None):
+        self.appels.append(("pose", list(contraintes)))
         if surveillance is not None:
-            # Le vrai exécuteur sonde toutes les 50 ms pendant la trajectoire ; le pilote,
-            # lui, republie /arm/servo_angles à 10 Hz. On rejoue les deux : sans cela la
-            # mesure serait périmée à la fin de la trajectoire simulée.
+            # Le vrai exécuteur sonde toutes les 50 ms pendant que MoveIt planifie et
+            # exécute ; le pilote republie les angles à 10 Hz. On rejoue les deux.
             for pas in range(40):
                 if self.etats is not None and pas % 3 == 0:
                     self.etats.maj_servo_angles(self.etats.servo_angles)
@@ -62,9 +64,11 @@ class FauxExecuteur:
                 if code:
                     return bras.Issue(False, code, "retour servo invalide simulé")
                 time.sleep(0.02)
-        if self.issue is not None:
-            return self.issue
-        return bras.Issue(True)
+        return self.issue or bras.Issue(True)
+
+    def executer_pince(self, position_rad, duree_s, timeout_s, surveillance=None):
+        self.appels.append(("pince", float(position_rad)))
+        return self.issue or bras.Issue(True)
 
 
 class FauxContexte:
@@ -72,15 +76,19 @@ class FauxContexte:
         self.params = params
         self.poses = poses or bras.charger(POSES)
         self.etats = etats or Etats()
-        self.executeur = executeur or FauxExecuteur(etats=self.etats)
+        self.executeur = executeur or FauxMoveIt(etats=self.etats)
         if getattr(self.executeur, "etats", None) is None:
             self.executeur.etats = self.etats
         self.publies = []
         self.attentes = []
 
     # surface utilisée par les skills du bras
-    def executer_bras(self, groupe, positions, duree_s, timeout_s, surveillance=None):
-        return self.executeur.executer(groupe, positions, duree_s, timeout_s, surveillance)
+    def executer_pose(self, pose, timeout_s, surveillance=None):
+        return self.executeur.executer_pose(bras.contraintes_articulaires(pose),
+                                            timeout_s, surveillance)
+
+    def executer_pince(self, position_rad, duree_s, timeout_s, surveillance=None):
+        return self.executeur.executer_pince(position_rad, duree_s, timeout_s, surveillance)
 
     @property
     def servo_angles(self):
@@ -160,33 +168,60 @@ def test_une_proposition_non_validee_n_est_pas_commandable():
         bras.depuis_document(contenu)
 
 
+@pytest.mark.req("REQ-ARM-003")
+def test_le_srdf_de_moveit_expose_les_memes_poses_que_le_yaml():
+    """MoveIt porte les poses : son SRDF doit être la copie exacte de la liste validée."""
+    poses = bras.charger(POSES)
+    etats = {}
+    for etat in ET.parse(SRDF).getroot().findall("group_state"):
+        if etat.get("group") != "arm":
+            continue
+        etats[etat.get("name")] = [float(j.get("value")) for j in etat.findall("joint")]
+
+    assert set(etats) == set(poses.poses), (sorted(etats), sorted(poses.poses))
+    for nom, positions in etats.items():
+        assert positions == pytest.approx(poses.poses[nom].positions_arm_rad(), abs=1e-5), nom
+
+
+@pytest.mark.req("REQ-ARM-003")
+def test_la_pose_devient_une_contrainte_articulaire_moveit():
+    repose = bras.charger(POSES).poses["repos"]
+    contraintes = bras.contraintes_articulaires(repose)
+
+    assert [joint for joint, _, _ in contraintes] == [
+        "arm_joint1", "arm_joint2", "arm_joint3", "arm_joint4", "arm_joint5"]
+    positions = [position for _, position, _ in contraintes]
+    assert positions == pytest.approx([0.0, 1.570796, -1.570796, -1.570796, 0.0], abs=2e-3)
+    tolerances = [tolerance for _, _, tolerance in contraintes]
+    assert tolerances == pytest.approx([math.radians(5)] * 5, abs=1e-9)
+
+
 # ── pose inconnue (REQ-ARM-003) ──────────────────────────────────────────────
 
 @pytest.mark.req("REQ-ARM-003")
 def test_pose_hors_liste_rejetee_invalid_params():
     ctx = FauxContexte({"pose": "salut"})
-    skill = construire(definition("arm_named_pose"))
-    resultat = skill.execute(ctx)
+    resultat = construire(definition("arm_named_pose")).execute(ctx)
 
     assert resultat.outcome == REJECTED
     assert resultat.error_code == "INVALID_PARAMS"
-    assert ctx.executeur.trajectoires == [], "aucune trajectoire ne doit partir"
+    assert ctx.executeur.appels == [], "aucune planification ne doit partir"
     assert ctx.publies == []
 
 
 @pytest.mark.req("REQ-ARM-003")
-def test_arm_named_pose_repos_envoie_les_cinq_axes_et_la_pince():
-    ctx = FauxContexte({"pose": "repos"}, etats=Etats())
+def test_arm_named_pose_repos_confie_la_pose_a_moveit_puis_la_pince():
+    ctx = FauxContexte({"pose": "repos"})
     ctx.etats.maj_servo_angles([90, 180, 0, 0, 90, 149])
     resultat = construire(definition("arm_named_pose")).execute(ctx)
 
     assert resultat.outcome == SUCCEEDED, resultat.message
-    groupes = [groupe for groupe, _, _ in ctx.executeur.trajectoires]
-    assert groupes == ["arm", "grip"]
-    _, positions, _ = ctx.executeur.trajectoires[0]
-    assert positions == pytest.approx([0.0, 1.5708, -1.5708, -1.5708, 0.0], abs=2e-3)
-    _, pince, _ = ctx.executeur.trajectoires[1]
-    assert pince == pytest.approx([(149 - 180) / 116.88311688], abs=2e-3)
+    assert [appel[0] for appel in ctx.executeur.appels] == ["pose", "pince"]
+    _, contraintes = ctx.executeur.appels[0]
+    assert [position for _, position, _ in contraintes] == pytest.approx(
+        [0.0, 1.5708, -1.5708, -1.5708, 0.0], abs=2e-3)
+    _, pince = ctx.executeur.appels[1]
+    assert pince == pytest.approx((149 - 180) / 116.88311688, abs=2e-3)
 
 
 # ── pince (REQ-ARM-003) ──────────────────────────────────────────────────────
@@ -198,27 +233,27 @@ def test_gripper_ouvert_et_ferme():
         ctx.etats.maj_servo_angles([90, 180, 0, 0, 90, attendu_deg])
         resultat = construire(definition("gripper")).execute(ctx)
         assert resultat.outcome == SUCCEEDED, (action, resultat.message)
-        assert [g for g, _, _ in ctx.executeur.trajectoires] == ["grip"]
-        _, positions, _ = ctx.executeur.trajectoires[0]
-        assert positions == pytest.approx([(attendu_deg - 180) / 116.88311688], abs=2e-3)
+        assert [appel[0] for appel in ctx.executeur.appels] == ["pince"]
+        _, position = ctx.executeur.appels[0]
+        assert position == pytest.approx((attendu_deg - 180) / 116.88311688, abs=2e-3)
 
 
 # ── arm_rest vérifié sur la mesure (REQ-ARM-006) ─────────────────────────────
 
 @pytest.mark.req("REQ-ARM-006")
 def test_arm_rest_reussit_quand_la_mesure_est_dans_l_enveloppe():
-    ctx = FauxContexte({}, etats=Etats())
+    ctx = FauxContexte({})
     ctx.etats.maj_servo_angles([90, 180, 0, 0, 90, 149])
     resultat = construire(definition("arm_rest")).execute(ctx)
 
     assert resultat.outcome == SUCCEEDED, resultat.message
-    assert [g for g, _, _ in ctx.executeur.trajectoires] == ["arm", "grip"]
+    assert [appel[0] for appel in ctx.executeur.appels] == ["pose", "pince"]
     assert "[90, 180, 0, 0, 90, 149]" in resultat.message
 
 
 @pytest.mark.req("REQ-ARM-006")
 def test_arm_rest_echoue_si_la_mesure_ne_suit_pas():
-    ctx = FauxContexte({}, etats=Etats())
+    ctx = FauxContexte({})
     ctx.etats.maj_servo_angles([90, 120, 0, 0, 90, 180])   # bras resté ailleurs
     resultat = construire(definition("arm_rest", verification_timeout_s=0.2)).execute(ctx)
 
@@ -229,11 +264,22 @@ def test_arm_rest_echoue_si_la_mesure_ne_suit_pas():
 
 @pytest.mark.req("REQ-ARM-006")
 def test_arm_rest_echoue_si_aucune_mesure():
-    ctx = FauxContexte({}, etats=Etats())
+    ctx = FauxContexte({})
     resultat = construire(definition("arm_rest", verification_timeout_s=0.2)).execute(ctx)
 
     assert resultat.outcome == FAILED
     assert resultat.error_code == "ARM_NOT_AT_REST"
+
+
+@pytest.mark.req("REQ-ARM-006")
+def test_un_plan_refuse_fait_echouer_le_skill_sans_toucher_la_pince():
+    ctx = FauxContexte({}, executeur=FauxMoveIt(
+        issue=bras.Issue(False, "PLANNING_FAILED", "pose en collision")))
+    resultat = construire(definition("arm_rest")).execute(ctx)
+
+    assert resultat.outcome == FAILED
+    assert resultat.error_code == "PLANNING_FAILED"
+    assert [appel[0] for appel in ctx.executeur.appels] == ["pose"], "la pince ne doit pas bouger"
 
 
 # ── retour servo invalide (REQ-ARM-005) ──────────────────────────────────────
@@ -278,11 +324,11 @@ def test_retour_servo_invalide_pendant_la_trajectoire_annule_le_skill():
     etats = Etats()
     etats.maj_servo_angles([90, 180, 0, 0, 90, 149])
 
-    class PiloteQuiMeurt(FauxExecuteur):
-        """Le servo 3 tombe à -1 après deux sondes."""
+    class PiloteQuiMeurt(FauxMoveIt):
+        """Le servo 3 tombe à -1 pendant que MoveIt exécute."""
 
-        def executer(self, groupe, positions, duree_s, timeout_s, surveillance=None):
-            self.trajectoires.append((groupe, list(positions), duree_s))
+        def executer_pose(self, contraintes, timeout_s, surveillance=None):
+            self.appels.append(("pose", list(contraintes)))
             etats.maj_servo_angles([90, 180, -1, 0, 90, 149])
             debut = time.monotonic()
             while time.monotonic() - debut < 2.0:

@@ -254,24 +254,22 @@ class SaveMap(Skill):
 
 
 class SkillBras(Skill):
-    """Base des skills du bras : trajectoire, puis vérification sur la mesure.
+    """Base des skills du bras : pose validée, puis vérification sur la mesure.
 
-    Le contrôleur ne reçoit aucun retour de position : ses `/arm/joint_states` sont des
-    consignes. Seul `/arm/servo_angles`, relu par le pilote, prouve le mouvement —
-    c'est pourquoi ces skills ne rendent `SUCCEEDED` qu'après cette vérification
-    (REQ-ARM-006).
+    MoveIt planifie et exécute la pose ; le contrôleur ne reçoit aucun retour de
+    position, ses `/arm/joint_states` sont des consignes. Seul `/arm/servo_angles`,
+    relu par le pilote, prouve le mouvement — c'est pourquoi ces skills ne rendent
+    `SUCCEEDED` qu'après cette vérification (REQ-ARM-006).
     """
 
     def _borne(self, nom: str, defaut: float) -> float:
         return float(self.definition.bornes.get(nom, defaut))
 
-    def _executer(self, ctx, groupe: str, positions, duree_s: float, timeout_s: float):
-        """Envoie une trajectoire en surveillant le retour servo (REQ-ARM-005)."""
-
-        def surveillance():
+    def _surveillance(self, ctx):
+        def surveiller():
             return bras.surveillance_servo(ctx, ctx.maintenant())
 
-        return ctx.executer_bras(groupe, list(positions), duree_s, timeout_s, surveillance)
+        return surveiller
 
     def _attendre_mesure(self, ctx, pose: bras.Pose, timeout_s: float,
                          servos=None) -> Resultat:
@@ -293,13 +291,13 @@ class SkillBras(Skill):
             ctx.attendre(0.1)
         return Resultat(FAILED, "ARM_NOT_AT_REST", dernier)
 
-    def _jouer_pose(self, ctx, pose: bras.Pose, duration_s: float) -> Resultat:
-        issue = self._executer(ctx, "arm", pose.positions_arm_rad(), duration_s,
-                               self.definition.timeout_s)
+    def _jouer_pose(self, ctx, pose: bras.Pose) -> Resultat:
+        """MoveIt planifie et exécute les cinq axes, puis la pince par le contrôleur."""
+        issue = ctx.executer_pose(pose, self.definition.timeout_s, self._surveillance(ctx))
         if not issue.ok:
             return Resultat(FAILED, issue.error_code, issue.message)
-        issue = self._executer(ctx, "grip", [pose.position_pince_rad()], min(duration_s, 1.5),
-                               self.definition.timeout_s)
+        issue = ctx.executer_pince(pose.position_pince_rad(), self._borne("duree_s", 1.5),
+                                   self.definition.timeout_s, self._surveillance(ctx))
         if not issue.ok:
             return Resultat(FAILED, issue.error_code, issue.message)
         return self._attendre_mesure(ctx, pose, self._borne("verification_timeout_s", 5.0))
@@ -313,7 +311,7 @@ class ArmRest(SkillBras):
         if pose is None:
             return Resultat(FAILED, "ARM_NOT_AT_REST",
                             "aucune pose `repos` validée dans config/arm_poses.yaml")
-        return self._jouer_pose(ctx, pose, self._borne("duree_s", 3.0))
+        return self._jouer_pose(ctx, pose)
 
 
 class ArmNamedPose(SkillBras):
@@ -327,8 +325,7 @@ class ArmNamedPose(SkillBras):
             return Resultat(REJECTED, "INVALID_PARAMS",
                             f"pose {nom!r} hors de la liste validée ({connues}) ; "
                             "aucun angle libre n'est accepté")
-        duration = float(ctx.params.get("duration_s") or self._borne("duree_s", 3.0))
-        return self._jouer_pose(ctx, pose, duration)
+        return self._jouer_pose(ctx, pose)
 
 
 class Gripper(SkillBras):
@@ -342,8 +339,8 @@ class Gripper(SkillBras):
         except bras.PosesInvalides as exc:
             return Resultat(REJECTED, "INVALID_PARAMS", str(exc))
 
-        issue = self._executer(ctx, "grip", [cible], self._borne("duree_s", 1.5),
-                               self.definition.timeout_s)
+        issue = ctx.executer_pince(cible, self._borne("duree_s", 1.5),
+                                   self.definition.timeout_s, self._surveillance(ctx))
         if not issue.ok:
             return Resultat(FAILED, issue.error_code, issue.message)
 

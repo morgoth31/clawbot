@@ -46,7 +46,8 @@ requirements:
     level: hardware
     criterion: >
       Au déploiement, `ros2 topic hz /arm/joint_states` ≥ 8 Hz pendant 30 s, capacité
-      `arm` active (`/clawbot/capabilities/state`). En domaine 99, le test
+      `arm` active (`/clawbot/capabilities/state`) — la capacité sonde `/move_action`,
+      les deux actions du contrôleur et le flux d'états. En domaine 99, le test
       d'intégration mesure la même cadence sur le contrôleur réel et exige ≥ 8 Hz.
     evidence: deploy/journal/2026-11-22_p13_bras.md
     status: approved
@@ -63,16 +64,20 @@ requirements:
       `bras_6dof.md`) : une consigne calculée n'est pas une position connue. Seule
       une pose vue et acceptée sur le robot est sûre. La liste vit dans
       `config/arm_poses.yaml` ; une pose sans `validated_by` ni `validated_at` n'est
-      pas chargeable, donc jamais commandable.
+      pas chargeable, donc jamais commandable. MoveIt porte ces poses (décision
+      opérateur du 2026-11-22) : `generate_srdf.py` en fait les `group_state` du SRDF,
+      et l'exécutif lui transmet la pose validée en contraintes d'articulation, jamais
+      un angle libre.
     sources: [C10, R03]
     safety: true
     method: test
     level: unit
     criterion: >
       `arm_named_pose` avec une pose absente de la liste rend `INVALID_PARAMS` sans
-      envoyer de trajectoire ; une entrée de `propositions` (non validée) est refusée
-      de la même façon ; chaque pose validée, convertie en radians, reste dans les
-      limites de `urdf/clawbot_x3plus.urdf`.
+      envoyer ni planification ni trajectoire ; une entrée de `propositions` (non
+      validée) est refusée de la même façon ; chaque pose validée, convertie en
+      radians, reste dans les limites de `urdf/clawbot_x3plus.urdf` ; le SRDF de
+      MoveIt expose exactement les poses de la liste, avec les mêmes positions.
     evidence: null
     status: draft
     approved_by: null

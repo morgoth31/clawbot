@@ -36,14 +36,17 @@ ros2 service call /clawbot/capabilities/set clawbot_interfaces/srv/SetCapability
   "{name: arm, active: true, timeout_s: 60.0}"
 ```
 
-- Attendu : `success: true`, `state: ACTIVE`.
+- Attendu : `success: true`, `state: ACTIVE`. La capacité n'est déclarée active que si
+  `/move_action`, `/arm_controller/follow_joint_trajectory`,
+  `/grip_controller/follow_joint_trajectory` et `/arm/joint_states` répondent.
 - Attendu : **aucun mouvement du bras.** Le contrôleur démarre, publie ses consignes
   initiales et n'exécute aucune trajectoire.
 - Contrôles :
 
 ```bash
 ros2 topic hz /arm/joint_states    # >= 8 Hz (mesure de référence : 20 Hz)
-ros2 action list | grep -E "arm_controller|grip_controller"
+ros2 action list | grep -E "move_action|arm_controller|grip_controller"
+# attendu : /move_action (MoveIt), /arm_controller/..., /grip_controller/...
 ```
 
 Consigner : `state` = __________ · `/arm/joint_states` = __________ Hz · mouvement
@@ -72,17 +75,30 @@ dans cet ordre, avec retour à `arm_rest` entre deux poses :
 | 1 | `home` — [90, 90, 90, 90, 90, 180] | voir ci-dessous | bras tendu verticalement, pince fermée, aucun contact | ☐ |
 | 2 | `ready` — [90, 119, 119, 90, 90, 180] | voir ci-dessous | pince ~15 cm devant la colonne, aucun contact | ☐ |
 
-Procédure par pose (exemple pour `home`, à répéter pour chaque ligne) :
+Procédure par pose (exemple pour `home`, à répéter pour chaque ligne). C'est le seul
+chemin hors liste : l'opérateur demande la pose directement à MoveIt, qui planifie et
+exécute. Aucun skill ne l'accepte avant validation.
 
 ```bash
-# 1. la pose est d'abord écrite dans la section `poses` par Hermes, avec
-#    validated_by: null — elle reste refusée. L'opérateur l'essaie par l'action du
-#    contrôleur, une seule fois, à vitesse lente :
-ros2 action send_goal /arm_controller/follow_joint_trajectory \
-  control_msgs/action/FollowJointTrajectory \
-  "{trajectory: {joint_names: [arm_joint1, arm_joint2, arm_joint3, arm_joint4, arm_joint5],
-    points: [{positions: [0.0, 0.0, 0.0, 0.0, 0.0], time_from_start: {sec: 4}}]}}"
+# 1. l'opérateur essaie la proposition, une seule fois, à vitesse réduite (50 %) :
+ros2 action send_goal /move_action moveit_msgs/action/MoveGroup \
+  "{request: {group_name: arm, num_planning_attempts: 3, allowed_planning_time: 5.0,
+    max_velocity_scaling_factor: 0.5, max_acceleration_scaling_factor: 0.5,
+    goal_constraints: [{joint_constraints: [
+      {joint_name: arm_joint1, position: 0.0, tolerance_above: 0.087, tolerance_below: 0.087, weight: 1.0},
+      {joint_name: arm_joint2, position: 0.0, tolerance_above: 0.087, tolerance_below: 0.087, weight: 1.0},
+      {joint_name: arm_joint3, position: 0.0, tolerance_above: 0.087, tolerance_below: 0.087, weight: 1.0},
+      {joint_name: arm_joint4, position: 0.0, tolerance_above: 0.087, tolerance_below: 0.087, weight: 1.0},
+      {joint_name: arm_joint5, position: 0.0, tolerance_above: 0.087, tolerance_below: 0.087, weight: 1.0}]}]},
+   planning_options: {plan_only: false, replan: false}}"
+```
 
+Les positions ci-dessus (`0.0` partout) sont la proposition `home` en radians ; pour
+`ready`, mettre `0.5` sur `arm_joint2` et `arm_joint3`. Un `error_code.val` négatif
+(`-1`, `PLANNING_FAILED`) signifie : pose en collision, hors limites ou non
+atteignable — elle ne doit pas être validée.
+
+```bash
 # 2. retour au repos, vérifié
 ros2 action send_goal /clawbot/execute_skill clawbot_interfaces/action/ExecuteSkill \
   "{skill: arm_rest, params_json: '{}', timeout_s: 20.0}"

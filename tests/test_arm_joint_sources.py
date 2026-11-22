@@ -55,6 +55,9 @@ def test_manifeste_arm_nomme_les_unites_et_actions_reelles():
                                    "clawbot-move-group.service"}
     assert capacite.managed is True
     actions = {condition["action"] for condition in capacite.ready_when if "action" in condition}
+    # P13 : les skills du bras passent par MoveIt, qui planifie puis execute sur le
+    # controleur ; la capacite ne doit etre active que si les trois servent.
+    assert "/move_action" in actions
     assert "/arm_controller/follow_joint_trajectory" in actions
     assert "/grip_controller/follow_joint_trajectory" in actions
     cadences = {condition["topic"]: condition.get("min_hz")

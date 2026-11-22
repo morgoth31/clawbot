@@ -125,22 +125,21 @@ skills:
     params_schema: {type: object, additionalProperties: false, properties: {}}
     requires: [arm]
     timeout_s: 20.0
-    bornes: {duree_s: 3.0, verification_timeout_s: 5.0}
+    bornes: {duree_s: 1.5, verification_timeout_s: 5.0}
 
   arm_named_pose:
     description: >
-      Exécute une pose nommée de la liste validée ; une pose inconnue est refusée
-      INVALID_PARAMS sans envoyer de trajectoire.
+      Exécute une pose nommée de la liste validée (MoveIt planifie et exécute) ; une
+      pose inconnue est refusée INVALID_PARAMS sans envoyer de trajectoire.
     params_schema:
       type: object
       additionalProperties: false
       required: [pose]
       properties:
         pose: {type: string, minLength: 1, maxLength: 32}
-        duration_s: {type: number, minimum: 1.0, maximum: 10.0}
     requires: [arm]
     timeout_s: 25.0
-    bornes: {duree_s: 3.0, verification_timeout_s: 5.0}
+    bornes: {duree_s: 1.5, verification_timeout_s: 5.0}
 
   gripper:
     description: "Ouvre ou ferme la pince (butées du SRDF, servo 6)."
