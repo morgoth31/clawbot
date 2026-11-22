@@ -44,8 +44,8 @@ requirements:
       paramétré sur toutes les paires (teleop 100 > nav 50 > skill 40 > legacy 10),
       plus ::test_entree_plus_prioritaire_gagne_apres_une_autre.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
     prompt: P04
 
   - id: REQ-SAFETY-011
@@ -64,8 +64,8 @@ requirements:
       ::test_entree_expiree_bascule_sur_la_suivante et ::test_aucune_entree_valide_sortie_nulle
       (horloge simulée, timeout 0,5 s) sortent verts.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
     prompt: P04
 
   - id: REQ-SAFETY-012
@@ -86,8 +86,8 @@ requirements:
       ::test_verrou_survit_a_estop_false. Démonstration :
       tests/hardware/HW-SAF-001.md, points (b) et (c).
     evidence: tests/hardware/HW-SAF-001.md
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
     prompt: P04
 
   - id: REQ-SAFETY-013
@@ -107,8 +107,8 @@ requirements:
       ::test_rearmement_accepte_apres_retour_a_false et
       ::test_service_sans_estop_actif_repond_false sortent verts.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
     prompt: P04
 
   - id: REQ-SAFETY-014
@@ -130,8 +130,8 @@ requirements:
       drop_torque / freeze, servo hors bornes, tension basse et pic, combinaisons)
       passent sur le code d'origine puis après refonte.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
     prompt: P04
 
   - id: REQ-SAFETY-015
@@ -153,8 +153,8 @@ requirements:
       (nom de l'entrée retenue ou null), « estop_latched » (bool) et
       « max_callback_ms » (float) ; le directeur sait encore lire l'état.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
     prompt: P04
 
   - id: REQ-SAFETY-016
@@ -175,8 +175,8 @@ requirements:
       aucun Twist n'est publié sur /cmd_vel, /cmd_vel/teleop, /cmd_vel/nav ou
       /cmd_vel/skill.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
     prompt: P04
 
   - id: REQ-SAFETY-017
@@ -196,6 +196,6 @@ requirements:
       fonctionnement ; relevé consigné dans tests/hardware/HW-SAF-001.md et dans
       le journal de déploiement.
     evidence: tests/hardware/HW-SAF-001.md
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
     prompt: P04
