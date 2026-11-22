@@ -153,6 +153,60 @@ def test_mission_sans_mouvement_reussit(banc):
     assert any(l["event"] == "SUCCEEDED" for l in lignes)
 
 
+def test_echec_decision_puis_relance_aboutit(banc):
+    """Chemin de reprise complet : échec → WAITING_DECISION → décision → SUCCEEDED.
+
+    L'échec est déterministe (`wait` à 31 s : hors bornes, donc INVALID_PARAMS) pour
+    ne pas dépendre de la convergence du simulateur ; la relance porte de nouveaux
+    paramètres et doit rendre un **résultat de goal** — c'est le chemin sur lequel
+    un LLM compte après un échec.
+    """
+    handle = banc.envoyer([("wait", {"seconds": 31})])
+    assert handle.accepted
+
+    fin = time.monotonic() + 60.0
+    etat = ""
+    while time.monotonic() < fin:
+        banc.tourner(0.2)
+        etat = banc.rapport().get("state", "")
+        if etat == "WAITING_DECISION":
+            break
+    assert etat == "WAITING_DECISION", f"état {etat}"
+    rapport = banc.rapport()
+    assert rapport["failure_report"]["error_code"] == "INVALID_PARAMS"
+
+    reponse = banc.decider(rapport["mission_id"], "RETRY_WITH_PARAMS",
+                           {"seconds": 0.2}, rationale="délai dans les bornes")
+    assert reponse.accepted, reponse.message
+    assert reponse.escalations_left == 2
+
+    resultat = banc.resultat(handle, limite_s=60.0)
+    assert resultat.state == "SUCCEEDED", resultat.summary_json
+    resume = json.loads(resultat.summary_json)
+    assert resume["state"] == "SUCCEEDED"
+    assert resume["decisions"][0]["decision"] == "RETRY_WITH_PARAMS"
+
+
+def test_base_bloquee_mene_a_un_timeout_et_une_decision_attendue(banc):
+    """Chaîne de sûreté : le skill échoue (TIMEOUT), la mission attend une décision."""
+    banc.base.bloque = True
+    handle = banc.envoyer([("move_relative", {"dx_m": 0.5})], timeout_s_etape=1.5)
+    assert handle.accepted
+    etat = ""
+    fin = time.monotonic() + 60.0
+    while time.monotonic() < fin:
+        banc.tourner(0.2)
+        etat = banc.rapport().get("state", "")
+        if etat == "WAITING_DECISION":
+            break
+    assert etat == "WAITING_DECISION", f"état {etat}"
+    assert banc.rapport()["failure_report"]["error_code"] == "TIMEOUT"
+    banc.base.bloque = False
+    banc.decider(banc.rapport()["mission_id"], "ABORT", rationale="fin du test")
+    resultat = banc.resultat(handle, limite_s=60.0)
+    assert resultat.state == "ABORTED", resultat.summary_json
+
+
 def test_mission_refusee_si_une_autre_tourne(banc):
     """Une seule mission active : la seconde est refusée (REQ-EXEC-010, §5.2)."""
     handle = banc.envoyer([("wait", {"seconds": 1.0})])

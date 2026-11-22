@@ -6,7 +6,9 @@ la reprise et les budgets, suspend la mission en attente de décision, et journa
 from __future__ import annotations
 
 import json
+import queue
 import threading
+import traceback
 import uuid
 from pathlib import Path
 
@@ -49,6 +51,10 @@ class MissionExecutive(Node):
         self._mission: Mission | None = None
         self._derniere: Mission | None = None
         self._verrou = threading.Lock()
+        # Le service ne modifie jamais la mission : il dépose un ordre, le fil qui fait
+        # avancer la mission l'applique. Un seul propriétaire de l'état, donc aucun
+        # croisement entre la décision et la boucle d'exécution.
+        self._ordres: "queue.Queue[tuple]" = queue.Queue()
         self._decision = threading.Event()
         self._sante: dict = {"level": "OK", "active_capabilities": [], "stale_flows": [],
                              "safety_state": "UNKNOWN", "estop_latched": False, "voltage": 0.0}
@@ -198,8 +204,9 @@ class MissionExecutive(Node):
                 if goal_handle.is_cancel_requested:
                     mission.annuler()
                     break
+                self._decision.wait(timeout=0.05)
                 self._decision.clear()
-                self._decision.wait(timeout=0.2)
+                self._appliquer_ordres(mission)
                 self._publier_evenements(mission)
                 if mission.etat == EtatMission.WAITING_DECISION:
                     if mission.verifier_delai_decision():
@@ -212,6 +219,10 @@ class MissionExecutive(Node):
 
             if goal_handle.is_cancel_requested and mission.etat not in TERMINAUX:
                 mission.annuler()
+        except Exception as exc:                  # noqa: BLE001 - jamais de résultat vide
+            self.get_logger().error(f"mission : exception {exc}\n{traceback.format_exc()}")
+            mission.forcer_etat(EtatMission.FAILED, f"exception interne : {exc}")
+            self._erreur_interne = str(exc)[:300]
         finally:
             journal.fermer()
             with self._verrou:
@@ -224,7 +235,11 @@ class MissionExecutive(Node):
         resultat.outcome = OUTCOME.get(mission.etat, 1)
         resultat.failure_report_json = (json.dumps(mission.dernier_rapport, ensure_ascii=False)
                                        if mission.dernier_rapport else "")
-        resultat.summary_json = json.dumps(mission.rapport(), ensure_ascii=False)
+        resume = mission.rapport()
+        if getattr(self, "_erreur_interne", None):
+            resume["internal_error"] = self._erreur_interne
+            self._erreur_interne = None
+        resultat.summary_json = json.dumps(resume, ensure_ascii=False)
         if mission.etat == EtatMission.SUCCEEDED:
             goal_handle.succeed()
         elif mission.etat == EtatMission.CANCELED:
@@ -280,13 +295,26 @@ class MissionExecutive(Node):
             reponse.accepted = False
             reponse.message = f"params_json illisible : {exc}"
             return reponse
-        accepte, message = mission.decider(requete.decision, params, requete.rationale)
+        accepte, message = mission.verifier_decision(requete.decision, params,
+                                                     requete.rationale)
         reponse.accepted = accepte
         reponse.message = message
-        reponse.escalations_left = max(0, mission.escalations_left)
+        reponse.escalations_left = max(0, mission.escalations_left - (1 if accepte else 0))
         if accepte:
+            self._ordres.put((requete.decision, params, requete.rationale))
             self._decision.set()
         return reponse
+
+    def _appliquer_ordres(self, mission: Mission) -> None:
+        """Applique les décisions déposées par le service, dans ce fil uniquement."""
+        while True:
+            try:
+                decision, params, rationale = self._ordres.get_nowait()
+            except queue.Empty:
+                return
+            accepte, message = mission.decider(decision, params, rationale)
+            if not accepte:
+                self.get_logger().warn(f"décision {decision} refusée à l'application : {message}")
 
     def _sur_report(self, requete, reponse):
         mission = self._mission

@@ -134,12 +134,16 @@ class ServeurSkills(Node):
         self._images: dict[str, object] = {}
         self._images_lock = threading.Lock()
         try:
+            from rclpy.qos import qos_profile_sensor_data
             from sensor_msgs.msg import Image
 
+            # QoS capteur (best effort) : une caméra publie en best effort, un abonné
+            # reliable ne reçoit rien (leçon P05 sur les flux image).
             for topic in ("/wrist_camera/image_raw", "/camera/color/image_raw"):
                 self.create_subscription(
                     Image, topic,
-                    lambda m, t=topic: self._sur_image(t, m), 5,
+                    lambda m, t=topic: self._sur_image(t, m),
+                    qos_profile_sensor_data,
                     callback_group=groupe_etats)
         except ImportError:                        # pragma: no cover
             pass

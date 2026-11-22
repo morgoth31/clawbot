@@ -95,6 +95,12 @@ class Mission:
         if self.journal is not None:
             self.journal.ecrire(nom, detail or {})
 
+    def forcer_etat(self, etat: EtatMission, raison: str = "") -> None:
+        """État terminal imposé par le serveur (exception interne), journalisé."""
+        self._poser(etat)
+        self.evenement(etat.value, {"reason": raison} if raison else {})
+        self._fermer_journal()
+
     def _poser(self, etat: EtatMission) -> None:
         if self.etat != etat:
             self.etat = etat
@@ -159,8 +165,13 @@ class Mission:
         self._fermer_journal()
 
     # ── décisions ────────────────────────────────────────────────────────────
-    def decider(self, decision: str, params: dict | None = None,
-                rationale: str = "") -> tuple[bool, str]:
+    def verifier_decision(self, decision: str, params: dict | None = None,
+                          rationale: str = "") -> tuple[bool, str]:
+        """Contrôle en lecture seule : mêmes règles que `decider`, sans rien modifier.
+
+        Le service s'en sert pour répondre sans toucher à l'état : la mission n'est
+        modifiée que par le fil qui la fait avancer.
+        """
         if self.etat != EtatMission.WAITING_DECISION:
             return False, f"aucune décision attendue (état {self.etat.value})"
         code = (self.dernier_rapport or {}).get("error_code", "")
@@ -170,6 +181,26 @@ class Mission:
                            f"{list(autorisees)} — budget inchangé")
         if not rationale.strip():
             return False, "rationale obligatoire"
+        if decision in ("RETRY_STEP", "RETRY_WITH_PARAMS") and self.index < len(self.etapes):
+            etape = self.etapes[self.index]
+            nouveaux = dict(params) if (decision == "RETRY_WITH_PARAMS" and params) else dict(etape.params)
+            cle = f"{etape.skill}:{json.dumps(nouveaux, sort_keys=True)}"
+            if self.attempts.get(cle, 0) >= TENTATIVES_MAX:
+                return False, (f"tentatives épuisées pour {etape.skill} avec ces paramètres "
+                               f"({TENTATIVES_MAX} au total)")
+        if decision in ("ABORT", "SKIP_STEP", "REPLACE_REMAINING"):
+            return True, ""
+        if self.escalations_left <= 0:
+            return False, "plus d'escalade disponible"
+        return True, ""
+
+    def decider(self, decision: str, params: dict | None = None,
+                rationale: str = "") -> tuple[bool, str]:
+        accepte, message = self.verifier_decision(decision, params, rationale)
+        if not accepte:
+            if message.startswith("plus d'escalade"):
+                self._abandonner(message)          # §6.3 : plus de budget → ABORTED
+            return False, message
 
         self.decisions.append({"decision": decision, "params": params or {},
                                "rationale": rationale})
@@ -192,15 +223,6 @@ class Mission:
                 return False, "REPLACE_REMAINING : étapes invalides (1 à 20, skills connus)"
             self.etapes = nouvelles
             self.index = 0
-
-        # §6.3 : 2 tentatives au total par étape et paramètres, relance comprise
-        if decision in ("RETRY_STEP", "RETRY_WITH_PARAMS") and self.index < len(self.etapes):
-            etape = self.etapes[self.index]
-            nouveaux = dict(params) if (decision == "RETRY_WITH_PARAMS" and params) else dict(etape.params)
-            cle = f"{etape.skill}:{json.dumps(nouveaux, sort_keys=True)}"
-            if self.attempts.get(cle, 0) >= TENTATIVES_MAX:
-                return False, (f"tentatives épuisées pour {etape.skill} avec ces paramètres "
-                               f"({TENTATIVES_MAX} au total)")
 
         if self.escalations_left <= 0:
             self._abandonner("plus d'escalade disponible")
