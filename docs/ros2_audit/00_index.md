@@ -68,6 +68,11 @@
 | S39 | Configuration de l'EKF | copie de `config/ekf.yaml` | `raw/20261122-105910/sources/ekf.yaml` | 2026-11-22T11:08:00+01:00 |
 | S40 | Profil Fast DDS du dépôt | copie de `fastdds_profile.xml` | `raw/20261122-105910/sources/fastdds_profile.xml` | 2026-11-22T11:08:00+01:00 |
 | S41 | Interruptions noyau (IRQ par cœur) | `cat /proc/interrupts` | `raw/20261122-105910/runtime/13_interrupts.txt` | 2026-11-22T11:05:40+01:00 |
+| S42 | Résultat du point d'entrée de test officiel | `scripts/run_tests.sh tests` | `raw/20261122-105910/runtime/21_tests_run_tests_sh.log` | 2026-11-22T11:22:10+01:00 |
+| S43 | Résultat de la suite complète hors deux scripts non-pytest | `ROS_DOMAIN_ID=98 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest tests -q --ignore=tests/test_cpp_bridge.py --ignore=tests/test_modes.py` | `raw/20261122-105910/runtime/22_tests_suite_complete.log` | 2026-11-22T11:23:05+01:00 |
+| S44 | Résultat d'un test unitaire ciblé | `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest tests/test_ekf_config.py -q` | `raw/20261122-105910/runtime/23_test_ekf_config.log` | 2026-11-22T11:24:30+01:00 |
+| S45 | Code de l'arbitre de sécurité (copie à l'instant de la collecte) | copie de `clawbot_safety/clawbot_safety/arbitrator.py` | `raw/20261122-105910/sources/arbitrator.py` | 2026-11-22T11:25:00+01:00 |
+| S46 | Seuils de l'arbitre (copie) | copie de `clawbot_safety/clawbot_safety/thresholds.py` | `raw/20261122-105910/sources/thresholds.py` | 2026-11-22T11:25:00+01:00 |
 
 ## 4. Zones non observées
 

@@ -1,0 +1,252 @@
+........................................................................ [ 27%]
+........................................................................ [ 55%]
+................................s....................................... [ 83%]
+......EEE....EEEEEEEEEEEEE.E.........EE...                               [100%]
+==================================== ERRORS ====================================
+_____________________ ERROR at setup of test_set_velocity ______________________
+file /home/jetson/clawbot/tests/test_regression.py, line 192
+  def test_set_velocity(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:192
+__________________ ERROR at setup of test_set_velocity_clamp ___________________
+file /home/jetson/clawbot/tests/test_regression.py, line 214
+  def test_set_velocity_clamp(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:214
+_________________________ ERROR at setup of test_stop __________________________
+file /home/jetson/clawbot/tests/test_regression.py, line 238
+  def test_stop(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:238
+____________________ ERROR at setup of test_capture_camera _____________________
+file /home/jetson/clawbot/tests/test_regression.py, line 317
+  def test_capture_camera(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:317
+__________________ ERROR at setup of test_capture_camera_claw __________________
+file /home/jetson/clawbot/tests/test_regression.py, line 343
+  def test_capture_camera_claw(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:343
+_____________________ ERROR at setup of test_analyze_scene _____________________
+file /home/jetson/clawbot/tests/test_regression.py, line 367
+  def test_analyze_scene(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:367
+____________________ ERROR at setup of test_recognize_face _____________________
+file /home/jetson/clawbot/tests/test_regression.py, line 385
+  def test_recognize_face(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:385
+___________________ ERROR at setup of test_recognize_object ____________________
+file /home/jetson/clawbot/tests/test_regression.py, line 402
+  def test_recognize_object(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:402
+___________________ ERROR at setup of test_recognize_qrcode ____________________
+file /home/jetson/clawbot/tests/test_regression.py, line 419
+  def test_recognize_qrcode(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:419
+_____________________ ERROR at setup of test_control_servo _____________________
+file /home/jetson/clawbot/tests/test_regression.py, line 438
+  def test_control_servo(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:438
+______________________ ERROR at setup of test_control_arm ______________________
+file /home/jetson/clawbot/tests/test_regression.py, line 455
+  def test_control_arm(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:455
+_____________________ ERROR at setup of test_control_claw ______________________
+file /home/jetson/clawbot/tests/test_regression.py, line 472
+  def test_control_claw(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:472
+_____________________ ERROR at setup of test_set_arm_pose ______________________
+file /home/jetson/clawbot/tests/test_regression.py, line 498
+  def test_set_arm_pose(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:498
+_________________________ ERROR at setup of test_beep __________________________
+file /home/jetson/clawbot/tests/test_regression.py, line 516
+  def test_beep(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:516
+_______________________ ERROR at setup of test_set_lamps _______________________
+file /home/jetson/clawbot/tests/test_regression.py, line 532
+  def test_set_lamps(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:532
+______________________ ERROR at setup of test_get_battery ______________________
+file /home/jetson/clawbot/tests/test_regression.py, line 554
+  def test_get_battery(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:554
+______________________ ERROR at setup of test_hw_capture _______________________
+file /home/jetson/clawbot/tests/test_regression.py, line 598
+  def test_hw_capture(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:598
+_________ ERROR at setup of test_high_level_instruction_pose_then_stop _________
+file /home/jetson/clawbot/tests/test_regression.py, line 778
+  def test_high_level_instruction_pose_then_stop(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:778
+__________ ERROR at setup of test_high_level_instruction_lamp_signal ___________
+file /home/jetson/clawbot/tests/test_regression.py, line 800
+  def test_high_level_instruction_lamp_signal(args):
+E       fixture 'args' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/jetson/clawbot/tests/test_regression.py:800
+=============================== warnings summary ===============================
+tests/mcp_bridge/contract/test_auth_transport.py:17
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_auth_transport.py:17: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_catalogue.py:13
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_catalogue.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_diagnostics.py:7
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_diagnostics.py:7: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_director_tools.py:16
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_director_tools.py:16: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_error_envelope.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_error_envelope.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_incident_context.py:9
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_incident_context.py:9: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_initialize.py:13
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_initialize.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_resources.py:12
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_resources.py:12: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_inventory.py:10
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_inventory.py:10: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_notify.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_notify.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_probes.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_probes.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_report.py:12
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_report.py:12: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_context.py:13
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_context.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_trigger_firing.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_trigger_firing.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_trigger_invariants.py:11
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_trigger_invariants.py:11: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_trigger_latency.py:11
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_trigger_latency.py:11: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_auth_transport.py::test_request_without_token_is_rejected
+  /home/jetson/.local/lib/python3.10/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/mcp_bridge/contract/test_auth_transport.py::test_request_without_token_is_rejected
+  /home/jetson/.local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_regression.py::test_set_velocity
+ERROR tests/test_regression.py::test_set_velocity_clamp
+ERROR tests/test_regression.py::test_stop
+ERROR tests/test_regression.py::test_capture_camera
+ERROR tests/test_regression.py::test_capture_camera_claw
+ERROR tests/test_regression.py::test_analyze_scene
+ERROR tests/test_regression.py::test_recognize_face
+ERROR tests/test_regression.py::test_recognize_object
+ERROR tests/test_regression.py::test_recognize_qrcode
+ERROR tests/test_regression.py::test_control_servo
+ERROR tests/test_regression.py::test_control_arm
+ERROR tests/test_regression.py::test_control_claw
+ERROR tests/test_regression.py::test_set_arm_pose
+ERROR tests/test_regression.py::test_beep
+ERROR tests/test_regression.py::test_set_lamps
+ERROR tests/test_regression.py::test_get_battery
+ERROR tests/test_regression.py::test_hw_capture
+ERROR tests/test_regression.py::test_high_level_instruction_pose_then_stop
+ERROR tests/test_regression.py::test_high_level_instruction_lamp_signal
+238 passed, 1 skipped, 18 warnings, 19 errors in 48.52s
