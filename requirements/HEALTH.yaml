@@ -40,9 +40,9 @@ requirements:
     method: test
     level: unit
     criterion: >
-      clawbot_health/test/test_estimateur.py::test_cadence_nominale,
-      ::test_cadence_a_moins_20_pour_cent et
-      clawbot_health/test/test_niveau.py::test_flux_lent_seul_donne_warn.
+      clawbot_health/test/test_estimateur.cpp (Estimateur.cadence_nominale,
+      .cadence_a_moins_20_pour_cent) et test_niveau.cpp (Niveau.flux_lent_seul_donne_warn),
+      exécutés par l'étape « cpp » de scripts/check.sh.
     evidence: null
     status: implemented
     approved_by: null
@@ -61,8 +61,8 @@ requirements:
     method: test
     level: unit
     criterion: >
-      clawbot_health/test/test_niveau.py, paramétré sur les combinaisons
-      (critique périmé, non critique périmé, lent, tout sain).
+      clawbot_health/test/test_niveau.cpp (Niveau.*) : critique périmé, non critique
+      périmé, lent, tout sain, et priorité de ERROR sur WARN dans les deux ordres.
     evidence: null
     status: implemented
     approved_by: null
@@ -86,11 +86,9 @@ requirements:
     method: test
     level: unit
     criterion: >
-      clawbot_health/test/test_abonnements_bruts.py::test_chaque_flux_brut_en_best_effort
-      ::test_manifeste_reel_un_seul_abonnement_par_topic (un seul abonnement par
-      topic du manifeste réel, sauf /voltage typé) et
-      ::test_abonnement_avec_le_type_reel_du_flux (LaserScan, Odometry, Twist, Imu,
-      Image sur les flux correspondants).
+      clawbot_health/test/test_abonnements.cpp (Abonnements.*) : un abonnement par
+      topic du manifeste réel, souscription générique pour tous sauf /voltage typé,
+      et type ROS réel vérifié (LaserScan, Odometry, Twist, Imu, Image).
     evidence: null
     status: implemented
     approved_by: null
@@ -110,9 +108,10 @@ requirements:
     level: hardware
     criterion: >
       Mesure du CPU du processus du moniteur, robot en fonctionnement :
-      %CPU < 5 %. Mesure du 2026-11-22 sur le robot : 39,5 % à 43,4 % (manifeste
-      complet) et 16,0 % sans les flux image — exigence NON tenue, voir
-      deploy/journal/2026-11-22_p05_sante.md. Décision de conception attendue.
+      %CPU < 5 %. Mesures du 2026-11-22 sur le robot : version Python 39,5–43,4 %
+      (9 flux) et 15,78 % (sans images) ; version C++ 14,3–15,7 % (9 flux) et
+      **2,56 %** (sans images). Exigence NON tenue : il ne reste que le coût de
+      recopie des trois flux image. Voir deploy/journal/2026-11-22_p05_sante.md.
     evidence: deploy/journal/2026-11-22_p05_sante.md
     status: implemented
     approved_by: null
@@ -131,8 +130,8 @@ requirements:
     method: test
     level: unit
     criterion: >
-      clawbot_health/test/test_niveau.py::test_capacite_inactive_ignoree et
-      ::test_capacite_active_mais_flux_absent_est_perime.
+      clawbot_health/test/test_niveau.cpp (Capacites.inactive_ignoree,
+      .active_mais_flux_absent_est_perime).
     evidence: null
     status: implemented
     approved_by: null
