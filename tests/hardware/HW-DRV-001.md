@@ -59,10 +59,18 @@ Les roues doivent tourner lentement dans le vide.
 
 ## Remise en service
 
+**Attention : arrêter l'arbitre arrête aussi le directeur (`Requires=`) et la
+sentinelle (`Requires=clawbot-director`) ; `start` sur l'arbitre ne les relance
+pas.** Il faut les trois, dans cet ordre :
+
 ```bash
 sudo systemctl start clawbot-safety-arbitrator
+sudo systemctl start clawbot-director
+sudo systemctl start clawbot-sentinel
+systemctl is-active clawbot-safety-arbitrator clawbot-director clawbot-sentinel
 ros2 topic hz /cmd_vel_safe     # doit remonter à ~20 Hz
 ros2 topic hz /safety/state     # doit remonter à ~20 Hz
+ros2 topic hz /director/state   # doit remonter à ~5 Hz
 ```
 
 ## Si l'essai échoue
