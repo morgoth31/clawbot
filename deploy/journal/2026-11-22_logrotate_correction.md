@@ -1,7 +1,8 @@
-# logrotate en échec — cause et correction proposée (P02)
+# logrotate en échec — cause, correction et application (P02)
 
-**Statut : non appliqué.** Toute correction de `/etc/logrotate.d/` est une écriture
-dans `/etc`, soumise à l'accord de l'opérateur.
+**APPLIQUÉ le 2026-11-22 à 13:06, après accord de l'opérateur** (« ok pour les
+deux »). `systemctl start logrotate` rend `Result=success` — première rotation
+réussie depuis au moins le 20 novembre.
 
 ## Constat
 
@@ -68,17 +69,25 @@ Nettoyage secondaire, facultatif : dans le bloc conservé, `size 10M` écrase
 garder `daily` et retirer `size 10M`, pour une rotation quotidienne bornée par
 `rotate 10`.
 
-## Vérification après application (à faire avec accord)
+## Vérification après application (faite le 2026-11-22 à 13:06)
 
 ```bash
-sudo logrotate --debug /etc/logrotate.conf 2>&1 | grep -i "error"   # attendu : aucune erreur sur jetson-logging
-sudo systemctl start logrotate && systemctl show logrotate -p Result  # attendu : success
+sudo logrotate --debug /etc/logrotate.conf 2>&1 | grep -i "^error"   # 0 ligne, code 0
+sudo systemctl start logrotate && systemctl show logrotate -p Result  # Result=success
 ```
+
+Piège rencontré : la sauvegarde `/etc/logrotate.d/jetson-logging.bak-20261122`
+**reproduit l'erreur**, parce que logrotate lit tous les fichiers du dossier.
+Elle a été déplacée hors de `/etc/logrotate.d/`, vers
+`~/clawbot_backups/20261122-125828/jetson-logging.bak-20261122`. Toute copie de
+sauvegarde d'un fichier de ce dossier doit vivre ailleurs.
+
+Le message `size overrides previously specified daily` subsiste : c'est un
+avertissement, pas une erreur. `size 10M` reste prioritaire sur `daily`.
 
 ## Retour arrière
 
 ```bash
-sudo cp /etc/logrotate.d/jetson-logging.bak-20261122 /etc/logrotate.d/jetson-logging
+sudo cp ~/clawbot_backups/20261122-125828/jetson-logging.bak-20261122 /etc/logrotate.d/jetson-logging
+sudo systemctl start logrotate
 ```
-
-(la sauvegarde est à créer avant toute modification).
