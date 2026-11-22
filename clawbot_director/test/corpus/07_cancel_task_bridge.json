@@ -1,0 +1,8 @@
+{
+  "appelant": "bridge_mcp/tools.py:295",
+  "requete": {
+    "op": "cancel_task",
+    "task_id": "t-abc123",
+    "reason": "demande operateur"
+  }
+}

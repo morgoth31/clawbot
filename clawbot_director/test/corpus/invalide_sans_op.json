@@ -1,0 +1,7 @@
+{
+  "appelant": "(cas invalide)",
+  "requete": {
+    "skill": "arm_move",
+    "args": {}
+  }
+}
