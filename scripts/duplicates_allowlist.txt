@@ -1,4 +1,36 @@
-# Doublons autorisés (scripts/check.sh --strict-duplicates).
-# Une ligne = un préfixe de chemin relatif ; un groupe n'est toléré que si
-# TOUS ses fichiers commencent par une ligne listée ici. Exemple :
-# clawbot_common/clawbot_common/
+# Doublons tolérés — scripts/check.sh --strict-duplicates
+#
+# Un motif = un chemin relatif ou un glob (fnmatch). Un groupe n'est toléré que
+# si TOUS ses fichiers correspondent à au moins un motif. Toute autre égalité
+# de sha256 entre deux paquets fait échouer --strict-duplicates.
+
+# 1. Enveloppes ament homonymes (21 paquets, générées par `ros2 pkg create`).
+#    pytest ne les collecte pas (--ignore-glob) et le lint est fait par ruff.
+*/test/test_flake8.py
+*/test/test_copyright.py
+*/test/test_pep257.py
+
+# 2. Marqueurs de paquet vides (et le résidu vide `untitled.py` de
+#    yahboomcar_bringup, qui n'est qu'un fichier de 0 octet).
+*/*/__init__.py
+yahboomcar_bringup/yahboomcar_bringup/untitled.py
+
+# 3. Copies vendor du même module, hors périmètre P03 (traitement P14).
+yahboomcar_astra/yahboomcar_astra/astra_common.py
+yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/astra_common.py
+
+# 4. follow_common dupliqué, y compris une sauvegarde Jupyter.
+yahboomcar_linefollow/yahboomcar_linefollow/follow_common.py
+yahboomcar_linefollow/yahboomcar_linefollow/.ipynb_checkpoints/follow_common-checkpoint.py
+yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/follow_common.py
+
+# 5. Instantané d'audit : copie figée de sources dans docs/ros2_audit/raw/.
+clawbot_safety/clawbot_safety/thresholds.py
+docs/ros2_audit/raw/20261122-105910/sources/thresholds.py
+
+# 6. cmd_scaling.py : le module d'échelle est copié dans le nouveau paquet, mais
+#    tests/test_cmd_vel_scaling.py importe encore la copie de yahboomcar_bringup
+#    (fichier déjà modifié hors P03). À repointé vers clawbot_base_driver quand
+#    ce test sera repris ; retirer alors cette entrée.
+clawbot_base_driver/clawbot_base_driver/cmd_scaling.py
+yahboomcar_bringup/yahboomcar_bringup/cmd_scaling.py

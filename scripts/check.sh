@@ -135,6 +135,7 @@ run_duplicates() {
     [[ $STRICT_DUPLICATES -eq 1 ]] && strict=1
     python3 - "$strict" <<'PY'
 """Repère les fichiers *.py identiques présents dans deux paquets différents."""
+import fnmatch
 import hashlib
 import sys
 from pathlib import Path
@@ -166,21 +167,25 @@ if fichier.is_file():
             allowlist.append(ligne)
 
 signales = 0
+refuses = 0
 for digest, chemins in sorted(empreintes.items()):
     if len({paquet(c) for c in chemins}) < 2:
         continue
     signales += 1
-    autorise = all(any(c.startswith(prefixe) for prefixe in allowlist) for c in chemins)
+    autorise = all(any(fnmatch.fnmatchcase(c, motif) for motif in allowlist) for c in chemins)
     etiquette = "toléré (allowlist)" if autorise else "À FUSIONNER"
     print(f"  {etiquette} : {' == '.join(sorted(chemins))}")
     if strict and not autorise:
-        print("ERREUR : doublon interdit par --strict-duplicates", file=sys.stderr)
-        sys.exit(1)
+        refuses += 1
 
 if signales == 0:
     print("  aucun doublon entre paquets")
 else:
     print(f"  {signales} groupe(s) de doublons — avertissement, code 0 sans --strict-duplicates")
+if refuses:
+    print(f"ERREUR : {refuses} groupe(s) de doublons non autorise(s) (--strict-duplicates)",
+          file=sys.stderr)
+    sys.exit(1)
 PY
 }
 

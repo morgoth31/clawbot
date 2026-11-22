@@ -62,8 +62,8 @@ def generate_launch_description():
     )
 
     driver_node = Node(
-        package='yahboomcar_bringup',
-        executable='Mcnamu_driver_X3',
+        package='clawbot_base_driver',
+        executable='driver_node',
     )
 
     base_node = Node(
