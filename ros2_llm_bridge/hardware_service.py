@@ -38,6 +38,7 @@ from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import OccupancyGrid
 from sensor_msgs.msg import CompressedImage, Imu
+from std_srvs.srv import Trigger
 from std_msgs.msg import Bool, Float32, Int32, Int32MultiArray, String
 
 logging.basicConfig(
@@ -92,7 +93,10 @@ class HardwareNode(Node):
         )
 
         # ── Publishers ────────────────────────────────────────────────────
-        self.cmd_vel_pub = self.create_publisher(Twist,          "/cmd_vel",    10)
+        # Entrée dédiée du multiplexeur (P04, §4) : la téléopération ne partage
+        # plus /cmd_vel avec le pont LLM et la sentinelle.
+        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel/teleop", 10)
+        self.cli_reset_estop = self.create_client(Trigger, "/safety/reset_estop")
         self.servo_pub   = self.create_publisher(Int32MultiArray, "/servo_ctrl", 10)
         self.buzzer_pub  = self.create_publisher(Bool,            "/Buzzer",     10)
         self.rgb_pub     = self.create_publisher(Int32,           "/RGBLight",   10)
@@ -321,6 +325,29 @@ async def set_motion(req: MotionRequest) -> dict:
     _last_motion_t = time.time()
     return {"linear_x": vx, "linear_y": vy, "angular_z": wz,
             "watchdog_s": MOTION_WATCHDOG_S, "status": "ok"}
+
+
+@app.post("/estop/reset")
+def reset_estop() -> dict:
+    """Réarme l'arrêt d'urgence — c'est le geste humain du tableau de bord.
+
+    Le verrou ne se lève que si le signal /safety/estop est retombé à false ;
+    l'arbitre refuse sinon, et ce refus est renvoyé tel quel (REQ-SAFETY-013).
+    """
+    if ros_node is None:
+        raise HTTPException(503, "ROS 2 node not ready.")
+    client = ros_node.cli_reset_estop
+    if not client.wait_for_service(timeout_sec=1.0):
+        raise HTTPException(503, "service /safety/reset_estop indisponible")
+    futur = client.call_async(Trigger.Request())
+    limite = time.time() + 2.0
+    while not futur.done() and time.time() < limite:
+        time.sleep(0.02)
+    if not futur.done():
+        raise HTTPException(504, "pas de reponse de l'arbitre")
+    reponse = futur.result()
+    return {"status": "ok" if reponse.success else "refuse",
+            "message": reponse.message}
 
 
 @app.post("/motion/stop")
