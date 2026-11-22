@@ -84,9 +84,29 @@ nue, que le nouveau directeur accepte.
 
 | Heure | Étape | Résultat |
 |---|---|---|
-| | accord opérateur | |
-| | sauvegarde | |
-| | construction | |
-| | redémarrages | |
-| | contrôles | |
-| | HW-SAF-001 | |
+| 14:31 | accord opérateur | « le déploiement §8 est autorisé », robot sur cales |
+| 14:33 | sauvegarde | `~/clawbot_backups/20261122-143324` — commit `0ba8d3e`, `install.tgz` 92 Mo, 49 Go libres |
+| 14:33 | vérification | `check.sh` 0 (492 passés) · `check.sh --integration` 0 (63 passés, 3 fois de suite) |
+| 14:34 | construction | 5 paquets, 0 échec ; YAML et `fake_inputs` installés |
+| 14:34 | bascule | `daemon-reload`, puis directeur → arbitre → hardware-service → sentinelle, 5 s entre chaque |
+| 14:35 | contrôles | tous conformes (voir ci-dessous) |
+| 14:35 | HW-SAF-001 | **à exécuter par l'opérateur** (aucune unité arrêtée par la procédure) |
+
+## Résultat des contrôles
+
+| Contrôle | Attendu | Mesuré |
+|---|---|---|
+| `/cmd_vel_safe` cadence | 20 Hz ± 10 % | 19,995 / 20,001 Hz |
+| `/cmd_vel_safe` éditeurs | 1 (`safety_arbitrator`) | 1 éditeur, 1 abonné (`driver_node`) |
+| `/cmd_vel` éditeurs | `llm_bridge_node` seul | 1 éditeur (`llm_bridge_node`), 1 abonné (`safety_arbitrator`, entrée héritage) |
+| `/safety/state` | `source`, `estop_latched=false` | `{"estop_latched": false, "max_callback_ms": 6.596, "source": null, "state": "OK"}` |
+| paramètres | `read_only` | `inputs.teleop.priority`=100, `stale_s`=2.0 ; écriture refusée |
+| unité | `Nice=-10`, cœur 4 | `Nice=-10`, `CPUAffinity=4`, `ExecMainStatus=0` |
+| `/safety/estop` | éditeur = sentinelle | 1 éditeur (`sentinel`), 1 abonné (`safety_arbitrator`) |
+| `POST /estop/reset` sans verrou | refus explicite | `{"status":"refuse","message":"aucun verrou actif"}` (HTTP 200) |
+| `systemd-analyze verify` | aucune erreur nouvelle | sorties avant/après identiques |
+| `smoke_check.sh` | conforme | conforme, 8 cadences dans la tolérance |
+
+Conclusion : déploiement réussi, aucun retour arrière. `max_callback_ms` relevé sur 10 min dans le
+rapport de fin.
+
