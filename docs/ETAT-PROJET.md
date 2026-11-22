@@ -427,6 +427,14 @@ VAD Silero + faster-whisper tiny sur les micros existants → publication sur
   différents. Le mode source ROS existe désormais : passer `CAMERA_FRONT_SOURCE=ros` +
   `CAMERA_FRONT_ROS_TOPIC=/camera/color/image_raw` et faire pointer le sentinel sur
   `?camera=front`. C'est la correction que l'opérateur a demandée le 2026-11-11.
+- **REQ-HEALTH-005 non tenue — moniteur de santé trop coûteux (P05, 2026-11-22)** : le moniteur
+  consomme **14,32–15,68 % d'un cœur** pour un budget de 5 %. Hors flux image il tombe à **2,56 %**
+  (version C++, donc sous le budget) ; les trois flux image (`/camera/color/image_raw`,
+  `/camera/depth/image_raw`, `/wrist_camera/image_raw`, ≈ 52 messages/s de 0,6 à 1,2 Mo) coûtent
+  ~12 points par recopie de la charge utile, et cette pile n'offre aucune zéro-copie exploitable.
+  Mesures, cause et pistes : `deploy/journal/2026-11-22_p05_rapport.md` §5.
+  **À trancher par l'opérateur** : budget révisé, prêts DDS zéro-copie (éditeurs compatibles
+  requis), ou surveillance des images portée par le nœud de perception en P12.
 - `DROP_TORQUE` (coupe de couple servo) — opérateur présent ; `set_uart_servo_torque` existe.
 - test d'inclinaison réel.
 - déprécier les endpoints de mouvement de `:8001` (casse le pont C++ historique : décision à
