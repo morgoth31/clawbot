@@ -77,5 +77,22 @@ grep -rn --include='*.urdf' --include='*.xacro' \
   -E "<joint|<parent|<child|<link name" . 2>/dev/null \
   | grep -v '^./build/' | grep -v '^./install/' > "$OUT/07_urdf_joints.txt"
 
+# 08 : analyse de code (executors, groupes, QoS, entrees/sorties, TF)
+mapfile -t SRC < <(xargs -a "$OUT/01_package_xml.txt" -n1 dirname 2>/dev/null | sort -u)
+grep -rn --include='*.py' -E "MultiThreadedExecutor|SingleThreadedExecutor|MutuallyExclusive|Reentrant|create_callback_group|create_timer" \
+  "${SRC[@]}" > "$OUT/08_executors_py.txt" 2>/dev/null
+grep -rn --include='*.cpp' -E "MultiThreadedExecutor|SingleThreadedExecutor|MutuallyExclusive|Reentrant|create_callback_group|create_wall_timer" \
+  "${SRC[@]}" > "$OUT/08_executors_cpp.txt" 2>/dev/null
+grep -rn --include='*.py' -E "QoSProfile|ReliabilityPolicy|DurabilityPolicy|HistoryPolicy|qos_profile" \
+  "${SRC[@]}" > "$OUT/08_qos_py.txt" 2>/dev/null
+grep -rn --include='*.py' -E "create_publisher|create_subscription|create_service|ActionServer|ActionClient" \
+  "${SRC[@]}" > "$OUT/08_io_py.txt" 2>/dev/null
+grep -rn --include='*.py' -E "declare_parameter|get_parameter" \
+  "${SRC[@]}" > "$OUT/08_params_py.txt" 2>/dev/null
+grep -rn --include='*.py' -E "TransformBroadcaster|StaticTransformBroadcaster|lookup_transform|Buffer\(" \
+  "${SRC[@]}" > "$OUT/08_tf_py.txt" 2>/dev/null
+grep -rn --include='*.py' -E "time\.sleep|\.result\(\)|cv2\.(imshow|waitKey)|requests\.|subprocess\.|spin_once" \
+  "${SRC[@]}" > "$OUT/08_sleeps_py.txt" 2>/dev/null
+
 echo "collecte statique terminee dans $OUT"
 ls -1 "$OUT" | wc -l
