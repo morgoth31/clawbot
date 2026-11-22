@@ -23,6 +23,7 @@ import time
 import rclpy
 from action_msgs.msg import GoalStatus
 from rclpy.action import ActionClient
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from std_msgs.msg import Int32MultiArray, String
 
@@ -383,8 +384,9 @@ def main():
     node.get_logger().info("directeur pret")
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):
         pass
     finally:
         node.destroy_node()
         rclpy.try_shutdown()
+    return 0

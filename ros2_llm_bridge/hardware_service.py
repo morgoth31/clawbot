@@ -973,7 +973,31 @@ async def yolo_status() -> dict:
     }
 
 
+def _shutdown_ros() -> None:
+    """Ferme le contexte ROS ouvert par le démarrage du service, s'il l'est."""
+    try:
+        if rclpy.ok():
+            rclpy.try_shutdown()
+    except Exception:  # noqa: BLE001 - un arrêt ne doit jamais lever
+        pass
+
+
+def main() -> int:
+    """Point d'entrée du service (P02, REQ-OPS-011).
+
+    SIGTERM coupe uvicorn proprement ; SIGINT lève KeyboardInterrupt. Dans les
+    deux cas on rend 0 pour que l'unité ne finisse pas en `failed`.
+    """
+    try:
+        uvicorn.run(app, host="0.0.0.0",
+                    port=int(os.getenv("HARDWARE_SERVICE_PORT", "8001")),
+                    log_level="info")
+    except (KeyboardInterrupt, SystemExit):
+        pass
+    finally:
+        _shutdown_ros()
+    return 0
+
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0",
-                port=int(os.getenv("HARDWARE_SERVICE_PORT", "8001")),
-                log_level="info")
+    raise SystemExit(main())
