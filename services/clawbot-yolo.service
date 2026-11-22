@@ -1,0 +1,38 @@
+[Unit]
+Description=Detection d'objets YOLO dans le graphe (yolo_node + facade HTTP 8003) - Clawbot X3 Plus
+Documentation=file:///home/jetson/clawbot/docs/architecture/cible.md
+After=network.target clawbot-wrist-camera.service clawbot-capability-manager.service
+Wants=clawbot-wrist-camera.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+Environment=ROS_DOMAIN_ID=28
+Environment=HOME=/home/jetson
+Environment=ROS_LOG_DIR=/var/lib/clawbot/ros-log
+Environment=YOLO_MODEL_PATH=/home/jetson/software/yolov5-7.0/yolov5s.pt
+WorkingDirectory=/home/jetson/clawbot
+# Le venv yolov5 porte torch CUDA ; ROS est source pour rclpy (python 3.10 des deux cotes).
+# La facade HTTP 8003 est servie dans le meme processus (thread), pas un second service.
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec /home/jetson/yolov5_env/bin/python3 -m yolo_node.noeud --ros-args -p http_port:=8003 -p max_rate_hz:=5.0"
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=10
+KillSignal=SIGINT
+
+StateDirectory=clawbot
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=read-only
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

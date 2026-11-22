@@ -94,3 +94,21 @@ skills:
         name: {type: string, pattern: "^[a-z0-9_-]{1,32}$"}
     requires: [mapping]
     timeout_s: 20.0
+
+  detect_objects:
+    description: >
+      Attend la prochaine détection d'objets et renvoie les boîtes filtrées par classes.
+      La capacité `detection` doit être active : le skill ne l'active pas lui-même.
+    params_schema:
+      type: object
+      additionalProperties: false
+      required: [camera]
+      properties:
+        camera: {type: string, enum: [wrist, astra], default: wrist}
+        classes:
+          type: array
+          items: {type: string}
+          maxItems: 20
+        timeout_s: {type: number, exclusiveMinimum: 0, maximum: 10.0, default: 3.0}
+    requires: [detection]
+    timeout_s: 12.0

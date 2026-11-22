@@ -20,7 +20,7 @@ import yaml
 RACINE = Path(__file__).resolve().parents[1]
 URDF = RACINE / "urdf" / "clawbot_x3plus.urdf"
 UNIT_CAMERA = RACINE / "services" / "clawbot-wrist-camera.service"
-UNIT_YOLO = RACINE / "services" / "yolo-inference.service"
+UNIT_YOLO = RACINE / "services" / "clawbot-yolo.service"
 CALIBRATION = RACINE / "config" / "wrist_camera_info.yaml"
 
 CADRE = "wrist_camera_optical_frame"
@@ -121,8 +121,10 @@ def test_l_unite_ne_convertit_pas_l_image_dans_le_noeud(unite_camera):
 
 # ── service YOLO : la caméra lui est donnée par le topic ──────────────────────
 def test_le_service_yolo_lit_la_camera_par_le_topic(unite_yolo, unite_camera):
-    assert "Environment=CAMERA_CLAW_SOURCE=ros" in unite_yolo
-    assert f"Environment=CAMERA_CLAW_ROS_TOPIC={TOPIC}" in unite_yolo
+    # Depuis P12, l'unité lance le nœud yolo_node, qui s'abonne au topic (BEST_EFFORT,
+    # profondeur 1) : elle n'ouvre aucun /dev/video* et ne porte donc plus d'index V4L.
+    assert "yolo_node.noeud" in unite_yolo
+    assert "CAMERA_CLAW_INDEX" not in unite_yolo and "CAMERA_FRONT_INDEX" not in unite_yolo
     assert "Environment=ROS_DOMAIN_ID=28" in unite_yolo, \
         "sans domaine, le nœud du service vit en domaine 0 : abonnement muet, sans erreur"
     # le topic écouté doit être celui que la caméra publie (même espace de noms)

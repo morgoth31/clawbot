@@ -32,7 +32,7 @@ UNITES_ACTIVES = [
     "ros2-hardware-service.service",
     "ros2-llm-bridge-cpp.service",
     "rosbridge.service",
-    "yolo-inference.service",
+    "clawbot-yolo.service",
 ]
 
 # Deux unités actives dont /etc porte encore une copie et non un lien : le
