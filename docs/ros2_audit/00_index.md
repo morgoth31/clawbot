@@ -72,6 +72,7 @@
 | S44 | Résultat d'un test unitaire ciblé | `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest tests/test_ekf_config.py -q` | `raw/20261122-105910/runtime/23_test_ekf_config.log` | 2026-11-22T11:24:30+01:00 |
 | S45 | Code de l'arbitre de sécurité (copie à l'instant de la collecte) | copie de `clawbot_safety/clawbot_safety/arbitrator.py` | `raw/20261122-105910/sources/arbitrator.py` | 2026-11-22T11:25:00+01:00 |
 | S46 | Seuils de l'arbitre (copie) | copie de `clawbot_safety/clawbot_safety/thresholds.py` | `raw/20261122-105910/sources/thresholds.py` | 2026-11-22T11:25:00+01:00 |
+| S47 | Rejeu partiel de la collecte dynamique (nœuds, topics, unités en échec) | `ros2 node list`, `ros2 topic list -t`, `systemctl --failed` | `raw/20261122-111310/runtime/01_nodes.txt` | 2026-11-22T11:13:10+01:00 |
 
 ## 4. Zones non observées
 

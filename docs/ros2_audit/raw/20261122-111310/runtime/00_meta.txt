@@ -1,0 +1,2 @@
+collecte=rejeu-partiel
+horodatage=2026-11-22T11:13:11+01:00

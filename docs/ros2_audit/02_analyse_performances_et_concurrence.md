@@ -6,6 +6,7 @@
 - **Cadences :** `ros2 topic hz` sur 7 s pour 39 topics [S08], puis 7 à 12 s sur les flux écartés de la boucle (images, `/scan`, `/point_cloud`, `/map`) [S09]. La sortie donne une **moyenne**, un **min/max d'inter-arrivée** et un **écart-type** : c'est cette valeur qui est reportée comme gigue, jamais une estimation.
 - **Ressources :** `ps` (moyenne CPU par processus depuis le démarrage, RSS) [S12], `tegrastats` à 1 Hz pendant 6 s (RAM, puissance, températures, `GR3D_FREQ`, fréquences CPU) [S16], `df` pour `/dev/shm` [S13].
 - **Réseau et IPC :** `ss -uan` (sockets RTPS) [S14], `ip -s link` [S15].
+- **Rejeu :** la collecte dynamique a été rejouée partiellement 14 minutes plus tard (11:13:10) : **20 nœuds et 54 topics, identiques** au premier relevé ; les unités en échec sont restées les deux mêmes, hors robot [S47].
 - **Ce que la méthode ne mesure pas :**
   - **Latence bout-en-bout** (capteur → actionneur) : aucun message ne porte d'horodatage comparable. `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `ros2 topic delay <topic>` sur les topics dont l'émetteur renseigne `header.stamp` (aucun émetteur maison ne le fait aujourd'hui : [S30]), ou instrumentation `ros2_tracing` (installation hors périmètre).
   - **Pertes de messages** : `ros2 topic hz` ne compte pas les trous au-delà de la fenêtre affichée. `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : abonné de comptage dédié, ou `ros2 topic bw` comparé au débit théorique.
