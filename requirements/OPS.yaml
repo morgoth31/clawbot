@@ -1,4 +1,4 @@
-# Exigences d'exploitation — mesures, topologie, décisions d'exploitation.
+# Exigences d'exploitation — mesures, unités systemd, arrêts propres, disque.
 # Format et règles : requirements/README.md
 
 domain: OPS
@@ -27,3 +27,84 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P01
+
+  - id: REQ-OPS-010
+    title: Politique de redémarrage et d'arrêt normalisée sur toutes les unités
+    statement: >
+      Chaque unité du robot doit déclarer Restart=on-failure, RestartSec=2,
+      StartLimitIntervalSec=60, StartLimitBurst=5 et TimeoutStopSec=10.
+    rationale: >
+      RestartSec était absent ou très court sur plusieurs unités (100 ms par
+      défaut), et Restart=always relançait un arrêt volontaire (R11, S25).
+    sources: [R11, S25, S26]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_units.py::test_politique_de_redemarrage_normalisee, paramétré sur
+      les 16 unités du robot (14 liées et actives, plus clawbot-description et
+      yahboom_oled dont /etc porte encore une copie), sort vert : les cinq clés
+      ont exactement la valeur exigée.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P02
+
+  - id: REQ-OPS-011
+    title: Sortie en code 0 sur SIGINT et SIGTERM pour les nœuds maison
+    statement: >
+      Un nœud maison (director, safety_arbitrator, sentinel, hardware_service)
+      qui reçoit SIGINT ou SIGTERM doit sortir en code 0.
+    rationale: >
+      Un arrêt normal de la sentinelle levait ExternalShutdownException et
+      laissait l'unité en failed (R05, S19) ; le directeur et l'arbitre ne
+      rattrapaient que KeyboardInterrupt.
+    sources: [R05, S19, R11]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      Un test par nœud remplace rclpy.spin (ou uvicorn.run) par une fonction qui
+      lève KeyboardInterrupt puis ExternalShutdownException/SystemExit, et vérifie
+      que main() renvoie 0. Quatre fichiers de test, deux cas chacun.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P02
+
+  - id: REQ-OPS-012
+    title: Serveur de documentation non exposé au réseau
+    statement: >
+      Le serveur de documentation ne doit écouter que sur 127.0.0.1.
+    rationale: >
+      clawbot-docs servait mkdocs sur 0.0.0.0:8080 sans authentification (R16).
+    sources: [R16, S25]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_units.py::test_documentation_ecoute_en_local : l'ExecStart de
+      clawbot-docs.service contient 127.0.0.1:8080 et ne contient plus 0.0.0.0.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P02
+
+  - id: REQ-OPS-013
+    title: Aucune commande de masse dans les unités
+    statement: >
+      Aucune commande d'unité ne doit contenir pkill, killall ou pgrep -f.
+    rationale: >
+      Le contrôle de processus passe par systemd uniquement, sur liste blanche ;
+      une unité qui tue par motif peut abattre un voisin (règle 5 du référentiel).
+    sources: [R11, S25]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_units.py::test_aucune_commande_de_masse, paramétré sur chaque
+      fichier *.service du dépôt, sort vert.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P02

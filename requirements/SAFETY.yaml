@@ -1,0 +1,28 @@
+# Exigences de sûreté — arrêt, mouvement, arbitre.
+# Format et règles : requirements/README.md. Une exigence safety: true reste en
+# draft jusqu'à la validation explicite de l'opérateur.
+
+domain: SAFETY
+requirements:
+  - id: REQ-SAFETY-001
+    title: Consigne nulle à l'arrêt de l'arbitre
+    statement: >
+      À l'arrêt, safety_arbitrator doit publier au moins trois consignes nulles
+      sur /cmd_vel_safe avant de quitter.
+    rationale: >
+      Le pilote n'a aucun arrêt sur silence (P01-M04) : le MCU conserve la
+      dernière trame reçue. Si l'arbitre s'arrête en plein mouvement sans publier
+      de zéro, le robot continue jusqu'à la trame suivante d'un autre éditeur.
+    sources: [P01-M04, R05, S19]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      clawbot_safety/test/test_shutdown_zero.py::test_on_shutdown_publie_trois_consignes_nulles
+      (trois Twist nuls à 20 ms d'intervalle, éditeur simulé) et
+      ::test_on_shutdown_ne_propage_pas_une_erreur_de_publication (contexte fermé :
+      avertissement journalisé, aucune exception) sortent verts.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P02
