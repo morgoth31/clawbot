@@ -1,0 +1,131 @@
+2026-11-22T12:38:23+01:00
+# mesure    : segments Fast DDS dans /dev/shm
+# horodatage: 2026-11-22T12:38:23+01:00
+# commande  : bash -c ls -la /dev/shm/ | head -80
+# --- sortie ---
+total 10216
+drwxrwxrwt  2 root   root     2600 Nov 22 12:36 .
+drwxr-xr-x 20 root   root     8620 Nov 16 07:42 ..
+-rw-r--r--  1 jetson jetson 549408 Nov 22 10:16 fastrtps_12ef676614d6899c
+-rw-r--r--  1 jetson jetson      0 Nov 22 10:16 fastrtps_12ef676614d6899c_el
+-rw-r--r--  1 jetson jetson 549408 Nov 15 12:04 fastrtps_190ec5c24a1d345a
+-rw-r--r--  1 jetson jetson      0 Nov 15 12:04 fastrtps_190ec5c24a1d345a_el
+-rw-r--r--  1 jetson jetson 549408 Nov 15 12:04 fastrtps_269399c08fb28df1
+-rw-r--r--  1 jetson jetson      0 Nov 15 12:04 fastrtps_269399c08fb28df1_el
+-rw-r--r--  1 jetson jetson 549408 Nov 12 13:15 fastrtps_2f58348be36ccc30
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_2f58348be36ccc30_el
+-rw-r--r--  1 jetson jetson 549408 Nov 15 12:04 fastrtps_3493ee817ecc2222
+-rw-r--r--  1 jetson jetson      0 Nov 15 12:04 fastrtps_3493ee817ecc2222_el
+-rw-r--r--  1 jetson jetson 549408 Nov 22 10:16 fastrtps_4c5831cad1d92b1d
+-rw-r--r--  1 jetson jetson      0 Nov 22 10:16 fastrtps_4c5831cad1d92b1d_el
+-rw-r--r--  1 jetson jetson 549408 Nov 22 10:16 fastrtps_4e517eb67c8d07de
+-rw-r--r--  1 jetson jetson      0 Nov 22 10:16 fastrtps_4e517eb67c8d07de_el
+-rw-r--r--  1 jetson jetson 549408 Nov 15 12:04 fastrtps_72164fe42789d7df
+-rw-r--r--  1 jetson jetson      0 Nov 15 12:04 fastrtps_72164fe42789d7df_el
+-rw-r--r--  1 jetson jetson 549408 Nov 22 12:18 fastrtps_8006a4f45ac06255
+-rw-rw-r--  1 jetson jetson      0 Nov 22 12:18 fastrtps_8006a4f45ac06255_el
+-rw-r--r--  1 jetson jetson 549408 Nov 12 13:15 fastrtps_8a5dac58e84c88ea
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_8a5dac58e84c88ea_el
+-rw-r--r--  1 jetson jetson 549408 Nov 12 13:15 fastrtps_9441793fc0d55ddc
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_9441793fc0d55ddc_el
+-rw-r--r--  1 jetson jetson 549408 Nov 12 13:15 fastrtps_a58f2d169bd75c3b
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_a58f2d169bd75c3b_el
+-rw-r--r--  1 jetson jetson 549408 Nov 12 13:15 fastrtps_aa95f5fa22a32682
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_aa95f5fa22a32682_el
+-rw-r--r--  1 jetson jetson 549408 Nov 12 13:15 fastrtps_b3355d0685cf56d9
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_b3355d0685cf56d9_el
+-rw-r--r--  1 jetson jetson 549408 Nov 22 10:16 fastrtps_bca15d8598eb6735
+-rw-r--r--  1 jetson jetson      0 Nov 22 10:16 fastrtps_bca15d8598eb6735_el
+-rw-r--r--  1 jetson jetson 549408 Nov 12 13:15 fastrtps_cd3161104380a084
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_cd3161104380a084_el
+-rw-r--r--  1 jetson jetson 549408 Nov 12 13:15 fastrtps_e572597d94e0c276
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_e572597d94e0c276_el
+-rw-r--r--  1 jetson jetson  52416 Nov 12 13:15 fastrtps_port14411
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_port14411_el
+-rw-r--r--  1 jetson jetson  52416 Nov 22 10:16 fastrtps_port14413
+-rw-r--r--  1 jetson jetson      0 Nov 22 10:16 fastrtps_port14413_el
+-rw-r--r--  1 jetson jetson  52416 Nov 15 12:04 fastrtps_port14415
+-rw-r--r--  1 jetson jetson      0 Nov 15 12:04 fastrtps_port14415_el
+-rw-r--r--  1 jetson jetson  52416 Nov 12 13:15 fastrtps_port14417
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_port14417_el
+-rw-r--r--  1 jetson jetson  52416 Nov 12 13:15 fastrtps_port14419
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_port14419_el
+-rw-r--r--  1 jetson jetson  52416 Nov 22 10:16 fastrtps_port14421
+-rw-r--r--  1 jetson jetson      0 Nov 22 10:16 fastrtps_port14421_el
+-rw-r--r--  1 jetson jetson  52416 Nov 22 10:16 fastrtps_port14423
+-rw-r--r--  1 jetson jetson      0 Nov 22 10:16 fastrtps_port14423_el
+-rw-r--r--  1 jetson jetson  52416 Nov 22 10:16 fastrtps_port14425
+-rw-r--r--  1 jetson jetson      0 Nov 22 10:16 fastrtps_port14425_el
+-rw-r--r--  1 jetson jetson  52416 Nov 12 13:15 fastrtps_port14427
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_port14427_el
+-rw-r--r--  1 jetson jetson  52416 Nov 12 13:15 fastrtps_port14429
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_port14429_el
+-rw-r--r--  1 jetson jetson  52416 Nov 12 13:15 fastrtps_port14431
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_port14431_el
+-rw-r--r--  1 jetson jetson  52416 Nov 12 13:15 fastrtps_port14433
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_port14433_el
+-rw-r--r--  1 jetson jetson  52416 Nov 12 13:15 fastrtps_port14435
+-rw-r--r--  1 jetson jetson      0 Nov 12 13:15 fastrtps_port14435_el
+-rw-r--r--  1 jetson jetson  52416 Nov 15 12:04 fastrtps_port14437
+-rw-r--r--  1 jetson jetson      0 Nov 15 12:04 fastrtps_port14437_el
+-rw-r--r--  1 jetson jetson  52416 Nov 15 12:04 fastrtps_port14439
+-rw-r--r--  1 jetson jetson      0 Nov 15 12:04 fastrtps_port14439_el
+-rw-r--r--  1 jetson jetson  52416 Nov 15 12:04 fastrtps_port14441
+-rw-r--r--  1 jetson jetson      0 Nov 15 12:04 fastrtps_port14441_el
+-rw-r--r--  1 jetson jetson  52416 Nov 22 12:18 fastrtps_port14443
+-rw-rw-r--  1 jetson jetson      0 Nov 22 12:18 fastrtps_port14443_el
+-rw-rw-rw-  1 root   root   197055 Nov 12 13:14 ipc_test_0
+-rw-rw-rw-  1 root   root   197055 Nov 12 13:14 ipc_test_a_0
+-rw-rw-rw-  1 root   root   197055 Nov 12 13:14 ipc_test_b_0
+-rw-rw-rw-  1 root   root   197055 Nov 12 13:14 ipc_test_c_0
+-rw-rw-rw-  1 root   root   197055 Nov 12 13:14 itc_test_0
+-rw-rw-rw-  1 root   root   786879 Nov 12 13:14 nvmap_sciipc_1
+-rw-rw-rw-  1 root   root   786879 Nov 12 13:14 nvmap_sciipc_3
+-rw-rw-rw-  1 root   root   786879 Nov 12 13:14 nvscibuf_ipc_A_B
+-rw-rw-rw-  1 root   root   786879 Nov 12 13:14 nvscibuf_ipc_A_D
+[code=0]
+
+# mesure    : nombre de segments fastrtps
+# horodatage: 2026-11-22T12:38:23+01:00
+# commande  : bash -c ls /dev/shm | grep -c fastrtps
+# --- sortie ---
+85
+[code=0]
+
+# mesure    : occupation /dev/shm
+# horodatage: 2026-11-22T12:38:23+01:00
+# commande  : bash -c df -h /dev/shm
+# --- sortie ---
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           7.7G   11M  7.7G   1% /dev/shm
+[code=0]
+
+# mesure    : environnement de l'unite clawbot-director
+# horodatage: 2026-11-22T12:38:23+01:00
+# commande  : bash -c systemctl show clawbot-director -p Environment
+# --- sortie ---
+Environment=ROS_DOMAIN_ID=28 HOME=/home/jetson
+[code=0]
+
+# mesure    : variables Fast DDS / RMW dans toutes les unites du robot
+# horodatage: 2026-11-22T12:38:23+01:00
+# commande  : bash -c for u in clawbot-director clawbot-safety-arbitrator clawbot-sentinel ros2-driver-node ros2-hardware-service ros2-llm-bridge-cpp clawbot-wrist-camera clawbot-lidar; do echo "== $u"; systemctl show $u -p Environment | tr " " "\n" | grep -E "FASTRTPS|RMW|ROS_LOCALHOST|ROS_DOMAIN" || echo "(aucune)"; done
+# --- sortie ---
+== clawbot-director
+Environment=ROS_DOMAIN_ID=28
+== clawbot-safety-arbitrator
+Environment=ROS_DOMAIN_ID=28
+== clawbot-sentinel
+Environment=ROS_DOMAIN_ID=28
+== ros2-driver-node
+Environment=ROS_DOMAIN_ID=28
+== ros2-hardware-service
+Environment=ROS_DOMAIN_ID=28
+== ros2-llm-bridge-cpp
+Environment=ROS_DOMAIN_ID=28
+== clawbot-wrist-camera
+Environment=ROS_DOMAIN_ID=28
+== clawbot-lidar
+Environment=ROS_DOMAIN_ID=28
+[code=0]
+

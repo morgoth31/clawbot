@@ -1,0 +1,109 @@
+2026-11-22T12:39:47+01:00
+# mesure    : parametres du noeud camera
+# horodatage: 2026-11-22T12:39:47+01:00
+# commande  : bash -c ros2 param list /camera/camera 2>&1 | grep -E "depth|color|enable|uvc" 
+# --- sortie ---
+  color_camera_info_qos
+  color_depth_synchronization
+  color_fps
+  color_frame_id
+  color_height
+  color_info_url
+  color_optical_frame_id
+  color_qos
+  color_roi_height
+  color_roi_width
+  color_roi_x
+  color_roi_y
+  color_width
+  depth_camera_info_qos
+  depth_fps
+  depth_frame_id
+  depth_height
+  depth_optical_frame_id
+  depth_qos
+  depth_registration
+  depth_roi_height
+  depth_roi_width
+  depth_roi_x
+  depth_roi_y
+  depth_scale
+  depth_width
+  enable_color
+  enable_colored_point_cloud
+  enable_depth
+  enable_ir
+  enable_point_cloud
+  enable_publish_extrinsic
+  qos_overrides./parameter_events.publisher.depth
+  qos_overrides./tf.publisher.depth
+  qos_overrides./tf_static.publisher.depth
+  use_uvc_camera
+  uvc_camera_format
+  uvc_product_id
+  uvc_retry_count
+  uvc_vendor_id
+[code=0]
+
+# mesure    : parametres de profondeur demandes
+# horodatage: 2026-11-22T12:39:49+01:00
+# commande  : bash -c for p in depth_fps color_fps depth_width depth_height enable_depth enable_color uvc_video_dev depth_mode; do echo -n "$p="; timeout 8 ros2 param get /camera/camera $p 2>&1 | tail -1; done
+# --- sortie ---
+depth_fps=Integer value is: 30
+color_fps=Integer value is: 30
+depth_width=Integer value is: 640
+depth_height=Integer value is: 480
+enable_depth=Boolean value is: True
+enable_color=Boolean value is: True
+uvc_video_dev=Parameter not set
+depth_mode=Parameter not set
+[code=0]
+
+# mesure    : erreurs USB/UVC du noyau sur 7 jours
+# horodatage: 2026-11-22T12:40:07+01:00
+# commande  : bash -c journalctl -k --since "-7d" | grep -iE "usb|uvc|astra" | tail -80
+# --- sortie ---
+Nov 22 07:38:19 yahboom kernel: tegra-xusb 3610000.usb: ERROR unknown event type 37
+Nov 22 10:02:36 yahboom kernel: tegra-xusb 3610000.usb: ERROR unknown event type 37
+[code=0]
+
+# mesure    : lancement d'astra_camera dans hardware_service.py
+# horodatage: 2026-11-22T12:41:32+01:00
+# commande  : bash -c grep -n "astra\|camera\|Popen\|subprocess\|launch" ros2_llm_bridge/hardware_service.py | head -40
+# --- sortie ---
+20:import subprocess
+139:            CompressedImage, "/camera/detection_image", self._yolo_img_cb, best_effort
+172:        """Cache latest YOLO annotated image from /camera/detection_image."""
+187:_slam_process: subprocess.Popen | None = None
+230:        "cameras": CAMERA_DEVICES,
+562:        # Check if slam_launch.py is in the process list
+563:        out = subprocess.check_output(["pgrep", "-f", "slam_launch.py"])
+565:    except subprocess.CalledProcessError:
+570:    """Start the SLAM background process using slam_launch.py.
+580:    cmd = shlex.split(f"bash -c 'source /opt/ros/humble/setup.bash && ROS_DOMAIN_ID={ROS_DOMAIN_ID} ros2 launch /home/jetson/clawbot/slam_launch.py'")
+583:        _slam_process = subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+600:        # Find the PID of the slam_launch.py script
+601:        pid_bytes = subprocess.check_output(["pgrep", "-f", "slam_launch.py"])
+609:                    pgid_bytes = subprocess.check_output(["ps", "-o", "pgid=", "-p", str(pid)])
+616:    except subprocess.CalledProcessError:
+617:        pass  # pgrep found nothing, slam_launch.py is not running
+623:            "slam_launch.py",
+630:            subprocess.run(["pkill", "-9", "-f", node], timeout=2.0)
+730:        result = await loop.run_in_executor(None, lambda: subprocess.run(
+735:    except subprocess.TimeoutExpired:
+804:    """Run a subprocess and return stdout, empty string on failure."""
+806:        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+892:def _capture(camera: str) -> bytes:
+893:    idx = CAMERA_DEVICES.get(camera)
+895:        raise ValueError(f"Unknown camera '{camera}'.")
+898:        raise RuntimeError(f"Cannot open camera {camera} (index {idx})")
+903:        raise RuntimeError(f"Frame capture failed for '{camera}'")
+909:async def capture_camera(
+910:    camera: str = Query("front"),
+913:    """Capture a raw frame from the specified camera.
+916:        camera: 'front' or 'claw' camera selection.
+923:        jpeg = _capture(camera)
+929:        path = os.path.join(WORKSPACE, f"camera_{camera}.jpg")
+932:    return {"camera": camera, "image_base64": b64, "format": "jpeg", "saved_path": path}
+[code=0]
+

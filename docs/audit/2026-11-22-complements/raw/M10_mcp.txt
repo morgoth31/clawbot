@@ -1,0 +1,49 @@
+2026-11-22T12:43:11+01:00
+# mesure    : outils MCP declares
+# horodatage: 2026-11-22T12:43:11+01:00
+# commande  : bash -c grep -oP "@mcp\.tool\(name=\"\K[^\"]+" /home/jetson/clawbot/bridge_mcp/tools.py
+# --- sortie ---
+incident_list
+incident_get
+graph_snapshot
+tf_snapshot
+topic_stats
+diagnostics
+param_get
+param_list
+logs_tail
+audit_tail
+resources_snapshot
+capabilities
+goal_list
+get_task
+param_set
+param_restore
+goal_cancel
+goal_send
+start_skill
+cancel_task
+safety_stop
+spec_propose
+patch_propose
+test_run
+escalate
+[code=0]
+
+# mesure    : declaration du serveur MCP dans Hermes
+# horodatage: 2026-11-22T12:43:11+01:00
+# commande  : bash -c grep -n -A10 "  clawbot:" /home/jetson/.hermes/config.yaml
+# --- sortie ---
+244:  clawbot:
+245-    command: /usr/bin/python3
+246-    args:
+247-      - -m
+248-      - bridge_mcp.stdio
+249-    env:
+250-      PYTHONPATH: /home/jetson/clawbot
+251-      ROS_DOMAIN_ID: '28'
+252-    connect_timeout: 45.0
+253-    enabled: true
+254-platforms:
+[code=0]
+

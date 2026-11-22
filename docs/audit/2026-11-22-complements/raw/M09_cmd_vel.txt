@@ -1,0 +1,35 @@
+2026-11-22T12:43:11+01:00
+# mesure    : editeurs de /cmd_vel dans le code
+# horodatage: 2026-11-22T12:43:11+01:00
+# commande  : bash -c grep -n "cmd_vel\|create_publisher\|_vel_cb\|watchdog" /home/jetson/clawbot/ros2_llm_bridge/hardware_service.py | head -30; echo "--- pont C++ ---"; grep -n -B3 -A4 "cmd_vel_pub_->publish" /home/jetson/clawbot/ros2_llm_bridge_cpp/src/bridge_node.cpp; echo "--- sentinelle ---"; grep -n "cmd_vel\|pub_cmd.publish" /home/jetson/clawbot/clawbot_sentinel/clawbot_sentinel/sentinel_node.py
+# --- sortie ---
+9:  Motion   → /cmd_vel          (geometry_msgs/Twist)
+75:        /cmd_vel       — robot velocity commands
+95:        self.cmd_vel_pub = self.create_publisher(Twist,          "/cmd_vel",    10)
+96:        self.servo_pub   = self.create_publisher(Int32MultiArray, "/servo_ctrl", 10)
+97:        self.buzzer_pub  = self.create_publisher(Bool,            "/Buzzer",     10)
+98:        self.rgb_pub     = self.create_publisher(Int32,           "/RGBLight",   10)
+122:        self.create_subscription(Twist,   "/vel_raw",      self._vel_cb,  best_effort)
+159:    def _vel_cb(self, msg: Twist) -> None:
+190:def _watchdog_thread():
+197:                ros_node.cmd_vel_pub.publish(Twist())
+218:    threading.Thread(target=_watchdog_thread, daemon=True).start()
+320:    ros_node.cmd_vel_pub.publish(msg)
+323:            "watchdog_s": MOTION_WATCHDOG_S, "status": "ok"}
+339:    ros_node.cmd_vel_pub.publish(Twist())
+--- pont C++ ---
+93-        return "Stop command sent. status=" + data.value("status", std::string("unknown"));
+94-    } catch (const std::exception& e) {
+95-        // Fallback: publish empty Twist to /cmd_vel
+96:        cmd_vel_pub_->publish(geometry_msgs::msg::Twist());
+97-        return "Stop sent to /cmd_vel (hardware service unreachable).";
+98-    }
+99-}
+100-
+--- sentinelle ---
+12:Le nœud ne publie jamais sur `/cmd_vel_safe` (propriété de l'arbitre) : l'arrêt local publie une
+13:consigne nulle sur `/cmd_vel`, l'entrée de l'arbitre, exactement comme un opérateur.
+66:        self.pub_cmd = self.create_publisher(Twist, "/cmd_vel", 10)
+159:        self.pub_cmd.publish(Twist())      # priorite 0,5 : même effet qu'un opérateur
+[code=0]
+
