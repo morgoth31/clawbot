@@ -1,0 +1,105 @@
+# Exigences du cadre de développement et de la suite de tests.
+# Format et règles : requirements/README.md
+
+domain: TEST
+requirements:
+  - id: REQ-TEST-001
+    title: Vérification unique verte sur la branche de travail
+    statement: >
+      scripts/check.sh doit sortir en code 0 sur la branche de travail, sans
+      erreur de collecte pytest.
+    rationale: >
+      Le point d'entrée officiel échoue avant toute exécution (code 2) : deux
+      scripts non-pytest sont collectés et le reste de la suite n'est pas
+      exécutable d'un seul geste (audit S42).
+    sources: [S42, S43]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      scripts/check.sh sort 0 sur cette branche ; le journal ne contient aucune
+      ligne « errors during collection ».
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P00
+
+  - id: REQ-TEST-002
+    title: Garde de domaine DDS dans le script de vérification
+    statement: >
+      scripts/check.sh doit refuser de s'exécuter si ROS_DOMAIN_ID vaut 28, et
+      utiliser 98 si la variable est absente.
+    rationale: >
+      Le domaine 28 est celui du robot en production ; un test lancé par erreur
+      sur ce domaine publie sur les topics du robot (S25).
+    sources: [S25, S42]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      ROS_DOMAIN_ID=28 → code de sortie non nul et message explicite contenant
+      « 28 » sur stderr ; variable absente → code 0 et affichage
+      ROS_DOMAIN_ID=98.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P00
+
+  - id: REQ-TEST-003
+    title: Traçabilité exigence ↔ test sans orphelin
+    statement: >
+      Chaque exigence de méthode test doit être couverte par au moins un test
+      marqué req, et chaque marqueur doit viser une exigence existante.
+    rationale: >
+      Sans contrôle automatique, une exigence peut être déclarée vérifiée sans
+      test et un test peut viser un identifiant disparu.
+    sources: [S43]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      python3 scripts/trace_check.py --repo . sort 0 : aucune exigence « test »
+      sans test, aucun marqueur vers une exigence inconnue.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P00
+
+  - id: REQ-TEST-004
+    title: Les scripts manuels ne sont pas collectés par pytest
+    statement: >
+      Les scripts manuels qui dépendent d'un service réseau ne doivent pas être
+      collectés par pytest.
+    rationale: >
+      tests/test_cpp_bridge.py et tests/test_modes.py appellent
+      http://localhost:8002 à l'import ; sans service, la collecte échoue et
+      toute la suite sort en code 2 (S42).
+    sources: [S42]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      pytest --collect-only -q ne liste aucun fichier de tests/manual/ et sort 0.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P00
+
+  - id: REQ-TEST-005
+    title: Cliquet sur les tests non tracés
+    statement: >
+      Le nombre de tests sans marqueur req ne doit pas augmenter.
+    rationale: >
+      La majorité des tests existants ne citent aucune exigence ; sans cliquet,
+      chaque nouveau prompt peut en ajouter sans que rien ne le signale.
+    sources: [S43]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      trace_check.py --max-untraced <valeur de requirements/.untraced_baseline>
+      sort 0 ; la valeur inscrite ne peut que diminuer.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P00

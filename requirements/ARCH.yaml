@@ -1,0 +1,26 @@
+# Exigences d'architecture — référentiel normatif versionné dans le dépôt.
+# Format et règles : requirements/README.md
+
+domain: ARCH
+requirements:
+  - id: REQ-ARCH-001
+    title: Référentiel d'architecture versionné dans le dépôt
+    statement: >
+      Le dépôt doit contenir le référentiel docs/architecture/cible.md, qui fait
+      foi pour les noms, types et codes.
+    rationale: >
+      Les prompts P01 à P16 et les exigences renvoient au référentiel par numéro
+      de section ; sans copie versionnée, la référence n'est ni relisible ni
+      vérifiable dans le dépôt.
+    sources: [S42]
+    safety: false
+    method: inspection
+    level: unit
+    criterion: >
+      docs/architecture/cible.md présent, identique au document source du paquet
+      d'entrée (sha256 e3624b5097179b380f38c62fb26eefd0bac6a5bad10755886ffca5e0a20bbb51),
+      et commençant par le titre « Architecture cible Clawbot X3 ».
+    evidence: docs/architecture/cible.md
+    status: implemented
+    approved_by: null
+    prompt: P00
