@@ -107,6 +107,16 @@ def test_trajectoire_du_bras_aboutit_et_emet_les_consignes(stack):
     final = {data[0]: data[1] for data in servos}
     assert final[1] == 119, final  # 90 + 28,648°
     assert final[2] == 61, final   # 90 - 28,648°
+    # `/arm/joint_states` est publié à 20 Hz par un minuteur, indépendamment de la fin de
+    # la trajectoire : le dernier message reçu au moment du résultat peut précéder le
+    # point final (course observée dans la suite complète, 0,417 rad au lieu de 0,5).
+    # On attend le message qui porte la position finale, avec échéance — l'assertion reste
+    # la même.
+    deadline = time.time() + 2.0
+    while time.time() < deadline:
+        if states and states[-1].get('arm_joint1') == pytest.approx(0.5, abs=1e-3):
+            break
+        time.sleep(0.02)
     assert states and set(states[-1]) == {
         'arm_joint1', 'arm_joint2', 'arm_joint3', 'arm_joint4', 'arm_joint5',
         'grip_joint'}

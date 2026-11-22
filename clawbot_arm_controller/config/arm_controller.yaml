@@ -28,9 +28,11 @@ arm_trajectory_server:
     max_duration_s: 30.0
 
     # Position supposee au demarrage (radians) : le MCU ne publie pas la position du
-    # bras, ce noeud ne peut donc pas la lire. Mettre le bras en pose de reference
-    # avant de demarrer le service, ou ajuster ici.
-    initial_positions: [-0.244346, 0.122173, 0.000000, 0.000000, 0.000000]
+    # bras, ce noeud ne peut donc pas la lire. Ces valeurs sont la pose de repos validee
+    # par l'operateur le 2026-11-11 (servos [90, 180, 0, 0, 90, 149], voir
+    # config/arm_poses.yaml et config/preconditions.yaml) : demarrer sur une autre
+    # hypothese ferait sauter le bras a la premiere trajectoire.
+    initial_positions: [0.000000, 1.570796, -1.570796, -1.570796, 0.000000]
     initial_grip_position: -0.265222
 
     # Articulations dont le servo n'est jamais commande (mais qui restent publiées dans
