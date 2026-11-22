@@ -1,3 +1,6 @@
+# NOTE AJOUTEE APRES COUP : le 'EXIT=0' ci-dessous est celui de la derniere
+# commande du tube (`tail -150`), pas celui de colcon. La construction a ECHOUE :
+# 1 package failed (ros2_llm_bridge_cpp), 3 aborted, 7 not processed.
 2026-11-22T21:09:09+01:00
 cmd: unset VIRTUAL_ENV PYTHONPATH PYTHONHOME; colcon build --build-base /tmp/diag_build --install-base /tmp/diag_install
 ROS_DOMAIN_ID=(non utilisé)

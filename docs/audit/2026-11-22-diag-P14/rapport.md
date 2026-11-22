@@ -81,7 +81,7 @@ CMake Error at CMakeLists.txt:18 (find_package):
   but CMake did not find one.
 ```
 
-Cause factuelle : `ros2_llm_bridge_cpp/CMakeLists.txt:18` appelle `find_package(clawbot_interfaces REQUIRED)` (ajouté pendant P14 pour l'action `/clawbot/execute_skill`), mais `ros2_llm_bridge_cpp/package.xml` **ne déclare aucune dépendance envers `clawbot_interfaces`** (`grep clawbot_interfaces package.xml` → 0 occurrence). Colcon construit donc les deux paquets en parallèle et l'API configure avant que les interfaces soient installées. Les trois paquets « aborted » ne sont pas fautifs : reconstruits seuls, ils passent (`D20b`, `Summary: 3 packages finished`, EXIT=0).
+Cause factuelle : `ros2_llm_bridge_cpp/CMakeLists.txt:18` appelle `find_package(clawbot_interfaces REQUIRED)` (ajouté pendant P14 pour l'action `/clawbot/execute_skill`), mais `ros2_llm_bridge_cpp/package.xml` **ne déclare aucune dépendance envers `clawbot_interfaces`** (`grep clawbot_interfaces package.xml` → 0 occurrence). Colcon construit donc les deux paquets en parallèle et l'API configure avant que les interfaces soient installées. Les trois paquets « aborted » ne sont pas fautifs : reconstruits seuls, ils passent (`D20b`, `Summary: 3 packages finished`, EXIT=0). Le fichier `D20_build_propre.txt` porte `EXIT=0` : c'est le code du `tail` du tube, pas celui de colcon (note ajoutée en tête du fichier) ; `D20b` a été lancé sans tube et son `EXIT=0` est réel.
 
 Pourquoi cela n'apparaissait pas plus tôt : le dernier `colcon build` du paquet a été fait avec `install/setup.bash` sourcé, où `clawbot_interfaces` était déjà installé (fichier `install/clawbot_interfaces/share/clawbot_interfaces/cmake/`). Un build incrémental dans un espace déjà peuplé masque la dépendance manquante.
 
