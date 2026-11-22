@@ -13,9 +13,16 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share',package_name,'launch'),glob(os.path.join('launch','*launch.py'))),
         (os.path.join('share',package_name,'urdf'),glob(os.path.join('urdf','*.*'))),
-        #(os.path.join('share',package_name,'meshes/Ackermann'),glob(os.path.join('meshes/Ackermann','*.*'))),
-        #(os.path.join('share',package_name,'meshes/mecanum'),glob(os.path.join('meshes/mecanum','*.*'))),
+        # P13 : les maillages sont dans des sous-dossiers (X3plus/visual, X3plus/collision,
+        # mecanum, sensor) et le glob de premier niveau n'en installait AUCUN. MoveIt
+        # chargeait donc un modele sans geometrie de collision : il planifiait dans un
+        # monde vide et ne pouvait rien proteger. Une entree par dossier, sans glob
+        # recursif (setup.py n'en connait pas).
         (os.path.join('share',package_name,'meshes'),glob(os.path.join('meshes','*.*'))),
+        (os.path.join('share',package_name,'meshes/mecanum'),glob(os.path.join('meshes/mecanum','*.*'))),
+        (os.path.join('share',package_name,'meshes/sensor'),glob(os.path.join('meshes/sensor','*.*'))),
+        (os.path.join('share',package_name,'meshes/X3plus/visual'),glob(os.path.join('meshes/X3plus/visual','*.*'))),
+        (os.path.join('share',package_name,'meshes/X3plus/collision'),glob(os.path.join('meshes/X3plus/collision','*.*'))),
         (os.path.join('share',package_name,'rviz'),glob(os.path.join('rviz','*.rviz*'))),
     ],
     install_requires=['setuptools'],
