@@ -98,3 +98,153 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P11
+
+  - id: REQ-PERC-010
+    title: /perception/detections publie au moins 2 Hz quand la détection est active
+    statement: >
+      Quand la capacité detection est active et que la caméra du poignet publie, le nœud
+      yolo_node doit publier vision_msgs/Detection2DArray sur /perception/detections à une
+      cadence moyenne d'au moins 2 Hz sur 60 s.
+    rationale: >
+      /detections et /camera/detection_image avaient des abonnés et aucun éditeur (S07,
+      R02) : la détection n'existait pas dans le graphe.
+    sources: [S07, R02, O06]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      Fenêtre de 60 s de mesure de cadence sur /perception/detections après
+      set detection true : moyenne ≥ 2 Hz, consignée dans
+      deploy/journal/2026-11-22_p12_mesures.md.
+    evidence: deploy/journal/2026-11-22_p12_mesures.md
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      Seuil de 2 Hz conservé tel qu'écrit (max_rate_hz par défaut 5 côté nœud).
+    prompt: P12
+
+  - id: REQ-PERC-011
+    title: L'inférence s'exécute sur le GPU
+    statement: >
+      Pendant une salve de 100 inférences, la fréquence moyenne du moteur graphique
+      (tegrastats GR3D_FREQ) doit être strictement supérieure à 0 %.
+    rationale: >
+      O06 relève le GPU à 0 % : le poste doit prouver que l'inférence tourne sur le GPU.
+    sources: [O06, S12, S16]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      tegrastats --interval 1000 pendant 100 inférences : moyenne GR3D_FREQ > 0 %, et au
+      moins 90 échantillons sur 100 non nuls.
+    evidence: deploy/journal/2026-11-22_p12_mesures.md
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      Mesure du 2026-11-22 : GR3D_FREQ 99 % pendant l'inférence, 0 % au repos — le GPU est
+      utilisé, l'audit confondait repos et inférence.
+    prompt: P12
+
+  - id: REQ-PERC-012
+    title: /detections garde le format JSON attendu par hardware_service
+    statement: >
+      Le message String publié sur /detections doit être une liste JSON d'objets
+      {"class", "class_id", "confidence", "bbox": {"x1","y1","x2","y2"}}, telle que
+      hardware_service la relit par json.loads sans transformation.
+    rationale: >
+      hardware_service._yolo_det_cb fait json.loads et expose la valeur brute dans /status
+      et /yolo/status : tout changement de forme casse le tableau de bord.
+    sources: [R02, S07]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      yolo_node/test/test_yolo_posttraitement.py::test_serialisation_identique_au_corpus.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P12
+
+  - id: REQ-PERC-013
+    title: /camera/detection_image n'est encodé qu'avec au moins un abonné
+    statement: >
+      Le nœud ne doit encoder et publier une CompressedImage annotée que si le topic a au
+      moins un abonné au moment de l'inférence.
+    rationale: >
+      L'encodage JPEG coûte une part notable du temps de traitement ; le faire sans
+      consommateur gaspille du CPU et fausse les mesures de latence.
+    sources: [S07]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      yolo_node/test/test_yolo_encodage.py::test_encode_seulement_avec_abonne et
+      ::test_pas_d_encodage_sans_abonne.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P12
+
+  - id: REQ-PERC-014
+    title: Le nœud ne traite que l'image la plus récente
+    statement: >
+      L'abonnement à /wrist_camera/image_raw doit être en profondeur 1 et BEST_EFFORT, et
+      la cadence d'inférence plafonnée par max_rate_hz ; une image en retard doit être
+      remplacée, jamais mise en file.
+    rationale: >
+      Une file d'images en retard produit des détections décalées par rapport à la scène :
+      inutilisable pour saisir un objet.
+    sources: [S07]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      yolo_node/test/test_yolo_file.py::test_abonnement_profondeur_un_best_effort et
+      ::test_image_remplacee_pas_mise_en_file.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P12
+
+  - id: REQ-PERC-015
+    title: /detect sur 8003 renvoie le même format qu'avant
+    statement: >
+      La réponse HTTP de /detect doit garder les mêmes clés et la même forme que le corpus
+      enregistré le 2026-11-22 (camera, detections, detection_count, inference_ms,
+      frame_size, format, image_base64), y compris le type de chaque champ.
+    rationale: >
+      Le pont HTTP 8003 reste une façade de compatibilité : un client existant ne doit pas
+      être cassé par le passage à un nœud ROS 2.
+    sources: [Q03, S16]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      yolo_node/test/test_yolo_http.py::test_reponse_compatible_avec_le_corpus (5 réponses
+      de tests/corpus/perc/, backend factice).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P12
+
+  - id: REQ-PERC-016
+    title: Aucun processus d'inférence quand la détection est inactive
+    statement: >
+      Quand la capacité detection est inactive, aucun processus yolo_node ne doit tourner
+      et /perception/detections ne doit plus être publié.
+    rationale: >
+      L'inférence permanente coûte 1,5 Go de RSS et un GPU occupé, sans consommateur.
+    sources: [S12, O06]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      Procédure HW-PERC-002 : après set detection false, systemctl is-active
+      clawbot-yolo inactive, pgrep -f yolo_node rend 0 ligne, aucun message sur
+      /perception/detections en 10 s.
+    evidence: tests/hardware/HW-PERC-002.md
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      Procédure à exécuter par l'opérateur après le déploiement.
+    prompt: P12

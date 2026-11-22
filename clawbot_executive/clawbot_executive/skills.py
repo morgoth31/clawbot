@@ -190,6 +190,26 @@ class CaptureImage(Skill):
                         result_json=json.dumps({"path": chemin, "camera": camera}))
 
 
+class DetectObjects(Skill):
+    """Attend la prochaine détection publiée et filtre par classes (REQ-PERC-010).
+
+    Le skill n'active pas la capacité : si `detection` est inactive, la précondition
+    répond CAPABILITY_INACTIVE et c'est à l'appelant de l'activer puis de relancer.
+    """
+
+    def execute(self, ctx) -> Resultat:
+        classes = list(ctx.params.get("classes") or [])
+        attente = float(ctx.params.get("timeout_s", self.definition.timeout_s))
+        detections = ctx.prochaines_detections(attente)
+        if detections is None:
+            return Resultat(FAILED, "TIMEOUT",
+                            f"aucune détection sur /perception/detections en {attente} s")
+        if classes:
+            detections = [d for d in detections if d.get("class") in classes]
+        return Resultat(SUCCEEDED, message=f"{len(detections)} détection(s)",
+                        result_json=json.dumps({"detections": detections}))
+
+
 class NavigateTo(Skill):
     """Déclaré, mais refusé tant que la capacité `navigation` n'est pas servie."""
 
@@ -212,6 +232,7 @@ CLASSES = {
     "move_relative": MoveRelative,
     "rotate": Rotate,
     "capture_image": CaptureImage,
+    "detect_objects": DetectObjects,
     "navigate_to": NavigateTo,
     "save_map": SaveMap,
 }

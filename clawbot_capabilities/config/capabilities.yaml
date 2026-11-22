@@ -73,15 +73,14 @@ capacites:
     timeout_s: 30.0
 
   detection:
-    # `yolo-inference.service` est active mais ne publie rien : /detections a
-    # 0 éditeur (mesuré le 2026-11-22), /camera/detection_image également muet.
-    # Une sonde de disponibilité honnête demande le travail de perception (P12) :
-    # en attendant, la capacité est décrite mais non pilotable.
-    units: [yolo-inference.service]
-    requires: [base]
-    managed: false
-    ready_when: [{topic: /detections, min_hz: 1.0}]
-    timeout_s: 60.0
+    # `clawbot-yolo.service` : nœud yolo_node (GPU) + façade HTTP 8003 dans le même
+    # processus. Pilotable depuis P12 ; l'ancien `yolo-inference.service` est arrêté.
+    units: [clawbot-yolo.service]
+    requires: [wrist_vision]
+    always_on: false
+    managed: true
+    ready_when: [{topic: /perception/detections, min_hz: 2.0}]
+    timeout_s: 30.0
 
   voice:
     units: []

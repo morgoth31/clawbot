@@ -33,6 +33,19 @@ REGISTRE_PAR_DEFAUT = "/home/jetson/clawbot/install/clawbot_executive/share/claw
 SNAPSHOTS_PAR_DEFAUT = "/var/lib/clawbot/snapshots"
 
 
+def _liste_detections(message) -> list:
+    """Detection2DArray → la forme des détections du registre."""
+    return [
+        {"class": (d.results[0].hypothesis.class_id if d.results else ""),
+         "class_id": 0,
+         "confidence": round(d.results[0].hypothesis.score, 3) if d.results else 0.0,
+         "bbox": {"x1": int(d.bbox.center.x - d.bbox.size_x / 2),
+                  "y1": int(d.bbox.center.y - d.bbox.size_y / 2),
+                  "x2": int(d.bbox.center.x + d.bbox.size_x / 2),
+                  "y2": int(d.bbox.center.y + d.bbox.size_y / 2)}}
+        for d in message.detections]
+
+
 class Contexte:
     """Ce qu'un skill peut faire : publier une consigne, lire l'état, attendre."""
 
@@ -45,6 +58,16 @@ class Contexte:
         demande = float(getattr(goal_handle.request, "timeout_s", 0.0) or 0.0)
         self.timeout_s = demande or float(getattr(definition, "timeout_s", 30.0))
         self._echeance = None
+
+    def prochaines_detections(self, attente_s: float):
+        """Détections reçues après l'appel, ou None si rien en `attente_s` (REQ-PERC-010)."""
+        debut = time.monotonic()
+        seuil = self.serveur._detections_stamp          # noqa: SLF001 — état partagé du nœud
+        while time.monotonic() - debut < attente_s:
+            if self.serveur._detections_stamp > seuil:  # noqa: SLF001
+                return list(self.serveur._detections)
+            time.sleep(0.05)
+        return None
 
     @property
     def etats(self) -> Etats:
@@ -106,6 +129,8 @@ class ServeurSkills(Node):
         self.snapshots_dir = Path(str(self.get_parameter("snapshots_dir").value))
 
         self.etats = etats if etats is not None else Etats()
+        self._detections: list = []
+        self._detections_stamp = 0.0
         self._en_cours = None                 # goal_handle du skill en exécution
         self.skill_courant: str | None = None
         self._preemption = threading.Event()  # stop demandé pendant une exécution
@@ -123,6 +148,17 @@ class ServeurSkills(Node):
         self.create_subscription(String, "/clawbot/capabilities/state",
                                  lambda m: self.etats.maj_capacites(m.data), 10,
                                  callback_group=groupe_etats)
+        try:
+            from vision_msgs.msg import Detection2DArray
+
+            def _recevoir(message) -> None:
+                self._detections = _liste_detections(message)
+                self._detections_stamp = time.monotonic()
+
+            self.create_subscription(Detection2DArray, "/perception/detections",
+                                     _recevoir, 10, callback_group=groupe_etats)
+        except ImportError:                                  # pragma: no cover
+            self.get_logger().warn("vision_msgs absent : detect_objects indisponible")
         try:
             from nav_msgs.msg import Odometry
 

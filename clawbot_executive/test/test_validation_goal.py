@@ -19,8 +19,10 @@ def definitions():
 
 
 def test_le_registre_declare_les_skills_du_prompt(definitions):
+    # P12 ajoute `detect_objects` au registre (§6.5 du prompt).
     assert set(definitions) == {
         "stop", "wait", "move_relative", "rotate", "capture_image", "navigate_to", "save_map",
+        "detect_objects",
     }
 
 
