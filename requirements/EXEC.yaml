@@ -362,3 +362,96 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P09
+
+  - id: REQ-EXEC-020
+    title: Le serveur de skills n'arrête plus l'exécutif
+    statement: >
+      Un arrêt ou un redémarrage de `clawbot-skill-server` ne doit pas arrêter
+      `clawbot-mission-executive`.
+    rationale: >
+      L'exécutif déclarait `Requires=clawbot-skill-server.service`. Le 2026-11-22 à 18:49,
+      le serveur de skills a planté en boucle ; systemd a arrêté l'exécutif par la
+      dépendance et ne l'a jamais relancé quand le serveur est revenu à 18:59:42. Aucune
+      mission n'a été possible pendant deux heures et demie, sans qu'aucune alerte ne le
+      dise (D31b, D32).
+    sources: [D31b, D32]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      `services/clawbot-mission-executive.service` ne porte ni `Requires=`, ni `BindsTo=`,
+      ni `PartOf=` vers `clawbot-skill-server.service` ; `Wants=` et `After=` sont admis.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C03
+
+  - id: REQ-EXEC-021
+    title: Mission refusée quand le serveur de skills est absent
+    statement: >
+      Si le serveur de skills est absent, l'exécutif doit refuser toute nouvelle mission
+      avec le code `SKILL_SERVER_UNAVAILABLE`, sans relance automatique, et reprendre seul
+      quand le serveur revient.
+    rationale: >
+      Sans ce code, l'absence du serveur se manifestait étape par étape en `UNKNOWN_SKILL`,
+      ce qui désignait le skill au lieu de l'infrastructure, et consommait le budget de
+      reprise de la mission pour rien.
+    sources: [D31b]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      Avec un client d'action dont `server_is_ready()` est faux, `_sur_goal` rend
+      `REJECT` et le code `SKILL_SERVER_UNAVAILABLE` est journalisé ; dès qu'il redevient
+      vrai, un nouveau goal est accepté, sans redémarrage du nœud.
+    evidence: null
+    status: implemented
+    approved_by: "opérateur 2026-11-22"
+    prompt: C03
+
+  - id: REQ-EXEC-022
+    title: Les unités déclarent leur dossier d'état
+    statement: >
+      Les unités qui écrivent dans `/var/lib/clawbot` déclarent `StateDirectory=clawbot`
+      au lieu d'un chemin qui doit préexister.
+    rationale: >
+      `ReadWritePaths=/var/lib/clawbot` faisait échouer le démarrage quand le dossier
+      n'existait pas encore : « Failed to set up mount namespacing :
+      /run/systemd/unit-root/var/lib/clawbot: No such file or directory », status
+      226/NAMESPACE, le 2026-11-22 à 16:54 (D32).
+    sources: [D32]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      Pour toute unité du dépôt dont l'`ExecStart` ou l'environnement cite
+      `/var/lib/clawbot` : `StateDirectory=clawbot` présent, et aucun
+      `ReadWritePaths=/var/lib/clawbot` résiduel.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C03
+
+  - id: REQ-EXEC-023
+    title: Les causes de plantage du 2026-11-22 sont couvertes
+    statement: >
+      Chacune des causes de plantage établie au diagnostic doit être couverte par un test
+      qui échouait avant sa correction.
+    rationale: >
+      Deux des trois causes étaient déjà corrigées dans le dépôt mais aucune n'était
+      testée : le service tournait une copie obsolète d'`install/` et rien ne le
+      signalait. Un test qui instancie le constructeur et un test de conversion d'image
+      auraient suffi.
+    sources: [D32]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      `AttributeError: 'ServeurSkills' object has no attribute '_sur_detections'` ne peut
+      plus se produire : un test instancie `ServeurSkills` en domaine 98. Une image
+      `yuv422_yuy2` de la caméra du poignet produit une image à trois canaux pour
+      l'inférence.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C03

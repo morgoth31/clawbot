@@ -145,3 +145,26 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P05
+
+  - id: REQ-HEALTH-010
+    title: Un point d'accès critique manquant passe la santé en ERROR
+    statement: >
+      Le moniteur de santé doit surveiller les points d'accès critiques déclarés dans
+      `expected_endpoints.yaml` ; l'absence de l'un d'eux plus de 5 s doit passer `level`
+      à ERROR et le nommer dans `detail_json.missing_endpoints`.
+    rationale: >
+      Le 2026-11-22, `/clawbot/execute_mission` et `/clawbot/mission/decide` ont disparu
+      pendant deux heures et demie alors que `/clawbot/health` restait OK (D33b/11) : la
+      santé surveillait des flux, pas les points d'accès dont dépendent les missions.
+    sources: [D33b]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      Point d'accès absent depuis plus de 5 s : `level` = ERROR et son nom présent dans
+      `detail_json["missing_endpoints"]` ; présent : `level` = OK et liste vide. La sonde
+      lit le graphe du nœud, n'appelle pas les services et ne lance aucun sous-processus.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C03

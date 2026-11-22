@@ -2,8 +2,10 @@
 Description=Executif de mission (action /clawbot/execute_mission) - Clawbot X3 Plus
 Documentation=file:///home/jetson/clawbot/docs/architecture/cible.md
 After=network.target clawbot-skill-server.service clawbot-health-monitor.service
-Requires=clawbot-skill-server.service
-Wants=clawbot-health-monitor.service
+# Wants= et non Requires= : un plantage du serveur de skills ne doit pas arrêter
+# l'exécutif (constaté le 2026-11-22 : systemd a arrêté l'exécutif à 18:49 et ne l'a
+# jamais relancé — REQ-EXEC-020).
+Wants=clawbot-skill-server.service clawbot-health-monitor.service
 StartLimitIntervalSec=60
 StartLimitBurst=5
 
@@ -17,6 +19,9 @@ Environment=ROS_LOG_DIR=/var/lib/clawbot/ros-log
 WorkingDirectory=/home/jetson/clawbot
 ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec /home/jetson/clawbot/install/clawbot_executive/lib/clawbot_executive/mission_executive"
 # Journal des missions : /var/lib/clawbot/missions/<date>/<mission_id>.jsonl (§6.5)
+# StateDirectory=clawbot crée le dossier avec le bon propriétaire ; ReadWritePaths
+# faisait doublon et refusait le démarrage quand le dossier n'existait pas encore
+# (step NAMESPACE, 226/NAMESPACE — REQ-EXEC-022).
 StateDirectory=clawbot
 Restart=on-failure
 RestartSec=3
@@ -28,7 +33,6 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=full
 ProtectHome=read-only
-ReadWritePaths=/var/lib/clawbot
 RestrictSUIDSGID=yes
 
 [Install]

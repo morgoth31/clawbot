@@ -42,6 +42,16 @@
       ],
       "operator_alert": false
     },
+    "SKILL_SERVER_UNAVAILABLE": {
+      "category": "PRECONDITION",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "RETRY_STEP",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
     "SENSOR_STALE": {
       "category": "SENSOR",
       "auto_retry": 1,
