@@ -106,24 +106,31 @@ class FauxJournal:
 
 
 def demarrer_rclpy():
-    """Initialise rclpy une seule fois pour tout le processus de test."""
-    if not rclpy.ok():
-        rclpy.init()
+    """Contexte rclpy PRIVE au test.
+
+    Le contexte global est partage par tout le processus pytest : l'initialiser
+    ici casserait les autres fichiers de test qui appellent rclpy.init(), et le
+    fermer laisserait un contexte inutilisable (« Context.init() must only be
+    called once »). Un contexte par test isole les deux.
+    """
+    contexte = rclpy.Context()
+    rclpy.init(context=contexte)
+    return contexte
 
 
-def arreter(node):
-    """Detruit le noeud ET ferme le contexte : sinon le test suivant ne peut plus
-    appeler rclpy.init() (« Context.init() must only be called once »)."""
+def arreter(node, contexte):
+    """Detruit le noeud et ferme le contexte prive."""
     node.destroy_node()
-    rclpy.try_shutdown()
+    rclpy.shutdown(context=contexte)
 
 
 def instancier(module, faux, horloge, journal, **parametres):
-    """Construit le pilote avec le faux matériel et les remplacements de test."""
-    demarrer_rclpy()
+    """Construit le pilote avec le faux materiel et les remplacements de test."""
+    contexte = demarrer_rclpy()
     node = module.yahboomcar_driver(
-        "driver_node", rosmaster_factory=lambda **_k: faux, **parametres
+        "driver_node", rosmaster_factory=lambda **_k: faux, context=contexte,
+        **parametres
     )
     node.now_s = horloge.now_s
     node.get_logger = lambda: journal
-    return node
+    return node, contexte

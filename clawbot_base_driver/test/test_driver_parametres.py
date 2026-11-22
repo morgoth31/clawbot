@@ -18,11 +18,14 @@ CHEMIN_MCU = "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0"
 
 
 @pytest.fixture
-def pilote():
+def pilote(tmp_path, monkeypatch):
+    # le pilote en service tient /run/lock/clawbot-mcu.lock : verrou temporaire
+    monkeypatch.setattr(base_driver, "chemin_verrou",
+                        lambda: str(tmp_path / "clawbot-mcu.lock"))
     faux = FauxRosmaster()
-    node = instancier(base_driver, faux, FausseHorloge(), FauxJournal())
+    node, contexte = instancier(base_driver, faux, FausseHorloge(), FauxJournal())
     yield node
-    arreter(node)
+    arreter(node, contexte)
 
 
 # ── REQ-DRV-003 : port série nommé ───────────────────────────────────────────
