@@ -134,7 +134,9 @@ def test_documentation_ecoute_en_local():
     cp = _lire("clawbot-docs.service")
     exec_start = cp.get("Service", "ExecStart")
 
-    assert "127.0.0.1:8080" in exec_start, f"adresse locale absente : {exec_start!r}"
+    # P14 (Q12) : `mkdocs build` puis service statique, lié à la boucle locale.
+    assert "mkdocs build" in exec_start, f"construction absente : {exec_start!r}"
+    assert "--bind 127.0.0.1" in exec_start, f"liaison locale absente : {exec_start!r}"
     assert "0.0.0.0" not in exec_start, f"écoute réseau encore présente : {exec_start!r}"
 
 

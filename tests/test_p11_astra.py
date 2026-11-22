@@ -33,7 +33,7 @@ def test_depth_vision_est_geree_par_le_gestionnaire():
 
 @pytest.mark.req("REQ-PERC-003")
 def test_hardware_service_ne_lance_plus_lastra():
-    source = (RACINE / "ros2_llm_bridge" / "hardware_service.py").read_text(encoding="utf-8")
+    source = (RACINE / "clawbot_bringup" / "clawbot_bringup" / "hardware_service.py").read_text(encoding="utf-8")
     for motif in ("astra_camera", "astro_pro", "orbbec-camera.service"):
         assert motif not in source, f"hardware_service lance encore l'Astra ({motif})"
 

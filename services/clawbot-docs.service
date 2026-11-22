@@ -1,5 +1,5 @@
 [Unit]
-Description=Clawbot documentation site (MkDocs Material, port 8080)
+Description=Clawbot documentation statique (MkDocs Material, 127.0.0.1:8080)
 Documentation=http://localhost:8080/
 After=network.target
 StartLimitIntervalSec=60
@@ -11,7 +11,9 @@ User=jetson
 Group=jetson
 WorkingDirectory=/home/jetson/clawbot
 Environment=PATH=/home/jetson/.local/bin:/usr/local/bin:/usr/bin:/bin
-ExecStart=/home/jetson/.local/bin/mkdocs serve --dev-addr 127.0.0.1:8080
+# P14 (Q12) : plus de serveur de developpement. Le site est construit une fois au
+# demarrage, puis servi en statique sur la boucle locale seulement.
+ExecStart=/bin/bash -c "cd /home/jetson/clawbot && /home/jetson/.local/bin/mkdocs build --quiet && exec /usr/bin/python3 -m http.server 8080 --bind 127.0.0.1 --directory site"
 Restart=on-failure
 RestartSec=2
 StandardOutput=journal

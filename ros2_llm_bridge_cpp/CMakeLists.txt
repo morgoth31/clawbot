@@ -14,6 +14,8 @@ find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(clawbot_interfaces REQUIRED)
 find_package(Threads REQUIRED)
 
 # nlohmann/json (header-only, system-installed)
@@ -55,7 +57,7 @@ target_include_directories(${PROJECT_NAME}_node PUBLIC
   ${NLOHMANN_JSON_INCLUDE_DIR}
 )
 ament_target_dependencies(${PROJECT_NAME}_node
-  rclcpp geometry_msgs std_msgs sensor_msgs nav_msgs
+  rclcpp rclcpp_action clawbot_interfaces geometry_msgs std_msgs sensor_msgs nav_msgs
 )
 target_link_libraries(${PROJECT_NAME}_node
   ${PROJECT_NAME}_schemas

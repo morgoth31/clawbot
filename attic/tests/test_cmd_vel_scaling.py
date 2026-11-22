@@ -34,9 +34,9 @@ def test_lateral_axis_is_handled_like_forward():
 
 
 def test_feedback_sign_matches_command():
-    # mesuré sur cales : consigne +0,05 -> retour brut -0,843
-    assert feedback(-0.843) > 0
-    assert feedback(0.745) < 0
+    # car_type=2 : le STM32 renvoie un signe positif natif, le driver ne retourne plus rien
+    assert feedback(0.843) > 0
+    assert feedback(-0.745) < 0
 
 
 def test_feedback_survives_nan():

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
+#include <clawbot_interfaces/action/execute_skill.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include "ros2_llm_bridge_cpp/http_client.hpp"
 
@@ -8,6 +10,9 @@ namespace ros2_llm_bridge_cpp {
 
 /// ROS 2 Node that bridges LLM tool calls to ROS 2 topics and the hardware service.
 /// This is the C++ equivalent of the Python BridgeNode.
+using ExecuteSkillAction = clawbot_interfaces::action::ExecuteSkill;
+using GoalHandleSkill = rclcpp_action::ClientGoalHandle<ExecuteSkillAction>;
+
 class BridgeNode : public rclcpp::Node {
 public:
     BridgeNode();
@@ -53,11 +58,15 @@ public:
                                        const std::string& camera);
 
 private:
-    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub_;
+    // P14 (REQ-OPS-043) : plus aucun editeur Twist. Tout mouvement passe par
+    // l'executif, qui journalise, applique les budgets et les preconditions.
+    rclcpp_action::Client<ExecuteSkillAction>::SharedPtr skills_;
     std::unique_ptr<HttpClient> hw_;
     std::unique_ptr<HttpClient> yolo_;
 
     void log_cid(const std::string& cid, const std::string& msg);
+    std::string envoyer_skill(const std::string& cid, const std::string& skill,
+                              const std::string& params_json);
     std::string hw_get(const std::string& path, const std::string& params = "");
     std::string hw_post(const std::string& path, const std::string& body = "",
                         const std::string& params = "");

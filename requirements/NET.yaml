@@ -21,6 +21,6 @@ requirements:
       retiré, plus aucune unité ni cible du dépôt ne le cite. Au déploiement,
       `ss -tlnp` ne montre le port 9090 que sur 127.0.0.1, ou pas du tout.
     evidence: null
-    status: draft
+    status: implemented
     approved_by: null
     prompt: P14

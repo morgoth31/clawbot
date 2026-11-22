@@ -19,8 +19,8 @@ import yaml
 
 RACINE = Path(__file__).resolve().parents[1]
 URDF = RACINE / "urdf" / "clawbot_x3plus.urdf"
-UNIT_CAMERA = RACINE / "services" / "clawbot-wrist-camera.service"
-UNIT_YOLO = RACINE / "services" / "clawbot-yolo.service"
+UNIT_CAMERA = RACINE / "clawbot_bringup" / "launch" / "wrist_camera.launch.py"
+UNIT_YOLO = RACINE / "clawbot_bringup" / "launch" / "detection.launch.py"
 CALIBRATION = RACINE / "config" / "wrist_camera_info.yaml"
 
 CADRE = "wrist_camera_optical_frame"
@@ -97,7 +97,7 @@ def test_l_urdf_reste_valide():
 
 # ── unité systemd de la caméra ────────────────────────────────────────────────
 def test_l_unite_publie_le_cadre_de_l_urdf(unite_camera, urdf):
-    assert f"camera_frame_id:={CADRE}" in unite_camera
+    assert f'"camera_frame_id": "{CADRE}"' in unite_camera
     assert CADRE in {lien.get("name") for lien in urdf.findall("link")}
 
 
@@ -108,7 +108,7 @@ def test_l_unite_utilise_le_chemin_by_id_et_pas_un_index(unite_camera):
 
 
 def test_l_unite_declare_le_domaine_et_un_seul_proprietaire(unite_camera):
-    assert "Environment=ROS_DOMAIN_ID=28" in unite_camera
+    assert "ROS_DOMAIN_ID=28" in (REPO / "deploy" / "env" / "clawbot.env").read_text()
     assert "User=jetson" in unite_camera
     assert "wrist_camera" in unite_camera and "Conflicts=" not in unite_camera, \
         "la caméra appartient à une seule unité : ce n'est pas un conflit, c'est une propriété"

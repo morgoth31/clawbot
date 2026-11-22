@@ -174,7 +174,7 @@ requirements:
       d'autre cible de démarrage ; `systemctl list-dependencies clawbot.target` les
       couvre toutes au déploiement.
     evidence: null
-    status: draft
+    status: implemented
     approved_by: null
     prompt: P14
 
@@ -198,7 +198,7 @@ requirements:
       le paquet ; aucune occurrence de `ros2 run` ni de `python3 -c` ; aucun chemin
       `/home/jetson/clawbot/launch/` (paramètres lus par `get_package_share_directory`).
     evidence: null
-    status: draft
+    status: implemented
     approved_by: null
     prompt: P14
 
@@ -220,7 +220,7 @@ requirements:
       est sous `attic/` avec `COLCON_IGNORE` ; `colcon list` ne les retourne plus ;
       `scripts/check.sh --strict-duplicates` passe sans exception pour `api_server.py`.
     evidence: null
-    status: draft
+    status: implemented
     approved_by: null
     prompt: P14
 
@@ -244,7 +244,7 @@ requirements:
       `SetVelocity`, `Stop` et `NavigateTo` appellent l'action `/clawbot/execute_skill`
       (ou `/clawbot/execute_mission`) ; les deux autres `api_server.py` ont disparu.
     evidence: null
-    status: draft
+    status: implemented
     approved_by: null
     prompt: P14
 

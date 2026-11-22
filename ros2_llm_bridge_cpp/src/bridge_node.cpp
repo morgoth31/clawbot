@@ -8,6 +8,7 @@
 #include <chrono>
 #include <thread>
 #include <cmath>
+#include <algorithm>
 #include <cstdlib>
 
 using json = nlohmann::json;
@@ -15,7 +16,7 @@ using json = nlohmann::json;
 namespace ros2_llm_bridge_cpp {
 
 BridgeNode::BridgeNode() : rclcpp::Node("llm_bridge_node") {
-    cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
+    skills_ = rclcpp_action::create_client<ExecuteSkillAction>(this, "/clawbot/execute_skill");
 
     const std::string hw_url = std::getenv("HARDWARE_SERVICE_URL")
         ? std::getenv("HARDWARE_SERVICE_URL") : "http://localhost:8001";
@@ -51,54 +52,49 @@ std::string BridgeNode::hw_post(const std::string& path, const std::string& body
 
 // ── Motion ──────────────────────────────────────────────────────────────
 
+std::string BridgeNode::envoyer_skill(const std::string& cid, const std::string& skill,
+                                      const std::string& params_json) {
+    log_cid(cid, "skill " + skill + " params=" + params_json);
+    if (!skills_->wait_for_action_server(std::chrono::seconds(2))) {
+        return "ERROR: executif injoignable (/clawbot/execute_skill) - robot non deplace.";
+    }
+    ExecuteSkillAction::Goal goal;
+    goal.skill = skill;
+    goal.params_json = params_json;
+    goal.timeout_s = 0.0f;
+
+    rclcpp_action::Client<ExecuteSkillAction>::SendGoalOptions options;
+    options.result_callback = [this, cid](const GoalHandleSkill::WrappedResult& result) {
+        const int issue = result.result ? static_cast<int>(result.result->outcome) : -1;
+        RCLCPP_INFO(get_logger(), "[CID: %s] %s termine : outcome %d", cid.c_str(),
+                    result.result ? result.result->error_code.c_str() : "?", issue);
+    };
+    skills_->async_send_goal(goal, options);
+    return "Skill " + skill + " transmis a l'executif (" + params_json +
+           "). Suivi : /clawbot/mission/events.";
+}
+
 std::string BridgeNode::execute_set_velocity(const std::string& cid,
                                              double linear_x, double linear_y,
                                              double angular_z, double duration) {
-    std::ostringstream oss;
-    oss << "SetVelocity: linear_x=" << linear_x << ", linear_y=" << linear_y
-        << ", angular_z=" << angular_z << ", duration=" << duration << "s";
-    log_cid(cid, oss.str());
-
-    json body = {{"linear_x", linear_x}, {"linear_y", linear_y}, {"angular_z", angular_z}};
-    try {
-        std::string resp = hw_post("/motion", body.dump());
-        json data = json::parse(resp);
-        bool clamped = data.value("clamped", false);
-        std::string note = clamped ? " [speed was clamped to safe limit]" : "";
-
-        // Schedule auto-stop after duration
-        if (duration > 0) {
-            // We use a detached thread to avoid blocking the API response
-            std::thread([this, cid, duration]() {
-                std::this_thread::sleep_for(
-                    std::chrono::duration<double>(duration));
-                execute_stop(cid + "-autostop");
-            }).detach();
-        }
-
-        return "Velocity set: vx=" + std::to_string(data["linear_x"].get<double>()) +
-               ", vy=" + std::to_string(data["linear_y"].get<double>()) +
-               ", wz=" + std::to_string(data["angular_z"].get<double>()) +
-               " for " + std::to_string(duration) + "s (auto-stop)." + note;
-    } catch (const std::exception& e) {
-        return std::string("ERROR: hardware service unreachable — ") + e.what() + ". Robot not moved.";
+    log_cid(cid, "SetVelocity -> skill borne");
+    // L'executif n'accepte pas de vitesse continue : la consigne devient une distance
+    // ou un angle relatifs, bornes par le registre des skills (2 m, 2*pi rad).
+    std::ostringstream params;
+    if (std::abs(angular_z) >= std::abs(linear_x)) {
+        params << "{\"angle_rad\": " << (angular_z * duration) << "}";
+        return envoyer_skill(cid, "rotate", params.str());
     }
+    const double dx = std::clamp(linear_x * duration, -2.0, 2.0);
+    const double dy = std::clamp(linear_y * duration, -2.0, 2.0);
+    params << "{\"dx_m\": " << dx << ", \"dy_m\": " << dy << "}";
+    return envoyer_skill(cid, "move_relative", params.str());
 }
 
 std::string BridgeNode::execute_stop(const std::string& cid) {
-    log_cid(cid, "Stop: zeroing all velocities");
-    try {
-        std::string resp = hw_post("/motion/stop");
-        json data = json::parse(resp);
-        return "Stop command sent. status=" + data.value("status", std::string("unknown"));
-    } catch (const std::exception& e) {
-        // Fallback: publish empty Twist to /cmd_vel
-        cmd_vel_pub_->publish(geometry_msgs::msg::Twist());
-        return "Stop sent to /cmd_vel (hardware service unreachable).";
-    }
+    log_cid(cid, "Stop -> skill stop");
+    return envoyer_skill(cid, "stop", "{}");
 }
-
-// ── Audio / Navigation (stubs) ──────────────────────────────────────────
 
 std::string BridgeNode::execute_speak(const std::string& cid, const std::string& text) {
     log_cid(cid, "Speak: '" + text + "'");
@@ -114,67 +110,12 @@ std::string BridgeNode::execute_speak(const std::string& cid, const std::string&
 
 std::string BridgeNode::execute_navigate_to(const std::string& cid,
                                             double target_x, double target_y) {
-    std::ostringstream oss;
-    oss << "NavigateTo: (" << target_x << ", " << target_y << ")";
-    log_cid(cid, oss.str());
-
-    // Try Nav2 action client first. If Nav2 is not running, fall back to
-    // simple dead-reckoning (calculate distance + heading, move, rotate).
-    // For now, we implement dead-reckoning since Nav2 requires an active map + AMCL.
-
-    // Simple dead-reckoning navigation:
-    // 1. Calculate distance to target
-    // 2. Move forward at max speed for calculated duration
-    // 3. Stop
-    // Note: This is inaccurate without odometry but provides basic functionality.
-
-    double distance = std::sqrt(target_x * target_x + target_y * target_y);
-    double angle = std::atan2(target_y, target_x);  // radians
-
-    // Clamp to safe limits
-    double max_speed = 0.05;  // m/s (slightly under 0.06 limit)
-    double max_angular = 0.2;  // rad/s
-
-    // Calculate durations
-    double move_duration = (distance > 0.01) ? (distance / max_speed) : 0.0;
-    double rotate_duration = (std::abs(angle) > 0.05) ? (std::abs(angle) / max_angular) : 0.0;
-
-    // Clamp durations to safe limits
-    move_duration = std::min(move_duration, 10.0);   // max 10s move
-    rotate_duration = std::min(rotate_duration, 5.0); // max 5s rotate
-
-    json result;
-    result["status"] = "dead_reckoning";
-    result["target_x"] = target_x;
-    result["target_y"] = target_y;
-    result["distance_m"] = round(distance * 1000) / 1000;
-    result["angle_rad"] = round(angle * 1000) / 1000;
-    result["move_duration_s"] = round(move_duration * 100) / 100;
-    result["rotate_duration_s"] = round(rotate_duration * 100) / 100;
-
-    // Step 1: Rotate to face the target
-    if (rotate_duration > 0.01) {
-        double angular_z = (angle > 0) ? max_angular : -max_angular;
-        log_cid(cid, "NavigateTo: rotating " + std::to_string(rotate_duration) + "s");
-        execute_set_velocity(cid, 0.0, 0.0, angular_z, rotate_duration);
-        // Wait for rotation to complete
-        std::this_thread::sleep_for(std::chrono::duration<double>(rotate_duration + 0.2));
-    }
-
-    // Step 2: Move forward
-    if (move_duration > 0.01) {
-        log_cid(cid, "NavigateTo: moving forward " + std::to_string(move_duration) + "s");
-        execute_set_velocity(cid, max_speed, 0.0, 0.0, move_duration);
-        // Wait for movement to complete
-        std::this_thread::sleep_for(std::chrono::duration<double>(move_duration + 0.2));
-    }
-
-    // Step 3: Stop
-    execute_stop(cid);
-
-    result["message"] = "Dead-reckoning navigation completed. For accurate navigation, "
-                         "activate Nav2 with a SLAM map.";
-    return result.dump();
+    log_cid(cid, "NavigateTo -> skill navigate_to");
+    // Plus de navigation a l'estime : la cible part a l'executif, qui refuse tant que la
+    // capacite `navigation` n'est pas servie (CAPABILITY_INACTIVE) au lieu de bouger.
+    std::ostringstream params;
+    params << "{\"x\": " << target_x << ", \"y\": " << target_y << "}";
+    return envoyer_skill(cid, "navigate_to", params.str());
 }
 
 std::string BridgeNode::execute_listen(const std::string& cid) {

@@ -13,7 +13,7 @@ import pytest
 
 pytestmark = pytest.mark.req("REQ-OPS-030")
 
-SERVICE = Path(__file__).resolve().parents[1] / "ros2_llm_bridge" / "hardware_service.py"
+SERVICE = Path(__file__).resolve().parents[1] / "clawbot_bringup" / "clawbot_bringup" / "hardware_service.py"
 
 
 class FauxResultat:
