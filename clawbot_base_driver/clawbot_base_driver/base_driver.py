@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 #public lib
+import os
 import sys
 import math
 import random
@@ -23,22 +24,51 @@ try:
 except ImportError:  # exécution directe du fichier
 	from cmd_scaling import RAMP_STEP, feedback, kick_boost, ramp_cmd, scale_cmd_vel
 from rclpy.clock import Clock
+from rclpy.executors import ExternalShutdownException
+from rcl_interfaces.msg import ParameterDescriptor
+try:
+	from .port_lock import PortBusyError, PortLock, chemin_verrou
+except ImportError:  # execution directe du fichier
+	from port_lock import PortBusyError, PortLock, chemin_verrou
 
 #from dynamic_reconfigure.server import Server
+# Chemin stable du MCU, releve en P01-M05 (REQ-DRV-003).
+MCU_PAR_DEFAUT = "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0"
 car_type_dic={
     'R2':5,
     'X3':1,
     'NONE':-1
 }
 class yahboomcar_driver(Node):
-	def __init__(self, name):
+	def __init__(self, name, rosmaster_factory=None):
 		super().__init__(name)
 		global car_type_dic
 		self.RA2DE = 180 / pi
+		# Port serie nomme (REQ-DRV-003) et delai d'arret (REQ-DRV-002), declares avant
+		# toute ouverture de port.
+		self.declare_parameter('device_path', MCU_PAR_DEFAUT)
+		self.device_path = self.get_parameter('device_path').get_parameter_value().string_value
+		self.declare_parameter(
+		    'cmd_timeout_s', 0.3,
+		    ParameterDescriptor(read_only=True,
+		                        description="Delai sans consigne avant arret des moteurs (s)"))
+		self.cmd_timeout_s = float(self.get_parameter('cmd_timeout_s').value)
+		self._last_cmd_t = None
+		self._derniere_consigne_nulle = True
+	
+		# Un seul proprietaire du port : deux lecteurs se volent les octets (C08).
+		self._verrou = PortLock(chemin_verrou())
+		try:
+			self._verrou.acquerir()
+		except PortBusyError as exc:
+			self.get_logger().fatal(str(exc))
+			sys.exit(1)
+	
 		# X3 Plus : moteurs 520, cinématique Mecanum. La trame de set_car_motion embarque ce
 		# type ; avec le type par défaut (1 = X3, moteurs 370) le PID interne du STM32 recevait
 		# les encodeurs à l'envers et partait en contre-réaction positive (ERR-010).
-		self.car = Rosmaster(car_type=2)
+		fabrique = rosmaster_factory or Rosmaster
+		self.car = fabrique(car_type=2, com=self.device_path)
 		# Séquence validée sur le matériel : le fil de réception doit tourner et le report
 		# automatique doit être armé AVANT set_car_type, sinon le STM32 ignore la trame.
 		self.car.create_receive_threading()
@@ -100,6 +130,8 @@ class yahboomcar_driver(Node):
 		self.car.create_receive_threading()
 		# Enable UART Servo Torque (Required for Arm)
 		self.car.set_uart_servo_torque(True)
+		# Garde de silence a 20 Hz (REQ-DRV-002).
+		self.timer_silence = self.create_timer(0.05, self._surveiller_silence)
 	#callback function
 	def cmd_vel_callback(self,msg):
         # 小车运动控制，订阅者回调函数
@@ -119,6 +151,8 @@ class yahboomcar_driver(Node):
 			self._moving = False
 		r = (kick_boost(r[0], _time.monotonic() - getattr(self, "_kick_start", 0.0)), r[1], r[2])
 		vx, vy, angular = scale_cmd_vel(*r)
+		self._last_cmd_t = self.now_s()
+		self._derniere_consigne_nulle = (vx == 0.0 and vy == 0.0 and angular == 0.0)
 		self.car.set_car_motion(vx, vy, angular)
 		'''print("cmd_vx: ",vx)
 		print("cmd_vy: ",vy)
@@ -253,16 +287,51 @@ class yahboomcar_driver(Node):
 		self._servo_pub.publish(_msg_angles)
 		self.volPublisher.publish(battery)
 		self.EdiPublisher.publish(edition)
-		
-		
-			
+
+	def now_s(self):
+		"""Horloge du noeud, en secondes : simulable dans les tests (REQ-DRV-002)."""
+		return self.get_clock().now().nanoseconds / 1e9
+
+	def _surveiller_silence(self):
+		"""Arret des moteurs si aucune consigne non nulle n'arrive depuis cmd_timeout_s.
+
+		Un seul zero par silence : sinon le MCU recevrait 20 trames nulles par seconde,
+		ce qui masquerait la perte du flux au lieu de la signaler.
+		"""
+		if self._last_cmd_t is None or self._derniere_consigne_nulle:
+			return
+		ecoule = self.now_s() - self._last_cmd_t
+		if ecoule <= self.cmd_timeout_s:
+			return
+		try:
+			self.car.set_car_motion(0.0, 0.0, 0.0)
+		except Exception as exc:  # liaison serie perdue : on le dit, on ne masque pas
+			self.get_logger().error(f"arret moteurs impossible : {exc}")
+		self._ramp = (0.0, 0.0, 0.0)
+		self._moving = False
+		self._derniere_consigne_nulle = True
+		self.get_logger().warn(f"consigne absente depuis {ecoule:.2f} s, arret")
+
+	def destroy_node(self):
+		"""Rend le port : le verrou ne doit pas survivre au noeud."""
+		verrou = getattr(self, "_verrou", None)
+		if verrou is not None:
+			try:
+				verrou.relacher()
+			except Exception:
+				pass
+			self._verrou = None
+		return super().destroy_node()
+
+
 def main():
-	rclpy.init() 
+	rclpy.init()
 	driver = yahboomcar_driver('driver_node')
-	rclpy.spin(driver)
-
-'''if __name__ == '__main__':
-	main()'''
-
-		
-		
+	try:
+		rclpy.spin(driver)
+	except (KeyboardInterrupt, ExternalShutdownException):
+		pass
+	finally:
+		driver.destroy_node()
+		rclpy.try_shutdown()
+	return 0
