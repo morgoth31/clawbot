@@ -1,0 +1,7 @@
+=== comptage editeurs/abonnes par topic ===
+topics: 54
+topics sans editeur: 7
+topics sans abonne: 25
+endpoints RELIABLE: 128
+endpoints BEST_EFFORT: 13
+endpoints TRANSIENT_LOCAL: 32

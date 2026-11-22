@@ -10,7 +10,7 @@ Le système est un robot mobile à bras (Jetson Orin NX, ROS 2 Humble, domaine D
 - La chaîne de commande existe et tient à 20 Hz : `/cmd_vel` → `safety_arbitrator` → `/cmd_vel_safe` → `driver_node` → série MCU [S08], [S02].
 - Le middleware est `rmw_fastrtps_cpp` sans aucun profil chargé : tout passe par UDP sur le Wi-Fi, `/dev/shm` reste à 12 Mo sur 7,7 Go [S17], [S20], [S13], [S15].
 - Les cinq nœuds maison de décision utilisent le `SingleThreadedExecutor` implicite de `rclpy.spin` et n'exposent qu'un paramètre, `use_sim_time` [S28], [S06].
-- Le CPU disponible est largement suffisant (≈143 % d'un cœur sur 8, 45 % de RAM) mais le premier consommateur (57,2 %) est un nœud dont le flux principal ne produit rien [S12], [S09], [S16].
+- Le CPU disponible est largement suffisant (145,6 % d'un cœur sur 8, 45 % de RAM) mais le premier consommateur (57,2 %) est un nœud dont le flux principal ne produit rien [S12], [S09], [S16].
 - Le test n'est pas reproductible par défaut : `scripts/run_tests.sh tests` échoue à la collecte, et la suite complète rend 238 réussites, 1 saut et 19 erreurs [S42], [S43].
 
 ### Limites structurelles
@@ -19,23 +19,24 @@ Le système est un robot mobile à bras (Jetson Orin NX, ROS 2 Humble, domaine D
 2. **Décision séquentielle et non paramétrable.** Un thread par nœud de décision, aucune priorité, aucun réglage à chaud [S28], [S25], [S06].
 3. **Deux descriptions concurrentes du démarrage.** 27 launch files d'un côté, 14 unités systemd de l'autre ; aucun n'utilise la composition ni le cycle de vie [S23], [S25].
 4. **Observabilité quasi nulle.** Pas d'horodatage de bout en bout, `/diagnostics` sans consommateur, aucune mesure de latence [S30], [S07].
-5. **Chaînes rompues non signalées.** Profondeur muette, détection absente du graphe, bras non commandable — sans qu'aucun état ne le publie [S09], [S07], [S05].
+5. **Chaînes rompues.** Profondeur muette, détection absente du graphe, bras non commandable, et cartographie morte parce que 100 % des scans sont rejetés sur un cadre TF inexistant (`laser` vs `laser_link`) [S09], [S07], [S05], [S54].
 
 ## 2. Contraintes non négociables
 
 | # | Contrainte | Valeur mesurée ou imposée | Marge disponible | Source |
 |---|---|---|---|---|
-| C01 | Carte | Jetson Orin NX, 8 cœurs, 15 656 Mo, noyau `5.15.148-tegra` | RAM : 8,5 Go libres ; CPU : ≈6,7 cœurs libres au repos | [S16], [S20] |
+| C01 | Carte | `NVIDIA Jetson Orin NX Engineering Reference Developer Kit Super`, 8 cœurs, 15 656 Mo, noyau `5.15.148-tegra`, Ubuntu 22.04.5 | RAM : 8,5 Go libres ; CPU : 6,5 cœurs libres (8 − 1,49 cœur consommé au repos) | [S48], [S16], [S12] |
 | C02 | Distribution ROS 2 | Humble ; Jazzy n'est pas installé | aucune : tout ce qui exige Jazzy est exclu | [S17] |
 | C03 | Middleware disponible | `rmw_fastrtps_cpp` ; aucun profil DDS chargé ; CycloneDDS non configuré | un profil peut être chargé, à condition de le tester hors domaine 28 | [S17], [S20] |
 | C04 | Domaine DDS | 28, imposé par chaque unité systemd | aucune : changer de domaine casse 14 unités | [S25] |
 | C05 | GPU | `GR3D_FREQ 0 %` : inutilisé aujourd'hui | accélérateur entièrement disponible pour l'inférence | [S16] |
-| C06 | Réseau | `wlP1p1s0` seule interface montée ; `eno1` sans porteuse | un lien filaire reste à câbler | [S15] |
+| C06 | Réseau | route par défaut via `wlP1p1s0` (Wi-Fi) ; `eno1` sans porteuse ; ponts Docker `br-0ebcc2854aa2` (172.18.0.0/16) et `vethb4baedf` actifs ; `tailscale0` sans IPv4 | un lien filaire reste à câbler ; l'attribution du trafic DDS par interface n'est pas mesurée | [S49] |
 | C07 | Disque | 117/147 Go occupés (84 %) ; `logrotate.service` en échec | 24 Go, dont il faut réserver la marge de build | [S13], [S34] |
 | C08 | Port série du MCU | exclusif, ouvert par `Rosmaster(car_type=2)` ; deux lecteurs se volent les octets sans erreur | aucune : un seul processus propriétaire | [S25] |
 | C09 | Capteurs | lidar USB 10 Hz, Astra RGB-D, caméra UVC poignet 30 Hz | cadences à ne pas dépasser sans mesure du bus USB | [S09], [S25] |
 | C10 | Enveloppe du bras | pose de repos `[90, 180, 0, 0, 90, 149]` (degrés servo), bande ±5°, validée par l'opérateur le 2026-11-11 | non extensible sans nouvel essai physique | [S37] |
 | C11 | Interfaces externes | service `/director/command` en JSON opaque, HTTP 8000/8001/8003 | l'appelant LLM n'est pas modifiable dans le même lot | [S38], [S25] |
+| C13 | Cadre du lidar | `/scan` publie `frame_id: laser` ; l'arbre TF ne contient que `laser_link` → **40 scans rejetés en 46 s** par `slam_toolbox`, aucune carte publiée | aucune : corriger le cadre ou ajouter un TF statique, sans quoi la cartographie ne produit rien | [S55], [S54], [S10] |
 | C12 | Cadences observées à respecter en régression | `/scan` 10,125 Hz, IMU 10,019 Hz, `/joint_states` 20,000 Hz, `/director/state` 4,999 Hz | une baisse de plus de 10 % est une régression | [S08], [S09] |
 
 ## 3. Interfaces à préserver
@@ -65,9 +66,9 @@ Contrat à ne pas oublier : **`/cmd_vel` a trois éditeurs** (`hardware_service_
 | Objectif | Valeur cible | Justification adossée à une mesure | Mesure de vérification |
 |---|---|---|---|
 | O01 — Latence perception → consigne | ≤ 50 ms sur `/cmd_vel_safe` | la chaîne actuelle n'est pas mesurée (02 §1) ; 50 ms borne le temps de réaction à 15 cm à 3 m/s, au-delà du rayon d'arrêt du lidar à 10 Hz | abonné instrumenté publiant `t_sortie − t_entrée` sur `/perf/chain`, comparé sur 1 000 messages |
-| O02 — Gigue de la chaîne de commande (p99) | ≤ 10 ms | mesurée à 0,00 ms sur `/safety/state` au repos, inconnue en charge [S08] | `ros2 topic hz --window 500` sur `/cmd_vel_safe`, en mission |
+| O02 — Gigue de la chaîne de commande (p99) | ≤ 10 ms | mesurée à 0,63 ms sur `/safety/state` au repos (min 46 / max 53 ms), inconnue en charge [S08] | `ros2 topic hz --window 500` sur `/cmd_vel_safe`, en mission |
 | O03 — Absence de blocage de l'arbitre | 0 callback dépassant 20 ms | aujourd'hui un seul thread partagé avec 50 msg/s [S28] | journal de durée par callback, publié à 1 Hz |
-| O04 — CPU total de la pile ROS | ≤ 100 % d'un cœur | 143 % mesurés, dont 57 % pour un flux muet [S12] | `ps` agrégé sur 10 min, plus `tegrastats` |
+| O04 — CPU total de la pile ROS | ≤ 100 % d'un cœur | 145,6 % mesurés sur les 13 processus listés (149,4 % avec les trois autres), dont 57 % pour un flux muet [S12] | `ps` agrégé sur 10 min, plus `tegrastats` |
 | O05 — RAM de la pile ROS | ≤ 1,5 Go hors inférence | 700 Mo hors `yolo_service` aujourd'hui [S12] | RSS cumulé par `ps`, sur 10 min |
 | O06 — Inférence sur GPU | `GR3D_FREQ > 0 %` en inférence | GPU à 0 % pendant que YOLO consomme 10 % de CPU [S16] | `tegrastats` pendant 100 inférences, `GR3D_FREQ` moyen |
 | O07 — Aucun flux capteur muet non signalé | 100 % des flux attendus déclarés et surveillés | 2 flux muets non signalés aujourd'hui [S09], [S07] | test qui coupe un flux et vérifie l'apparition d'un état `SENSOR_STALE` |
@@ -89,6 +90,7 @@ Contrat à ne pas oublier : **`/cmd_vel` a trois éditeurs** (`hardware_service_
 | Q07 | La composition (`ComposableNode` + intra-processus) est-elle viable avec les binaires vendor (astra, ydlidar, robot_localization) ? | elle décide du gain de transport et de la faisabilité de O08 | prototype en domaine 99 avec les trois binaires vendor en conteneur composable | oui |
 | Q08 | Quel budget thermique en charge continue ? | 53 °C au repos ne dit rien d'une mission de 20 min | `tegrastats --interval 1000` pendant une mission réelle, robot au sol, opérateur présent | oui |
 | Q09 | Les 5 messages `yahboomcar_msgs` sont-ils morts ? | ils n'ont aucun éditeur ni abonné mais occupent le contrat d'interface | `grep` de chaque type dans tout l'arbre déployé, vendor compris | non |
+| Q09b | Faut-il corriger `frame_id` côté lidar (`laser_link`) ou publier un TF statique `laser → laser_link` ? | le choix touche un fichier vendor et le paramètre `frame_id` du driver ; il décide si `slam_toolbox` fonctionne | appliquer les deux variantes en domaine 99 et comparer `/map` produit et `ros2 run tf2_tools echo laser laser_link` | oui |
 | Q10 | Le port série du MCU doit-il être exposé en paramètre (`device_path`) ? | il est aujourd'hui auto-détecté, donc non maîtrisable ni testable | décision ; la mesure de soutien est `ls -l /dev/serial/by-id/` et la stabilité de l'énumération au rebranchement | non |
 | Q11 | Faut-il conserver `rosbridge` (WebSocket) exposé sur le réseau ? | il ajoute une surface d'attaque et 9,9 % de CPU | `ss -ltnp` pour le port, puis décision de sécurité | non |
 | Q12 | Le service `clawbot-docs` doit-il rester un serveur de développement sur `0.0.0.0:8080` ? | exposition réseau sans authentification | décision d'exploitation ; remplacer par un site statique si la réponse est non | non |

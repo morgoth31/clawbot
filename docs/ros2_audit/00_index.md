@@ -1,7 +1,7 @@
 # Audit ROS 2 — Clawbot X3 — index et registre des sources
 
 **Poste :** Jetson Orin NX, `ROS_DOMAIN_ID=28`, ROS 2 Humble, RMW `rmw_fastrtps_cpp`
-**Collecte :** 2026-11-22T10:59:33+01:00 (dynamique), 2026-11-22T10:59:10+01:00 (statique), compléments jusqu'à 11:08
+**Collecte :** 2026-11-22T10:59:33+01:00 (dynamique), 2026-11-22T10:59:10+01:00 (statique), compléments et corrections jusqu'à 11:18
 **Livrables :** `01_architecture_factuelle.md`, `02_analyse_performances_et_concurrence.md`, `03_audit_robustesse_et_maintenabilite.md`, `04_cahier_entree_refonte_pour_claude.md`
 
 ## 1. Périmètre
@@ -67,12 +67,27 @@
 | S38 | Contrat du service du directeur | copie de `clawbot_interfaces/srv/DirectorCommand.srv` | `raw/20261122-105910/sources/DirectorCommand.srv` | 2026-11-22T11:08:00+01:00 |
 | S39 | Configuration de l'EKF | copie de `config/ekf.yaml` | `raw/20261122-105910/sources/ekf.yaml` | 2026-11-22T11:08:00+01:00 |
 | S40 | Profil Fast DDS du dépôt | copie de `fastdds_profile.xml` | `raw/20261122-105910/sources/fastdds_profile.xml` | 2026-11-22T11:08:00+01:00 |
+| S41 | Interruptions noyau par cœur | `cat /proc/interrupts` | `raw/20261122-105910/runtime/13_interrupts.txt` | 2026-11-22T11:05:40+01:00 |
 | S42 | Résultat du point d'entrée de test officiel | `scripts/run_tests.sh tests` | `raw/20261122-105910/runtime/21_tests_run_tests_sh.log` | 2026-11-22T11:22:10+01:00 |
 | S43 | Résultat de la suite complète hors deux scripts non-pytest | `ROS_DOMAIN_ID=98 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest tests -q --ignore=tests/test_cpp_bridge.py --ignore=tests/test_modes.py` | `raw/20261122-105910/runtime/22_tests_suite_complete.log` | 2026-11-22T11:23:05+01:00 |
 | S44 | Résultat d'un test unitaire ciblé | `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest tests/test_ekf_config.py -q` | `raw/20261122-105910/runtime/23_test_ekf_config.log` | 2026-11-22T11:24:30+01:00 |
 | S45 | Code de l'arbitre de sécurité (copie à l'instant de la collecte) | copie de `clawbot_safety/clawbot_safety/arbitrator.py` | `raw/20261122-105910/sources/arbitrator.py` | 2026-11-22T11:25:00+01:00 |
 | S46 | Seuils de l'arbitre (copie) | copie de `clawbot_safety/clawbot_safety/thresholds.py` | `raw/20261122-105910/sources/thresholds.py` | 2026-11-22T11:25:00+01:00 |
-| S47 | Rejeu partiel de la collecte dynamique (nœuds, topics, unités en échec) | `ros2 node list`, `ros2 topic list -t`, `systemctl --failed` | `raw/20261122-111310/runtime/01_nodes.txt` | 2026-11-22T11:13:10+01:00 |
+| S47 | Rejeu partiel : nœuds actifs | `ros2 node list` | `raw/20261122-111310/runtime/01_nodes.txt` | 2026-11-22T11:13:10+01:00 |
+| S60 | Rejeu partiel : topics | `ros2 topic list -t` | `raw/20261122-111310/runtime/03_topics_types.txt` | 2026-11-22T11:13:10+01:00 |
+| S61 | Rejeu partiel : unités en échec | `systemctl --failed` | `raw/20261122-111310/runtime/19_units_failed.txt` | 2026-11-22T11:13:10+01:00 |
+| S48 | Modèle de carte, distribution et noyau | `cat /proc/device-tree/model`, `grep VERSION /etc/os-release`, `uname -srm` | `raw/20261122-105910/runtime/24_materiel.txt` | 2026-11-22T11:16:40+01:00 |
+| S49 | Interfaces, adresses et table de routage | `ip -br addr`, `ip route`, `ip -6 route`, `ip -br link` | `raw/20261122-105910/runtime/25_interfaces.txt` | 2026-11-22T11:16:45+01:00 |
+| S50 | Ports en écoute et unité `rosbridge` | `ss -ltnp`, `systemctl show rosbridge.service` | `raw/20261122-105910/runtime/26_ports_rosbridge.txt` | 2026-11-22T11:16:50+01:00 |
+| S51 | Comptages éditeurs/abonnés et profils QoS | `grep -c` sur `07_topics_info_v.txt` | `raw/20261122-105910/runtime/27_comptages_qos.txt` | 2026-11-22T11:17:10+01:00 |
+| S52 | Propriétés d'ordonnancement et de redémarrage des unités | `systemctl show <unité> -p RestartUSec -p Nice -p CPUSchedulingPolicy -p CPUAffinity -p MemoryMax` | `raw/20261122-105910/runtime/28_units_extra.txt` | 2026-11-22T11:17:30+01:00 |
+| S53 | Métriques de code (except, tailles, doublons, YAML, MCP) | `grep -c except`, `wc -l`, `diff -q`, `grep -c 'def '` | `raw/20261122-105910/runtime/29_metriques_code.txt` | 2026-11-22T11:18:05+01:00 |
+| S54 | Scans rejetés par le filtre TF de `slam_toolbox` | `grep 'Message Filter'` sur `16_journaux.txt` | `raw/20261122-105910/runtime/30_filtre_tf.txt` | 2026-11-22T11:18:20+01:00 |
+| S55 | Cadre du message `/scan` | `ros2 topic echo /scan --once` | `raw/20261122-105910/runtime/31_scan_header.txt` | 2026-11-22T11:18:40+01:00 |
+| S56 | Code du directeur à l'instant de la collecte | copie de `clawbot_director/clawbot_director/director_node.py` | `raw/20261122-105910/sources/director_node.py` | 2026-11-22T11:19:00+01:00 |
+| S57 | Code du sentinel à l'instant de la collecte | copie de `clawbot_sentinel/clawbot_sentinel/sentinel_node.py` | `raw/20261122-105910/sources/sentinel_node.py` | 2026-11-22T11:19:00+01:00 |
+| S58 | Services systemd actifs au moment de la collecte | `systemctl list-units --type=service --state=running` | `raw/20261122-105910/static/06_units_actives.txt` | 2026-11-22T10:59:10+01:00 |
+| S59 | Empreintes des YAML du dépôt | `sha256sum` sur la liste des YAML | `raw/20261122-105910/static/05_yaml_sha256.txt` | 2026-11-22T10:59:10+01:00 |
 
 ## 4. Zones non observées
 

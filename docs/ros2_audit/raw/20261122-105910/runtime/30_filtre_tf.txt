@@ -1,0 +1,8 @@
+=== lignes 'Message Filter' par unite ===
+40
+=== extrait ===
+Nov 22 11:04:07 yahboom bash[2817]: [INFO] [1795341847.094401890] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341846.895 for reason 'discarding message because the queue is full'
+Nov 22 11:04:09 yahboom bash[2817]: [INFO] [1795341849.660893161] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341849.463 for reason 'discarding message because the queue is full'
+Nov 22 11:04:12 yahboom bash[2817]: [INFO] [1795341852.232447415] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341852.033 for reason 'discarding message because the queue is full'
+=== cadres cites ===
+     40 frame 'laser'

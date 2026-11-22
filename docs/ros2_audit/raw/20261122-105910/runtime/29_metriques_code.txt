@@ -1,0 +1,30 @@
+=== horodatage ===
+2026-11-22T11:18:05+01:00
+=== blocs except (noeuds maison) ===
+38
+=== except suivis de pass ===
+4
+=== plus gros fichiers python ===
+    450 ./joy_teleop/calibrer_manette.py
+    477 ./yahboomcar_bringup/yahboomcar_bringup/.ipynb_checkpoints/patrol_a1_X3-checkpoint.py
+    477 ./yahboomcar_bringup/yahboomcar_bringup/patrol_a1_X3.py
+    659 ./joy_teleop/calibration.py
+    826 ./bridge_mcp/health.py
+    970 ./tests/test_regression.py
+    979 ./ros2_llm_bridge/hardware_service.py
+  54699 total
+=== diff driver deux copies ===
+IDENTIQUES
+=== copies api_server.py ===
+./ros2_llm_bridge/install/ros2_llm_bridge/lib/python3.10/site-packages/ros2_llm_bridge/api_server.py
+./ros2_llm_bridge/build/ros2_llm_bridge/build/lib/ros2_llm_bridge/api_server.py
+./ros2_llm_bridge/ros2_llm_bridge/api_server.py
+=== outils MCP declares ===
+0
+34
+=== gitignore : lignes install ===
+6:install/
+=== YAML source vs install (sha256) ===
+config/ekf.yaml b435cb06dea6751b | ABSENT 
+config/preconditions.yaml 98ff95b4a18e908d | ABSENT 
+config/manette.yaml b66cd54e928730ba | ABSENT 

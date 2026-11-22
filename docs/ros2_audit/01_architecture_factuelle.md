@@ -14,27 +14,27 @@ Le système se lit en deux couches : une **couche ROS 2** (20 nœuds, 54 topics,
 
 | Élément | Valeur mesurée | Source |
 |---|---|---|
-| Carte | Jetson Orin NX, noyau `5.15.148-tegra` | [S20] |
+| Carte | `NVIDIA Jetson Orin NX Engineering Reference Developer Kit Super`, noyau `5.15.148-tegra`, Ubuntu 22.04.5 LTS | [S48] |
 | Distribution ROS 2 | `humble` | [S17] |
 | Middleware (RMW) | `rmw_fastrtps_cpp` | [S17] |
 | Profil Fast DDS chargé | aucun : `FASTRTPS_DEFAULT_PROFILES_FILE` non défini | [S20] |
 | Variable CycloneDDS | non définie | [S20] |
 | Domaine DDS | 28 (imposé par chaque unité) | [S25] |
-| Interfaces réseau actives | `wlP1p1s0` UP (état DORMANT) ; `eno1` NO-CARRIER ; `l4tbr0`, `usb0`, `usb1` DOWN ; `can0` DOWN | [S15] |
+| Interfaces réseau | UP : `wlP1p1s0` (192.168.1.47/24, route par défaut), `br-0ebcc2854aa2` (172.18.0.1/16, pont Docker), `vethb4baedf` ; DOWN : `eno1` (sans porteuse), `docker0`, `l4tbr0`, `usb0`, `usb1`, `can0` ; `tailscale0` sans adresse IPv4 | [S49] |
 | Sockets RTPS | 6 sockets UDP en écoute sur `0.0.0.0` (7400, 7412, 7413, 7414, 7415) | [S14] |
 | RAM | 7 092 / 15 656 Mo utilisés | [S16] |
 | Mémoire partagée | `/dev/shm` : 12 Mo utilisés sur 7,7 Go (1 %) | [S13] |
 | Disque | 117 Go utilisés sur 147 Go (84 %) | [S13] |
 | Uptime / charge | 6 j 22 h ; load average 2,98 (1 min) | [S20] |
-| Fréquence CPU observée | 729 MHz ou 1 190 MHz selon les cœurs, 8 cœurs | [S16] |
-| Accélérateur | `GR3D_FREQ 0 %` sur toute la fenêtre de 6 s | [S16] |
+| Fréquence CPU observée | 729 MHz sur 29 des 36 mesures par cœur, paliers à 883, 1 190 et 1 574 MHz, 8 cœurs | [S16] |
+| Accélérateur | `GR3D_FREQ 0 %` sur les 5 échantillons relevés en 5 s | [S16] |
 | Températures | `cpu 53,5 °C`, `tj 53,5 °C`, `gpu 50,9 °C`, `soc0 48,3 °C` | [S16] |
-| Puissance | `VDD_IN 6 090 mW` | [S16] |
+| Puissance | `VDD_IN` 6 090 mW sur 3 des 5 échantillons, 5 995 mW sur 2 | [S16] |
 
 Faits qui en découlent et qui contraignent toute refonte :
 
 1. **Aucun transport partagé n'est configuré** : sans `FASTRTPS_DEFAULT_PROFILES_FILE`, Fast DDS utilise ses transports par défaut, et le taux d'occupation de `/dev/shm` (1 %) montre qu'aucun segment de mémoire partagée significatif n'est en usage [S13], [S20]. Le profil `fastdds_profile.xml` du dépôt ([S40]) déclare un participant UDP-only : il n'est pas chargé.
-2. **Le trafic DDS circule sur le Wi-Fi** : la seule interface montée est `wlP1p1s0`, `eno1` est sans porteuse [S15].
+2. **La route par défaut passe par le Wi-Fi** (`default via 192.168.1.1 dev wlP1p1s0`) et `eno1` est sans porteuse [S49]. Deux ponts locaux sont aussi actifs : `br-0ebcc2854aa2` (172.18.0.0/16, Docker) et `vethb4baedf`, plus `tailscale0`. **L'attribution du trafic DDS à une interface n'a pas été mesurée** : `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `nstat -az` ou `ss -ti` sur les sockets RTPS avant et après une minute de flux image, et compteurs `ip -s link show wlP1p1s0 br-0ebcc2854aa2`.
 3. **Le GPU est inutilisé** (`GR3D_FREQ 0 %`), alors que le service YOLO tourne et consomme 1,5 Go de RSS [S12], [S16].
 4. **Le disque est à 84 %**, ce qui interdit d'installer sans nettoyage préalable [S13].
 
@@ -86,23 +86,23 @@ Deux constats de structure :
 | `/llm_bridge_node` | `ros2_llm_bridge_cpp` | `ros2-llm-bridge-cpp.service` | 3 | 1 | [S02], [S25] |
 | `/camera/camera` | `astra_camera` (vendor, C++) | aucune unité dédiée (lancé par le service matériel) | 11 | 3 | [S02], [S12] |
 | `/wrist_camera/camera` | `v4l2_camera` | `clawbot-wrist-camera.service` | 7 | 1 | [S02], [S25] |
-| `/yolo_source_camera` | `yolo_service.py` | `yolo-inference.service` | 0 | 1 | [S02], [S25] |
+| `/yolo_source_camera` | `yolo_service.py` | `yolo-inference.service` | 2 (infrastructure seule : `parameter_events`, `rosout`) | 1 (`/wrist_camera/image_raw`) | [S02], [S25] |
 | `/ydlidar_ros2_driver_node` | `ydlidar_ros2_driver` (vendor, C++) | `clawbot-lidar.service` | 4 | 1 | [S02], [S25] |
 | `/ekf_filter_node` | `robot_localization` (vendor, C++) | `clawbot-ekf.service` | 5 | 4 | [S02], [S25], [S39] |
 | `/slam_toolbox` | `slam_toolbox` (asynchrone, mode `mapping`) | `clawbot-slam.service` | 9 | 4 | [S02], [S25] |
 | `/robot_state_publisher` | `robot_state_publisher` | `clawbot-description.service` | 5 | 2 | |
 | `/joint_state_publisher` | `joint_state_publisher` | lancé par `clawbot-description.service` | 3 | 2 | [S02], [S12] |
-| `/rosbridge_websocket`, `/rosapi`, `/rosapi_params` | `rosbridge_server` | aucune unité dédiée | 4 / 2 / 2 | 0 | [S02], [S12] |
+| `/rosbridge_websocket`, `/rosapi`, `/rosapi_params` | `rosbridge_server` (workspace vendor) | `rosbridge.service` (port 9090, `active`) | 4 / 2 / 2 | 0 | [S02], [S25], [S50] |
 
 Nœuds **absents** du graphe alors que leurs unités ou leurs paquets existent : `clawbot-arm-controller` (aucun nœud `/arm_trajectory_server`), `clawbot-move-group` (aucun `move_group`, donc **aucune action** — cf. §6), `clawbot-nav2`, `clawbot-joy-teleop`, `clawbot-health` [S01], [S25]. Ces unités ne figurent pas dans la liste des services en cours d'exécution [S25].
 
 ## 5. Topics
 
-54 topics, 8 avec zéro éditeur, 12 avec zéro abonné [S07]. Cadence mesurée sur 39 topics (images et nuages exclus de la boucle) [S08], puis sur les flux capteurs [S09].
+54 topics : **7 sans aucun éditeur** et **25 sans aucun abonné** [S51]. Les 7 topics sans éditeur sont `/arm/joint_states`, `/camera/detection_image`, `/detections`, `/sentinel/transcript`, `/set_pose`, `/slam_toolbox/feedback` et `/ydlidar_ros2_driver_node/transition_event` [S07]. Cadence mesurée sur 39 topics (images et nuages exclus de la boucle) [S08], puis sur les flux capteurs [S09].
 
 | Topic | Type | Éd. | Ab. | Cadence mesurée | Source |
 |---|---|---|---|---|---|
-| `/scan` | `sensor_msgs/msg/LaserScan` | 1 | 2 | 10,125 Hz (min 0,095 s / max 0,102 s) | [S09] |
+| `/scan` | `sensor_msgs/msg/LaserScan`, `frame_id: laser` | 1 | 2 | 10,125 Hz (min 0,095 s / max 0,102 s) | [S09], [S55] |
 | `/point_cloud` | `sensor_msgs/msg/PointCloud` | 1 | 0 | 10,110 Hz | [S09] |
 | `/camera/color/image_raw` | `sensor_msgs/msg/Image` | 1 | 0 | 30,004 Hz | [S09] |
 | `/camera/depth/image_raw` | `sensor_msgs/msg/Image` | 1 | 2 | **0 message en 12 s** | [S09] |
@@ -135,7 +135,7 @@ Nœuds **absents** du graphe alors que leurs unités ou leurs paquets existent :
 | `/diagnostics` | `diagnostic_msgs/msg/DiagnosticArray` | 1 | 0 | 1,936 Hz | [S08] |
 | `/tf` | `tf2_msgs/msg/TFMessage` | 5 | 2 | 25,959 Hz | [S08] |
 | `/tf_static` | `tf2_msgs/msg/TFMessage` | 2 | 2 | aucun message (QoS TRANSIENT_LOCAL, publié à l'attachement) | [S08], [S07] |
-| `/map`, `/map_metadata` | `nav_msgs/msg/OccupancyGrid`, `MapMetaData` | 1 | 2 / 0 | 0 message en 12 s (publication sur mise à jour) | [S09] |
+| `/map`, `/map_metadata` | `nav_msgs/msg/OccupancyGrid`, `MapMetaData` | 1 | 2 / 0 | 0 message en 12 s — cohérent avec les scans rejetés (voir §7) | [S09], [S54] |
 | `/robot_description` | `std_msgs/msg/String` | 1 | 1 | aucun message (TRANSIENT_LOCAL) | [S08] |
 | `/pose` | `PoseWithCovarianceStamped` | 1 | 0 | non publié pendant la fenêtre | [S08] |
 | `/Buzzer`, `/RGBLight`, `/servo_ctrl` | `Bool`, `Int32`, `Int32MultiArray` | 1 | 1 | 0 message en 7 s | [S08] |
@@ -161,10 +161,10 @@ Deux ruptures de chaîne établies par ces mesures :
 | `/enable` | `std_srvs/srv/Empty` | `slam_toolbox` | aucun | [S04] |
 | `/start_scan`, `/stop_scan` | `std_srvs/srv/Empty` | `ydlidar_ros2_driver_node` | aucun | [S04] |
 | `/slam_toolbox/{save_map,serialize_map,deserialize_map,dynamic_map,clear_changes,manual_loop_closure,pause_new_measurements,toggle_interactive_mode,get_interactive_markers}` | types `slam_toolbox/*`, `nav_msgs/srv/GetMap` | `slam_toolbox` | aucun | [S04] |
-| `/camera/{get_camera_info,get_device_info,set_depth_exposure,set_laser_enable,…}` (43 services) | `astra_camera_msgs/*`, `std_srvs/*` | `camera` | aucun | [S04] |
+| `/camera/{get_camera_info,get_device_info,set_depth_exposure,set_laser_enable,…}` (44 services) | `astra_camera_msgs/*`, `std_srvs/*` | `camera` | aucun | [S04] |
 | `/wrist_camera/set_camera_info` | `sensor_msgs/srv/SetCameraInfo` | `wrist_camera/camera` | aucun | [S04] |
 | `/ydlidar_ros2_driver_node/change_state` | `lifecycle_msgs/srv/ChangeState` | `ydlidar_ros2_driver_node` | `launch_ros_1308` | [S04], [S02] |
-| `/<nœud>/{describe,get,set,list}_parameters{, _atomically}` | `rcl_interfaces/*` | les 13 nœuds ROS 2 | `rosapi` | [S04], [S02] |
+| `/<nœud>/{describe,get,set,list}_parameters{, _atomically}` | `rcl_interfaces/*` | 17 nœuds ROS 2 | `rosapi` | [S04], [S51] |
 
 `DirectorCommand` est un service **à charge utile JSON opaque** : `string request_json` en entrée, `string response_json` en sortie [S38]. Aucune validation de schéma n'est exprimée dans l'interface : le contrat réel est dans le code du directeur et dans la documentation du pont.
 
@@ -187,6 +187,8 @@ Arêtes dynamiques supplémentaires observées sur 5 s de `/tf` [S11] : `odom �
 
 - **Une seule racine** : `odom`, alimentée par l'EKF [S11], [S39].
 - **Un seul écrivain de `odom → base_footprint`** : `ekf_filter_node` (diffuseur TF déclaré, 5 Hz de sortie) [S32], [S02].
+- **`/scan` publie `frame_id: laser`, alors que l'arbre TF ne contient que `laser_link`** [S55], [S10]. Conséquence mesurée : `slam_toolbox` rejette **40 scans** entre 11:04:07 et 11:04:53 avec `Message Filter dropping message: frame 'laser' … queue is full` [S54]. La cartographie ne consomme donc aucun scan, ce qui explique qu'aucun `/map` n'ait été publié pendant les 12 s de mesure [S09]. `safety_arbitrator` n'est pas affecté : il lit les portées de `/scan` sans passer par TF [S45].
+- **La capture de `/tf` a été tronquée à 200 lignes** : les arêtes `llink2 → llink3` et `rlink2 → rlink3` n'y sont pas observées, seules `llink1 → llink2` et `arm_link5 → llink3` le sont [S11]. Les chaînes latérales sont donc **partiellement** établies ; `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `ros2 run tf2_tools view_frames` (arbre complet, une racine).
 - **`arm_link4 → mono_link` est statique** alors que `base_link → arm_link4` est dynamique : la chaîne du bras n'est complète que si `joint_state_publisher` et `robot_state_publisher` publient les joints du bras. Or `/arm/joint_states` n'a **aucun éditeur** [S07] : la chaîne `arm_link1..4` observée provient donc d'un autre chemin, que la collecte n'isole pas. `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `ros2 run tf2_tools view_frames` puis `ros2 topic echo /joint_states --once` pour attribuer chaque arête à son éditeur.
 - **`wrist_camera_optical_frame` est un enfant de `mono_link`** (statique) et non de `arm_link5` : la caméra du poignet est donc rattachée à la chaîne du bras par un joint fixe intermédiaire, conformément à l'URDF [S27], [S10].
 
@@ -214,7 +216,7 @@ Conséquence directe : **les cinq nœuds maison qui portent la décision ne sont
 
 27 fichiers `*.launch.py` sur disque [S23]. Aucun n'utilise `ComposableNode`, `LifecycleNode`, ni `executor` : **0 occurrence** de chacun dans les structures déclarées [S23]. Aucune composition, aucun cycle de vie.
 
-Le lancement réel n'est pas fait par ces launch files mais par **17 unités systemd** [S25], [S26] :
+Le lancement réel n'est pas fait par ces launch files mais par **14 unités systemd actives** (15 avec `rosbridge.service`, lancée depuis le workspace vendor) [S25], [S26], [S58], [S50] :
 
 | Unité | Commande réelle | `Restart` | Dépend de | Source |
 |---|---|---|---|---|
@@ -234,7 +236,7 @@ Le lancement réel n'est pas fait par ces launch files mais par **17 unités sys
 | `clawbot-docs.service` | `mkdocs serve --dev-addr 0.0.0.0:8080` | on-failure | — | [S25] |
 
 - **Une seule unité a un `ExecStop`** : `clawbot-director` (`scripts/annuler_tache_service.sh`) [S25]. Aucun autre service n'est arrêté proprement.
-- **`clawbot-slam` et `clawbot-nav2` se déclarent `Conflicts=` mutuellement** [S25] : un seul écrivain de `map → odom`.
+- **`clawbot-slam` déclare `Conflicts=clawbot-nav2.service`** [S25] ; le sens inverse n'est pas observé (les propriétés de `clawbot-nav2` ne sont pas dans la collecte : l'unité n'est pas active). `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `systemctl show clawbot-nav2.service -p Conflicts`.
 - **`clawbot-docs.service` sert `mkdocs serve` en `--dev-addr 0.0.0.0:8080`**, c'est-à-dire un serveur de développement exposé sur le réseau, dans le même système que le contrôle du robot [S25].
 
 ## 10. QoS et middleware
@@ -272,7 +274,8 @@ QoS effectif lu sur les endpoints, par `ros2 topic info -v` [S07]. Abréviations
 
 **Middleware.**
 - `rmw_fastrtps_cpp` [S17], sans profil chargé [S20] : les transports par défaut de Fast DDS s'appliquent, et `/dev/shm` reste à 12 Mo, ce qui montre qu'aucun segment partagé notable n'est utilisé [S13].
-- **Deux profils QoS seulement sont écrits dans le code maison** : `qos_profile_sensor_data` pour `/scan` et la profondeur (`BEST_EFFORT`), et un `QoSProfile(RELIABLE, TRANSIENT_LOCAL)` pour `/map` dans le service matériel [S29]. Tout le reste utilise les profils par défaut — ce qui explique que 141 endpoints sur 54 topics partagent `RELIABLE`/`VOLATILE` [S07].
+- **La répartition réelle des profils sur les 173 endpoints est hétérogène** : 128 `RELIABLE`, 13 `BEST_EFFORT`, et 32 endpoints en `TRANSIENT_LOCAL` [S51]. Les profils `BEST_EFFORT` concernent `/scan`, `/point_cloud`, `/detections`, `/camera/detection_image` et plusieurs abonnés capteurs ; les `TRANSIENT_LOCAL` concernent `/map`, `/map_metadata`, `/robot_description`, `/tf_static`, `/rosout`, `/client_count`, `/connected_clients` [S07].
+- **Deux profils QoS seulement sont écrits dans le code maison** : `qos_profile_sensor_data` pour `/scan` et la profondeur (`BEST_EFFORT`), et un `QoSProfile(RELIABLE, TRANSIENT_LOCAL)` pour `/map` dans le service matériel [S29]. Tout le reste utilise les profils par défaut [S07].
 - **Aucun `use_intra_process_comms`** : la composition de nœuds étant absente (§9), l'IPC intra-processus est impossible par construction. `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `grep -rn use_intra_process_comms` sur l'arbre (0 occurrence attendue).
 - **Aucun SHM déclaré** : le profil du dépôt ([S40]) ne déclare que `UDPv4` et `useBuiltinTransports=false` ; il n'est pas chargé, donc le transport effectif est celui par défaut de Fast DDS sur UDPv4.
 - **Deux sérialisations différentes coexistent pour la même donnée** : `sensor_msgs/Image` brut (`/wrist_camera/image_raw`) et `CompressedImage` (`/wrist_camera/image_raw/compressed`), plus `theora` et `compressedDepth` publiés par la même caméra [S03], [S07]. De même pour la profondeur : `Image` et `PointCloud2` [S03].
@@ -309,7 +312,7 @@ flowchart LR
   AST -->|"/camera/depth/image_raw"| SEN
   WRI -->|"/wrist_camera/image_raw"| YOLO
   IMU -->|"/imu/data_raw"| DRV
-  DRV -->|"/arm/servo_angles, /joint_states, /odom_raw, /voltage, /vel_raw"| SAF
+  DRV -->|"/arm/servo_angles, /imu/data_raw, /voltage"| SAF
   DRV -->|"/arm/servo_angles"| DIR
   SAF -->|"/safety/state"| DIR
   DIR -->|"/director/state"| SEN
@@ -328,7 +331,7 @@ flowchart LR
 ```mermaid
 flowchart TB
   subgraph Jetson["Jetson Orin NX — 8 cœurs, 15,7 Go RAM, noyau 5.15.148-tegra"]
-    SYS["17 unités systemd<br/>ROS_DOMAIN_ID=28"]
+    SYS["14 unités systemd actives<br/>ROS_DOMAIN_ID=28"]
   end
   subgraph USB
     MCU2["Carte de commande<br/>Rosmaster_Lib 3.3.9"]
@@ -378,4 +381,5 @@ flowchart TB
 - **Identité USB des trois caméras et du lidar (`VID:PID`)** — non relevée. `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `udevadm info -q property -n /dev/video0` et `lsusb`.
 - **Contenu des launch files vendor utilisés** (`ydlidar_raw_launch.py`, `robot_description.launch.py`) — seuls les fichiers du dépôt `clawbot` ont été inventoriés [S23]. `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `find /home/jetson/yahboomcar_ros2_ws -name '*.launch.py'`.
 - **Profondeur de file effective** — `UNKNOWN` sur tous les endpoints [S07]. `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : lecture des `create_publisher`/`create_subscription` [S30] et des YAML `qos_overrides` [S24].
-- **Nœuds exposés par `rosbridge` sur le réseau** — le port du websocket n'a pas été relevé. `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `ss -ltnp | grep -E '9090|8080|8000|8001|8003'`.
+- **Attribution du trafic DDS par interface** — la route par défaut passe par le Wi-Fi et deux ponts locaux sont actifs (`br-0ebcc2854aa2`, `vethb4baedf`), mais aucun compteur ne dit par où passent réellement les messages [S49]. `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `nstat -az` avant/après une minute de flux, et `ip -s link show` sur chaque interface.
+- **Services exposés sur le réseau** — relevé : 8000, 8001, 8003, 8080 (MkDocs), 9090 (rosbridge), 8888, 8889, 22, 3389 (bureau distant), plus 11434 en `127.0.0.1` [S50]. Aucun filtrage observé.

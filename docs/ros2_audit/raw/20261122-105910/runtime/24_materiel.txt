@@ -1,0 +1,7 @@
+=== modele ===
+NVIDIA Jetson Orin NX Engineering Reference Developer Kit Super
+=== os-release ===
+NAME="Ubuntu"
+VERSION="22.04.5 LTS (Jammy Jellyfish)"
+=== uname ===
+Linux 5.15.148-tegra aarch64
