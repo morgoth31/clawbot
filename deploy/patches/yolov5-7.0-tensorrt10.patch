@@ -1,0 +1,26 @@
+--- yolov5-7.0/export.py	2022-11-22 16:23:47.000000000 +0100
++++ yolov5-7.0-trt10/export.py	2026-11-22 19:01:49.916493424 +0100
+@@ -268,7 +268,7 @@
+ 
+     builder = trt.Builder(logger)
+     config = builder.create_builder_config()
+-    config.max_workspace_size = workspace * 1 << 30
++    config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, workspace * 1 << 30)  # TRT 10
+     # config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, workspace << 30)  # fix TRT 8.4 deprecation notice
+ 
+     flag = (1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
+@@ -295,8 +295,12 @@
+     LOGGER.info(f'{prefix} building FP{16 if builder.platform_has_fast_fp16 and half else 32} engine as {f}')
+     if builder.platform_has_fast_fp16 and half:
+         config.set_flag(trt.BuilderFlag.FP16)
+-    with builder.build_engine(network, config) as engine, open(f, 'wb') as t:
+-        t.write(engine.serialize())
++    # TensorRT 10 : build_engine() n'existe plus -> build_serialized_network()
++    serialized = builder.build_serialized_network(network, config)
++    if serialized is None:
++        return None, "build_serialized_network a rendu None"
++    with open(f, 'wb') as t:
++        t.write(serialized)
+     return f, None
+ 
+ 
