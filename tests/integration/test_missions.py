@@ -139,6 +139,7 @@ def banc(tmp_path_factory):
     assert banc.client_decide.wait_for_service(timeout_sec=20.0)
     banc.tourner(2.0)
     yield banc
+    banc.espion.destroy_publisher(banc.pub_angles)
     banc.executif.destroy_node()
     banc.skills.destroy_node()
     for noeud in (banc.arbitre, banc.base, banc.entrees, banc.espion):
