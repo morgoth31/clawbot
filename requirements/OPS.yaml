@@ -108,3 +108,27 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P02
+
+  - id: REQ-OPS-020
+    title: Seuils et table d'entrées en paramètres ROS en lecture seule
+    statement: >
+      Les seuils et la table d'entrées doivent être des paramètres ROS déclarés
+      en lecture seule, chargés d'un YAML.
+    rationale: >
+      Les seuils vivaient en constantes Python (thresholds.py, S46) : les
+      ajuster demandait de modifier le code et de reconstruire. La table
+      d'entrées doit être vérifiable par un opérateur sans lire le source.
+    sources: [S46, S07]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_safety/test/test_arbitre_parametres.py : publish_rate_hz, stale_s,
+      cmd_timeout_s et chaque entrée (topic, priority, timeout_s) sont déclarés
+      avec un ParameterDescriptor read_only=True ; le YAML
+      clawbot_safety/config/arbitrator.yaml les fournit ; tenter un
+      ros2 param set échoue.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P04
