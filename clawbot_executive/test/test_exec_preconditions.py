@@ -13,6 +13,10 @@ def etats(actives=("base", "lidar")):
     etats.capacites = {nom: {"name": nom, "state": "ACTIVE"} for nom in actives}
     etats.safety_state = "OK"
     etats.estop_latched = False
+    # Bras dans l'enveloppe validée : sans cela, `move_relative` est refusé
+    # ARM_NOT_AT_REST avant même la question de capacité (REQ-ARM-004). Le refus
+    # bras hors enveloppe est couvert par test_arm_skills.py.
+    etats.maj_servo_angles([90, 180, 0, 0, 90, 149])
     return etats
 
 

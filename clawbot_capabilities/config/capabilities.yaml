@@ -49,11 +49,16 @@ capacites:
     timeout_s: 90.0
 
   arm:
+    # Unites reelles : le controleur de trajectoire (actions bras + pince, /arm/joint_states
+    # a 20 Hz) et move_group, optionnel, qui ne sert qu'a la planification. Les deux sont
+    # demarrees a la demande par le gestionnaire (jamais au boot : ni l'une ni l'autre n'a
+    # de lien multi-user.target.wants, et `systemctl is-enabled` rend `linked` code 1).
     units: [clawbot-arm-controller.service, clawbot-move-group.service]
     requires: [base]
     managed: true
     ready_when:
       - {action: /arm_controller/follow_joint_trajectory}
+      - {action: /grip_controller/follow_joint_trajectory}
       - {topic: /arm/joint_states, min_hz: 8.0}
     timeout_s: 45.0
 

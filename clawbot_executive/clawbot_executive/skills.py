@@ -11,6 +11,9 @@ import os
 import time
 from dataclasses import dataclass, field
 
+from clawbot_common import preconditions as regles_preconditions
+
+from . import bras
 from .deplacement import Deplacement, code_safety
 from .registre import Definition
 
@@ -32,9 +35,12 @@ class Resultat:
 class Skill:
     """Base commune : préconditions puis exécution."""
 
-    def __init__(self, definition: Definition):
+    def __init__(self, definition: Definition, regles=None):
         self.definition = definition
         self.nom = definition.nom
+        # Enveloppe de repos : chargée par le serveur, injectée ici pour que les tests
+        # n'aient pas à dépendre du fichier de configuration installé.
+        self.regles = regles
 
     # ── préconditions ────────────────────────────────────────────────────────
     def capacites_requises(self, params=None) -> list[str]:
@@ -57,14 +63,35 @@ class Skill:
         return None
 
     def detail_precondition(self, etats, params=None) -> str:
+        return self.refus_precondition(etats, params)[1]
+
+    def refus_precondition(self, etats, params=None) -> tuple[str | None, str]:
+        """(code, raison) du refus, ou (None, "") si le skill peut démarrer.
+
+        Deux familles : la capacité exigée (P08) et, pour un skill qui déplace la base,
+        l'enveloppe de repos du bras (REQ-ARM-004). Le silence n'est pas un feu vert :
+        des angles jamais reçus ou périmés valent refus.
+        """
         manquante = self.capacite_manquante(etats, params)
-        return f"capacité {manquante} inactive" if manquante else ""
+        if manquante:
+            return "CAPABILITY_INACTIVE", f"capacité {manquante} inactive"
+
+        regles = self._regles()
+        if regles.exige_bras_replie(self.nom):
+            ok, raison = regles_preconditions.verifier_bras(
+                etats.servo_angles, etats.age_servo(), regles)
+            if not ok:
+                return "ARM_NOT_AT_REST", raison
+        return None, ""
 
     def check_preconditions(self, etats, params=None) -> str | None:
         """Code d'erreur si le skill ne peut pas démarrer, sinon None."""
-        if self.capacite_manquante(etats, params):
-            return "CAPABILITY_INACTIVE"
-        return None
+        return self.refus_precondition(etats, params)[0]
+
+    def _regles(self):
+        if self.regles is None:
+            self.regles = regles_preconditions.charger()
+        return self.regles
 
     # ── exécution ────────────────────────────────────────────────────────────
     def execute(self, ctx) -> Resultat:            # pragma: no cover - interface
@@ -226,6 +253,109 @@ class SaveMap(Skill):
                         "mapping non pilotable par le service (P07 : unité systemd)")
 
 
+class SkillBras(Skill):
+    """Base des skills du bras : trajectoire, puis vérification sur la mesure.
+
+    Le contrôleur ne reçoit aucun retour de position : ses `/arm/joint_states` sont des
+    consignes. Seul `/arm/servo_angles`, relu par le pilote, prouve le mouvement —
+    c'est pourquoi ces skills ne rendent `SUCCEEDED` qu'après cette vérification
+    (REQ-ARM-006).
+    """
+
+    def _borne(self, nom: str, defaut: float) -> float:
+        return float(self.definition.bornes.get(nom, defaut))
+
+    def _executer(self, ctx, groupe: str, positions, duree_s: float, timeout_s: float):
+        """Envoie une trajectoire en surveillant le retour servo (REQ-ARM-005)."""
+
+        def surveillance():
+            return bras.surveillance_servo(ctx, ctx.maintenant())
+
+        return ctx.executer_bras(groupe, list(positions), duree_s, timeout_s, surveillance)
+
+    def _attendre_mesure(self, ctx, pose: bras.Pose, timeout_s: float,
+                         servos=None) -> Resultat:
+        echeance = ctx.maintenant() + timeout_s
+        dernier = "aucune mesure reçue"
+        while ctx.maintenant() < echeance:
+            code = bras.surveillance_servo(ctx, ctx.maintenant())
+            if code:
+                return Resultat(FAILED, code, "servo muet pendant la vérification")
+            ok, raison = pose.mesure_conforme(ctx.servo_angles, ctx.age_servo(),
+                                              servos=servos)
+            if ok:
+                return Resultat(SUCCEEDED, message=f"bras dans l'enveloppe : {ctx.servo_angles}",
+                                result_json=json.dumps({"pose": pose.nom,
+                                                        "servo_deg": list(ctx.servo_angles)}))
+            dernier = raison
+            if ctx.annule():
+                return Resultat(CANCELED, message="vérification annulée")
+            ctx.attendre(0.1)
+        return Resultat(FAILED, "ARM_NOT_AT_REST", dernier)
+
+    def _jouer_pose(self, ctx, pose: bras.Pose, duration_s: float) -> Resultat:
+        issue = self._executer(ctx, "arm", pose.positions_arm_rad(), duration_s,
+                               self.definition.timeout_s)
+        if not issue.ok:
+            return Resultat(FAILED, issue.error_code, issue.message)
+        issue = self._executer(ctx, "grip", [pose.position_pince_rad()], min(duration_s, 1.5),
+                               self.definition.timeout_s)
+        if not issue.ok:
+            return Resultat(FAILED, issue.error_code, issue.message)
+        return self._attendre_mesure(ctx, pose, self._borne("verification_timeout_s", 5.0))
+
+
+class ArmRest(SkillBras):
+    """Ramène le bras dans l'enveloppe de repos validée (C10)."""
+
+    def execute(self, ctx) -> Resultat:
+        pose = ctx.poses.poses.get("repos")
+        if pose is None:
+            return Resultat(FAILED, "ARM_NOT_AT_REST",
+                            "aucune pose `repos` validée dans config/arm_poses.yaml")
+        return self._jouer_pose(ctx, pose, self._borne("duree_s", 3.0))
+
+
+class ArmNamedPose(SkillBras):
+    """Exécute une pose nommée de la liste validée, jamais un angle libre."""
+
+    def execute(self, ctx) -> Resultat:
+        nom = ctx.params["pose"]
+        pose = ctx.poses.poses.get(nom)
+        if pose is None:
+            connues = ", ".join(sorted(ctx.poses.poses)) or "aucune"
+            return Resultat(REJECTED, "INVALID_PARAMS",
+                            f"pose {nom!r} hors de la liste validée ({connues}) ; "
+                            "aucun angle libre n'est accepté")
+        duration = float(ctx.params.get("duration_s") or self._borne("duree_s", 3.0))
+        return self._jouer_pose(ctx, pose, duration)
+
+
+class Gripper(SkillBras):
+    """Ouvre ou ferme la pince (butées du SRDF, servo 6)."""
+
+    def execute(self, ctx) -> Resultat:
+        action = ctx.params["action"]
+        try:
+            cible = ctx.poses.pince.cible_rad(action)
+            servo = ctx.poses.pince.ouvert_deg if action == "open" else ctx.poses.pince.ferme_deg
+        except bras.PosesInvalides as exc:
+            return Resultat(REJECTED, "INVALID_PARAMS", str(exc))
+
+        issue = self._executer(ctx, "grip", [cible], self._borne("duree_s", 1.5),
+                               self.definition.timeout_s)
+        if not issue.ok:
+            return Resultat(FAILED, issue.error_code, issue.message)
+
+        pose = bras.Pose(nom=f"pince_{action}", servo_deg=tuple([0.0] * 5 + [servo]),
+                         tolerance_deg=(5.0,) * 6)
+        resultat = self._attendre_mesure(ctx, pose, self._borne("verification_timeout_s", 3.0),
+                                         servos=[5])
+        if resultat.outcome == SUCCEEDED:
+            resultat.message = f"pince {action} : servo 6 à {int(servo)}°"
+        return resultat
+
+
 CLASSES = {
     "stop": Stop,
     "wait": Wait,
@@ -235,14 +365,17 @@ CLASSES = {
     "detect_objects": DetectObjects,
     "navigate_to": NavigateTo,
     "save_map": SaveMap,
+    "arm_rest": ArmRest,
+    "arm_named_pose": ArmNamedPose,
+    "gripper": Gripper,
 }
 
 
-def construire(definition: Definition) -> Skill:
+def construire(definition: Definition, regles=None) -> Skill:
     classe = CLASSES.get(definition.nom)
     if classe is None:
         raise KeyError(f"skill sans implémentation : {definition.nom}")
-    return classe(definition)
+    return classe(definition, regles=regles)
 
 
 def _ecart_angle(angle: float) -> float:

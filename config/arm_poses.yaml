@@ -1,0 +1,65 @@
+# Poses nommées du bras — liste blanche des commandes de l'exécutif (REQ-ARM-003).
+#
+# Unités : DEGRÉS DE SERVO, exactement ce que l'opérateur lit sur `/arm/servo_angles`
+# et ce que le pilote envoie à la carte. Ordre des six valeurs :
+#   [arm_joint1, arm_joint2, arm_joint3, arm_joint4, arm_joint5, grip_joint]
+# soit [servo 1, servo 2, servo 3, servo 4, servo 5, servo 6 (pince)].
+#
+# Une pose n'entre dans `poses` qu'après validation physique par l'opérateur, une par
+# une, bras au repos et main sur l'arrêt. `validated_by` et `validated_at` sont
+# obligatoires : le chargeur refuse une entrée qui n'a pas les deux, donc une pose
+# proposée mais non validée n'est jamais commandable (elle vit dans `propositions`,
+# section informative jamais lue par les skills).
+#
+# Les zéros mécaniques des servos ne sont pas identifiés (base OKF `bras_6dof.md`) :
+# ces valeurs sont des consignes validées à l'œil sur le robot, pas des positions
+# métriques connues. Ne pas les recalculer depuis l'URDF.
+
+format: 1
+joints: [arm_joint1, arm_joint2, arm_joint3, arm_joint4, arm_joint5, grip_joint]
+
+poses:
+  repos:
+    description: >
+      Bras debout compact au-dessus de la colonne, pince à demi fermée (servo 149),
+      caméra du poignet tournée vers l'avant. Seule pose admise avant un déplacement
+      de la base (enveloppe C10, `config/preconditions.yaml`).
+    servo_deg: [90, 180, 0, 0, 90, 149]
+    tolerance_deg: [5, 5, 5, 5, 5, 5]
+    validated_by: "opérateur"
+    validated_at: "2026-11-11T19:20:40+01:00"
+    evidence: "docs/knowledge-base/03_Operations/2026-11-11_essai_prehen_stylo.md"
+
+# Propositions construites depuis le SRDF de `clawbot_moveit_config`
+# (`group_state`) et les limites de l'URDF, en attente d'essai physique.
+# NON COMMANDABLES : le chargeur ne lit que `poses`.
+propositions:
+  home:
+    description: >
+      Toutes les articulations à 0 rad (group_state `home` du SRDF), bras tendu
+      verticalement, pince fermée. Sert de référence de cinématique directe.
+    servo_deg: [90, 90, 90, 90, 90, 180]
+    source: "SRDF clawbot_moveit_config/config/clawbot_x3plus.srdf :: group_state home"
+  ready:
+    description: >
+      group_state `ready` du SRDF : arm_joint2 et arm_joint3 à +0,5 rad
+      (90 + 28,65 = 118,65 -> 119°), autres axes à 0. Déporte la pince vers l'avant,
+      environ 15 cm devant la colonne.
+    servo_deg: [90, 119, 119, 90, 90, 180]
+    source: "SRDF clawbot_moveit_config/config/clawbot_x3plus.srdf :: group_state ready"
+
+# Pince : valeurs du SRDF (`group_state open` / `closed`) et du service matériel.
+# Utilisées par le skill `gripper`, jamais par `arm_named_pose`.
+pince:
+  ouvert:
+    servo_deg: 0
+    joint_rad: -1.54
+    validated_by: "opérateur"
+    validated_at: "2026-11-11T19:20:40+01:00"
+    source: "SRDF group_state open ; servo 6 à 0° ouvert (bras_6dof.md)"
+  ferme:
+    servo_deg: 180
+    joint_rad: 0.0
+    validated_by: "opérateur"
+    validated_at: "2026-11-11T19:20:40+01:00"
+    source: "SRDF group_state closed ; servo 6 à 180° fermé"

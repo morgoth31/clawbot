@@ -112,3 +112,44 @@ skills:
         timeout_s: {type: number, exclusiveMinimum: 0, maximum: 10.0, default: 3.0}
     requires: [detection]
     timeout_s: 12.0
+
+  # ── bras (P13) ────────────────────────────────────────────────────────────
+  # Les poses commandées viennent de `config/arm_poses.yaml` : liste blanche validée
+  # par l'opérateur, jamais un angle libre. La conversion servo -> radians est celle du
+  # contrôleur ; la vérification finale se fait sur `/arm/servo_angles`.
+
+  arm_rest:
+    description: >
+      Ramène le bras dans l'enveloppe de repos validée (C10) : trajectoire vers la pose
+      `repos`, puis vérification sur les angles relus par le pilote.
+    params_schema: {type: object, additionalProperties: false, properties: {}}
+    requires: [arm]
+    timeout_s: 20.0
+    bornes: {duree_s: 3.0, verification_timeout_s: 5.0}
+
+  arm_named_pose:
+    description: >
+      Exécute une pose nommée de la liste validée ; une pose inconnue est refusée
+      INVALID_PARAMS sans envoyer de trajectoire.
+    params_schema:
+      type: object
+      additionalProperties: false
+      required: [pose]
+      properties:
+        pose: {type: string, minLength: 1, maxLength: 32}
+        duration_s: {type: number, minimum: 1.0, maximum: 10.0}
+    requires: [arm]
+    timeout_s: 25.0
+    bornes: {duree_s: 3.0, verification_timeout_s: 5.0}
+
+  gripper:
+    description: "Ouvre ou ferme la pince (butées du SRDF, servo 6)."
+    params_schema:
+      type: object
+      additionalProperties: false
+      required: [action]
+      properties:
+        action: {type: string, enum: [open, close]}
+    requires: [arm]
+    timeout_s: 10.0
+    bornes: {duree_s: 1.5, verification_timeout_s: 3.0}
