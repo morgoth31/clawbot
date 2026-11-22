@@ -1,0 +1,197 @@
+{
+  "schema": "clawbot.errors/1",
+  "codes": {
+    "CAPABILITY_INACTIVE": {
+      "category": "PRECONDITION",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "RETRY_STEP",
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "CAPABILITY_CONFLICT": {
+      "category": "PRECONDITION",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "ARM_NOT_AT_REST": {
+      "category": "PRECONDITION",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "MAP_MISSING": {
+      "category": "PRECONDITION",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "SENSOR_STALE": {
+      "category": "SENSOR",
+      "auto_retry": 1,
+      "retry_delay_s": 2.0,
+      "decisions": [
+        "RETRY_STEP",
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "DEPTH_UNAVAILABLE": {
+      "category": "SENSOR",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "SAFETY_HOLD": {
+      "category": "SAFETY",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "RETRY_STEP",
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "OBSTACLE_TOO_CLOSE": {
+      "category": "SAFETY",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "ESTOP_LATCHED": {
+      "category": "SAFETY",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "ABORT"
+      ],
+      "operator_alert": true
+    },
+    "LOW_VOLTAGE": {
+      "category": "SAFETY",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "ABORT"
+      ],
+      "operator_alert": true
+    },
+    "TIMEOUT": {
+      "category": "EXECUTION",
+      "auto_retry": 1,
+      "retry_delay_s": 0.5,
+      "decisions": [
+        "RETRY_WITH_PARAMS",
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "GOAL_UNREACHABLE": {
+      "category": "EXECUTION",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "RETRY_WITH_PARAMS",
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "PLANNING_FAILED": {
+      "category": "EXECUTION",
+      "auto_retry": 1,
+      "retry_delay_s": 0.5,
+      "decisions": [
+        "RETRY_WITH_PARAMS",
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "GRASP_FAILED": {
+      "category": "EXECUTION",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "RETRY_WITH_PARAMS",
+        "SKIP_STEP",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "SERIAL_LOST": {
+      "category": "HARDWARE",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "ABORT"
+      ],
+      "operator_alert": true
+    },
+    "SERVO_NO_FEEDBACK": {
+      "category": "HARDWARE",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "ABORT"
+      ],
+      "operator_alert": true
+    },
+    "INVALID_PARAMS": {
+      "category": "INTERFACE",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "RETRY_WITH_PARAMS",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "UNKNOWN_SKILL": {
+      "category": "INTERFACE",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "REPLACE_REMAINING",
+        "ABORT"
+      ],
+      "operator_alert": false
+    },
+    "UNHANDLED_EXCEPTION": {
+      "category": "INTERNAL",
+      "auto_retry": 0,
+      "retry_delay_s": 0.0,
+      "decisions": [
+        "ABORT"
+      ],
+      "operator_alert": false
+    }
+  }
+}

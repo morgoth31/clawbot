@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawbot.failure_report/1",
+  "title": "Rapport d'échec d'étape (référentiel §6.2)",
+  "type": "object",
+  "required": ["schema", "mission_id", "objective", "step_index", "skill", "error_code",
+               "error_category", "message", "attempts", "auto_retries_done", "health",
+               "allowed_decisions", "budget", "stamp"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "clawbot.failure_report/1"},
+    "mission_id": {"type": "string", "minLength": 1},
+    "objective": {"type": "string"},
+    "step_index": {"type": "integer", "minimum": 0},
+    "skill": {"type": "string", "minLength": 1},
+    "params": {"type": "object"},
+    "error_code": {"type": "string", "minLength": 1},
+    "error_category": {
+      "type": "string",
+      "enum": ["PRECONDITION", "SENSOR", "SAFETY", "EXECUTION", "HARDWARE",
+               "INTERFACE", "INTERNAL"]
+    },
+    "message": {"type": "string"},
+    "attempts": {"type": "integer", "minimum": 1},
+    "auto_retries_done": {"type": "integer", "minimum": 0},
+    "health": {
+      "type": "object",
+      "required": ["level", "active_capabilities", "stale_flows", "safety_state",
+                   "estop_latched", "voltage"],
+      "properties": {
+        "level": {"type": "string", "enum": ["OK", "WARN", "ERROR"]},
+        "active_capabilities": {"type": "array", "items": {"type": "string"}},
+        "stale_flows": {"type": "array", "items": {"type": "string"}},
+        "safety_state": {"type": "string"},
+        "estop_latched": {"type": "boolean"},
+        "voltage": {"type": "number"}
+      }
+    },
+    "last_events": {"type": "array", "items": {"type": "object"}},
+    "allowed_decisions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string",
+                "enum": ["RETRY_STEP", "RETRY_WITH_PARAMS", "SKIP_STEP",
+                         "REPLACE_REMAINING", "ABORT"]}
+    },
+    "budget": {
+      "type": "object",
+      "required": ["escalations_left", "same_step_attempts_left", "time_left_s"],
+      "properties": {
+        "escalations_left": {"type": "integer", "minimum": 0},
+        "same_step_attempts_left": {"type": "integer", "minimum": 0},
+        "time_left_s": {"type": "number", "minimum": 0}
+      }
+    },
+    "stamp": {"type": "string", "minLength": 10}
+  }
+}
