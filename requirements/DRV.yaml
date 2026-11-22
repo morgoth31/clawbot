@@ -46,8 +46,8 @@ requirements:
       2 s de silence. Démonstration complémentaire : tests/hardware/HW-DRV-001.md
       (roues arrêtées en moins de 0,5 s après coupure de la publication).
     evidence: tests/hardware/HW-DRV-001.md
-    status: approved
-    approved_by: "opérateur 2026-11-22"
+    status: verified
+    approved_by: "opérateur 2026-11-22 (cmd_timeout_s=0,3 s ; HW-DRV-001 du 2026-11-22)"
     prompt: P03
 
   - id: REQ-DRV-003

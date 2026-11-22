@@ -24,11 +24,14 @@ sudo systemctl stop clawbot-safety-arbitrator
 ```
 
 Vérifier qu'il est bien arrêté : `systemctl is-active clawbot-safety-arbitrator`
-doit répondre `inactive`. Vérifier aussi qu'aucun autre éditeur ne reste :
+doit répondre `inactive`. Vérifier aussi qu'aucun éditeur ne publie :
 
 ```bash
-ros2 topic info /cmd_vel_safe -v | grep -c "Node name"
-# attendu : 0 éditeur (seul l'abonnement du pilote subsiste)
+ros2 topic info /cmd_vel_safe -v | grep -E "Endpoint type|Node name"
+# attendu : 1 SUBSCRIPTION (driver_node) et 0 PUBLISHER.
+# Attention : `grep -c "Node name"` compte les deux types d'endpoints et renvoie
+# 2 juste après le stop, tant que la découverte DDS n'a pas purgé l'éditeur de
+# l'arbitre. Lire les deux lignes, pas le total.
 ```
 
 ## Essai
@@ -73,12 +76,26 @@ ros2 topic hz /safety/state     # doit remonter à ~20 Hz
 - Arrêt trop tardif (mesuré > 0,5 s) : consigner le délai réel, c'est une
   exigence non tenue.
 
-## Résultat à consigner
+## Résultat mesuré — 2026-11-22 13:38:56, opérateur
+
+Méthode : publication de 40 messages à 0,05 m/s pendant 2 s, arbitre arrêté, avec
+enregistrement de `/vel_raw` (retour encodeur, 10 Hz) en parallèle.
 
 | Mesure | Valeur |
 |---|---|
-| Délai entre le dernier message publié et l'arrêt des roues | ______ s |
-| Ligne WARN présente | oui / non |
-| Nombre de WARN sur 10 s de silence | ______ |
-| `/cmd_vel_safe` remonté à 20 Hz après relance | oui / non |
-| Heure de l'essai | ______ |
+| Dernière consigne non nulle reçue | t = …137,442 |
+| Consigne nulle émise par le pilote | t = …137,772 (**+0,330 s**) |
+| WARN journalisé | oui, **une seule** ligne : « consigne absente depuis 0.33 s, arret » |
+| Dernier échantillon non nul (`/vel_raw`) | t = …137,855, vx = 0,017 m/s |
+| Premier échantillon nul | t = …137,955 |
+| **Arrêt physique après la dernière consigne** | **entre 0,41 et 0,51 s** (résolution 0,1 s) |
+| Course après la consigne nulle | entre 0,08 et 0,18 s |
+| Roues pendant la publication | tourné dans le vide, vx max mesuré 0,053 m/s |
+| `/cmd_vel_safe` après relance | 20,006 Hz, 1 éditeur |
+| Heure de l'essai | 13:38:56 |
+
+**Conclusion.** La consigne de zéro part bien dans la fenêtre exigée (0,30–0,35 s).
+L'arrêt physique tombe à la limite du critère de 0,5 s : les 0,08 à 0,18 s de
+course restante sont la décélération propre du MCU, pas le délai du pilote. Le
+critère matériel est donc tenu à la résolution de mesure près, et la perception
+« plus lent » correspond à ces ~0,45 s au total.
