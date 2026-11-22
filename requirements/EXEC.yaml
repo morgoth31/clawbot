@@ -182,3 +182,183 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P08
+
+  - id: REQ-EXEC-010
+    title: Étapes dans l'ordre, événement par transition
+    statement: >
+      Une mission exécute ses étapes dans l'ordre via /clawbot/execute_skill et publie
+      un MissionEvent à chaque transition.
+    rationale: >
+      L'exécutif remplace la logique d'étapes du directeur (S38) : la seule preuve
+      observable est la suite d'événements, pas l'état interne.
+    sources: [S38, §3.3, §3.4]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_mission_machine.py::test_etapes_dans_l_ordre et
+      ::test_evenement_a_chaque_transition.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P09
+
+  - id: REQ-EXEC-011
+    title: Reprise automatique conforme à la table
+    statement: >
+      Après un échec d'étape, l'exécutif applique exactement la relance automatique de
+      §6.1 pour le code reçu : 0 ou 1 relance, avec le délai prévu par la table.
+    rationale: >
+      La table d'erreurs est la seule autorité sur la relance ; une relance inventée
+      par l'exécutif doublerait le temps d'une mission vouée à l'échec.
+    sources: [§6.1, R04]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_mission_reprise.py, paramétré sur les 19 codes de
+      clawbot_common.errors : nombre de tentatives et délai observés.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P09
+
+  - id: REQ-EXEC-012
+    title: Échec persistant, décision attendue, stop exécuté
+    statement: >
+      Si l'échec persiste après la reprise automatique, la mission passe en
+      WAITING_DECISION, le goal se termine FAILED avec le rapport, et un skill stop est
+      exécuté.
+    rationale: >
+      Une mission en échec doit laisser le robot à l'arrêt et rendre la main au LLM avec
+      un rapport exploitable.
+    sources: [§6.1, §6.4]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_mission_machine.py::test_echec_persistant_attend_decision
+      et ::test_stop_execute_apres_echec.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P09
+
+  - id: REQ-EXEC-013
+    title: Décision hors table refusée sans budget
+    statement: >
+      Une décision absente de allowed_decisions est refusée (accepted=false) et ne
+      consomme aucun budget.
+    rationale: >
+      Le LLM ne doit pas pouvoir inventer une décision ; le refus doit être gratuit,
+      sinon une erreur de raisonnement épuise les escalades.
+    sources: [§6.3]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_mission_machine.py::test_decision_hors_table_refusee
+      (budget inchangé) ; parametré sur tous les codes.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P09
+
+  - id: REQ-EXEC-014
+    title: Budgets de §6.3 appliqués
+    statement: >
+      Les budgets de §6.3 (3 escalades, 2 tentatives par étape et paramètres, 600 s
+      plafonnées à 1 800 s, décision en 120 s) sont appliqués par l'exécutif ; toute
+      valeur de goal supérieure est ramenée au plafond.
+    rationale: >
+      Un goal ne doit jamais acheter plus de budget que le référentiel n'en accorde.
+    sources: [§6.3, INV-07]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_mission_budget.py (4 tests : escalades, tentatives,
+      durée, plafonnement des paramètres de goal).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P09
+
+  - id: REQ-EXEC-015
+    title: Décision tardive → ABORTED
+    statement: >
+      Sans décision dans decision_timeout_s, la mission passe ABORTED.
+    rationale: >
+      Une mission suspendue retient le robot ; sans échéance elle le bloquerait
+      indéfiniment.
+    sources: [§6.3, §6.4]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_mission_machine.py::test_delai_de_decision_depasse_abandonne.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P09
+
+  - id: REQ-EXEC-016
+    title: Journal JSONL par mission
+    statement: >
+      Chaque événement, rapport et décision (avec rationale) est écrit dans
+      /var/lib/clawbot/missions/<date>/<mission_id>.jsonl, une ligne JSON valide par
+      entrée, fichier fermé en fin de mission.
+    rationale: >
+      §6.5 : le journal est la trace exploitable d'une mission, y compris les décisions
+      du LLM et leurs justifications.
+    sources: [§6.5]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_journal_mission.py (4 tests, dossier temporaire).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P09
+
+  - id: REQ-EXEC-017
+    title: Rapport de mission complet
+    statement: >
+      /clawbot/mission/report renvoie l'état, les étapes, le dernier rapport, les
+      décisions et le budget restant.
+    rationale: >
+      C'est la seule vue dont le LLM dispose pour décider sans relancer une mission.
+    sources: [§3.5, §6.2]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_executive/test/test_report_mission.py (3 tests).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P09
+
+  - id: REQ-EXEC-018
+    title: Façade du directeur, réponses inchangées
+    statement: >
+      /director/command traduit vers une mission chaque op qui a un équivalent en
+      skill, et conserve le traitement actuel pour les autres ; la forme des réponses
+      ne change pas.
+    rationale: >
+      Les trois appelants du directeur ne changent pas dans ce lot (C11) : la façade
+      doit être invisible pour eux.
+    sources: [C11, S38]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_director/test/test_facade_missions.py, sur le corpus P06 : chaque requête
+      produit soit la mission attendue, soit le traitement historique ; forme des
+      réponses comparée champ par champ. clawbot_director/test/test_director_schema.py
+      reste vert (mode legacy par défaut).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P09

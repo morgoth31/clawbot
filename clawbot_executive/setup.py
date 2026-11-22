@@ -20,5 +20,8 @@ setup(
     description="Serveur de skills (actions ROS 2) - P08",
     license="Proprietary",
     tests_require=["pytest"],
-    entry_points={"console_scripts": ["skill_server = clawbot_executive.serveur:main"]},
+    entry_points={"console_scripts": [
+        "skill_server = clawbot_executive.serveur:main",
+        "mission_executive = clawbot_executive.mission_node:main",
+    ]},
 )

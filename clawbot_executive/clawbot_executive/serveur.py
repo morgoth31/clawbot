@@ -36,10 +36,15 @@ SNAPSHOTS_PAR_DEFAUT = "/var/lib/clawbot/snapshots"
 class Contexte:
     """Ce qu'un skill peut faire : publier une consigne, lire l'état, attendre."""
 
-    def __init__(self, serveur: "ServeurSkills", params: dict, goal_handle):
+    def __init__(self, serveur: "ServeurSkills", params: dict, goal_handle,
+                 definition=None):
         self.serveur = serveur
         self.params = params
         self.goal_handle = goal_handle
+        # délai effectif : celui du goal s'il est fourni, sinon celui du registre
+        demande = float(getattr(goal_handle.request, "timeout_s", 0.0) or 0.0)
+        self.timeout_s = demande or float(getattr(definition, "timeout_s", 30.0))
+        self._echeance = None
 
     @property
     def etats(self) -> Etats:
@@ -67,6 +72,14 @@ class Contexte:
 
     def maintenant(self) -> float:
         return time.monotonic()
+
+    def echeance(self) -> float:
+        if self._echeance is None:
+            self._echeance = self.maintenant() + self.timeout_s
+        return self._echeance
+
+    def expire(self) -> bool:
+        return self.maintenant() >= self.echeance()
 
     def prochaine_image(self, camera: str, timeout_s: float):
         topic = {"wrist": "/wrist_camera/image_raw",
@@ -253,7 +266,7 @@ class ServeurSkills(Node):
                 return self._terminer(goal_handle, resultat, Resultat(
                     FAILED, code, skill.detail_precondition(self.etats)),
                     skill=demandee, params=params)
-            ctx = Contexte(self, params, goal_handle)
+            ctx = Contexte(self, params, goal_handle, definition=definition)
             resultat_skill = skill.execute(ctx)
         except Exception as exc:                        # noqa: BLE001
             self.get_logger().error(f"{demandee} : exception {exc}")

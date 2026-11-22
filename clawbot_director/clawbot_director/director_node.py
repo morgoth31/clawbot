@@ -57,6 +57,11 @@ class DirectorNode(Node):
         # trois appelants ne sont pas modifiables dans ce lot (C11).
         self.declare_parameter("validation_mode", "warn")
         self.mode_validation = self.get_parameter("validation_mode").value
+        # P09 : façade vers l'exécutif de mission. `legacy` par défaut — le passage en
+        # `mission` change le chemin d'exécution et demande un accord opérateur.
+        self.declare_parameter("facade_mode", "legacy")
+        self.mode_facade = str(self.get_parameter("facade_mode").value)
+        self.cli_mission = None
         self.regles = regles_preconditions.charger()
         self.director = Director(preconditions=self.verifier_preconditions)
         self.safety = None          # dernière valeur lue, None si l'arbitre n'a jamais parlé
@@ -81,6 +86,59 @@ class DirectorNode(Node):
                                            ensure_ascii=False)
         return reponse
 
+    # ── façade de mission (P09, REQ-EXEC-018) ────────────────────────────
+    @staticmethod
+    def _traduire_en_mission(demande: dict):
+        from .facade import traduire
+
+        return traduire(demande)
+
+    def _mission(self, demande: dict) -> dict:
+        """Exécute la requête comme une mission ; la forme de la réponse ne change pas."""
+        import uuid
+
+        from clawbot_interfaces.action import ExecuteMission
+
+        etapes = self._traduire_en_mission(demande)
+        if etapes is None:                       # ne devrait pas arriver : garde-fou
+            return {"status": "INVALID", "reason": "requête non traduisible en mission"}
+        if self.cli_mission is None:
+            from rclpy.action import ActionClient
+
+            self.cli_mission = ActionClient(self, ExecuteMission, "/clawbot/execute_mission")
+        if not self.cli_mission.wait_for_server(timeout_sec=2.0):
+            return {"status": "INDISPONIBLE", "reason": "exécutif de mission injoignable"}
+
+        goal = ExecuteMission.Goal()
+        goal.mission_id = str(uuid.uuid4())
+        goal.objective = demande.get("objective") or demande.get("op", "")
+        goal.steps_json = json.dumps(etapes, ensure_ascii=False)
+        # Pas d'attente bloquante : le futur se résout dans l'exécuteur, pas ici.
+        futur = self.cli_mission.send_goal_async(goal)
+        futur.add_done_callback(self._mission_acceptee)
+        self._missions_en_vol = getattr(self, "_missions_en_vol", {})
+        self._missions_en_vol[goal.mission_id] = futur
+        return {"status": "ACCEPTED", "task_id": goal.mission_id}
+
+    def _mission_acceptee(self, futur) -> None:
+        try:
+            handle = futur.result()
+        except Exception as exc:                  # noqa: BLE001
+            self.get_logger().error(f"mission : envoi du goal impossible ({exc})")
+            return
+        if not handle.accepted:
+            self.get_logger().warn("mission : goal refusé par l'exécutif (une mission en cours)")
+            return
+        handle.get_result_async().add_done_callback(self._mission_terminee)
+
+    def _mission_terminee(self, futur) -> None:
+        try:
+            result = futur.result().result
+            self.get_logger().info(f"mission {result.mission_id} : {result.state} "
+                                   f"({result.outcome})")
+        except Exception as exc:                  # noqa: BLE001
+            self.get_logger().error(f"mission : résultat illisible ({exc})")
+
     def commande(self, texte: str) -> dict:
         """Une seule porte d'entrée : JSON en entrée, JSON en sortie, rien d'implicite."""
         try:
@@ -95,6 +153,9 @@ class DirectorNode(Node):
             self.get_logger().warn(resume_journal(demande, erreurs))
         if refus is not None:
             return refus
+
+        if self.mode_facade == "mission" and self._traduire_en_mission(demande) is not None:
+            return self._mission(demande)
 
         op = demande.get("op")
         if op == "start_skill":
