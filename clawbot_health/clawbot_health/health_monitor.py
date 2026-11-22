@@ -29,6 +29,11 @@ from .estimateur import (LEVEL_ERROR, LEVEL_OK, LEVEL_WARN, EstimateurFlux, Etat
 
 CAPACITES_PAR_DEFAUT = ["base", "lidar", "wrist_vision", "depth_vision"]
 
+# Flux dont la valeur est publiée dans RobotHealth : ils reçoivent UN abonnement typé
+# (ils alimentent aussi l'estimateur). Abonner deux fois le même topic avec deux types
+# différents est refusé par DDS — constaté au premier démarrage du binaire sur /voltage.
+FLUX_TYPES = {"/voltage"}
+
 
 def _lecture_seule():
     return ParameterDescriptor(read_only=True)
@@ -58,6 +63,8 @@ class HealthMonitor(Node):
         qos_brut = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT,
                               durability=DurabilityPolicy.VOLATILE)
         for flux in self._flux:
+            if flux.topic in FLUX_TYPES:
+                continue        # abonnement typé plus bas, il alimente aussi l'estimateur
             self.create_subscription(String, flux.topic,
                                      lambda _msg, topic=flux.topic: self._on_flux(topic),
                                      qos_brut, raw=True)
@@ -91,6 +98,9 @@ class HealthMonitor(Node):
 
     def _on_voltage(self, msg):
         self.voltage = float(msg.data)
+        est = self._estimateurs.get("/voltage")
+        if est is not None:
+            est.enregistrer(self._now())
 
     def _on_capacites(self, msg):
         """P07 publiera la liste réelle ; tant qu'elle se tait, le paramètre fait foi."""

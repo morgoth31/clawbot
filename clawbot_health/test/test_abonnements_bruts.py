@@ -16,6 +16,7 @@ from rclpy.qos import ReliabilityPolicy  # noqa: E402
 from clawbot_health.health_monitor import HealthMonitor  # noqa: E402
 
 MANIFESTE = Path(__file__).resolve().parent / "manifeste_test.yaml"
+MANIFESTE_REEL = Path(__file__).resolve().parents[1] / "config" / "expected_flows.yaml"
 
 pytestmark = pytest.mark.req("REQ-HEALTH-004")
 
@@ -63,3 +64,39 @@ def test_aucun_abonnement_deserialise_sur_un_flux(moniteur):
         if topic in topics_manifeste:
             assert kwargs.get("raw") is True, topic
             assert msg_type.__name__ != "Image", topic
+
+
+@pytest.mark.req("REQ-HEALTH-004")
+def test_manifeste_reel_un_seul_abonnement_par_topic():
+    """Aucun topic du manifeste réel n'est abonné deux fois (types incompatibles).
+
+    Défaut constaté au premier démarrage du binaire : /voltage figurait dans le
+    manifeste comme flux surveillé et recevait en plus un abonnement typé
+    Float32 pour remplir `RobotHealth.voltage` ; DDS refuse deux abonnements de
+    types différents sur le même topic et le nœud mourait dans son constructeur.
+    """
+    from rclpy.parameter import Parameter as P
+
+    ctx = rclpy.Context()
+    rclpy.init(context=ctx)
+    node = MoniteurEspion(context=ctx, parameter_overrides=[
+        P("flows_file", value=str(MANIFESTE_REEL)),
+        P("assume_active_capabilities", value=["base", "lidar", "depth_vision"]),
+    ])
+    try:
+        topics = [c[0] for c in node.captures]
+        assert len(topics) == len(set(topics)), f"topic abonné deux fois : {sorted(topics)}"
+
+        flux = {f.topic for f in node._flux}
+        for topic, msg_type, qos, kwargs in node.captures:
+            if topic in flux:
+                brut = kwargs.get("raw") is True
+                # exception documentée : /voltage porte une valeur lue dans RobotHealth
+                if topic == "/voltage":
+                    assert brut is False and msg_type.__name__ == "Float32"
+                else:
+                    assert brut is True, topic
+                    assert qos.reliability == ReliabilityPolicy.BEST_EFFORT, topic
+    finally:
+        node.destroy_node()
+        rclpy.shutdown(context=ctx)
