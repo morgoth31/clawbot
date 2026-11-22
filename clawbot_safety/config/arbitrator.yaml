@@ -1,0 +1,28 @@
+# Table des entrées et seuils de l'arbitre (référentiel §4).
+# Les valeurs par défaut vivent dans clawbot_safety/thresholds.py ; ce fichier
+# est la vue de déploiement, chargée par l'unité via --params-file.
+# Tous les paramètres sont déclarés read_only : un ros2 param set est refusé.
+
+safety_arbitrator:
+  ros__parameters:
+    publish_rate_hz: 20.0
+    stale_s: 2.0            # STALE_S de thresholds.py
+    cmd_timeout_s: 0.5      # CMD_TIMEOUT_S de thresholds.py
+    inputs:
+      names: [teleop, nav, skill, legacy]
+      teleop:
+        topic: /cmd_vel/teleop
+        priority: 100
+        timeout_s: 0.5
+      nav:
+        topic: /cmd_vel/nav
+        priority: 50
+        timeout_s: 0.5
+      skill:
+        topic: /cmd_vel/skill
+        priority: 40
+        timeout_s: 0.5
+      legacy:
+        topic: /cmd_vel
+        priority: 10
+        timeout_s: 0.5
