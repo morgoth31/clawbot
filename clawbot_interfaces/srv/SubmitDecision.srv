@@ -1,0 +1,8 @@
+string mission_id
+string decision            # RETRY_STEP | RETRY_WITH_PARAMS | SKIP_STEP | REPLACE_REMAINING | ABORT
+string params_json         # RETRY_WITH_PARAMS : nouveaux params ; REPLACE_REMAINING : nouvelles étapes
+string rationale           # justification du LLM, obligatoire, consignée au journal
+---
+bool accepted
+string message
+uint8 escalations_left

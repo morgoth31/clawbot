@@ -1,0 +1,22 @@
+# Goal
+string mission_id          # vide : le serveur en génère un (UUID4)
+string skill               # nom du registre (§7)
+string params_json         # validé contre le schéma JSON du skill ; refus = REJECTED + INVALID_PARAMS
+float32 timeout_s          # 0 : délai par défaut du skill
+---
+# Result
+uint8 OUTCOME_SUCCEEDED=0
+uint8 OUTCOME_FAILED=1
+uint8 OUTCOME_CANCELED=2
+uint8 OUTCOME_REJECTED=3
+uint8 outcome
+string error_code          # vide si SUCCEEDED ; sinon un code de §6.1
+string error_category      # PRECONDITION | SENSOR | SAFETY | EXECUTION | HARDWARE | INTERFACE | INTERNAL
+string message             # phrase courte, en français
+string result_json         # sortie utile du skill (ex. chemin d'image, détections)
+string failure_report_json # rapport §6.2, vide si SUCCEEDED
+---
+# Feedback
+string phase               # ex. "checking_preconditions", "moving", "settling"
+float32 progress           # 0.0 à 1.0
+string detail_json
