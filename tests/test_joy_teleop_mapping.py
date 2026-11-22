@@ -26,7 +26,14 @@ import pytest
 RACINE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RACINE / "joy_teleop"))
 
-os.environ["ROS_DOMAIN_ID"] = "98"   # isolé de la simulation (99) et du robot (28)
+# Domaine 98 pour ces tests, isolé de la simulation (99) et du robot (28).
+# N'écrase jamais un domaine déjà fixé : la collecte importe TOUS les modules
+# avant de lancer le premier test, donc une affectation inconditionnelle ici
+# imposait 98 à toute la session — les tests d'intégration qui lancent un
+# sous-processus en 99 ne voyaient alors plus le service de leur propre parent
+# (« /director/command absent du domaine »).
+if os.environ.get("ROS_DOMAIN_ID") in (None, ""):
+    os.environ["ROS_DOMAIN_ID"] = "98"
 
 rclpy = pytest.importorskip("rclpy")
 from geometry_msgs.msg import Twist          # noqa: E402

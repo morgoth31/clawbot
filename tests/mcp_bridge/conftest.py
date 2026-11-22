@@ -37,7 +37,6 @@ def pytest_configure(config: pytest.Config) -> None:
             returncode=2,
         )
     os.environ.setdefault("ROS_DOMAIN_ID", TEST_DOMAIN)
-    os.environ["ROS_LOCALHOST_ONLY"] = "1"
 
 
 class Client:
@@ -64,10 +63,20 @@ class Client:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def _environment_is_isolated() -> None:
-    """Vérifie les variables d'isolation de la session (ENV-01, ENV-02)."""
+def _environment_is_isolated() -> Iterator[None]:
+    """Isole la session (ENV-01, ENV-02) **sans fuiter hors de ces tests**.
+
+    `ROS_LOCALHOST_ONLY=1` était posé dans `pytest_configure`, donc pour toute la
+    session pytest : les sous-processus des tests du directeur (client
+    `/director/command`, script ExecStop) ne voyaient plus le service du parent
+    — découverte DDS restreinte à la boucle locale, échec « service absent ».
+    Le réglage vaut maintenant le temps des tests du pont MCP seulement.
+    """
     assert os.environ["ROS_DOMAIN_ID"] != PRODUCTION_DOMAIN
-    assert os.environ["ROS_LOCALHOST_ONLY"] == "1"
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setenv("ROS_LOCALHOST_ONLY", "1")
+        assert os.environ["ROS_LOCALHOST_ONLY"] == "1"
+        yield
 
 
 @pytest.fixture
