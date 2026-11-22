@@ -412,6 +412,6 @@ Outils interdits : publication de `Twist`, d'angles de servo, réarmement d'e-st
 - **Arbre :** paquets à la racine (existant). Nouveaux dossiers : `requirements/`, `docs/architecture/`, `docs/audit/2026-11-22/`, `deploy/` (unités, polkit, profils DDS), `scripts/`.
 - **Exigences :** `requirements/<domaine>.yaml`, domaines `ARCH`, `SAFETY`, `DRV`, `EXEC`, `CAPA`, `HEALTH`, `MCP`, `PERC`, `ARM`, `OPS`, `TEST`, `PERF`, `NET`. Format dans le skill `clawbot-dev-cycle` (`templates/requirement.yaml`).
 - **Tests :** pytest ; marqueur `@pytest.mark.req("REQ-XXX-NNN")` déclaré dans `pytest.ini`. Unitaires dans `<paquet>/test/`, intégration dans `tests/integration/` (launch_testing, domaine 99), matériel dans `tests/hardware/` (jamais lancés automatiquement, procédure écrite).
-- **Point d'entrée unique :** `scripts/check.sh` (lint `ruff`, unitaires, traçabilité, doublons, intégration si `--integration`).
+- **Point d'entrée unique :** `scripts/check.sh` — `lint` (flake8 ou ruff, plafonné par `requirements/.lint_baseline`), `unit`, `cpp`, `trace`, `interdits`, `doublons`, `cliquets` (REQ-ARCH-015), `--integration` (domaine 99) et `--build` (construction depuis zéro sous `env -i`, dans `/tmp`, seul l'underlay `/opt/ros/humble`). `--etape <nom>` exécute une seule étape. Un contrôle absent n'avertit pas : il échoue (REQ-TEST-011).
 - **Branches :** `feat/REQ-<ID>-<slug>`, `fix/REQ-…`. Commits : `<type>(<paquet>): <résumé> [REQ-…]`.
 - **Déploiement :** procédure du skill `clawbot-deploy` ; journal dans `deploy/journal/AAAA-MM-JJ_<sujet>.md`.

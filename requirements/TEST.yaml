@@ -103,3 +103,92 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P00
+
+  - id: REQ-TEST-010
+    title: Construction propre vérifiée
+    statement: >
+      `scripts/check.sh --build` doit construire tous les paquets du dépôt depuis zéro,
+      dans un dossier temporaire, dans un environnement qui ne contient que
+      /opt/ros/humble, et sortir en échec si un paquet échoue ou est interrompu.
+    rationale: >
+      `check.sh` était vert alors que la construction depuis zéro échouait :
+      `ros2_llm_bridge_cpp` appelait `find_package(clawbot_interfaces)` sans le déclarer
+      dans `package.xml`, et le défaut restait invisible parce que les constructions se
+      faisaient avec `install/setup.bash` déjà sourcé (D20). Un contrôle qui ne construit
+      pas ne prouve pas que le dépôt se construit.
+    sources: [D20, S23]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      `scripts/check.sh --build` lance `colcon build` sous `env -i` avec le seul
+      underlay /opt/ros/humble, dans /tmp/clawbot_check_build ; le code de sortie est
+      celui de colcon ; un paquet qui `find_package` un autre sans le déclarer fait
+      sortir la commande en échec en nommant le paquet manquant.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C02
+
+  - id: REQ-TEST-011
+    title: Le lint s'exécute, ou échoue
+    statement: >
+      L'étape lint doit s'exécuter sur les paquets maison ; si l'outil manque,
+      `scripts/check.sh` échoue au lieu d'avertir.
+    rationale: >
+      Depuis P00, `check.sh` affichait « ruff absent, étape lint ignorée » et sortait 0
+      (D10) : le dépôt n'a jamais été linté, et rien ne le disait.
+    sources: [D10]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      Avec les paquets maison seuls (`clawbot_*`, `yolo_node`, `tests`, `scripts`,
+      `joy_teleop`, jamais `attic/`) : si ni `flake8` ni `ruff` n'est joignable,
+      `check.sh --etape lint` sort non nul avec un message explicite ; sinon il publie
+      le nombre d'erreurs.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C02
+
+  - id: REQ-TEST-012
+    title: Le lint ne se dégrade pas
+    statement: >
+      Le nombre d'erreurs de lint ne doit pas dépasser `requirements/.lint_baseline`.
+    rationale: >
+      Corriger 702 erreurs de style n'est pas le sujet ; empêcher d'en ajouter l'est.
+      Sans plafond, un outil qu'on active enfin devient un outil qu'on ignore.
+    sources: [D10]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      `check.sh --etape lint` sort non nul si le compte dépasse la valeur de
+      `requirements/.lint_baseline`, et rappelle que le plafond ne se relève pas.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C02
+
+  - id: REQ-TEST-013
+    title: Les cliquets ne remontent pas
+    statement: >
+      `requirements/.untraced_baseline` et `requirements/.lint_baseline` ne doivent
+      jamais être plus élevés que leur valeur sur `main`.
+    rationale: >
+      `trace_check.py` compare le dépôt au fichier, pas le fichier à son histoire : un
+      cliquet relevé reste vert pour toujours. 464 tests sur 635 ne sont pas tracés ; on
+      ne sait pas si ce nombre a monté (D14).
+    sources: [D14]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      L'étape `cliquets` compare chaque fichier avec `git show main:<fichier>` ; une
+      valeur supérieure fait sortir `check.sh` en échec en nommant le fichier. Un fichier
+      absent de `main` est accepté (première valeur).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C02

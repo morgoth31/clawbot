@@ -6,6 +6,8 @@
 #   scripts/check.sh --self-test         # annonce les étapes et sort 0
 #   scripts/check.sh --integration       # pytest -m integration en domaine 99
 #   scripts/check.sh --strict-duplicates # échec sur tout doublon hors allowlist
+#   scripts/check.sh --build             # + construction propre des paquets (env -i, /tmp)
+#   scripts/check.sh --etape <nom>       # une seule étape : lint|unit|cpp|trace|interdits|doublons|cliquets|build
 #
 # Garde de domaine : refuse ROS_DOMAIN_ID=28 (robot en production), impose 98
 # quand la variable est absente.
@@ -19,21 +21,27 @@ cd "$(dirname "$0")/.."
 SELF_TEST=0
 INTEGRATION=0
 STRICT_DUPLICATES=0
+BUILD=0
+ETAPE=
 TARGETS=()
 
 usage() {
     sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
 }
 
-for arg in "$@"; do
-    case "$arg" in
+while [[ $# -gt 0 ]]; do
+    case "$1" in
         --self-test)          SELF_TEST=1 ;;
         --integration)        INTEGRATION=1 ;;
         --strict-duplicates)  STRICT_DUPLICATES=1 ;;
+        --build)              BUILD=1 ;;
+        --etape)              shift; ETAPE="${1:-}"
+                              [[ -n "$ETAPE" ]] || { echo "check.sh : --etape attend un nom" >&2; exit 2; } ;;
         -h|--help)            usage; exit 0 ;;
-        -*)                   echo "check.sh : option inconnue '$arg'" >&2; exit 2 ;;
-        *)                    TARGETS+=("$arg") ;;
+        -*)                   echo "check.sh : option inconnue '$1'" >&2; exit 2 ;;
+        *)                    TARGETS+=("$1") ;;
     esac
+    shift
 done
 
 # ── 1. Garde de domaine DDS (REQ-TEST-002) ───────────────────────────────────
@@ -80,23 +88,108 @@ export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
 if [[ $SELF_TEST -eq 1 ]]; then
     echo "ROS_DOMAIN_ID=${ROS_DOMAIN_ID}"
     echo "Étapes prévues :"
-    echo "  lint      ruff check sur les paquets maison (avertissement si ruff absent)"
+    echo "  lint      flake8 (ou ruff) sur les paquets maison, plafonné par requirements/.lint_baseline"
     echo "  unit      pytest -q en domaine ${ROS_DOMAIN_ID}"
+    echo "  cpp       binaires gtest de build/"
     echo "  trace     scripts/trace_check.py --max-untraced <requirements/.untraced_baseline>"
+    echo "  interdits pkill/killall/pgrep -f hors exception nommée"
     echo "  doublons  sha256 des *.py, doublons entre paquets (avertissement)"
+    echo "  cliquets  .untraced_baseline et .lint_baseline comparés à main"
+    if [[ $BUILD -eq 1 ]]; then
+        echo "  build     colcon build depuis zéro, env -i, /tmp/clawbot_check_build"
+    fi
     echo "Auto-test terminé : code 0"
     exit 0
 fi
 
 # ── 4. Étapes ────────────────────────────────────────────────────────────────
+# Paquets maison seulement : les vendor (yahboomcar_*), attic/ et install/ restent dehors.
+CIBLES_LINT=(clawbot_* yolo_node tests scripts joy_teleop)
+LINT_BASELINE=requirements/.lint_baseline
+
 run_lint() {
     echo "── lint ────────────────────────────────────────────────────────────"
-    if command -v ruff >/dev/null 2>&1; then
-        # Paquets maison seulement : les paquets vendor (yahboomcar_*) restent hors périmètre.
-        ruff check clawbot_* bridge_mcp tests scripts joy_teleop
-    else
-        echo "AVERTISSEMENT : ruff absent, étape lint ignorée (rien n'a été installé)." >&2
+    local outil="" nb=0 code=0 sortie base=0
+    if command -v flake8 >/dev/null 2>&1; then
+        outil="flake8"
+    elif python3 -m flake8 --version >/dev/null 2>&1; then
+        outil="python3 -m flake8"
+    elif command -v ruff >/dev/null 2>&1; then
+        outil="ruff"
     fi
+    # Point d'injection pour les tests : flake8 vient du paquet système python3-flake8 et
+    # reste importable même sans PYTHONPATH, il n'existe donc pas d'environnement « sans
+    # outil » reproductible. La variable force la branche d'échec.
+    if [[ "${CLAWBOT_LINT_SANS_OUTIL:-0}" == "1" ]]; then
+        outil=""
+    fi
+    if [[ -z "$outil" ]]; then
+        echo "ERREUR : aucun outil de lint disponible (ni flake8, ni ruff)." >&2
+        echo "         L'étape ne s'ignore pas : /usr/bin/python3 -m pip install --user ruff" >&2
+        exit 1
+    fi
+    echo "outil : $outil"
+    if [[ "$outil" == "ruff" ]]; then
+        sortie=$(ruff check "${CIBLES_LINT[@]}" 2>&1) || code=$?
+        nb=$(printf '%s\n' "$sortie" | grep -cE '^[^ :]+:[0-9]+:[0-9]+')
+    else
+        # flake8 rend 1 quand il trouve des erreurs : ce n'est pas une panne, et
+        # `set -e` tuerait le script sur cette affectation.
+        sortie=$($outil --count --max-line-length=120 --extend-ignore=E203,W503 \
+                 --statistics "${CIBLES_LINT[@]}" 2>&1) || code=$?
+        printf '%s\n' "$sortie" | tail -12
+        nb=$(printf '%s\n' "$sortie" | tail -1 | tr -dc '0-9')
+    fi
+    [[ -n "$nb" ]] || nb=0
+    if [[ -f "$LINT_BASELINE" ]]; then
+        base=$(tr -dc '0-9' < "$LINT_BASELINE") ; [[ -n "$base" ]] || base=0
+    fi
+    if [[ "$nb" -gt "$base" ]]; then
+        echo "ERREUR : $nb erreurs de lint > plafond $base ($LINT_BASELINE)." >&2
+        echo "         Corriger les nouvelles erreurs, ne relevez pas le plafond." >&2
+        exit 1
+    fi
+    echo "lint : $nb erreur(s), plafond $base (code outil $code)"
+}
+
+run_cliquets() {
+    echo "── cliquets ────────────────────────────────────────────────────────"
+    local f actuel reference code=0
+    for f in requirements/.untraced_baseline "$LINT_BASELINE"; do
+        [[ -f "$f" ]] || continue
+        actuel=$(tr -dc '0-9' < "$f") ; [[ -n "$actuel" ]] || actuel=0
+        if ! git cat-file -e "main:$f" 2>/dev/null; then
+            echo "OK     $f : absent de main, valeur de départ $actuel acceptée"
+            continue
+        fi
+        reference=$(git show "main:$f" | tr -dc '0-9') ; [[ -n "$reference" ]] || reference=0
+        if [[ "$actuel" -gt "$reference" ]]; then
+            echo "ERREUR : $f a augmenté ($reference sur main -> $actuel)." >&2
+            code=1
+        else
+            echo "OK     $f : $actuel <= $reference (main)"
+        fi
+    done
+    [[ $code -eq 0 ]] || exit 1
+}
+
+run_build() {
+    echo "── build ───────────────────────────────────────────────────────────"
+    # Construction depuis zéro, dans un environnement qui ne contient QUE l'underlay ROS :
+    # c'est la seule qui prouve que les package.xml déclarent leurs dépendances. Le code
+    # de sortie est celui de colcon (jamais celui d'un `tail` : piège de D20).
+    local code=0
+    rm -rf /tmp/clawbot_check_build
+    env -i HOME="$HOME" PATH=/usr/bin:/bin LANG=C.UTF-8 bash -c \
+        'source /opt/ros/humble/setup.bash && colcon build \
+            --build-base /tmp/clawbot_check_build/build \
+            --install-base /tmp/clawbot_check_build/install \
+            --event-handlers console_cohesion+' || code=$?
+    if [[ $code -ne 0 ]]; then
+        echo "ERREUR : construction propre en échec (colcon code $code)." >&2
+        exit "$code"
+    fi
+    echo "Construction propre : conforme"
 }
 
 run_unit() {
@@ -248,11 +341,27 @@ if [[ $INTEGRATION -eq 1 ]]; then
     exit 0
 fi
 
+# ── 4 bis. Une seule étape, pour les tests et le diagnostic ──────────────────
+case "$ETAPE" in
+    "")      ;;
+    lint)    run_lint;     echo "Étape lint terminée : code 0";     exit 0 ;;
+    unit)    run_unit;     echo "Étape unit terminée : code 0";     exit 0 ;;
+    cpp)     run_cpp;      echo "Étape cpp terminée : code 0";      exit 0 ;;
+    trace)   run_trace;    echo "Étape trace terminée : code 0";    exit 0 ;;
+    interdits) run_interdits; echo "Étape interdits terminée : code 0"; exit 0 ;;
+    doublons) run_duplicates; echo "Étape doublons terminée : code 0";  exit 0 ;;
+    cliquets) run_cliquets; echo "Étape cliquets terminée : code 0"; exit 0 ;;
+    build)   run_build;    echo "Étape build terminée : code 0";    exit 0 ;;
+    *) echo "check.sh : étape inconnue '$ETAPE'" >&2; exit 2 ;;
+esac
+
+[[ $BUILD -eq 1 ]] && run_build
 run_lint
 run_unit
 run_cpp
 run_trace
 run_interdits
 run_duplicates
+run_cliquets
 
 echo "Vérification terminée : code 0"

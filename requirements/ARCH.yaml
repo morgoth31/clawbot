@@ -132,3 +132,27 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P06
+
+  - id: REQ-ARCH-015
+    title: Le point d'entrée de vérification construit et mesure
+    statement: >
+      Le point d'entrée unique de vérification doit prouver trois choses : que le dépôt
+      se construit depuis zéro, que le lint s'exécute, et que les cliquets de qualité ne
+      remontent pas.
+    rationale: >
+      Un point d'entrée qui ne construit pas, ne lifte pas et ne contrôle pas ses
+      propres seuils ne vérifie que ce qui va bien. Les trois trous de C02 (D10, D14,
+      D20) étaient tous des contrôles annoncés et jamais exécutés.
+    sources: [D10, D14, D20]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      `scripts/check.sh --self-test` annonce les étapes `lint`, `unit`, `cpp`, `trace`,
+      `interdits`, `doublons`, `cliquets` et, avec `--build`, `build` ; chacune est
+      réellement exécutée par l'appel correspondant ; `--etape <nom>` exécute une seule
+      étape pour les tests.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C02
