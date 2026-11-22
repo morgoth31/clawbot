@@ -71,9 +71,10 @@ public:
       manifeste = "";          // paquet non installé : le paramètre devra le fournir
     }
     declare_parameter<std::string>("flows_file", manifeste, lecture_seule());
+    // P07 : la liste n'est plus supposee. Elle vient de /clawbot/capabilities/state
+    // (REQ-CAPA-006) ; le parametre ne sert qu'au diagnostic hors gestionnaire.
     declare_parameter<std::vector<std::string>>(
-      "assume_active_capabilities",
-      {"base", "lidar", "wrist_vision", "depth_vision"}, lecture_seule());
+      "assume_active_capabilities", std::vector<std::string>{}, lecture_seule());
     declare_parameter<double>("publish_rate_hz", 1.0, lecture_seule());
     declare_parameter<double>("rate_window_s", 5.0, lecture_seule());
 
@@ -109,8 +110,13 @@ public:
     abonnements_types_.push_back(create_subscription<std_msgs::msg::String>(
         "/safety/state", 10,
         [this](std_msgs::msg::String::ConstSharedPtr msg) {sur_safety(msg->data);}));
+    // TRANSIENT_LOCAL : le gestionnaire republie a chaque changement, mais un
+    // abonne demarre apres le dernier changement doit quand meme recevoir l'etat.
+    rclcpp::QoS qos_capacites(rclcpp::KeepLast(1));
+    qos_capacites.reliable();
+    qos_capacites.transient_local();
     abonnements_types_.push_back(create_subscription<std_msgs::msg::String>(
-        "/clawbot/capabilities/state", 10,
+        "/clawbot/capabilities/state", qos_capacites,
         [this](std_msgs::msg::String::ConstSharedPtr msg) {sur_capacites(msg->data);}));
 
     pub_health_ = create_publisher<clawbot_interfaces::msg::RobotHealth>("/clawbot/health", 10);
@@ -204,7 +210,20 @@ private:
       if (charge.is_array()) {
         actives = charge.get<std::vector<std::string>>();
       } else if (charge.contains("active")) {
+        // ancien format (hors gestionnaire) : liste nue
         actives = charge.at("active").get<std::vector<std::string>>();
+      } else if (charge.contains("capabilities")) {
+        // format du gestionnaire (REQ-CAPA-006) : {capabilities: [{name, state, ...}]}
+        for (const auto & entree : charge.at("capabilities")) {
+          const std::string etat = entree.value("state", "INACTIVE");
+          if (etat == "ACTIVE" || etat == "STARTING" || etat == "DEGRADED") {
+            actives.push_back(entree.value("name", std::string{}));
+          }
+        }
+        // une liste vide est une information : plus aucune capacite active
+        capacites_ = actives;
+        capacites_reelles_ = true;
+        return;
       }
       if (!actives.empty()) {
         capacites_ = actives;
