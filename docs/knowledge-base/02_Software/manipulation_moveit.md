@@ -205,13 +205,15 @@ part vers le servo, la position reste suivie).
   bande morte du servo). Un axe chargé peut rester à 1° de sa consigne.
 - **Bras 5 axes** : une pose 6D arbitraire n'est pas atteignable ; `pick_ik` échoue souvent sur des
   objectifs de pose. La planification en espace articulaire fonctionne.
-- **Enveloppe atteignable mesurée (2026-11-11 20:10, `/compute_fk` de MoveIt, 2 205 échantillons sur
+- **Enveloppe atteignable mesurée (2026-11-11 20:15, `/compute_fk` de MoveIt, 2 205 échantillons sur
   tout l'espace articulaire)** : `arm_link5` et les deux doigts descendent au plus bas à
-  **z = −0,115 m dans `base_link`**, et portent au plus à **x = +0,439 m**. Le sol mesuré par la
-  profondeur Astra est à **z = −0,414 m** : **les doigts s'arrêtent 0,299 m au-dessus du sol**. Ce
-  bras ne peut donc rien saisir **posé au sol**, quelle que soit la position de la caméra ; il faut
-  un support dont le dessus est entre 0,35 et 0,55 m, à moins de 0,40 m de la colonne.
-  Repères : `base_link` est à 0,414 m du sol, l'Astra à 0,42 m dans `base_link` (0,83 m du sol).
+  **z = −0,115 m dans `base_link`**, et portent au plus à **x = +0,439 m**. Le sol, mesuré par le pic
+  d'histogramme des z de la profondeur Astra, est à **z = −0,064 m** : les doigts descendent donc
+  **5 cm sous le niveau du sol**. La contrainte de saisie n'est pas la hauteur mais la **distance** :
+  il faut approcher le robot à moins de ~0,40 m de l'objet.
+  Repères : `base_link` est à 6,4 cm du sol, l'Astra à 0,42 m dans `base_link`.
+  **Piège payé** : un percentile des z sur la bande basse de l'image donnait −0,414 m et une
+  conclusion inverse (« les doigts s'arrêtent 30 cm au-dessus du sol »).
 - **Caméra du bras sur le même index que « front »** : le seul périphérique UVC (`0c45:6340`) sert
   les deux noms dans la configuration actuelle, voir [[camera_usb_bras]].
 - Durée maximale d'une trajectoire acceptée par le contrôleur : `max_duration_s: 30,0` ; au-delà,

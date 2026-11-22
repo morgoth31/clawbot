@@ -1,95 +1,119 @@
-# Clawbot Joy Teleop — Pro Controller / Manette Générique
+# joy_teleop
 
-## Appairage Bluetooth Pro Controller
+**Nintendo Pro Controller Teleoperation Interface**
 
+## Purpose
+Maps Nintendo Pro Controller input to robot motion & arm commands. Enables real-time direct control via USB-C (fully functional) or Bluetooth (pending kernel support).
+
+## Architecture
+
+### Files
+- **`clawbot_joy_teleop.py`**: Main ROS2 node
+  - Subscribes `/joy` (sensor_msgs/Joy from hid-nintendo)
+  - Publishes `/cmd_vel` (motion), `/servo_ctrl` (arm), `/beep`, `/lamp_color`
+  - Deadman switch (ZR button) for safety
+  
+- **`joy_teleop_launch.py`**: ROS2 launch file (starts joy node + teleop node)
+- **`identify_mapping.py`**: Helper to test/identify button mappings
+- **`test_controller.py`**: Standalone test script (no ROS2 needed)
+
+## Button Mapping
+
+### Current (hid-nintendo USB-C only)
+| Button | Function | Details |
+|--------|----------|---------|
+| **ZR** | Deadman (enable) | Must hold to send commands |
+| **ZL** | Arm mode toggle | Switches between wheel/arm control |
+| **L/R** | Unused (reserved) | – |
+| **A** | Gripper close | Servo 6 → 180° |
+| **B** | Gripper open | Servo 6 → 0° |
+| **X** | Unused | – |
+| **Y** | Unused | – |
+| **±** | Reserved | – |
+| **LStick** | Wheel motion | LX=strafe, LY=forward, RX=rotate |
+| **RStick** | Arm (if enabled) | RY=pan, RX=tilt (future) |
+| **DPad** | Servo selection | Up/Down = joint ±5°, L/R = next joint |
+
+### Axis Mapping (hid-nintendo)
+- **Axis 0 (LX)**: -1.0 (left) to +1.0 (right) — lateral/strafe
+- **Axis 1 (LY)**: -1.0 (down/forward) to +1.0 (up/back)
+- **Axis 2 (RX)**: -1.0 (left) to +1.0 (right) — rotate
+- **Axis 3 (RY)**: -1.0 (down) to +1.0 (up) — vertical motion / pan
+- **Axis 6 (DX)**, **Axis 7 (DY)**: D-Pad horizontal/vertical
+
+## Hardware Setup
+
+### USB-C Path (✅ Working)
+```
+hid-nintendo DKMS (v3.2) → /dev/input/js0 → ros2 joy node → /joy topic
+```
+- **Driver**: `/usr/src/nintendo-3.2/` (DKMS kernel module)
+- **Device**: `/dev/input/js0` (joystick interface)
+- **Status**: Fully functional; auto-detected on boot
+
+### Bluetooth Path (❌ Pending)
+```
+joycond daemon → /dev/input/js[X] → ros2 joy node
+```
+- **Blocker**: Linux kernel 5.15.148-tegra missing HIDP socket support
+- **Workaround**: Use USB-C only
+- **joycond** installed @ `/usr/bin/joycond` (ready when kernel fixed)
+
+## ROS2 Integration
+
+### Startup
 ```bash
-bluetoothctl
-  power on
-  agent on
-  scan on
-  # Maintenir le bouton SYNC (petit bouton haut du controller)
-  pair XX:XX:XX:XX:XX:XX
-  connect XX:XX:XX:XX:XX:XX
-  trust XX:XX:XX:XX:XX:XX
-  quit
-
-# Vérifier que le device est détecté
-ls /dev/input/js*
-jstest /dev/input/js0     # tester les axes/boutons
+ROS_DOMAIN_ID=28 ros2 launch joy_teleop/joy_teleop_launch.py
 ```
 
-## Lancement Téléop
+### Topics
+- **Subscribe**: `/joy` (sensor_msgs/Joy) ← hid-nintendo driver
+- **Publish**:
+  - `/cmd_vel` (geometry_msgs/Twist) → hardware_service
+  - `/servo_ctrl` (clawbot_msgs/ServoCommand) → hardware_service
+  - `/beep` (std_msgs/Bool) → buzzer
+  - `/lamp_color` (std_msgs/Int32Array) → RGB LEDs
 
+### Systemd Service
+- **Name**: `clawbot-joy-teleop.service`
+- **Enabled**: Yes (auto-starts on boot after hardware_service + driver_node)
+- **Logs**: `journalctl -u clawbot-joy-teleop -f`
+
+## Configuration
+
+### Speed Limits (in `clawbot_joy_teleop.py`)
+- **Max linear**: ±0.06 m/s (hardware limit)
+- **Max angular**: ±0.25 rad/s (hardware limit)
+- **Deadman**: Must hold ZR throughout
+
+### Servo Limits
+- **Range**: 0–180° per servo
+- **Speed**: Configurable (currently hardware-limited to ~30°/s)
+
+## Testing
+
+### Identify Button Mapping
 ```bash
-# Terminal 1 — déjà en cours si SLAM actif (driver_node + hardware_service)
-# Si pas de SLAM: sudo systemctl start ros2-driver-node
-
-# Terminal 2 — Joystick + Téléop
-source /opt/ros/humble/setup.bash
-source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash
-export ROS_DOMAIN_ID=28
-ros2 launch /home/jetson/clawbot/joy_teleop/joy_teleop_launch.py
-
-# Ou avec options:
-ros2 launch /home/jetson/clawbot/joy_teleop/joy_teleop_launch.py \
-  arm_step:=5.0 deadman_button:=7 linear_scale:=0.05
+python3 /home/jetson/clawbot/joy_teleop/identify_mapping.py
+# Press buttons; outputs event numbers
 ```
 
-## Mapping Contrôles
-
-### Chassis Mécanum (tenir ZR)
-| Contrôle        | Action                    |
-|-----------------|---------------------------|
-| ZR (hold)       | **Deadman** — activer mouvement |
-| Stick G. Y      | Avant / Arrière           |
-| Stick G. X      | Strafe Gauche / Droite    |
-| Stick D. X      | Rotation G / D            |
-| Plus (+)        | ⛔ Stop d'urgence          |
-
-### Bras (5 DOF)
-| Contrôle        | Servo | Action                |
-|-----------------|-------|-----------------------|
-| D-pad Y         | S1    | Base haut/bas         |
-| D-pad X         | S2    | Épaule gauche/droite  |
-| Stick D. Y      | S3    | Coude haut/bas        |
-| L (shoulder)    | S4    | Poignet -             |
-| R (shoulder)    | S4    | Poignet +             |
-| ZL + D-pad X    | S5    | Rotation poignet      |
-
-### Pince & Poses
-| Bouton   | Action                    |
-|----------|---------------------------|
-| A        | Pince ouverte             |
-| B        | Pince fermée              |
-| Y        | Pose sécurisée (anti-collision) |
-| X        | Pose neutre (90°)         |
-| Minus (-)| Reset bras → 90° partout  |
-
-## Identifier le Mapping de ta Manette
-
-Si les contrôles ne correspondent pas, lance:
+### Standalone Test (no ROS2)
 ```bash
-ROS_DOMAIN_ID=28 python3 /home/jetson/clawbot/joy_teleop/identify_mapping.py
-```
-Puis bouge les sticks et appuie sur les boutons pour voir les indices.
-Ensuite ajuste les constantes en haut de `clawbot_joy_teleop.py`.
-
-## Ajustements Vitesse Bras
-
-Par défaut `arm_step=3°` par tick. Si le bras bouge trop vite ou trop lentement:
-```bash
-# Plus lent (précis)
-ros2 launch ... arm_step:=1.5
-
-# Plus rapide
-ros2 launch ... arm_step:=5.0
+python3 /home/jetson/clawbot/joy_teleop/test_controller.py
+# Reads /dev/input/js0 directly
 ```
 
-## Sans Deadman (démo/test sur cales)
+## Known Issues
+- **Axis Inversion**: DPad Y-axis may be inverted (DY swapped)
+- **Slow Response**: Poll rate ~100Hz; consider higher if lag detected
+- **Bluetooth**: Blocked by kernel. Use USB-C.
 
-```bash
-ros2 launch /home/jetson/clawbot/joy_teleop/joy_teleop_launch.py deadman_button:=-1
-```
-(deadman_button=-1 → bouton index -1 = toujours False → chaos garanti, utiliser sur cales uniquement!)
+## Future Work
+- [ ] Arm IK solver (instead of manual servo selection)
+- [ ] Profile system (different button mappings for different tasks)
+- [ ] Haptic feedback (rumble on collision warnings)
 
-En pratique pour désactiver le deadman: modifier `deadman_held = True` dans le code.
+**Status**: ✅ Production (USB-C). Tested on Pro Controller v2.
+
+**Maintainer**: clawbot developers

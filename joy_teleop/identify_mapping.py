@@ -21,10 +21,11 @@ AXIS_NAMES_PRO = {
 }
 
 BTN_NAMES_PRO = {
-    0: "B",  1: "A",  2: "X",  3: "Y",
-    4: "O",  5: "L",  6: "R", 7: "ZL",
-    8: "ZR",  9: "-",  10: "+", 11: "Home",
-    12: "JL", 13: "JR",
+    0: "B (doublon M2)", 1: "A (doublon M1)", 2: "X", 3: "Y",
+    4: "Z (jamais émis sur ce pad)",
+    5: "ZL", 6: "ZR", 7: "L", 8: "R",
+    9: "-", 10: "+", 11: "Home",
+    12: "clic L", 13: "clic R",
 }
 
 

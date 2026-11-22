@@ -1,63 +1,82 @@
 #!/bin/bash
-
 # clawbot_restart_teleop.sh
-# Script pour nettoyer et relancer proprement les nœuds de contrôle de la manette.
+# Nettoie les processus de téléopération et relance proprement la chaîne manette.
+
+set -u
+
+ICI=$(cd "$(dirname "$0")" && pwd)
 
 echo "========================================================"
-echo "🧹 1. Nettoyage des processus fantômes..."
+echo "🧹 1. Nettoyage des processus de téléopération"
 echo "========================================================"
 
-# Tuer les processus launch
-pkill -f "joy_teleop_launch.py"
-# Tuer les nœuds Python et C++
-pkill -f "clawbot_joy_teleop.py"
-pkill -f "joy_node"
-
-echo "Attente de l'arrêt des processus..."
+# -x : nom exact, pour ne pas tuer le shell qui porte le motif dans sa ligne de
+# commande (piège rencontré avec pkill -f sur des motifs courts).
+pkill -x js_joy_source 2>/dev/null || true
+pkill -x joy_node 2>/dev/null || true
+pkill -f "clawbot_joy_teleop.py" 2>/dev/null || true
+pkill -f "joy_teleop_launch.py" 2>/dev/null || true
 sleep 2
 
 echo ""
 echo "========================================================"
-echo "🤖 2. Redémarrage du service ROS2 Hardware (driver_node)"
+echo "🤖 2. Redémarrage du service ROS 2 Hardware (driver_node)"
 echo "========================================================"
-# Le README indique de lancer ros2-driver-node si le SLAM n'est pas actif.
-# On le redémarre pour avoir une base saine.
 sudo systemctl restart ros2-driver-node
-echo "✅ ros2-driver-node redémarré (mot de passe sudo peut-être requis ci-dessus)."
+echo "✅ ros2-driver-node redémarré"
 
 echo ""
-# Source des environnements ROS 2
+# shellcheck disable=SC1091
 source /opt/ros/humble/setup.bash
+# shellcheck disable=SC1091
 source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash
-
-export ROS_DOMAIN_ID=28
+export ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-28}
 
 echo ""
 echo "========================================================"
-echo "🎮 3. Vérification de la Manette"
+echo "🎮 3. Vérification de la manette"
 echo "========================================================"
 
-while [ ! -e /dev/input/js0 ]; do
-    echo "❌ Manette introuvable sur /dev/input/js0 !"
-    echo "   👉 Veuillez allumer votre manette (appuyez sur le bouton Home ou n'importe quel bouton)."
-    echo "   👉 Assurez-vous que les voyants indiquent une connexion Bluetooth/USB."
-    echo "   👉 Si elle n'est pas appairée, ouvrez un autre terminal et exécutez :"
-    echo "      /home/jetson/clawbot/joy_teleop/pair_procontroller.sh"
+# Le pad est le nœud js dont le nom n'est pas un capteur inertiel : son IMU
+# apparaît elle aussi comme une manette, avec exactement le même nom SDL.
+trouver_js() {
+    local nom="" ligne jeton
+    while IFS= read -r ligne; do
+        case "$ligne" in
+            "N: Name="*) nom=${ligne#N: Name=}; nom=${nom%\"}; nom=${nom#\"} ;;
+            "H: Handlers="*)
+                for jeton in $ligne; do
+                    case "$jeton" in
+                        js[0-9]*)
+                            if [ -n "$nom" ] && ! echo "$nom" | grep -qiE "IMU|Accel|Gyro|Magnet"; then
+                                echo "/dev/input/$jeton"
+                                return 0
+                            fi ;;
+                    esac
+                done ;;
+        esac
+    done < /proc/bus/input/devices
+    return 1
+}
+
+while ! JSDEV=$(trouver_js); do
+    echo "❌ Aucun nœud /dev/input/js* de manette"
+    echo "   👉 allumer la manette (appui sur un bouton)"
+    echo "   👉 vérifier : bluetoothctl info 98:B6:E9:43:94:AA"
+    echo "   👉 si elle n'est pas appairée : sudo bash $ICI/pair_procontroller.sh"
     echo ""
     echo "Recherche en cours... (Ctrl+C pour annuler)"
     sleep 3
 done
 
-echo "✅ Manette détectée !"
+echo "✅ Manette détectée sur $JSDEV"
 
 echo ""
 echo "========================================================"
 echo "🚀 4. Lancement du Joy Teleop"
 echo "========================================================"
-echo "Lancement de joy_teleop_launch.py avec device_id:=0 (Boutons/Sticks)"
-echo "⚠️  (Ne pas utiliser device_id:=1 car c'est le gyroscope IMU !)"
+echo "Chemin du périphérique transmis explicitement — aucun index SDL à deviner."
 echo "Appuyez sur Ctrl+C pour quitter."
 echo "--------------------------------------------------------"
 
-# On force device_id:=0 car c'est le périphérique contenant les boutons et joysticks
-ros2 launch /home/jetson/clawbot/joy_teleop/joy_teleop_launch.py device_id:=0
+ros2 launch "$ICI/joy_teleop_launch.py" device_path:="$JSDEV"

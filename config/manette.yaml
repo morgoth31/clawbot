@@ -1,11 +1,12 @@
 schema: 1
-genere_le: '2026-11-15T15:06:26+01:00'
+genere_le: '2026-11-15T23:35:24+01:00'
 outil: joy_teleop/calibration.py
 poste: yahboom
 appareil:
   nom: Nintendo Switch Pro Controller
   js_pad: /dev/input/js0
-  js_imu: /dev/input/js1
+  nb_axes: 6
+  nb_boutons: 14
 boutons:
   A: 1
   B: 0
@@ -17,6 +18,7 @@ boutons:
   rond: 4
   ZL: 7
   ZR: 8
+  L: 5
   R: 6
   appui_stick_gauche: 12
   appui_stick_droit: 13
@@ -24,33 +26,29 @@ aliases:
   M1: A
   M2: B
 absents:
-- T
 - light
-- L
 absents_raisons:
-  T: passée par l'opérateur (Entrée)
-  light: passée par l'opérateur (Entrée)
-  L: passée par l'opérateur (Entrée)
+  light: 'aucun événement : bouton non fonctionnel'
 axes:
   stick_gauche_x:
     index: 0
     centre: 0.0
-    min: -0.9943
-    max: 0.985
+    min: -1.0
+    max: 1.0
     zone_morte: 0.08
     inverser: false
   stick_gauche_y:
     index: 1
     centre: 0.0
     min: -1.0
-    max: 0.9347
+    max: 1.0
     zone_morte: 0.08
     inverser: true
   stick_droit_x:
     index: 2
     centre: 0.0
-    min: 0.0
-    max: 0.0
+    min: -1.0
+    max: 1.0
     zone_morte: 0.08
     inverser: false
   stick_droit_y:
@@ -75,38 +73,41 @@ axes:
     zone_morte: 0.5
     inverser: true
 capacites:
-  gachettes_analogiques:
-    disponible: true
-    axes_detectes:
-      R:
-        '5': 1.0
+  turbo:
+    bouton: T
+    actif: false
+    reference: A
+    repetitions: 1
+    repetitions_reference: 1
+    mesure_valide: true
+    duree_mesure_s: 2.0
   vibration:
     disponible: true
-    methode: evdev EV_FF (FF_RUMBLE)
+    methode: evdev EV_FF (ioctl EVIOCSFF)
+    effet_accepte: false
     verifie: false
+    raison: 'effet refusé ou non joué : [Errno 38] Function not implemented'
   lumieres:
     disponible: true
     entrees:
-    - 0005:057E:2009.0006:home
-    - 0005:057E:2009.0006:player1
-    - 0005:057E:2009.0006:player2
-    - 0005:057E:2009.0006:player3
-    - 0005:057E:2009.0006:player4
-imu:
-  chemin: /dev/input/js1
-  biais:
-  - -0.0088
-  - 0.0014
-  - 0.1224
-  - 0.0055
-  - 0.0016
-  - -0.0015
-  bruit:
-  - 0.0005
-  - 0.0002
-  - 0.0071
-  - 0.0003
-  - 0.0001
-  - 0.0001
-  gravite: 0.1227
-  verifie: true
+    - 0005:057E:2009.000A:home
+    - 0005:057E:2009.000A:player1
+    - 0005:057E:2009.000A:player2
+    - 0005:057E:2009.000A:player3
+    - 0005:057E:2009.000A:player4
+    ecriture: root requis (/sys/class/leds/<nom>/brightness)
+gachettes:
+  L:
+    analogique: false
+    axes:
+      '4': 1.0
+      '5': 1.0
+  R:
+    analogique: false
+  ZL:
+    analogique: true
+  ZR:
+    analogique: true
+reserve:
+  T: 'touche TURBO : aucun code propre, arme une répétition sur un autre bouton (mesuré
+    en phase 1 bis)'

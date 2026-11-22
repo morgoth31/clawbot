@@ -1,99 +1,78 @@
 #!/bin/bash
-# pair_procontroller.sh — Pair and connect Nintendo Switch Pro Controller
-# Usage: sudo bash pair_procontroller.sh
+# pair_procontroller.sh — appairer une manette Nintendo en Bluetooth (BR/EDR)
 #
-# Before running: HOLD the SYNC button (small button on the back of the controller)
-# until the LEDs cycle rapidly (pairing mode).
+# Usage : sudo bash pair_procontroller.sh [adresse]
+#
+# À faire avant : maintenir le bouton SYNC (petit bouton à l'arrière) jusqu'à ce
+# que les voyants défilent vite.
+#
+# Deux corrections par rapport à la version précédente, mesurées le 2026-11-15 :
+#   1. L'adresse n'est plus codée en dur. Le pad se présentait sous
+#      98:B6:E9:43:94:AA alors que le script visait 98:B6:1F:49:26:F3 : toutes les
+#      tentatives étaient mortes avant de commencer. On découvre le pad par son
+#      nom à chaque appairage.
+#   2. `bluetoothctl pair` seul n'aboutit jamais sur ce noyau : il n'émet aucune
+#      réponse à IO_Capability_Request (même cause que l'enceinte SRS-XB100).
+#      L'appairage passe par l'injection HCI de
+#      scripts/appairer_enceinte_bluetooth.sh.
 
-set -e
+set -u
 
-MAC="98:B6:1F:49:26:F3"
+ICI=$(cd "$(dirname "$0")" && pwd)
+INJECTION="$ICI/../scripts/appairer_enceinte_bluetooth.sh"
+MAX_SCAN=${MAX_SCAN:-30}
+
+MAC="${1:-}"
 
 echo "============================================"
-echo "  Pro Controller Bluetooth Pairing Script"
+echo "  Appairage manette Nintendo (Bluetooth)"
 echo "============================================"
-echo ""
-echo ">>> HOLD the SYNC button on the back of the"
-echo ">>> Pro Controller until LEDs cycle rapidly!"
-echo ""
-echo "Scanning for $MAC ..."
 
-# Ensure adapter is ready
-bluetoothctl power on
-bluetoothctl agent on
-bluetoothctl default-agent
-
-# Start scan in background
-bluetoothctl scan on &
-SCAN_PID=$!
-
-# Wait until we find the controller (up to 30 seconds)
-FOUND=0
-for i in $(seq 1 30); do
-    sleep 1
-    if bluetoothctl devices 2>/dev/null | grep -q "$MAC"; then
-        echo ""
-        echo ">>> FOUND Pro Controller!"
-        FOUND=1
-        break
-    fi
-    echo -n "."
-done
-
-# Stop scan
-bluetoothctl scan off 2>/dev/null || true
-kill $SCAN_PID 2>/dev/null || true
-wait $SCAN_PID 2>/dev/null || true
-
-if [ "$FOUND" -eq 0 ]; then
-    echo ""
-    echo "ERROR: Pro Controller not found!"
-    echo "Make sure:  1) Controller is charged"
-    echo "            2) You are HOLDING the SYNC button"
-    echo "            3) Controller is not already connected to a Switch"
+if [ ! -x "$INJECTION" ]; then
+    echo "ERREUR : $INJECTION introuvable ou non exécutable" >&2
     exit 1
 fi
 
-echo ""
-echo ">>> Step 1: Pairing..."
-bluetoothctl pair "$MAC" 2>&1 || echo "(pair may auto-complete)"
-sleep 2
+if [ -z "$MAC" ]; then
+    echo
+    echo ">>> Maintenir le bouton SYNC de la manette (voyants qui défilent)"
+    echo ">>> Recherche pendant ${MAX_SCAN}s..."
+    bluetoothctl power on >/dev/null 2>&1
+    bluetoothctl pairable on >/dev/null 2>&1
+    timeout $((MAX_SCAN + 2)) bluetoothctl scan on >/dev/null 2>&1
+    MAC=$(bluetoothctl devices 2>/dev/null \
+        | grep -iE "pro controller|nintendo" \
+        | head -1 | awk '{print $2}')
+fi
 
-echo ">>> Step 2: Trusting..."
-bluetoothctl trust "$MAC" 2>&1
-sleep 1
+if [ -z "$MAC" ]; then
+    echo "ERREUR : aucune manette Nintendo vue pendant le scan." >&2
+    echo "  - bouton SYNC maintenu jusqu'au défilement des voyants ?" >&2
+    echo "  - manette déjà connectée à une Switch ?" >&2
+    echo "  - bluetoothctl devices pour lister ce qui est réellement vu." >&2
+    exit 1
+fi
 
-echo ">>> Step 3: Connecting..."
-bluetoothctl connect "$MAC" 2>&1
-sleep 3
+echo
+echo ">>> Manette : $MAC"
+echo ">>> Appairage avec réponse IO_Capability injectée"
+sudo bash "$INJECTION" "$MAC"
 
-echo ""
-echo ">>> Checking connection status..."
-bluetoothctl info "$MAC" | grep -E "Name|Paired|Trusted|Connected|Icon"
+echo
+echo ">>> État final"
+bluetoothctl info "$MAC" | grep -E "Name|Paired|Trusted|Connected"
 
-echo ""
-echo ">>> Checking joystick device..."
-sleep 2
-if ls /dev/input/js* 2>/dev/null; then
-    echo ""
-    echo "✅ SUCCESS! Joystick device found!"
-    echo "You can test with: jstest /dev/input/js0"
+echo
+echo ">>> Nœuds d'entrée"
+if ls /dev/input/js* >/dev/null 2>&1; then
+    for js in /dev/input/js*; do
+        echo -n "$js : "
+        cat "/sys/class/input/$(basename "$js")/device/name" 2>/dev/null
+    done
+    echo
+    echo "Le pad est le nœud dont le nom ne contient pas « IMU »."
+    echo "Test : jstest --normal /dev/input/js0"
 else
-    echo ""
-    echo "⚠ No /dev/input/js* device yet."
-    echo "Checking /proc/bus/input/devices for Pro Controller..."
-    if grep -qi "pro.controller\|nintendo" /proc/bus/input/devices 2>/dev/null; then
-        echo "✅ Controller detected in input subsystem!"
-        grep -A8 -i "pro.controller\|nintendo" /proc/bus/input/devices
-    else
-        echo ""
-        echo "❌ Controller not registered as input device."
-        echo ""
-        echo "Troubleshooting:"
-        echo "  1. Check dmesg:  sudo dmesg | tail -30"
-        echo "  2. Verify hid_nintendo module: lsmod | grep hid_nintendo"
-        echo "  3. Try: sudo modprobe -r hid_nintendo && sudo modprobe hid_nintendo"
-        echo "  4. Restart bluetooth: sudo systemctl restart bluetooth"
-        echo "  5. Reconnect: bluetoothctl disconnect $MAC && bluetoothctl connect $MAC"
-    fi
+    echo "Aucun /dev/input/js* — vérifier que hidp est chargé :"
+    echo "  sudo modprobe hidp && lsmod | grep hidp"
 fi
