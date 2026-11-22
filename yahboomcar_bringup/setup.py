@@ -29,7 +29,6 @@ setup(
     },
     entry_points={
         'console_scripts': [
-        'Mcnamu_driver_X3	= yahboomcar_bringup.Mcnamu_driver_X3:main',
         'Mcnamu_driver_x1 = yahboomcar_bringup.Mcnamu_driver_x1:main',
         'calibrate_linear_X3 = yahboomcar_bringup.calibrate_linear_X3:main', 
         'calibrate_angular_X3 = yahboomcar_bringup.calibrate_angular_X3:main',
