@@ -1,0 +1,15 @@
+# Flux attendus et seuils (référentiel §8). Cadences C12 à −10 %.
+# Un flux n'est surveillé que si sa capacité est active
+# (paramètre assume_active_capabilities tant que P07 n'existe pas).
+
+flows:
+  - {topic: /scan,                     min_hz: 9.0,  max_age_s: 1.0, capability: lidar,        critical: true}
+  - {topic: /odom,                     min_hz: 8.0,  max_age_s: 1.0, capability: base,         critical: true}
+  - {topic: /imu/data_raw,             min_hz: 9.0,  max_age_s: 1.0, capability: base,         critical: true}
+  - {topic: /voltage,                  min_hz: 9.0,  max_age_s: 2.0, capability: base,         critical: true}
+  - {topic: /arm/servo_angles,         min_hz: 9.0,  max_age_s: 2.0, capability: base,         critical: false}
+  - {topic: /cmd_vel_safe,             min_hz: 18.0, max_age_s: 0.5, capability: base,         critical: true}
+  - {topic: /wrist_camera/image_raw,   min_hz: 25.0, max_age_s: 1.0, capability: wrist_vision, critical: false}
+  - {topic: /camera/color/image_raw,   min_hz: 25.0, max_age_s: 1.0, capability: depth_vision, critical: false}
+  - {topic: /camera/depth/image_raw,   min_hz: 10.0, max_age_s: 1.0, capability: depth_vision, critical: false}
+  - {topic: /perception/detections,    min_hz: 2.0,  max_age_s: 2.0, capability: detection,    critical: false}
