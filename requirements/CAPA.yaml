@@ -86,8 +86,10 @@ requirements:
       Une capacité always_on ne peut pas être arrêtée par le service.
     rationale: >
       base et lidar portent la sûreté : les couper par un appel de service
-      supprimerait /scan et /cmd_vel_safe sans passer par l'arbitre.
-    sources: [S25, INV-01]
+      supprimerait /scan et /cmd_vel_safe sans passer par l'arbitre. Interdire cet
+      arrêt est le comportement voulu (INV-08) : le pilotage des processus passe
+      par systemd et par la liste blanche, jamais par un appel de service.
+    sources: [S25, INV-01, INV-08]
     safety: true
     method: test
     level: unit
@@ -96,8 +98,12 @@ requirements:
       (message explicite, état inchangé) et
       ::test_arret_refuse_si_une_capacite_active_en_depend.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      « REQ-CAPA-005 est approuvée telle qu'écrite — interdire l'arrêt de base et
+      lidar par le service est le comportement voulu (INV-08). » Décision de
+      l'opérateur du 2026-11-22, après présentation de l'énoncé et des deux tests.
     prompt: P07
 
   - id: REQ-CAPA-006
