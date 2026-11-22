@@ -436,6 +436,13 @@ VAD Silero + faster-whisper tiny sur les micros existants → publication sur
   **À trancher par l'opérateur** : budget révisé, prêts DDS zéro-copie (éditeurs compatibles
   requis), ou surveillance des images portée par le nœud de perception en P12.
 - `DROP_TORQUE` (coupe de couple servo) — opérateur présent ; `set_uart_servo_torque` existe.
+- **`joy_teleop/clawbot_restart_teleop.sh` hors INV-08 (P07, 2026-11-22)** : l'outil manuel de
+  redémarrage de la téléopération contient encore **trois `pkill -f`** (`clawbot_joy_teleop.py`,
+  `joy_teleop_launch.py`) et deux `pkill -x`. Le fichier est **modifié hors de la zone de travail**
+  de P07 et n'a pas été touché ; l'étape `interdits` de `scripts/check.sh` le cite donc en exception
+  nommée. **À reprendre avec le fichier d'origine** : remplacer ces motifs par un arrêt des unités
+  systemd concernées (`clawbot-joy-teleop.service`), puis retirer l'exclusion de `check.sh`.
+  **À trancher par l'opérateur** (propriétaire de ce fichier).
 - test d'inclinaison réel.
 - déprécier les endpoints de mouvement de `:8001` (casse le pont C++ historique : décision à
   prendre, pas à subir). `joy-teleop` est arrêté et désactivé depuis le 2026-11-11.
