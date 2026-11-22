@@ -8,6 +8,7 @@
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <depend>clawbot_interfaces</depend>
+  <depend>clawbot_common</depend>
   <depend>action_msgs</depend>
   <depend>control_msgs</depend>
   <depend>trajectory_msgs</depend>

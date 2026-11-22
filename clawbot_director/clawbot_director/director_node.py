@@ -32,6 +32,7 @@ from clawbot_interfaces.srv import DirectorCommand
 from . import preconditions as regles_preconditions
 from .director import (ACCEPTED, Director, PRECONDITION_FAILED, RUNNING,
                        WAITING_CONFIRMATION)
+from .validation_frontiere import controler, resume_journal
 from .skills import (SkillIndisponible, SkillInconnu, SkillInvalide,
                      construire_plan)
 
@@ -52,6 +53,10 @@ ETATS_GOAL = {
 class DirectorNode(Node):
     def __init__(self):
         super().__init__("director")
+        # P06 : contrôle du contrat DirectorCommand à la frontière. `warn` par défaut —
+        # trois appelants ne sont pas modifiables dans ce lot (C11).
+        self.declare_parameter("validation_mode", "warn")
+        self.mode_validation = self.get_parameter("validation_mode").value
         self.regles = regles_preconditions.charger()
         self.director = Director(preconditions=self.verifier_preconditions)
         self.safety = None          # dernière valeur lue, None si l'arbitre n'a jamais parlé
@@ -84,6 +89,12 @@ class DirectorNode(Node):
             return {"status": "INVALID", "reason": f"requete JSON invalide : {exc}"}
         if not isinstance(demande, dict):
             return {"status": "INVALID", "reason": "objet JSON attendu"}
+
+        erreurs, refus = controler(demande, self.mode_validation)
+        if erreurs:
+            self.get_logger().warn(resume_journal(demande, erreurs))
+        if refus is not None:
+            return refus
 
         op = demande.get("op")
         if op == "start_skill":

@@ -1,0 +1,26 @@
+{
+  "appelant": "scripts/preuve_navigation_99.py:146",
+  "requete": {
+    "op": "start_sequence",
+    "steps": [
+      {
+        "skill": "navigate_to",
+        "args": {
+          "destination": "ouest"
+        }
+      },
+      {
+        "skill": "navigate_to",
+        "args": {
+          "destination": "centre"
+        }
+      },
+      {
+        "skill": "navigate_to",
+        "args": {
+          "destination": "est"
+        }
+      }
+    ]
+  }
+}

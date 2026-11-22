@@ -1,0 +1,8 @@
+{
+  "appelant": "(cas invalide)",
+  "requete": {
+    "op": "start_skill",
+    "skill": 42,
+    "args": {}
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "appelant": "bridge_mcp/tools.py:195",
+  "requete": {
+    "op": "get_task"
+  }
+}

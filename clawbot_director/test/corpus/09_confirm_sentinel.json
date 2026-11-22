@@ -1,0 +1,7 @@
+{
+  "appelant": "clawbot_sentinel/sentinel_node.py:158",
+  "requete": {
+    "op": "confirm",
+    "accepte": true
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "appelant": "bridge_mcp/tools.py:277",
+  "requete": {
+    "op": "start_skill",
+    "skill": "navigate_to",
+    "args": {
+      "destination": "centre"
+    }
+  }
+}
