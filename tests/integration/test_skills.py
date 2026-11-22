@@ -28,7 +28,7 @@ from rclpy.action import ActionClient  # noqa: E402
 from rclpy.executors import SingleThreadedExecutor  # noqa: E402
 from rclpy.node import Node  # noqa: E402
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy  # noqa: E402
-from std_msgs.msg import Bool, String  # noqa: E402
+from std_msgs.msg import Bool, Int32MultiArray, String  # noqa: E402
 
 from clawbot_interfaces.action import ExecuteSkill  # noqa: E402
 from clawbot_safety.arbitrator import Arbitrator  # noqa: E402
@@ -62,6 +62,11 @@ class Banc:
         qos_estop = QoSProfile(depth=1, reliability=ReliabilityPolicy.RELIABLE,
                                durability=DurabilityPolicy.TRANSIENT_LOCAL)
         self.pub_estop = self.espion.create_publisher(Bool, "/safety/estop", qos_estop)
+        # Le pilote réel publie /arm/servo_angles à 10 Hz : sans ce flux, un skill qui
+        # déplace la base est refusé ARM_NOT_AT_REST (REQ-ARM-004). On rejoue la pose de
+        # repos validée plutôt que de contourner la précondition.
+        self.pub_angles = self.espion.create_publisher(
+            Int32MultiArray, "/arm/servo_angles", 10)
         for noeud in (self.arbitre, self.base, self.entrees, self.espion):
             self.executeur.add_node(noeud)
 
@@ -82,6 +87,9 @@ class Banc:
         fin = time.monotonic() + duree_s
         while time.monotonic() < fin:
             self.publier_capacites()
+            angles = Int32MultiArray()
+            angles.data = [90, 180, 0, 0, 90, 149]        # pose de repos validée (C10)
+            self.pub_angles.publish(angles)
             self.executeur.spin_once(timeout_sec=0.02)
 
     def fermer(self) -> None:

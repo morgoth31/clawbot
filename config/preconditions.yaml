@@ -35,9 +35,14 @@ arm:
   mesure_le: "2026-11-11T19:20:40+01:00"
   valide_par_operateur: true
 
-# Skills qui déplacent la base : eux seuls exigent le bras replié. `arm_move` et `grip_set` en sont
-# exclus, sans quoi le bras ne pourrait plus être replié par le directeur lui-même.
+# Skills qui déplacent la base : eux seuls exigent le bras replié. Les skills du bras
+# (`arm_rest`, `arm_named_pose`, `gripper`) et les skills du directeur `arm_move` / `grip_set` en
+# sont exclus, sans quoi le bras ne pourrait plus être replié par le directeur lui-même.
+# `move_relative` et `rotate` ajoutés en P13 : ils publient sur `/cmd_vel/skill` et déplacent la
+# base au même titre que `navigate_to` (REQ-ARM-004).
 skills_exigeant_bras_replie:
   - navigate_to
   - follow_human
   - search_object
+  - move_relative
+  - rotate

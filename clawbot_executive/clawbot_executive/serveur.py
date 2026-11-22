@@ -21,16 +21,22 @@ from rclpy.action import ActionServer, CancelResponse, GoalResponse
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import Int32MultiArray, String
+
+from clawbot_common import preconditions as regles_preconditions
 
 from clawbot_interfaces.action import ExecuteSkill
 
+from . import bras
 from .etats import Etats
+from .executeur_bras import ExecuteurActions
 from .registre import Definition, charger, valider_parametres
 from .skills import (CANCELED, FAILED, REJECTED, SUCCEEDED, Resultat, construire)
 
 REGISTRE_PAR_DEFAUT = "/home/jetson/clawbot/install/clawbot_executive/share/clawbot_executive/config/skills.yaml"
 SNAPSHOTS_PAR_DEFAUT = "/var/lib/clawbot/snapshots"
+POSES_PAR_DEFAUT = "/home/jetson/clawbot/config/arm_poses.yaml"
+PRECONDITIONS_PAR_DEFAUT = "/home/jetson/clawbot/config/preconditions.yaml"
 
 
 def _liste_detections(message) -> list:
@@ -73,6 +79,25 @@ class Contexte:
     @property
     def etats(self) -> Etats:
         return self.serveur.etats
+
+    # ── bras ─────────────────────────────────────────────────────────────────
+    @property
+    def poses(self):
+        return self.serveur.poses
+
+    @property
+    def servo_angles(self):
+        return self.serveur.etats.servo_angles
+
+    def age_servo(self):
+        return self.serveur.etats.age_servo()
+
+    def duree_invalide(self, maintenant=None):
+        return self.serveur.etats.duree_invalide(maintenant)
+
+    def executer_bras(self, groupe, positions, duree_s, timeout_s, surveillance=None):
+        return self.serveur.executeur_bras.executer(
+            groupe, positions, duree_s, timeout_s, surveillance)
 
     @property
     def periode(self) -> float:
@@ -118,16 +143,28 @@ class Contexte:
 
 class ServeurSkills(Node):
     def __init__(self, registre: str | Path | None = None, etats: Etats | None = None,
-                 editeur=None, demarrer: bool = False, nom: str = "skill_server"):
+                 editeur=None, demarrer: bool = False, nom: str = "skill_server",
+                 poses: str | Path | None = None, preconditions: str | Path | None = None,
+                 executeur_bras=None):
         super().__init__(nom)
         self.declare_parameter("registre", REGISTRE_PAR_DEFAUT)
         self.declare_parameter("snapshots_dir", SNAPSHOTS_PAR_DEFAUT)
         self.declare_parameter("periode_s", 0.05)
+        self.declare_parameter("arm_poses", POSES_PAR_DEFAUT)
+        self.declare_parameter("preconditions", PRECONDITIONS_PAR_DEFAUT)
 
         chemin = str(registre or self.get_parameter("registre").value)
         self.definitions: dict[str, Definition] = charger(chemin)
         self.periode_s = float(self.get_parameter("periode_s").value)
         self.snapshots_dir = Path(str(self.get_parameter("snapshots_dir").value))
+
+        # Liste blanche des poses et enveloppe de repos : chargées au démarrage, pas au
+        # premier goal. Un fichier inutilisable doit empêcher le service de démarrer,
+        # pas produire un refus incompréhensible au moment du mouvement (P13).
+        chemin_poses = str(poses or self.get_parameter("arm_poses").value)
+        chemin_preconditions = str(preconditions or self.get_parameter("preconditions").value)
+        self.poses = bras.charger(chemin_poses)
+        self.regles = regles_preconditions.charger(chemin_preconditions)
 
         self.etats = etats if etats is not None else Etats()
         self._detections: list = []
@@ -167,6 +204,15 @@ class ServeurSkills(Node):
                                      callback_group=groupe_etats)
         except ImportError:                        # pragma: no cover
             self.get_logger().warn("nav_msgs absent : odométrie indisponible")
+
+        # Angles de servo relus par le pilote : seule mesure du bras (REQ-ARM-005/006).
+        # Abonnement typé conservé par le nœud ; la sonde de capacité s'abonne de son
+        # côté, sur la même durée de vie courte.
+        self.create_subscription(Int32MultiArray, "/arm/servo_angles",
+                                 self._sur_servo_angles, 10,
+                                 callback_group=groupe_etats)
+
+        self.executeur_bras = executeur_bras or ExecuteurActions(self, self.etats)
 
         self._images: dict[str, object] = {}
         self._images_lock = threading.Lock()
@@ -211,6 +257,9 @@ class ServeurSkills(Node):
     def _sur_odom(self, msg) -> None:
         position = msg.pose.pose.position
         self.etats.maj_odom(position.x, position.y, Etats.lacet(msg.pose.pose.orientation))
+
+    def _sur_servo_angles(self, msg) -> None:
+        self.etats.maj_servo_angles(list(msg.data))
 
     def _sur_image(self, topic: str, msg) -> None:
         with self._images_lock:
@@ -301,7 +350,7 @@ class ServeurSkills(Node):
             self.skill_courant = demandee
 
         try:
-            skill = construire(definition)
+            skill = construire(definition, self.regles)
             code = skill.check_preconditions(self.etats, params)
             if code:
                 return self._terminer(goal_handle, resultat, Resultat(

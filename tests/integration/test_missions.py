@@ -27,7 +27,7 @@ from rclpy.executors import SingleThreadedExecutor  # noqa: E402
 from rclpy.node import Node  # noqa: E402
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy  # noqa: E402
 from sensor_msgs.msg import Image  # noqa: E402
-from std_msgs.msg import String  # noqa: E402
+from std_msgs.msg import Int32MultiArray, String  # noqa: E402
 
 from clawbot_interfaces.action import ExecuteMission  # noqa: E402
 from clawbot_interfaces.srv import GetMissionReport, SubmitDecision  # noqa: E402
@@ -56,6 +56,10 @@ class Banc:
             QoSProfile(depth=1, reliability=ReliabilityPolicy.RELIABLE,
                        durability=DurabilityPolicy.TRANSIENT_LOCAL))
         self.pub_image = self.espion.create_publisher(Image, "/wrist_camera/image_raw", 5)
+        # Pilote réel : /arm/servo_angles à 10 Hz. Sans ce flux, `move_relative` est
+        # refusé ARM_NOT_AT_REST (REQ-ARM-004) — le banc rejoue la pose de repos.
+        self.pub_angles = self.espion.create_publisher(
+            Int32MultiArray, "/arm/servo_angles", 10)
         for noeud in (self.arbitre, self.base, self.entrees, self.espion):
             self.executeur.add_node(noeud)
 
@@ -77,6 +81,9 @@ class Banc:
                 {"name": "base", "state": "ACTIVE"}, {"name": "lidar", "state": "ACTIVE"},
                 {"name": "wrist_vision", "state": "ACTIVE"}]})
             self.pub_capa.publish(message)
+            angles = Int32MultiArray()
+            angles.data = [90, 180, 0, 0, 90, 149]        # pose de repos validée (C10)
+            self.pub_angles.publish(angles)
             image = Image()
             image.height, image.width, image.encoding = 4, 4, "rgb8"
             image.step = 12
