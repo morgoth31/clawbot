@@ -61,7 +61,8 @@ capacites:
     units: [clawbot-wrist-camera.service]
     requires: [base]
     managed: true
-    ready_when: [{topic: /wrist_camera/image_raw, min_hz: 8.0}]
+    # 8,0 Hz etait le seuil theorique ; mesure P09/P12 = 6,9 Hz sur USB 2.0 -> 6,0 Hz (mesure - 10 %).
+    ready_when: [{topic: /wrist_camera/image_raw, min_hz: 6.0}]
     timeout_s: 30.0
 
   depth_vision:
