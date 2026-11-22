@@ -44,3 +44,20 @@ def test_safety_bloquant_avant_mouvement():
     assert code_safety(safety_state="SENSOR_STALE", estop_latched=False) == "SENSOR_STALE"
     assert code_safety(safety_state="HOLD", estop_latched=False) == "SAFETY_HOLD"
     assert code_safety(safety_state="OK", estop_latched=True) == "ESTOP_LATCHED"
+
+
+@pytest.mark.req("REQ-PERC-005")
+def test_dependance_par_camera_pour_capture_image():
+    """L'Astra n'exige pas la caméra du poignet : la dépendance suit le paramètre."""
+    from pathlib import Path
+
+    from clawbot_executive.registre import charger
+    from clawbot_executive.skills import construire
+
+    racine = Path(__file__).resolve().parents[2]
+    definitions = charger(racine / "clawbot_executive" / "config" / "skills.yaml")
+    skill = construire(definitions["capture_image"])
+
+    assert skill.capacites_requises({"camera": "astra"}) == ["depth_vision"]
+    assert skill.capacites_requises({"camera": "wrist"}) == ["wrist_vision"]
+    assert skill.capacites_requises({}) == []          # sans paramètre : aucune exigence

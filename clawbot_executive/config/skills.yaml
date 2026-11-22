@@ -61,7 +61,13 @@ skills:
       required: [camera]
       properties:
         camera: {type: string, enum: [wrist, astra]}
-    requires: [wrist_vision]
+    # La capacité exigée dépend de la caméra : l'Astra n'a pas besoin de la caméra
+    # du poignet (REQ-PERC-005).
+    requires: []
+    requires_by_param:
+      camera:
+        wrist: [wrist_vision]
+        astra: [depth_vision]
     timeout_s: 5.0
 
   navigate_to:

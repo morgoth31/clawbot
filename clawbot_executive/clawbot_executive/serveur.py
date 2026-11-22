@@ -265,10 +265,10 @@ class ServeurSkills(Node):
 
         try:
             skill = construire(definition)
-            code = skill.check_preconditions(self.etats)
+            code = skill.check_preconditions(self.etats, params)
             if code:
                 return self._terminer(goal_handle, resultat, Resultat(
-                    FAILED, code, skill.detail_precondition(self.etats)),
+                    FAILED, code, skill.detail_precondition(self.etats, params)),
                     skill=demandee, params=params)
             ctx = Contexte(self, params, goal_handle, definition=definition)
             resultat_skill = skill.execute(ctx)

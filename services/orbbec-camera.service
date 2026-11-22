@@ -1,22 +1,43 @@
 [Unit]
-Description=Clawbot Orbbec Astra Pro+ Camera (depth + RGB → ROS2 topics)
-After=network.target ros2-driver-node.service
-# Ne pas bloquer le boot si la caméra n'est pas branchée
+Description=Clawbot Orbbec Astra Pro+ Camera (depth + RGB -> ROS2 topics) - Clawbot X3 Plus
+Documentation=file:///home/jetson/clawbot/docs/architecture/decisions/ADR-001-profondeur-astra.md
+After=network.target
+# Ne pas bloquer le boot si la camera n'est pas branchee
 StartLimitIntervalSec=60
 StartLimitBurst=5
+# Pilotee par le gestionnaire de capacites (capacite depth_vision, REQ-PERC-003) :
+# elle n'est pas activee au boot, le gestionnaire la demarre a la demande.
 
 [Service]
 Type=simple
 User=jetson
 Group=jetson
 Environment=ROS_DOMAIN_ID=28
+Environment=HOME=/home/jetson
 Environment=FASTRTPS_DEFAULT_PROFILES_FILE=/home/jetson/clawbot/fastdds_profile.xml
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
-  source /home/jetson/yahboomcar_ros2_ws/software/library_ws/install/setup.bash && \
-  ROS_DOMAIN_ID=28 ros2 launch astra_camera astro_pro_plus.launch.xml"
+# ProtectHome=read-only interdit ~/.ros : les journaux rclpy vont dans l'etat du service
+Environment=ROS_LOG_DIR=/var/lib/clawbot/ros-log
+WorkingDirectory=/home/jetson/clawbot
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source /home/jetson/yahboomcar_ros2_ws/software/library_ws/install/setup.bash && exec ros2 launch astra_camera astro_pro_plus.launch.xml"
 Restart=on-failure
 RestartSec=2
 TimeoutStopSec=10
+
+# Durcissement (meme modele qu'en P02) : la camera lit /dev/bus/usb, ecrit ses
+# journaux dans /var/lib/clawbot et n'a besoin de rien d'autre.
+StateDirectory=clawbot
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=read-only
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+DeviceAllow=/dev/bus/usb rw
+DeviceAllow=/dev/video0 rw
 
 [Install]
 WantedBy=multi-user.target
