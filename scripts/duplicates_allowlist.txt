@@ -1,0 +1,4 @@
+# Doublons autorisés (scripts/check.sh --strict-duplicates).
+# Une ligne = un préfixe de chemin relatif ; un groupe n'est toléré que si
+# TOUS ses fichiers commencent par une ligne listée ici. Exemple :
+# clawbot_common/clawbot_common/
