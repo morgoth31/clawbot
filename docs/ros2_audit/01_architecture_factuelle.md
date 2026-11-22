@@ -161,10 +161,10 @@ Deux ruptures de chaîne établies par ces mesures :
 | `/enable` | `std_srvs/srv/Empty` | `slam_toolbox` | aucun | [S04] |
 | `/start_scan`, `/stop_scan` | `std_srvs/srv/Empty` | `ydlidar_ros2_driver_node` | aucun | [S04] |
 | `/slam_toolbox/{save_map,serialize_map,deserialize_map,dynamic_map,clear_changes,manual_loop_closure,pause_new_measurements,toggle_interactive_mode,get_interactive_markers}` | types `slam_toolbox/*`, `nav_msgs/srv/GetMap` | `slam_toolbox` | aucun | [S04] |
-| `/camera/{get_camera_info,get_device_info,set_depth_exposure,set_laser_enable,…}` (44 services) | `astra_camera_msgs/*`, `std_srvs/*` | `camera` | aucun | [S04] |
+| `/camera/{get_camera_info,get_device_info,set_depth_exposure,set_laser_enable,…}` (44 services sur les 186) | `astra_camera_msgs/*`, `std_srvs/*` | `camera` | aucun | [S04] |
 | `/wrist_camera/set_camera_info` | `sensor_msgs/srv/SetCameraInfo` | `wrist_camera/camera` | aucun | [S04] |
 | `/ydlidar_ros2_driver_node/change_state` | `lifecycle_msgs/srv/ChangeState` | `ydlidar_ros2_driver_node` | `launch_ros_1308` | [S04], [S02] |
-| `/<nœud>/{describe,get,set,list}_parameters{, _atomically}` | `rcl_interfaces/*` | 17 nœuds ROS 2 | `rosapi` | [S04], [S51] |
+| `/<nœud>/{describe,get,set,list}_parameters{, _atomically}` | `rcl_interfaces/*` | 17 nœuds ROS 2 (186 services au total) | `rosapi` | [S04] |
 
 `DirectorCommand` est un service **à charge utile JSON opaque** : `string request_json` en entrée, `string response_json` en sortie [S38]. Aucune validation de schéma n'est exprimée dans l'interface : le contrat réel est dans le code du directeur et dans la documentation du pont.
 
