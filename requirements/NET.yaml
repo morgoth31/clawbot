@@ -1,0 +1,26 @@
+domain: NET
+requirements:
+  - id: REQ-NET-001
+    title: rosbridge retiré ou lié à la boucle locale
+    statement: >
+      Le service rosbridge ne doit plus être joignable depuis le réseau : soit il est
+      retiré du démarrage, soit son écoute est liée à 127.0.0.1.
+    rationale: >
+      rosbridge écoute sur toutes les interfaces (9090) et ouvre trois nœuds pour 9,9 %
+      de CPU relevés à l'audit (Q11, S21). La mesure du 2026-11-22 ne trouve **aucune
+      connexion client en sept jours** et aucune socket établie : le service est exposé
+      sans usage. La décision (retrait ou liaison locale) est celle de l'opérateur ;
+      l'exigence ne tranche que l'exposition.
+    sources: [Q11, S21, P01-M08]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      Si le fichier d'unité rosbridge subsiste dans `services/`, son `ExecStart` passe
+      l'option de liaison à `127.0.0.1` (aucune écoute sur `0.0.0.0`) ; s'il a été
+      retiré, plus aucune unité ni cible du dépôt ne le cite. Au déploiement,
+      `ss -tlnp` ne montre le port 9090 que sur 127.0.0.1, ou pas du tout.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P14
