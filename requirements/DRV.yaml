@@ -1,0 +1,115 @@
+# Exigences du pilote du châssis — source unique, port série nommé, arrêt sur silence.
+# Format et règles : requirements/README.md
+
+domain: DRV
+requirements:
+  - id: REQ-DRV-001
+    title: Source unique du pilote dans le dépôt
+    statement: >
+      Le pilote déployé doit provenir du paquet clawbot_base_driver du dépôt
+      clawbot, et aucune autre copie de son code ne doit exister dans ce dépôt.
+    rationale: >
+      Le pilote existait en deux copies identiques ; l'unité exécutait celle du
+      workspace vendor, donc modifier la copie du dépôt n'avait aucun effet
+      (R10, S25).
+    sources: [R10, S25]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests dans clawbot_base_driver/test/ : aucun fichier Mcnamu_driver_X3.py
+      dans le dépôt, et l'ExecStart de services/ros2-driver-node.service nomme
+      clawbot_base_driver. Au déploiement, check.sh --strict-duplicates ne
+      signale plus le pilote et systemctl cat ros2-driver-node cite le paquet.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P03
+
+  - id: REQ-DRV-002
+    title: Arrêt moteurs sur silence des consignes
+    statement: >
+      Le pilote doit commander une vitesse nulle au MCU au plus cmd_timeout_s
+      (défaut 0,3 s) après la dernière consigne non nulle reçue, et ne pas
+      renvoyer de consigne nulle en boucle ensuite.
+    rationale: >
+      Le pilote n'avait aucune garde : le MCU conservait la dernière trame reçue
+      si l'arbitre cessait de publier (P01-M04). Un arrêt de l'arbitre en plein
+      mouvement laissait donc le robot avancer.
+    sources: [P01-M04, R05, C08]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      Un test à horloge simulée vérifie un set_car_motion(0, 0, 0) entre 0,30 et
+      0,35 s après la dernière consigne non nulle, puis un seul appel nul sur
+      2 s de silence. Démonstration complémentaire : tests/hardware/HW-DRV-001.md
+      (roues arrêtées en moins de 0,5 s après coupure de la publication).
+    evidence: tests/hardware/HW-DRV-001.md
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    prompt: P03
+
+  - id: REQ-DRV-003
+    title: Port série nommé par un paramètre
+    statement: >
+      Le chemin du port série doit être le paramètre ROS device_path, par défaut
+      le chemin /dev/serial/by-id/... relevé en P01-M05.
+    rationale: >
+      Le pilote ouvrait le port par le défaut de la bibliothèque (/dev/myserial),
+      sans chemin explicite ni trace (Q10, C08).
+    sources: [Q10, C08, P01-M05]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      Test de déclaration : device_path vaut par défaut
+      /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0 et est transmis à la
+      fabrique Rosmaster. Au déploiement : ros2 param get /driver_node
+      device_path.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P03
+
+  - id: REQ-DRV-004
+    title: Un seul propriétaire du port série
+    statement: >
+      Un second processus qui tente d'ouvrir le même port doit échouer
+      immédiatement avec un message explicite, sans perturber le premier.
+    rationale: >
+      Le port est exclusif : deux lecteurs se volent les octets sans erreur
+      (C08). Le verrou rend la faute visible au lieu de la subir.
+    sources: [C08, P01-M05]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      Deux instances du verrou sur un même fichier temporaire : la seconde lève
+      PortBusyError dont le message contient le chemin et le PID du détenteur.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P03
+
+  - id: REQ-DRV-005
+    title: Interfaces et cadences du pilote inchangées
+    statement: >
+      Les topics publiés par le pilote, leurs types et leurs cadences doivent
+      rester ceux de C12 à -10 % près.
+    rationale: >
+      Le remplacement de la source ne doit rien changer d'observable pour
+      l'arbitre, l'EKF, SLAM et le bras.
+    sources: [C12, S25]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      Au déploiement : /voltage 10 Hz, /imu/data_raw 10 Hz, /odom_raw 10 Hz,
+      /vel_raw 10 Hz, /arm/servo_angles ~1,7 Hz, /joint_states 20 Hz (celui de
+      joint_state_publisher), tous à -10 % près, et ros2 node list contient
+      /driver_node.
+    evidence: deploy/journal/2026-11-22_p03_pilote.md
+    status: implemented
+    approved_by: null
+    prompt: P03
