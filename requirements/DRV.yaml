@@ -106,9 +106,10 @@ requirements:
     level: hardware
     criterion: >
       Au déploiement : /voltage 10 Hz, /imu/data_raw 10 Hz, /odom_raw 10 Hz,
-      /vel_raw 10 Hz, /arm/servo_angles ~1,7 Hz, /joint_states 20 Hz (celui de
-      joint_state_publisher), tous à -10 % près, et ros2 node list contient
-      /driver_node.
+      /vel_raw 10 Hz, /arm/servo_angles 10 Hz (le topic publie à chaque cycle ;
+      chaque servo n'est relu qu'une fois par cycle de 6, ~1,7 Hz), /joint_states
+      20 Hz (celui de joint_state_publisher), tous à -10 % près, et ros2 node
+      list contient /driver_node.
     evidence: deploy/journal/2026-11-22_p03_pilote.md
     status: implemented
     approved_by: null
