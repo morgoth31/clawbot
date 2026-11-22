@@ -32,6 +32,34 @@ def detections_depuis_lignes(lignes, noms=None, conf_min: float = CONF_MIN) -> l
     return detections
 
 
+def detections_depuis_sortie_yolo(lignes, noms=None, conf_min: float = CONF_MIN) -> list:
+    """Décode la sortie brute `(cx, cy, w, h, obj, cls…)` d'un moteur TensorRT.
+
+    Ce n'est PAS le format de `detections_depuis_lignes` (qui reçoit déjà des xyxy) :
+    confondre les deux produit des dizaines de « person » sur toute image (constaté le
+    2026-11-22 avec le moteur FP16).
+    """
+    noms = noms or {}
+    detections = []
+    for ligne in lignes:
+        cx, cy, w, h, obj = (float(v) for v in ligne[:5])
+        scores = [float(v) for v in ligne[5:]]
+        if not scores:
+            continue
+        classe = int(max(range(len(scores)), key=lambda i: scores[i]))
+        confiance = obj * float(scores[classe])
+        if confiance < conf_min:
+            continue
+        detections.append({
+            "class": noms.get(classe, str(classe)),
+            "class_id": classe,
+            "confidence": round(confiance, 3),
+            "bbox": {"x1": int(cx - w / 2), "y1": int(cy - h / 2),
+                     "x2": int(cx + w / 2), "y2": int(cy + h / 2)},
+        })
+    return detections
+
+
 def _iou(a: dict, b: dict) -> float:
     ax1, ay1, ax2, ay2 = a["bbox"]["x1"], a["bbox"]["y1"], a["bbox"]["x2"], a["bbox"]["y2"]
     bx1, by1, bx2, by2 = b["bbox"]["x1"], b["bbox"]["y1"], b["bbox"]["x2"], b["bbox"]["y2"]
