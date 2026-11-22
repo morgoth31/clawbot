@@ -1,7 +1,9 @@
 # Candidats à la purge — 2026-11-22 (P02)
 
-Mesures en lecture seule. **Rien n'a été supprimé.** Chaque ligne attend l'accord
-de l'opérateur. Disque au moment de la mesure : `/dev/nvme0n1p1` 147 Go,
+**APPLIQUÉ le 2026-11-22 à 13:07, après accord de l'opérateur** (« ok pour les
+deux »). Résultat : disque de 117 Go / 84 % à **91 Go / 66 %**, soit ≈ 26 Go
+libérés. Détail de l'application en fin de document. Les lignes 8 à 10 n'ont pas
+été exécutées (voir « Non exécuté »). Disque au moment de la mesure : `/dev/nvme0n1p1` 147 Go,
 117 Go utilisés, 24 Go libres (**84 %**), plus gros consommateur =
 `/home/jetson` 23 Go, puis les images Docker (34,9 Go, hors /home).
 
@@ -43,3 +45,33 @@ soit un disque ramené d'environ 84 % à 64 %.
 3. Purges 4 à 7 — sans effet sur le robot, `build/` reconstruit par colcon.
 4. 8 et 9 : seulement si l'opérateur confirme que Chromium snap et les navigateurs
    Playwright ne servent pas.
+
+## Application — 2026-11-22 13:07
+
+| Étape | Commande | Résultat mesuré |
+|---|---|---|
+| 1 | `sudo apt-get clean` | archives .deb supprimées |
+| 2 | `sudo journalctl --vacuum-size=100M` | **195,7 Mo** libérés |
+| 3 | `docker image prune -a -f --filter "until=720h"` | **22,66 Go** ; l'image `ros2_llm_bridge-llm_bridge` (20621c37) supprimée |
+| 3 bis | `docker builder prune -f` | **284,7 Mo** de cache de construction |
+| 4 | `rm -rf ~/.hermes/cache/{uv,pnpm}/*` | 721 Mo |
+| 5 | `rm ~/.ros/rtabmap.db ~/.ros/rtabmap_slam3d.db` | **220,7 Mo** (46,8 + 173,9) |
+| 6 | `rm -rf ~/.ros/log/*` | 51 Mo |
+| 7 | `rm -rf /home/jetson/clawbot/{build,log}` | 159 Mo |
+
+Disque : **117 Go → 91 Go utilisés**, 24 Go → **49 Go libres**, 84 % → **66 %**
+(≈ 26 Go libérés). Les deux conteneurs actifs (`searxng`, `charles-dashboard`)
+n'ont pas été touchés ; `docker ps` toujours à 2.
+
+Contrôle après purge : aucune unité du robot en échec, `clawbot-sentinel`,
+`clawbot-director`, `clawbot-safety-arbitrator` et `ros2-driver-node` actifs.
+
+## Non exécuté (volontairement)
+
+| # | Objet | Raison |
+|---|---|---|
+| 8 | `snap remove chromium` | « ok pour les deux » ne dit pas que Chromium est inutilisé ; 300 Mo ne justifient pas de retirer une application sans confirmation explicite |
+| 9 | `~/.cache/ms-playwright` | idem : navigateurs de l'outil navigateur Hermes, réinstallés à la demande mais utiles si l'outil sert |
+| 10 | `/tmp` | risque de casser un processus en cours pour 48 Mo |
+
+Ces trois lignes restent disponibles sur un mot de vous (≈ 675 Mo).
