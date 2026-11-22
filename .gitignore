@@ -5,6 +5,10 @@
 build/
 install/
 log/
+# Mêmes répertoires, quel que soit le niveau (paquets imbriqués, sous-workspaces)
+**/install/
+**/build/
+**/log/
 
 # Python
 __pycache__/
