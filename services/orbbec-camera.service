@@ -36,8 +36,9 @@ ProtectKernelModules=yes
 RestrictSUIDSGID=yes
 RestrictRealtime=yes
 LockPersonality=yes
-DeviceAllow=/dev/bus/usb rw
-DeviceAllow=/dev/video0 rw
+# Pas de DeviceAllow : dès qu'on en déclare une, systemd n'autorise plus que ces
+# périphériques. L'Astra ouvre /dev/bus/usb/00X/0YY (usbfs, ioctl UVC) et cela
+# échouait en « Input/output error » (essai du 2026-11-22).
 
 [Install]
 WantedBy=multi-user.target
