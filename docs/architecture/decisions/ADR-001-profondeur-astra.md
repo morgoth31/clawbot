@@ -59,7 +59,14 @@ l'exigence, et changer de mode n'aurait fait que dégrader ou déplacer la limit
    `NoNewPrivileges`, `PrivateTmp`, `ProtectSystem=full`, `ProtectHome=read-only`,
    `ProtectKernelTunables`, `ProtectControlGroups`, `ProtectKernelModules`, `RestrictSUIDSGID`,
    `RestrictRealtime`, `LockPersonality`, `StateDirectory=clawbot` et `ROS_LOG_DIR` dans l'état du
-   service, plus une liste `DeviceAllow` explicite (`/dev/bus/usb`, `/dev/video0`).
+   service.
+
+   **`DeviceAllow` essayée puis retirée** : déclarer une liste `DeviceAllow` fait de systemd un
+   filtre exclusif, et l'ouverture usbfs de l'Astra échouait alors en `Could not open
+   "2bc5/060f@1/13": Input/output error`, en boucle, sans aucune image. Le retrait a rétabli
+   immédiatement 20 Hz. Constat daté du 2026-11-22, journal de déploiement.
+   `RestrictRealtime=yes` laisse un avertissement bénin du SDK (« USB events thread - failed to set
+   priority ») : les mesures après durcissement ne montrent aucune perte (trou max 0,112 s).
 3. **Dépendance par caméra** : `capture_image {camera: astra}` exigeait `wrist_vision` et
    répondait donc `CAPABILITY_INACTIVE` alors que l'Astra publiait — c'est le `CAPABILITY_INACTIVE`
    vu à l'essai P10. Le registre porte maintenant `requires_by_param`.
