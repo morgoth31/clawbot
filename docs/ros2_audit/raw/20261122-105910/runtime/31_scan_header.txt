@@ -1,0 +1,14 @@
+=== /scan header (--once) ===
+header:
+  stamp:
+    sec: 1795342695
+    nanosec: 638920000
+  frame_id: laser
+angle_min: -3.1415927410125732
+angle_max: 3.1415927410125732
+angle_increment: 0.0031120283529162407
+time_increment: 4.994331902707927e-05
+scan_time: 0.09868799895048141
+range_min: 0.009999999776482582
+range_max: 50.0
+=== /camera/depth/image_raw : frame attendu par sentinel ===

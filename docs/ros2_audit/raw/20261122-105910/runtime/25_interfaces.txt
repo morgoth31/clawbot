@@ -1,0 +1,42 @@
+=== ip -br addr ===
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+can0             DOWN           
+wlP1p1s0         UP             192.168.1.47/24 2a01:cb19:8667:cb00:a60b:61f3:5a4f:31fa/64 2a01:cb19:8667:cb00:c1f4:51a0:e45c:6096/64 2a01:cb19:8667:cb00:6ca9:a078:2bca:68ee/64 2a01:cb19:8667:cb00:eb50:dca0:d3e2:f6d2/64 2a01:cb19:8667:cb00:df24:8628:ee7:505f/64 2a01:cb19:8667:cb00:95ae:e386:e8c7:2b83/64 2a01:cb19:8667:cb00:b362:8861:aa88:230b/64 2a01:cb19:8667:cb00:53a5:edef:fa25:ed5d/64 fe80::fe6:eba1:ee66:1b3f/64 
+eno1             DOWN           
+l4tbr0           DOWN           
+usb0             DOWN           
+usb1             DOWN           
+br-0ebcc2854aa2  UP             172.18.0.1/16 fe80::442e:6fff:fec7:278b/64 
+docker0          DOWN           172.17.0.1/16 
+vethb4baedf@if2  UP             fe80::20e9:60ff:fe9c:ed4c/64 
+tailscale0       UNKNOWN        fe80::6935:8b85:c793:b2a4/64 
+=== ip route ===
+default via 192.168.1.1 dev wlP1p1s0 proto dhcp metric 600 
+169.254.0.0/16 dev wlP1p1s0 scope link metric 1000 
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown 
+172.18.0.0/16 dev br-0ebcc2854aa2 proto kernel scope link src 172.18.0.1 
+192.168.1.0/24 dev wlP1p1s0 proto kernel scope link src 192.168.1.47 metric 600 
+=== ip -6 route ===
+::1 dev lo proto kernel metric 256 pref medium
+2a01:cb19:8667:cb00::/64 dev wlP1p1s0 proto ra metric 600 pref medium
+fe80::/64 dev vethb4baedf proto kernel metric 256 pref medium
+fe80::/64 dev br-0ebcc2854aa2 proto kernel metric 256 pref medium
+fe80::/64 dev tailscale0 proto kernel metric 256 pref medium
+fe80::/64 dev wlP1p1s0 proto kernel metric 1024 pref medium
+multicast ff00::/8 dev wlP1p1s0 proto kernel metric 256 pref medium
+multicast ff00::/8 dev vethb4baedf proto kernel metric 256 pref medium
+multicast ff00::/8 dev br-0ebcc2854aa2 proto kernel metric 256 pref medium
+multicast ff00::/8 dev tailscale0 proto kernel metric 256 pref medium
+default via fe80::1a86:37ff:fe0a:f810 dev wlP1p1s0 proto ra metric 600 pref high
+=== etats ===
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP> 
+can0             DOWN           <NOARP,ECHO> 
+wlP1p1s0         UP             dc:4a:9e:df:d6:e2 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+eno1             DOWN           3c:6d:66:a4:1f:26 <NO-CARRIER,BROADCAST,MULTICAST,UP> 
+l4tbr0           DOWN           3e:c7:e7:79:f3:87 <BROADCAST,MULTICAST> 
+usb0             DOWN           82:82:aa:1a:47:41 <NO-CARRIER,BROADCAST,MULTICAST,UP> 
+usb1             DOWN           82:82:aa:1a:47:43 <NO-CARRIER,BROADCAST,MULTICAST,UP> 
+br-0ebcc2854aa2  UP             46:2e:6f:c7:27:8b <BROADCAST,MULTICAST,UP,LOWER_UP> 
+docker0          DOWN           7a:32:94:97:5c:cb <NO-CARRIER,BROADCAST,MULTICAST,UP> 
+vethb4baedf@if2  UP             22:e9:60:9c:ed:4c <BROADCAST,MULTICAST,UP,LOWER_UP> 
+tailscale0       UNKNOWN        <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> 

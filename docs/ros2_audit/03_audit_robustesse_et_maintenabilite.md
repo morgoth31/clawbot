@@ -4,28 +4,28 @@
 
 ### 1.1 Politique de redémarrage des unités
 
-14 unités actives inspectées [S25], 73 fichiers `.service` sur le poste.
+15 unités actives inspectées (14 robot + `rosbridge`) [S25], [S50] ; 224 services chargés sur le poste et 73 fichiers `.service` dans `/etc/systemd/system` [S58].
 
 | Unité | `Restart` | `RestartSec` | `Requires` | `Conflicts` | `ExecStop` | Source |
 |---|---|---|---|---|---|---|
-| `clawbot-director.service` | **always** | non renseigné | `clawbot-safety-arbitrator` | `shutdown.target` | **oui** (`scripts/annuler_tache_service.sh`) | [S25] |
-| `clawbot-safety-arbitrator.service` | **always** | non renseigné | `ros2-driver-node` | `shutdown.target` | non | [S25] |
-| `clawbot-sentinel.service` | **always** | non renseigné | `clawbot-director` | `shutdown.target` | non | [S25] |
-| `ros2-driver-node.service` | on-failure | non renseigné | `ros2-hardware-service` | `shutdown.target` | non | [S25] |
-| `ros2-hardware-service.service` | on-failure | non renseigné | — | `shutdown.target` | non | [S25] |
-| `ros2-llm-bridge-cpp.service` | on-failure | non renseigné | `ros2-hardware-service` | `shutdown.target` | non | [S25] |
-| `clawbot-ekf.service` | on-failure | non renseigné | `ros2-driver-node` | `shutdown.target` | non | [S25] |
-| `clawbot-lidar.service` | on-failure | non renseigné | — | `shutdown.target` | non | [S25] |
-| `clawbot-slam.service` | on-failure | non renseigné | `ros2-driver-node` | **`clawbot-nav2`** | non | [S25] |
-| `clawbot-wrist-camera.service` | on-failure | non renseigné | — | `shutdown.target` | non | [S25] |
-| `clawbot-description.service` | on-failure | non renseigné | — | `shutdown.target` | non | [S25] |
-| `yolo-inference.service` | on-failure | non renseigné | — | `shutdown.target` | non | [S25] |
+| `clawbot-director.service` | **always** | 3 s | `clawbot-safety-arbitrator` | `shutdown.target` | **oui** (`scripts/annuler_tache_service.sh`) | [S25] |
+| `clawbot-safety-arbitrator.service` | **always** | 3 s | `ros2-driver-node` | `shutdown.target` | non | [S25] |
+| `clawbot-sentinel.service` | **always** | 3 s | `clawbot-director` | `shutdown.target` | non | [S25] |
+| `ros2-driver-node.service` | on-failure | 5 s | `ros2-hardware-service` | `shutdown.target` | non | [S25] |
+| `ros2-hardware-service.service` | on-failure | 5 s | — | `shutdown.target` | non | [S25] |
+| `ros2-llm-bridge-cpp.service` | on-failure | 3 s | `ros2-hardware-service` | `shutdown.target` | non | [S25] |
+| `clawbot-ekf.service` | on-failure | 5 s | `ros2-driver-node` | `shutdown.target` | non | [S25] |
+| `clawbot-lidar.service` | on-failure | 5 s | — | `shutdown.target` | non | [S25] |
+| `clawbot-slam.service` | on-failure | 5 s | `ros2-driver-node` | **`clawbot-nav2`** | non | [S25] |
+| `clawbot-wrist-camera.service` | on-failure | 5 s | — | `shutdown.target` | non | [S25] |
+| `clawbot-description.service` | on-failure | 5 s | — | `shutdown.target` | non | [S25] |
+| `yolo-inference.service` | on-failure | 5 s | — | `shutdown.target` | non | [S25] |
 | `yahboom_oled.service` | **no** | — | — | `shutdown.target` | non | [S25] |
-| `clawbot-docs.service` | on-failure | non renseigné | — | `shutdown.target` | non | [S25] |
+| `clawbot-docs.service` | on-failure | 5 s | — | `shutdown.target` | non | [S25] |
 
 Constats :
 
-1. **`RestartSec` n'est renseigné nulle part** : systemd applique son défaut de 100 ms. Un service qui échoue au démarrage (port occupé, périphérique absent) est donc relancé en rafale.
+1. **`RestartSec` vaut 3 s ou 5 s selon l'unité, et 100 ms sur `yahboom_oled`** (`RestartUSec` = 3s, 5s, 100ms) [S52]. Une unité qui échoue au démarrage est donc relancée au plus toutes les 3 s — sauf l'afficheur, en rafale à 10 Hz.
 2. **`Restart=always` sur trois unités qui ne sont pas des démons de calcul** : `director`, `safety_arbitrator`, `sentinel` redémarrent même après un arrêt volontaire, ce qui interdit un arrêt propre sans `systemctl stop` explicite et masque les sorties normales.
 3. **Un seul `ExecStop`** : arrêter les autres unités laisse les nœuds sans étape de nettoyage (aucune annulation de tâche, aucune remise à zéro de la pince).
 4. **`clawbot-slam` et `clawbot-nav2` sont mutuellement exclusifs** : c'est la seule protection contre deux écrivains de `map → odom` [S25].
@@ -42,7 +42,7 @@ Nov 22 10:14:06 bash[1354]: rclpy.executors.ExternalShutdownException
 Nov 22 10:14:06 systemd[1]: clawbot-sentinel.service: Main process exited, code=exited, status=1/FAILURE
 ```
 
-L'exception est levée par `rclpy.spin` sur un `SIGTERM` : c'est un **arrêt normal qui produit un échec d'unité**. Conséquence : l'unité reste en `failed`, doit être remise à zéro par `systemctl reset-failed` avant de repartir, et toute supervision qui compte les unités en échec compte un faux positif [S19].
+L'exception est levée par `rclpy.spin` sur un `SIGTERM` : c'est un **arrêt normal qui produit un code de sortie 1**. Comme l'unité porte `Restart=always`, systemd l'a relancée seule 2 min 44 s plus tard (10:16:50) **sans `reset-failed`**, et elle n'apparaît pas dans `systemctl --failed` à 11:06 [S19], [S34]. Le défaut n'est donc pas un blocage mais un **faux positif transitoire** : un opérateur qui lit `journalctl` y voit une erreur là où il n'y a qu'un arrêt demandé.
 
 ### 1.3 Supervision
 
@@ -60,7 +60,7 @@ L'exception est levée par `rclpy.spin` sur un `SIGTERM` : c'est un **arrêt nor
 
 ### 1.4 État global du poste
 
-`systemctl --failed` renvoie deux unités, **aucune du robot** : `apport-autoreport.service` et `logrotate.service` [S34]. Les 40 dernières lignes de journal de chaque unité robot active ne contiennent, elles, qu'un incident : l'arrêt `ExternalShutdownException` de `clawbot-sentinel` (§1.2) et des avertissements de rendu MkDocs [S18]. L'état `degraded` du poste n'est donc pas imputable à la pile ROS, mais il prive l'opérateur d'un signal global fiable : un `systemctl is-system-running` qui répond `degraded` ne dit rien de l'état du robot.
+`systemctl --failed` renvoie deux unités, **aucune du robot** : `apport-autoreport.service` et `logrotate.service` [S34]. Les journaux des unités robot contiennent, eux, **trois** familles de lignes : l'arrêt `ExternalShutdownException` de `clawbot-sentinel` (§1.2), des avertissements de rendu MkDocs, et surtout **40 rejets de scans par `slam_toolbox`** (`Message Filter dropping message: frame 'laser' … queue is full`, 11:04:07 → 11:04:53) [S18], [S54]. Ce dernier point n'est pas un bruit de journal : c'est le symptôme du défaut de cadre TF traité en 02 §6 #1, et la raison pour laquelle aucune carte n'est publiée. L'état `degraded` du poste n'est donc pas imputable à la pile ROS, mais il prive l'opérateur d'un signal global fiable : un `systemctl is-system-running` qui répond `degraded` ne dit rien de l'état du robot.
 
 ## 2. Points uniques de défaillance
 
@@ -76,14 +76,14 @@ L'exception est levée par `rclpy.spin` sur un `SIGTERM` : c'est un **arrêt nor
 | Disque à 84 % | infrastructure | plus d'installation, de sacs, de journaux ; un `logrotate` déjà en échec | `logrotate.service` en échec sur le poste | [S13], [S34] |
 | `clawbot-docs.service` | logiciel | documentation indisponible, sans effet sur le robot | `Restart=on-failure` | [S25] |
 
-Deux SPOF sont **silencieux** : ni `astra_camera` ni `ydlidar` n'ont de consommateur qui signale l'absence de flux. La seule détection possible aujourd'hui est un `ros2 topic hz` manuel.
+Un seul SPOF est **silencieux** : `astra_camera`. La perte de `/scan` est, elle, détectée par l'arbitre via `SENSOR_STALE` [S45], [S46]. En revanche, **la perte de la cartographie l'est aussi silencieusement** : `slam_toolbox` rejette 100 % des scans (cadre `laser` absent de l'arbre TF) sans publier d'état, et `/map` reste muet [S54], [S09].
 
 ## 3. Gestion des erreurs
 
 | Indicateur | Valeur mesurée | Source |
 |---|---|---|
-| Blocs `except` dans les nœuds maison (`director`, `safety`, `sentinel`, `hardware_service`) | 38 | comptage sur l'arbre, 2026-11-22T11:20 |
-| Dont `except Exception: pass` consécutifs | 4 | `grep -A1 except \| grep -c pass` |
+| Blocs `except` dans les nœuds maison (`director`, `safety`, `sentinel`, `hardware_service`) | 38 | [S53] |
+| Dont `except Exception: pass` consécutifs | 4 | [S53] |
 | Valeurs sentinelles `-1` sur `/arm/servo_angles` | documentées par la base OKF ; non re-mesurées ici | `[NON OBSERVÉ / À VÉRIFIER]` → obtenir : `ros2 topic echo /arm/servo_angles --once` après arrêt de la carte |
 | Sorties de processus par motif | `subprocess.check_output(['pgrep','-f','slam_launch.py'])` et `subprocess.run(['pkill','-9','-f',node])` dans le service matériel | [S33] |
 
@@ -98,13 +98,13 @@ Trois faits qui pèsent :
 | Constat | Valeur mesurée | Effet | Source |
 |---|---|---|---|
 | Paquets sur disque | 38, dont 8 paquets de didacticiel (`pkg_*`) et 12 paquets vendor non déployés | la moitié de l'arbre n'est pas du code du robot | [S21] |
-| Driver châssis | 2 copies identiques (`clawbot/…` et `yahboomcar_ws/src/…`) | toute correction doit être appliquée deux fois ; la copie déployée est la seconde | `diff -q`, 2026-11-22T11:10 |
+| Driver châssis | 2 copies identiques (`clawbot/…` et `yahboomcar_ws/src/…`) | toute correction doit être appliquée deux fois ; la copie déployée est la seconde | [S53] |
 | Serveur API | 3 fichiers `api_server.py` dans `ros2_llm_bridge*` | trois variantes d'une même interface HTTP | [S28] |
-| Plus gros fichiers | `ros2_llm_bridge/hardware_service.py` 979 lignes, `bridge_mcp/health.py` 826, `yolo_service.py` 415 | concentration de responsabilités : HTTP + ROS + série + processus | `wc -l`, 2026-11-22T11:12 |
-| Répertoire `install/` imbriqué | `ros2_llm_bridge/install/` versionné ? non ignoré par le `.gitignore` racine (seul `/install` l'est) | confusion entre source et artefact de build | `.gitignore`, [S36] |
+| Plus gros fichiers | `ros2_llm_bridge/hardware_service.py` 979 lignes, `bridge_mcp/health.py` 826, `tests/test_regression.py` 970 | concentration de responsabilités : HTTP + ROS + série + processus | [S53] |
+| Artefacts de build dans un paquet | `ros2_llm_bridge/install/` et `ros2_llm_bridge/build/` existent **dans** le paquet (chacun avec un `api_server.py`) | trois copies d'un même serveur ; le `.gitignore` les couvre (`install/`, motif sans ancrage), mais ils trompent la lecture et occupent le disque | [S53] |
 | Launch files | 27, dont 0 composition, 0 cycle de vie ; le lancement réel est fait par 14 unités | deux descriptions concurrentes du démarrage | [S23], [S25] |
 | Configuration | 5 nœuds maison à 1 paramètre (`use_sim_time`) | aucun réglage sans redémarrage | [S06] |
-| YAML source vs installé | 2 copies par paquet (`config/` et `install/<pkg>/share/…`), `sha256` relevés | modifier la source ne change pas le service | [S36], [S25] |
+| Configuration YAML | aucun des trois YAML de `config/` n'a de copie dans `install/*/share/` ; les unités les lisent **par chemin absolu** (`--params-file /home/jetson/clawbot/config/ekf.yaml`) ; 3 YAML seulement dans `config/` [S36] | ici la source fait foi — l'inverse du piège classique ; mais rien ne le documente dans le paquet | [S53], [S59], [S25] |
 | Unités systemd | fichiers du dépôt liés dans `/etc/systemd/system` | modifier l'unité casse le lien si on écrit dans `/etc` | [S26] |
 | Interface du directeur | service JSON opaque (`request_json`/`response_json`) | aucun contrat lisible par un tiers, aucune génération de client | [S38] |
 
@@ -114,7 +114,7 @@ Le point le plus coûteux pour une reprise : **le démarrage est décrit deux fo
 
 | Suite | Chemin | Commande | Résultat observé | Source |
 |---|---|---|---|---|
-| Entrée officielle | `scripts/run_tests.sh` | `scripts/run_tests.sh tests` | **exit 2**, collecte interrompue : 2 erreurs (`tests/test_cpp_bridge.py`, `tests/test_modes.py` appellent `http://localhost:8002` à l'import) | [S42] |
+| Entrée officielle | `scripts/run_tests.sh` | `scripts/run_tests.sh tests` | **code de retour 2** (`code_retour=2` consigné), collecte interrompue : 2 erreurs (`tests/test_cpp_bridge.py`, `tests/test_modes.py` appellent `http://localhost:8002` à l'import) | [S42] |
 | Suite sans ces deux fichiers | `tests/` | `ROS_DOMAIN_ID=98 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest tests -q --ignore=…` | **238 passed, 1 skipped, 19 errors en 48,52 s** (les 19 erreurs viennent de `tests/test_regression.py`, dont les signatures sont interprétées comme des fixtures) | [S43] |
 | Test unitaire ciblé | `tests/test_ekf_config.py` | `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest tests/test_ekf_config.py -q` | **3 passed en 0,07 s** | [S44] |
 | Banc de nœud isolé | `clawbot_*/test/` | lancé par la suite ci-dessus | inclus dans les 238 | — |
@@ -137,26 +137,27 @@ Aucun test ne couvre : le contrat HTTP 8000/8001/8003, l'absence de flux capteur
 | R02 | La détection d'objets n'existe pas dans le graphe | fonctionnel | `/detections` et `/camera/detection_image` sans éditeur [S07] | deux abonnés attendent des messages qui ne viendront jamais | republier le résultat d'inférence en ROS 2, ou supprimer les abonnés |
 | R03 | Le bras n'est ni planifiable ni commandable | fonctionnel | aucune action, `clawbot-arm-controller` et `move-group` non actifs [S05], [S25] | le directeur échoue à toute étape de bras ; l'opérateur ne peut pas déplacer le bras par MoveIt | activer et superviser les deux unités, ou déclarer la capacité indisponible au niveau de l'API |
 | R04 | L'arbitre de sécurité est mono-thread et sans priorité | sécurité + temps réel | 1 thread, ~50 msg/s en entrée, 20 Hz en sortie, 0 `Nice=`/`CPUAffinity=` [S28], [S25] | un callback lent retarde l'arrêt ; `astra_camera` à 57 % concourt sur les mêmes cœurs | executor multi-thread avec groupes dédiés, priorité d'ordonnancement sur le nœud d'arrêt |
-| R05 | Un arrêt normal produit un `failed` d'unité | exploitation | `ExternalShutdownException` → `status=1/FAILURE` [S19] | faux positif de supervision, unité bloquée jusqu'à `reset-failed` | attraper l'exception dans `main()` et sortir 0, comme le fait déjà le directeur |
+| R05 | La cartographie est morte par incompatibilité de cadre TF | architecture + fonctionnel | `/scan` publie `frame_id: laser`, l'arbre ne contient que `laser_link` ; 40 scans rejetés en 46 s [S55], [S54] | aucun `/map` publié, donc aucune navigation possible sur carte, sans message d'erreur côté production | aligner `frame_id` sur `laser_link` (ou TF statique `laser → laser_link`) et tester `/map` non vide |
+| R06 | Un arrêt normal produit un `failed` d'unité | exploitation | `ExternalShutdownException` → `status=1/FAILURE` [S19] | faux positif de supervision : une erreur apparaît au journal pour un arrêt demandé | attraper `ExternalShutdownException` dans `main()` et sortir 0 |
 
 ### Criticité moyenne
 
 | ID | Risque | Classe | Preuve | Impact exploitable | Mitigation proposée |
 |---|---|---|---|---|---|
-| R06 | Tout le trafic DDS passe par le Wi-Fi | infrastructure | `wlP1p1s0` seule interface montée, `eno1` sans porteuse [S15] | latence et pertes non bornées sur les images et le nuage de points | transport SHM/UDP local pour les flux volumineux, ou lien filaire |
-| R07 | Les cinq nœuds de décision ne sont pas paramétrables | maintenabilité | 1 paramètre par nœud (`use_sim_time`) [S06] | aucun réglage sans redémarrage, aucune reconfiguration en mission | exposer seuils et cadences en paramètres ROS 2 |
-| R08 | Aucune mesure de latence ni d'horodatage | observabilité | aucun `header.stamp` dans les publications maison [S30] | aucune régression de performance ne peut être détectée | horodater entrées/sorties, publier un écart mesuré |
-| R09 | `/diagnostics` n'a aucun consommateur | observabilité | 1 éditeur, 0 abonné [S07] | les défauts EKF ne remontent nulle part | `diagnostic_aggregator` + remontée dans `/director/state` |
-| R10 | Deux copies du driver et trois du serveur API | maintenabilité | `diff -q` identique sur deux chemins ; 3 `api_server.py` [S28] | correction appliquée au mauvais endroit, sans effet | une seule source, vendor en dépendance externe |
-| R11 | `RestartSec` absent sur 14 unités, `Restart=always` sur trois | exploitation | [S25] | rafales de redémarrage ; arrêt volontaire impossible sans `stop` | `RestartSec=2`, `Restart=on-failure` partout sauf nécessité démontrée |
-| R12 | Le point d'entrée des tests échoue à la collecte | testabilité | `scripts/run_tests.sh tests` → exit 2 | aucune vérification reproductible n'est lancée par défaut | exclure les deux scripts non-pytest dans le script |
+| R07 | Tout le trafic DDS passe par le Wi-Fi | infrastructure | `wlP1p1s0` seule interface montée, `eno1` sans porteuse [S15] | latence et pertes non bornées sur les images et le nuage de points | transport SHM/UDP local pour les flux volumineux, ou lien filaire |
+| R08 | Les cinq nœuds de décision ne sont pas paramétrables | maintenabilité | 1 paramètre par nœud (`use_sim_time`) [S06] | aucun réglage sans redémarrage, aucune reconfiguration en mission | exposer seuils et cadences en paramètres ROS 2 |
+| R09 | Aucune mesure de latence ni d'horodatage | observabilité | aucun `header.stamp` dans les publications maison [S30] | aucune régression de performance ne peut être détectée | horodater entrées/sorties, publier un écart mesuré |
+| R10 | `/diagnostics` n'a aucun consommateur | observabilité | 1 éditeur, 0 abonné [S07] | les défauts EKF ne remontent nulle part | `diagnostic_aggregator` + remontée dans `/director/state` |
+| R11 | Deux copies du driver et trois du serveur API | maintenabilité | `diff -q` identique sur deux chemins ; 3 `api_server.py` [S28] | correction appliquée au mauvais endroit, sans effet | une seule source, vendor en dépendance externe |
+| R12 | `Restart=always` sur trois unités, `RestartSec` à 100 ms sur l'afficheur | exploitation | [S25], [S52] | redémarrage automatique après un arrêt volontaire ; rafale sur `yahboom_oled` | `Restart=on-failure` sauf nécessité démontrée, `RestartSec=2 s` minimum partout |
+| R13 | Le point d'entrée des tests échoue à la collecte | testabilité | `scripts/run_tests.sh tests` → exit 2 | aucune vérification reproductible n'est lancée par défaut | exclure les deux scripts non-pytest dans le script |
 
 ### Criticité basse
 
 | ID | Risque | Classe | Preuve | Impact exploitable | Mitigation proposée |
 |---|---|---|---|---|---|
-| R13 | Disque à 84 %, `logrotate` en échec | infrastructure | 117/147 Go, `logrotate.service` failed [S13], [S34] | installation et enregistrement de sacs impossibles | purge des journaux et des artefacts de build |
-| R14 | L'afficheur OLED consomme 9 % de CPU | performance | 19 Mo, 9,0 % [S12] | charge inutile sur un cœur | réduire la cadence ou déporter l'affichage |
-| R15 | 8 paquets de didacticiel dans l'arbre | maintenabilité | [S21] | bruit dans les builds et les recherches | déplacer hors du workspace déployé |
-| R16 | La documentation est servie en mode développement sur `0.0.0.0:8080` | sécurité | `mkdocs serve --dev-addr 0.0.0.0:8080` [S25] | serveur de développement exposé, sans authentification | servir un site statique, ou restreindre à `127.0.0.1` |
-| R17 | Aucun cycle de vie ROS 2 | architecture | 0 `LifecycleNode` sur 27 launch files [S23] | pas d'état « inactif/actif » par nœud, pas de démarrage ordonné | introduire des nœuds à cycle de vie sur les composants critiques |
+| R14 | Disque à 84 %, `logrotate` en échec | infrastructure | 117/147 Go, `logrotate.service` failed [S13], [S34] | installation et enregistrement de sacs impossibles | purge des journaux et des artefacts de build |
+| R15 | L'afficheur OLED consomme 9 % de CPU | performance | 19 Mo, 9,0 % [S12] | charge inutile sur un cœur | réduire la cadence ou déporter l'affichage |
+| R16 | 8 paquets de didacticiel dans l'arbre | maintenabilité | [S21] | bruit dans les builds et les recherches | déplacer hors du workspace déployé |
+| R17 | La documentation est servie en mode développement sur `0.0.0.0:8080` | sécurité | `mkdocs serve --dev-addr 0.0.0.0:8080` [S25] | serveur de développement exposé, sans authentification | servir un site statique, ou restreindre à `127.0.0.1` |
+| R18 | Aucun cycle de vie ROS 2 | architecture | 0 `LifecycleNode` sur 27 launch files [S23] | pas d'état « inactif/actif » par nœud, pas de démarrage ordonné | introduire des nœuds à cycle de vie sur les composants critiques |

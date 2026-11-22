@@ -170,4 +170,5 @@ tests/mcp_bridge/triggers/test_trigger_latency.py:11
 ERROR tests/test_cpp_bridge.py - httpx.ConnectError: [Errno 111] Connection r...
 ERROR tests/test_modes.py - httpx.ConnectError: [Errno 111] Connection refused
 !!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
-======================== 16 warnings, 2 errors in 3.31s ========================
+======================== 16 warnings, 2 errors in 3.04s ========================
+code_retour=2

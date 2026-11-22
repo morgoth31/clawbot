@@ -1,0 +1,120 @@
+=== clawbot-director
+RestartUSec=3s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=clawbot-director.service
+ActiveState=active
+=== clawbot-safety-arbitrator
+RestartUSec=3s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=clawbot-safety-arbitrator.service
+ActiveState=active
+=== clawbot-sentinel
+RestartUSec=3s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=clawbot-sentinel.service
+ActiveState=active
+=== ros2-driver-node
+RestartUSec=5s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=ros2-driver-node.service
+ActiveState=active
+=== ros2-hardware-service
+RestartUSec=5s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=ros2-hardware-service.service
+ActiveState=active
+=== ros2-llm-bridge-cpp
+RestartUSec=3s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=ros2-llm-bridge-cpp.service
+ActiveState=active
+=== clawbot-ekf
+RestartUSec=5s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=clawbot-ekf.service
+ActiveState=active
+=== clawbot-lidar
+RestartUSec=5s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=clawbot-lidar.service
+ActiveState=active
+=== clawbot-slam
+RestartUSec=5s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=clawbot-slam.service
+ActiveState=active
+=== clawbot-wrist-camera
+RestartUSec=5s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=clawbot-wrist-camera.service
+ActiveState=active
+=== clawbot-description
+RestartUSec=5s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=clawbot-description.service
+ActiveState=active
+=== yolo-inference
+RestartUSec=5s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=yolo-inference.service
+ActiveState=active
+=== yahboom_oled
+RestartUSec=100ms
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=yahboom_oled.service
+ActiveState=active
+=== clawbot-docs
+RestartUSec=5s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=clawbot-docs.service
+ActiveState=active
+=== rosbridge
+RestartUSec=5s
+MemoryMax=infinity
+Nice=0
+CPUSchedulingPolicy=0
+CPUAffinity=
+Id=rosbridge.service
+ActiveState=active

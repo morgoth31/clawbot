@@ -1,0 +1,26 @@
+=== ports en ecoute ===
+State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                    
+LISTEN 0      4096       127.0.0.1:11434      0.0.0.0:*                                              
+LISTEN 0      2048       127.0.0.1:60589      0.0.0.0:*    users:(("hermes",pid=1722636,fd=21))      
+LISTEN 0      5          127.0.0.1:11539      0.0.0.0:*    users:(("python3",pid=3792886,fd=6))      
+LISTEN 0      128          0.0.0.0:8644       0.0.0.0:*    users:(("hermes",pid=1722636,fd=36))      
+LISTEN 0      128          0.0.0.0:22         0.0.0.0:*                                              
+LISTEN 0      4096         0.0.0.0:111        0.0.0.0:*                                              
+LISTEN 0      128          0.0.0.0:9090       0.0.0.0:*    users:(("python3",pid=3526,fd=26))        
+LISTEN 0      4096         0.0.0.0:631        0.0.0.0:*                                              
+LISTEN 0      128          0.0.0.0:8888       0.0.0.0:*                                              
+LISTEN 0      4096         0.0.0.0:8889       0.0.0.0:*                                              
+LISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*                                              
+LISTEN 0      16           0.0.0.0:8000       0.0.0.0:*    users:(("api_server",pid=3805272,fd=29))  
+LISTEN 0      2048         0.0.0.0:8001       0.0.0.0:*    users:(("python3",pid=1331,fd=36))        
+LISTEN 0      2048         0.0.0.0:8003       0.0.0.0:*    users:(("pt_main_thread",pid=1394,fd=43)) 
+LISTEN 0      5            0.0.0.0:8080       0.0.0.0:*    users:(("mkdocs",pid=3883819,fd=6))       
+LISTEN 0      2048         0.0.0.0:8081       0.0.0.0:*                                              
+LISTEN 0      10                 *:3389             *:*    users:(("gnome-remote-de",pid=2381,fd=22))
+LISTEN 0      128             [::]:8644          [::]:*    users:(("hermes",pid=1722636,fd=35))      
+LISTEN 0      128             [::]:22            [::]:*                                              
+=== unite rosbridge ===
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash &&    source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash &&    ROS_DOMAIN_ID=28 ros2 launch rosbridge_server rosbridge_websocket_launch.xml port:=9090 ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Id=rosbridge.service
+ActiveState=active
+FragmentPath=/etc/systemd/system/rosbridge.service
