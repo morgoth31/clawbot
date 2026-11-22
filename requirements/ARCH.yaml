@@ -156,3 +156,24 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C02
+
+  - id: REQ-ARCH-020
+    title: Le referentiel integre l'addendum A
+    statement: >
+      Le referentiel doit integrer l'addendum A (capacites, skills, codes, invariants
+      INV-11 a INV-15) et y renvoyer depuis son §1.
+    rationale: >
+      Trois fonctions sont demandees (SLAM 2D, saisie MoveIt 2, SLAM 3D) ; leurs capacites,
+      leurs skills et leurs invariants n'existaient nulle part dans le referentiel, qui
+      serait devenu faux des la premiere ligne de code.
+    sources: [F00]
+    safety: false
+    method: inspection
+    level: unit
+    criterion: >
+      `docs/architecture/addendum_A_fonctions.md` existe ; `cible.md` §1 nomme INV-11 a
+      INV-15 et renvoie vers l'addendum.
+    evidence: docs/architecture/addendum_A_fonctions.md
+    status: implemented
+    approved_by: null
+    prompt: F00

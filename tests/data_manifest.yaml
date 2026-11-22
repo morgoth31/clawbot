@@ -1,0 +1,26 @@
+# Inventaire des jeux de reference enregistres sur le robot (F00, REQ-TEST-020).
+# Les donnees vivent dans /var/lib/clawbot/test_data/ : elles ne sont pas dans le depot.
+# `enregistre: false` = jeu declare mais pas encore capture (F00 attend l'operateur).
+dossier: /var/lib/clawbot/test_data
+jeux:
+  slam2d_piece:
+    enregistre: false
+    duree_s: null
+    topics: [/scan, /odom, /odom_raw, /imu/data_raw, /tf, /tf_static]
+    scenario: "tour complet d'une piece, retour au point de depart marque au sol"
+    verites_terrain: {}
+  rgbd_statique:
+    enregistre: false
+    duree_s: null
+    topics: [/scan, /odom, /odom_raw, /imu/data_raw, /tf, /tf_static,
+             /camera/color/image_raw, /camera/depth/image_raw,
+             /camera/color/camera_info, /camera/depth/camera_info]
+    scenario: "robot immobile face a un meuble et un mur a distances mesurees"
+    verites_terrain: {}
+  objets_table:
+    enregistre: false
+    duree_s: null
+    topics: [/wrist_camera/image_raw, /camera/color/image_raw,
+             /camera/depth/image_raw, /tf, /arm/joint_states]
+    scenario: "trois objets de classes connues du modele YOLO"
+    verites_terrain: {}

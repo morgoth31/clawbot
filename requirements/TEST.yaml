@@ -192,3 +192,44 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C02
+
+  - id: REQ-TEST-020
+    title: Les jeux de reference existent et sont inventories
+    statement: >
+      Les jeux `slam2d_piece`, `rgbd_statique` et `objets_table` doivent exister dans
+      /var/lib/clawbot/test_data/ et leur inventaire (chemin, taille, sha256, duree,
+      topics) dans `tests/data_manifest.yaml`.
+    rationale: >
+      Sans donnees enregistrees sur le robot, SLAM et perception ne se testent qu'en
+      presence de l'operateur : chaque essai coute une session et n'est pas reproductible.
+    sources: [F00]
+    safety: false
+    method: test
+    level: integration
+    criterion: >
+      Les trois entrees existent dans `tests/data_manifest.yaml` avec leurs mesures au
+      metre ruban ; les fichiers cites existent et leurs sha256 correspondent.
+    evidence: tests/data_manifest.yaml
+    status: draft
+    approved_by: null
+    prompt: F00
+
+  - id: REQ-TEST-021
+    title: L'inventaire se verifie sur un poste sans donnees
+    statement: >
+      Un test doit verifier que les fichiers de reference correspondent a l'inventaire, et
+      etre ignore avec une raison explicite - et non en echec - si les donnees sont absentes.
+    rationale: >
+      Les donnees vivent sur le robot (/var/lib/clawbot), pas dans le depot : un poste de
+      developpement sans enregistrement doit pouvoir lancer la suite sans rouge trompeur.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      `tests/test_data_manifest.py` verifie presence et sha256 ; si le dossier de donnees
+      manque, `pytest.skip("donnees de reference absentes : voir F00")`.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: F00
