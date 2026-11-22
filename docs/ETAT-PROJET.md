@@ -443,6 +443,18 @@ VAD Silero + faster-whisper tiny sur les micros existants → publication sur
   nommée. **À reprendre avec le fichier d'origine** : remplacer ces motifs par un arrêt des unités
   systemd concernées (`clawbot-joy-teleop.service`), puis retirer l'exclusion de `check.sh`.
   **À trancher par l'opérateur** (propriétaire de ce fichier).
+- **Réarmement de l'e-stop : le relâchement de l'entrée n'est spécifié nulle part (P10, 2026-11-22)** :
+  `/safety/reset_estop` (et `POST /estop/reset` sur 8001) refusent de lever le verrou tant que
+  `/safety/estop` vaut `true`, mais **aucun composant ne publie `false`** : la sentinelle ne publie
+  que `true` au mot d'arrêt (`sentinel_node.py:165`), il n'existe ni mot de reprise, ni service de
+  relâchement. Le seul chemin constaté est une publication `false` manuelle sur `/safety/estop`
+  (faite une fois, sous délégation, pour débloquer P10). **Recommandation** : porter le geste sur la
+  sentinelle, derrière un service explicite `release_estop` (`std_srvs/Trigger`) exposé seulement à
+  la route authentifiée du tableau de bord, qui publie `false` **une fois**, journalise l'auteur et
+  l'heure, et refuse si une autre source maintient encore `true`. À écarter : un mot de reprise
+  vocal (un mot mal entendu ne doit jamais lever un verrou de sûreté) ; à préférer si un bouton
+  physique arrive : relayer son état relâché plutôt que d'ajouter un service.
+  **À trancher en P13 (le bras doit bouger) ou P14.**
 - test d'inclinaison réel.
 - déprécier les endpoints de mouvement de `:8001` (casse le pont C++ historique : décision à
   prendre, pas à subir). `joy-teleop` est arrêté et désactivé depuis le 2026-11-11.
