@@ -1,0 +1,16 @@
+[Unit]
+Description=transbot_oled start service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=idle
+User=jetson
+WorkingDirectory=/home/jetson
+ExecStart=/bin/sh -c "python3 /home/jetson/oled_yahboom/yahboom_oled.pyc"
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

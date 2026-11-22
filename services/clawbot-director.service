@@ -2,6 +2,8 @@
 Description=Directeur S1 - Clawbot X3 Plus
 After=network.target clawbot-safety-arbitrator.service
 Requires=clawbot-safety-arbitrator.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -14,9 +16,10 @@ ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setu
 # Un arret ou un redemarrage n'annulait aucun goal en vol : la tache restait RUNNING cote serveurs
 # d'action, sans personne pour l'attendre. ExecStop parle au noeud encore vivant.
 ExecStop=/bin/bash /home/jetson/clawbot/scripts/annuler_tache_service.sh
-TimeoutStopSec=20
-Restart=always
-RestartSec=3
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=2
+KillSignal=SIGINT
 
 [Install]
 WantedBy=multi-user.target

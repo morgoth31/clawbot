@@ -2,6 +2,8 @@
 Description=Clawbot documentation site (MkDocs Material, port 8080)
 Documentation=http://localhost:8080/
 After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -9,11 +11,12 @@ User=jetson
 Group=jetson
 WorkingDirectory=/home/jetson/clawbot
 Environment=PATH=/home/jetson/.local/bin:/usr/local/bin:/usr/bin:/bin
-ExecStart=/home/jetson/.local/bin/mkdocs serve --dev-addr 0.0.0.0:8080
+ExecStart=/home/jetson/.local/bin/mkdocs serve --dev-addr 127.0.0.1:8080
 Restart=on-failure
-RestartSec=5
+RestartSec=2
 StandardOutput=journal
 StandardError=journal
+TimeoutStopSec=10
 
 [Install]
 WantedBy=multi-user.target

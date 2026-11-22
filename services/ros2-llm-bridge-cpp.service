@@ -2,6 +2,8 @@
 Description=Clawbot C++ LLM Bridge (port 8000)
 After=network.target ros2-hardware-service.service
 Requires=ros2-hardware-service.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -16,11 +18,12 @@ ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
   export BRIDGE_PORT=8000 && \
   /home/jetson/clawbot/install/ros2_llm_bridge_cpp/lib/ros2_llm_bridge_cpp/api_server"
 Restart=on-failure
-RestartSec=3
+RestartSec=2
 Environment=ROS_DOMAIN_ID=28
 Environment=HARDWARE_SERVICE_URL=http://localhost:8001
 Environment=YOLO_SERVICE_URL=http://localhost:8003
 Environment=BRIDGE_PORT=8000
+TimeoutStopSec=10
 
 [Install]
 WantedBy=multi-user.target
