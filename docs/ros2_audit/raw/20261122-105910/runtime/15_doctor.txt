@@ -1,0 +1,1245 @@
+WARNING: Package name "yahboomcar_KCFTracker" does not follow the naming conventions. It should start with a lower case letter and only contain lower case letters, digits, underscores, and dashes.
+/opt/ros/humble/lib/python3.10/site-packages/ros2doctor/api/__init__.py: 154: UserWarning: Fail to call PackageReport class functions.
+
+   NETWORK CONFIGURATION
+inet         : 127.0.0.1
+inet4        : ['127.0.0.1']
+inet6        : ['::1']
+netmask      : 255.0.0.0
+device       : lo
+flags        : 73<RUNNING,UP,LOOPBACK>
+mtu          : 65536
+inet         : 192.168.1.47
+inet4        : ['192.168.1.47']
+ether        : dc:4a:9e:df:d6:e2
+inet6        : ['2a01:cb19:8667:cb00:a60b:61f3:5a4f:31fa', '2a01:cb19:8667:cb00:c1f4:51a0:e45c:6096', '2a01:cb19:8667:cb00:6ca9:a078:2bca:68ee', '2a01:cb19:8667:cb00:eb50:dca0:d3e2:f6d2', '2a01:cb19:8667:cb00:df24:8628:ee7:505f', '2a01:cb19:8667:cb00:95ae:e386:e8c7:2b83', '2a01:cb19:8667:cb00:b362:8861:aa88:230b', '2a01:cb19:8667:cb00:53a5:edef:fa25:ed5d', 'fe80::fe6:eba1:ee66:1b3f%wlP1p1s0']
+netmask      : 255.255.255.0
+device       : wlP1p1s0
+flags        : 4163<RUNNING,BROADCAST,MULTICAST,UP>
+mtu          : 1500
+broadcast    : 192.168.1.255
+inet         : 172.18.0.1
+inet4        : ['172.18.0.1']
+ether        : 46:2e:6f:c7:27:8b
+inet6        : ['fe80::442e:6fff:fec7:278b%br-0ebcc2854aa2']
+netmask      : 255.255.0.0
+device       : br-0ebcc2854aa2
+flags        : 4163<RUNNING,BROADCAST,MULTICAST,UP>
+mtu          : 1500
+broadcast    : 172.18.255.255
+inet         : 172.17.0.1
+inet4        : ['172.17.0.1']
+ether        : 7a:32:94:97:5c:cb
+netmask      : 255.255.0.0
+device       : docker0
+flags        : 4099<BROADCAST,MULTICAST,UP>
+mtu          : 1500
+broadcast    : 172.17.255.255
+ether        : 22:e9:60:9c:ed:4c
+inet6        : ['fe80::20e9:60ff:fe9c:ed4c%vethb4baedf']
+device       : vethb4baedf
+flags        : 4163<RUNNING,BROADCAST,MULTICAST,UP>
+mtu          : 1500
+inet6        : ['fe80::6935:8b85:c793:b2a4%tailscale0']
+device       : tailscale0
+flags        : 4305<RUNNING,PTP,UP,NOARP,MULTICAST>
+mtu          : 1280
+ether        : 3c:6d:66:a4:1f:26
+device       : eno1
+flags        : 4099<BROADCAST,MULTICAST,UP>
+mtu          : 1500
+ether        : 3e:c7:e7:79:f3:87
+device       : l4tbr0
+flags        : 4098<BROADCAST,MULTICAST>
+mtu          : 1500
+ether        : 82:82:aa:1a:47:41
+device       : usb0
+flags        : 4099<BROADCAST,MULTICAST,UP>
+mtu          : 1500
+ether        : 82:82:aa:1a:47:43
+device       : usb1
+flags        : 4099<BROADCAST,MULTICAST,UP>
+mtu          : 1500
+
+   PLATFORM INFORMATION
+system           : Linux
+platform info    : Linux-5.15.148-tegra-aarch64-with-glibc2.35
+release          : 5.15.148-tegra
+processor        : aarch64
+
+   QOS COMPATIBILITY LIST
+topic [type]            : /Buzzer [std_msgs/msg/Bool]
+publisher node          : hardware_service_node
+subscriber node         : driver_node
+compatibility status    : OK
+topic [type]            : /RGBLight [std_msgs/msg/Int32]
+publisher node          : hardware_service_node
+subscriber node         : driver_node
+compatibility status    : OK
+topic [type]            : /arm/servo_angles [std_msgs/msg/Int32MultiArray]
+publisher node          : driver_node
+subscriber node         : safety_arbitrator
+compatibility status    : OK
+topic [type]            : /arm/servo_angles [std_msgs/msg/Int32MultiArray]
+publisher node          : driver_node
+subscriber node         : director
+compatibility status    : OK
+topic [type]            : /camera/depth/camera_info [sensor_msgs/msg/CameraInfo]
+publisher node          : camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /camera/depth/image_raw [sensor_msgs/msg/Image]
+publisher node          : camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /camera/depth/image_raw [sensor_msgs/msg/Image]
+publisher node          : camera
+subscriber node         : sentinel
+compatibility status    : OK
+topic [type]            : /cmd_vel [geometry_msgs/msg/Twist]
+publisher node          : hardware_service_node
+subscriber node         : safety_arbitrator
+compatibility status    : OK
+topic [type]            : /cmd_vel [geometry_msgs/msg/Twist]
+publisher node          : llm_bridge_node
+subscriber node         : safety_arbitrator
+compatibility status    : OK
+topic [type]            : /cmd_vel [geometry_msgs/msg/Twist]
+publisher node          : sentinel
+subscriber node         : safety_arbitrator
+compatibility status    : OK
+topic [type]            : /cmd_vel_safe [geometry_msgs/msg/Twist]
+publisher node          : safety_arbitrator
+subscriber node         : driver_node
+compatibility status    : OK
+topic [type]            : /director/state [std_msgs/msg/String]
+publisher node          : director
+subscriber node         : sentinel
+compatibility status    : OK
+topic [type]            : /imu/data_raw [sensor_msgs/msg/Imu]
+publisher node          : driver_node
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /imu/data_raw [sensor_msgs/msg/Imu]
+publisher node          : driver_node
+subscriber node         : hardware_service_node
+compatibility status    : OK
+topic [type]            : /imu/data_raw [sensor_msgs/msg/Imu]
+publisher node          : driver_node
+subscriber node         : safety_arbitrator
+compatibility status    : OK
+topic [type]            : /joint_states [sensor_msgs/msg/JointState]
+publisher node          : driver_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /joint_states [sensor_msgs/msg/JointState]
+publisher node          : joint_state_publisher
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /map [nav_msgs/msg/OccupancyGrid]
+publisher node          : slam_toolbox
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /map [nav_msgs/msg/OccupancyGrid]
+publisher node          : slam_toolbox
+subscriber node         : hardware_service_node
+compatibility status    : OK
+topic [type]            : /odom_raw [nav_msgs/msg/Odometry]
+publisher node          : driver_node
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : slam_toolbox
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ekf_filter_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : launch_ros_1308
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : driver_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : hardware_service_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : llm_bridge_node
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : safety_arbitrator
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : director
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : camera
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : sentinel
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : yolo_source_camera
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : robot_state_publisher
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : joint_state_publisher
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosbridge_websocket
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : rosapi_params
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : ekf_filter_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : ydlidar_ros2_driver_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : llm_bridge_node
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : camera
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /parameter_events [rcl_interfaces/msg/ParameterEvent]
+publisher node          : _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+subscriber node         : robot_state_publisher
+compatibility status    : OK
+topic [type]            : /robot_description [std_msgs/msg/String]
+publisher node          : robot_state_publisher
+subscriber node         : joint_state_publisher
+compatibility status    : OK
+topic [type]            : /safety/state [std_msgs/msg/String]
+publisher node          : safety_arbitrator
+subscriber node         : director
+compatibility status    : OK
+topic [type]            : /scan [sensor_msgs/msg/LaserScan]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : slam_toolbox
+compatibility status    : OK
+topic [type]            : /scan [sensor_msgs/msg/LaserScan]
+publisher node          : ydlidar_ros2_driver_node
+subscriber node         : safety_arbitrator
+compatibility status    : OK
+topic [type]            : /servo_ctrl [std_msgs/msg/Int32MultiArray]
+publisher node          : hardware_service_node
+subscriber node         : driver_node
+compatibility status    : OK
+topic [type]            : /tf [tf2_msgs/msg/TFMessage]
+publisher node          : slam_toolbox
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /tf [tf2_msgs/msg/TFMessage]
+publisher node          : slam_toolbox
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /tf [tf2_msgs/msg/TFMessage]
+publisher node          : slam_toolbox
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /tf [tf2_msgs/msg/TFMessage]
+publisher node          : slam_toolbox
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /tf [tf2_msgs/msg/TFMessage]
+publisher node          : ekf_filter_node
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /tf [tf2_msgs/msg/TFMessage]
+publisher node          : ekf_filter_node
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /tf [tf2_msgs/msg/TFMessage]
+publisher node          : camera
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /tf [tf2_msgs/msg/TFMessage]
+publisher node          : camera
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /tf [tf2_msgs/msg/TFMessage]
+publisher node          : robot_state_publisher
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /tf [tf2_msgs/msg/TFMessage]
+publisher node          : robot_state_publisher
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /tf_static [tf2_msgs/msg/TFMessage]
+publisher node          : camera
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /tf_static [tf2_msgs/msg/TFMessage]
+publisher node          : camera
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /tf_static [tf2_msgs/msg/TFMessage]
+publisher node          : robot_state_publisher
+subscriber node         : transform_listener_impl_aaab185aad50
+compatibility status    : OK
+topic [type]            : /tf_static [tf2_msgs/msg/TFMessage]
+publisher node          : robot_state_publisher
+subscriber node         : transform_listener_impl_aaaacd0c8c60
+compatibility status    : OK
+topic [type]            : /vel_raw [geometry_msgs/msg/Twist]
+publisher node          : driver_node
+subscriber node         : hardware_service_node
+compatibility status    : OK
+topic [type]            : /voltage [std_msgs/msg/Float32]
+publisher node          : driver_node
+subscriber node         : hardware_service_node
+compatibility status    : OK
+topic [type]            : /voltage [std_msgs/msg/Float32]
+publisher node          : driver_node
+subscriber node         : safety_arbitrator
+compatibility status    : OK
+topic [type]            : /wrist_camera/image_raw [sensor_msgs/msg/Image]
+publisher node          : camera
+subscriber node         : yolo_source_camera
+compatibility status    : OK
+
+   RMW MIDDLEWARE
+middleware name    : rmw_fastrtps_cpp
+
+   ROS 2 INFORMATION
+distribution name      : humble
+distribution type      : ros2
+distribution status    : active
+release platforms      : {'rhel': ['8'], 'ubuntu': ['jammy']}
+
+   TOPIC LIST
+topic               : /Buzzer
+publisher count     : 0
+subscriber count    : 0
+topic               : /RGBLight
+publisher count     : 0
+subscriber count    : 0
+topic               : /arm/joint_states
+publisher count     : 0
+subscriber count    : 0
+topic               : /arm/servo_angles
+publisher count     : 0
+subscriber count    : 2
+topic               : /camera/color/camera_info
+publisher count     : 1
+subscriber count    : 0
+topic               : /camera/color/image_raw
+publisher count     : 1
+subscriber count    : 0
+topic               : /camera/depth/camera_info
+publisher count     : 1
+subscriber count    : 1
+topic               : /camera/depth/image_raw
+publisher count     : 1
+subscriber count    : 2
+topic               : /camera/depth/points
+publisher count     : 1
+subscriber count    : 0
+topic               : /camera/detection_image
+publisher count     : 0
+subscriber count    : 0
+topic               : /camera/ir/camera_info
+publisher count     : 1
+subscriber count    : 0
+topic               : /camera/ir/image_raw
+publisher count     : 1
+subscriber count    : 0
+topic               : /client_count
+publisher count     : 0
+subscriber count    : 0
+topic               : /cmd_vel
+publisher count     : 1
+subscriber count    : 1
+topic               : /cmd_vel_safe
+publisher count     : 1
+subscriber count    : 0
+topic               : /connected_clients
+publisher count     : 0
+subscriber count    : 0
+topic               : /detections
+publisher count     : 0
+subscriber count    : 0
+topic               : /diagnostics
+publisher count     : 1
+subscriber count    : 0
+topic               : /director/state
+publisher count     : 1
+subscriber count    : 1
+topic               : /edition
+publisher count     : 0
+subscriber count    : 0
+topic               : /imu/data_raw
+publisher count     : 0
+subscriber count    : 2
+topic               : /imu/mag
+publisher count     : 0
+subscriber count    : 0
+topic               : /joint_states
+publisher count     : 0
+subscriber count    : 1
+topic               : /map
+publisher count     : 1
+subscriber count    : 1
+topic               : /map_metadata
+publisher count     : 1
+subscriber count    : 0
+topic               : /odom
+publisher count     : 1
+subscriber count    : 0
+topic               : /odom_raw
+publisher count     : 0
+subscriber count    : 1
+topic               : /point_cloud
+publisher count     : 0
+subscriber count    : 0
+topic               : /pose
+publisher count     : 1
+subscriber count    : 0
+topic               : /robot_description
+publisher count     : 1
+subscriber count    : 0
+topic               : /safety/hold
+publisher count     : 1
+subscriber count    : 0
+topic               : /safety/state
+publisher count     : 1
+subscriber count    : 1
+topic               : /scan
+publisher count     : 0
+subscriber count    : 2
+topic               : /sentinel/event
+publisher count     : 1
+subscriber count    : 0
+topic               : /sentinel/state
+publisher count     : 1
+subscriber count    : 0
+topic               : /sentinel/transcript
+publisher count     : 0
+subscriber count    : 1
+topic               : /servo_ctrl
+publisher count     : 0
+subscriber count    : 0
+topic               : /set_pose
+publisher count     : 0
+subscriber count    : 1
+topic               : /slam_toolbox/feedback
+publisher count     : 0
+subscriber count    : 1
+topic               : /slam_toolbox/graph_visualization
+publisher count     : 1
+subscriber count    : 0
+topic               : /slam_toolbox/scan_visualization
+publisher count     : 1
+subscriber count    : 0
+topic               : /slam_toolbox/update
+publisher count     : 1
+subscriber count    : 0
+topic               : /tf
+publisher count     : 5
+subscriber count    : 2
+topic               : /tf_static
+publisher count     : 2
+subscriber count    : 2
+topic               : /vel_raw
+publisher count     : 0
+subscriber count    : 0
+topic               : /voltage
+publisher count     : 0
+subscriber count    : 1
+topic               : /wrist_camera/camera_info
+publisher count     : 0
+subscriber count    : 0
+topic               : /wrist_camera/image_raw
+publisher count     : 0
+subscriber count    : 0
+topic               : /wrist_camera/image_raw/compressed
+publisher count     : 0
+subscriber count    : 0
+topic               : /wrist_camera/image_raw/compressedDepth
+publisher count     : 0
+subscriber count    : 0
+topic               : /wrist_camera/image_raw/theora
+publisher count     : 0
+subscriber count    : 0
+topic               : /ydlidar_ros2_driver_node/transition_event
+publisher count     : 0
+subscriber count    : 1

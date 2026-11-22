@@ -1,0 +1,39 @@
+=== ./clawbot_interfaces/srv/DirectorCommand.srv
+string request_json
+---
+string response_json
+=== ./pkg_interfaces/action/Progress.action
+int64 num
+---
+int64 sum
+---
+float64 progress=== ./pkg_interfaces/msg/Person.msg
+string   name
+int32    age
+float64  height=== ./pkg_interfaces/srv/Add.srv
+int32 num1
+int32 num2
+---
+int32 sum=== ./yahboomcar_msgs/msg/ImageMsg.msg
+int32 height
+int32 width
+int32 channels
+uint8[] data=== ./yahboomcar_msgs/msg/PointArray.msg
+geometry_msgs/Point[] points=== ./yahboomcar_msgs/msg/Position.msg
+float32 anglex
+float32 angley
+float32 distance=== ./yahboomcar_msgs/msg/TargetArray.msg
+yahboomcar_msgs/Target[] data=== ./yahboomcar_msgs/msg/Target.msg
+string frame_id
+builtin_interfaces/Time stamp
+float32 scores
+float32 ptx
+float32 pty
+float32 distw
+float32 disth
+float32 centerx
+float32 centery
+=== ./yahboom_web_savmap_interfaces/src/srv/WebSaveMap.srv
+string mapname
+---
+string response

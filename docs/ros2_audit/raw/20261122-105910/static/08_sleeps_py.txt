@@ -1,0 +1,189 @@
+./clawbot_arm_controller/clawbot_arm_controller/arm_trajectory_server.py:254:                time.sleep(remaining)
+./clawbot_arm_controller/clawbot_arm_controller/arm_trajectory_server.py:328:                time.sleep(self.servo_stagger_s)
+./clawbot_arm_controller/test/test_action_server.py:61:    time.sleep(1.0)
+./clawbot_arm_controller/test/test_action_server.py:81:        time.sleep(0.02)
+./clawbot_arm_controller/test/test_action_server.py:82:    handle = future.result()
+./clawbot_arm_controller/test/test_action_server.py:97:        time.sleep(0.02)
+./clawbot_arm_controller/test/test_action_server.py:99:    assert result.result().result.error_code == SUCCESSFUL
+./clawbot_arm_controller/test/test_action_server.py:133:        time.sleep(0.02)
+./clawbot_arm_controller/test/test_action_server.py:134:    assert result.result().result.error_code == SUCCESSFUL
+./clawbot_arm_controller/test/test_action_server.py:147:    time.sleep(0.6)
+./clawbot_arm_controller/test/test_action_server.py:152:        time.sleep(0.02)
+./clawbot_arm_controller/test/test_action_server.py:153:    assert result.result().status == 5  # STATUS_CANCELED
+./clawbot_arm_controller/test/test_action_server.py:155:    time.sleep(0.6)
+./clawbot_arm_controller/test/test_passive_joint.py:58:    time.sleep(1.0)
+./clawbot_arm_controller/test/test_passive_joint.py:74:            time.sleep(0.02)
+./clawbot_arm_controller/test/test_passive_joint.py:75:        handle = send.result()
+./clawbot_arm_controller/test/test_passive_joint.py:80:            time.sleep(0.02)
+./clawbot_arm_controller/test/test_passive_joint.py:81:        assert result.result().result.error_code == SUCCESSFUL
+./clawbot_arm_controller/test/test_passive_joint.py:82:        time.sleep(0.4)  # laisser le minuteur /arm/joint_states publier la position finale
+./clawbot_director/test/test_preconditions.py:154:            time.sleep(0.05)
+./clawbot_director/test/test_preconditions.py:161:            time.sleep(0.05)
+./clawbot_director/test/test_preconditions.py:180:        time.sleep(period)
+./clawbot_director/test/test_preconditions.py:191:    return json.loads(futur.result().response_json)
+./clawbot_director/test/test_preconditions.py:204:        time.sleep(0.05)
+./clawbot_director/test/test_navigate_skill.py:125:            time.sleep(0.05)
+./clawbot_director/test/test_navigate_skill.py:132:            time.sleep(0.05)
+./clawbot_director/test/test_navigate_skill.py:133:        time.sleep(0.5)   # découverte DDS du faux serveur avant le premier goal
+./clawbot_director/test/test_navigate_skill.py:150:        time.sleep(period)
+./clawbot_director/test/test_navigate_skill.py:161:    return json.loads(futur.result().response_json)
+./clawbot_director/test/test_director_client_ros.py:52:            time.sleep(0.05)
+./clawbot_director/test/test_director_client_ros.py:57:            time.sleep(0.02)
+./clawbot_director/test/test_director_client_ros.py:60:            time.sleep(0.05)
+./clawbot_director/test/test_director_client_ros.py:78:    proc = subprocess.run(["bash", "-c", commande], input=json.dumps(charge),
+./clawbot_director/test/test_director_client_ros.py:103:    proc = subprocess.run(["bash", "-c", commande], input=json.dumps({'op': 'get_task'}),
+./clawbot_director/test/soutien_actions.py:45:        time.sleep(0.5)   # découverte DDS avant que le directeur n'envoie un goal
+./clawbot_director/test/soutien_actions.py:60:                time.sleep(0.01)
+./clawbot_director/test/soutien_actions.py:70:        time.sleep(0.05)
+./clawbot_director/test/test_skill_execution.py:58:            time.sleep(0.05)
+./clawbot_director/test/test_skill_execution.py:64:            time.sleep(0.05)
+./clawbot_director/test/test_skill_execution.py:66:        time.sleep(0.5)
+./clawbot_director/test/test_skill_execution.py:83:        time.sleep(period)
+./clawbot_director/test/test_skill_execution.py:94:    return json.loads(futur.result().response_json)
+./clawbot_director/test/test_director_node.py:72:            time.sleep(0.05)
+./clawbot_director/test/test_director_node.py:99:        time.sleep(period)
+./clawbot_director/test/test_director_node.py:127:    return json.loads(futur.result().response_json)
+./clawbot_director/test/test_director_node.py:150:    time.sleep(0.3)
+./clawbot_director/test/test_director_node.py:215:        time.sleep(0.01)
+./clawbot_director/test/test_director_node.py:304:    reponse = json.loads(futur.result().response_json)
+./clawbot_director/test/test_arret_service.py:88:            time.sleep(0.05)
+./clawbot_director/test/test_arret_service.py:94:            time.sleep(0.05)
+./clawbot_director/test/test_arret_service.py:96:        time.sleep(0.5)
+./clawbot_director/test/test_arret_service.py:112:        time.sleep(period)
+./clawbot_director/test/test_arret_service.py:123:    return json.loads(futur.result().response_json)
+./clawbot_director/test/test_arret_service.py:134:    resultat = subprocess.run(["/bin/bash", str(SCRIPT)], capture_output=True, text=True,
+./clawbot_director/test/soutien_navigation.py:45:        time.sleep(0.5)   # découverte DDS avant que le directeur n'envoie un goal
+./clawbot_director/test/soutien_navigation.py:60:                time.sleep(0.01)
+./clawbot_director/test/soutien_navigation.py:69:        time.sleep(0.05)
+./clawbot_director/clawbot_director/director_node.py:229:        handle = futur.result()
+./clawbot_director/clawbot_director/director_node.py:246:        statut = futur.result().status
+./clawbot_director/clawbot_director/director_node.py:298:                reponse.result()
+./clawbot_moveit_config/tools/move_joint_step.py:51:        rclpy.spin_once(node, timeout_sec=0.1)
+./clawbot_moveit_config/tools/move_joint_step.py:96:        rclpy.spin_once(node, timeout_sec=0.05)
+./clawbot_moveit_config/tools/move_joint_step.py:97:    handle = send.result()
+./clawbot_moveit_config/tools/move_joint_step.py:105:        rclpy.spin_once(node, timeout_sec=0.05)
+./clawbot_moveit_config/tools/move_joint_step.py:110:    result = result_future.result().result
+./clawbot_moveit_config/tools/apply_mast.py:72:            rclpy.spin_once(self, timeout_sec=0.1)
+./clawbot_moveit_config/tools/apply_mast.py:75:        scene = future.result().scene
+./clawbot_moveit_config/tools/apply_mast.py:89:            rclpy.spin_once(self, timeout_sec=0.1)
+./clawbot_moveit_config/tools/apply_mast.py:92:        return bool(future.result().success)
+./clawbot_moveit_config/tools/apply_mast.py:105:            rclpy.spin_once(self, timeout_sec=0.2)
+./clawbot_moveit_config/tools/apply_mast.py:116:            time.sleep(1.0)
+./clawbot_moveit_config/tools/plan_demo.py:64:        rclpy.spin_once(node, timeout_sec=0.1)
+./clawbot_moveit_config/tools/plan_demo.py:69:    response = future.result()
+./clawbot_moveit_config/tools/check_state.py:59:        rclpy.spin_once(node, timeout_sec=0.1)
+./clawbot_moveit_config/tools/check_state.py:64:    reponse = future.result()
+./clawbot_moveit_config/tools/execute_demo.py:87:        rclpy.spin_once(node, timeout_sec=0.05)
+./clawbot_moveit_config/tools/execute_demo.py:88:    handle = send.result()
+./clawbot_moveit_config/tools/execute_demo.py:96:        rclpy.spin_once(node, timeout_sec=0.05)
+./clawbot_moveit_config/tools/execute_demo.py:101:    result = result_future.result().result
+./clawbot_sentinel/clawbot_sentinel/sentinel_node.py:178:            reponse = json.loads(futur.result().response_json)
+./clawbot_sentinel/test/test_sentinel_node.py:92:        time.sleep(period)
+./clawbot_sentinel/test/test_sentinel_node.py:115:    time.sleep(2.5)
+./clawbot_sentinel/test/test_sentinel_node.py:133:    time.sleep(0.3)
+./clawbot_sentinel/test/test_sentinel_node.py:135:    time.sleep(0.6)
+./clawbot_sentinel/test/test_sentinel_node.py:143:    time.sleep(0.3)
+./clawbot_sentinel/test/test_sentinel_node.py:147:    time.sleep(0.8)
+./clawbot_sentinel/test/test_sentinel_node.py:160:        time.sleep(0.2)
+./pkg_action/pkg_action/action_server_demo.py:34:            time.sleep(0.1)
+./pkg_action/pkg_action/action_client_demo.py:22:        goal_handle = future.result()
+./pkg_action/pkg_action/action_client_demo.py:34:        result = future.result().result
+./pkg_helloworld_py/pkg_helloworld_py/helloworld.py:13:            time.sleep(0.5)                        # 休眠控制循环时间
+./pkg_service/pkg_service/client_demo.py:28:        rclpy.spin_once(service_client)
+./pkg_service/pkg_service/client_demo.py:33:                response = service_client.future.result()
+./pkg_tf/pkg_tf/turtle_following.py:62:                        f'Successfully spawned {self.result.result().name}')
+./ros2_llm_bridge/install/ros2_llm_bridge/lib/python3.10/site-packages/ros2_llm_bridge/bridge_node.py:28:            correlation_id: A unique identifier for tracing requests.
+./ros2_llm_bridge/build/ros2_llm_bridge/build/lib/ros2_llm_bridge/bridge_node.py:28:            correlation_id: A unique identifier for tracing requests.
+./ros2_llm_bridge/test/test_backend_services.py:11:    response = requests.get(f"{LLM_BRIDGE_URL}/health", timeout=TIMEOUT)
+./ros2_llm_bridge/test/test_backend_services.py:18:    response = requests.get(f"{HARDWARE_SERVICE_URL}/health", timeout=TIMEOUT)
+./ros2_llm_bridge/test/test_backend_services.py:26:    response = requests.get(f"{HARDWARE_SERVICE_URL}/battery", timeout=TIMEOUT)
+./ros2_llm_bridge/test/test_backend_services.py:35:    response = requests.post(f"{HARDWARE_SERVICE_URL}/lamps", json=payload, timeout=TIMEOUT)
+./ros2_llm_bridge/test/test_backend_services.py:45:    response = requests.get(f"{LLM_BRIDGE_URL}/openapi.json", timeout=TIMEOUT)
+./ros2_llm_bridge/hardware_service.py:187:_slam_process: subprocess.Popen | None = None
+./ros2_llm_bridge/hardware_service.py:192:        time.sleep(0.3)
+./ros2_llm_bridge/hardware_service.py:563:        out = subprocess.check_output(["pgrep", "-f", "slam_launch.py"])
+./ros2_llm_bridge/hardware_service.py:565:    except subprocess.CalledProcessError:
+./ros2_llm_bridge/hardware_service.py:583:        _slam_process = subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+./ros2_llm_bridge/hardware_service.py:601:        pid_bytes = subprocess.check_output(["pgrep", "-f", "slam_launch.py"])
+./ros2_llm_bridge/hardware_service.py:609:                    pgid_bytes = subprocess.check_output(["ps", "-o", "pgid=", "-p", str(pid)])
+./ros2_llm_bridge/hardware_service.py:616:    except subprocess.CalledProcessError:
+./ros2_llm_bridge/hardware_service.py:630:            subprocess.run(["pkill", "-9", "-f", node], timeout=2.0)
+./ros2_llm_bridge/hardware_service.py:730:        result = await loop.run_in_executor(None, lambda: subprocess.run(
+./ros2_llm_bridge/hardware_service.py:735:    except subprocess.TimeoutExpired:
+./ros2_llm_bridge/hardware_service.py:806:        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+./yahboom_app_save_map/yahboom_app_save_map/yahboom_app_save_map.py:21:        possess = subprocess.Popen(args, stdout=subprocess.PIPE)
+./yahboom_app_save_map/yahboom_app_save_map/yahboom_app_save_map_client.py:29:        rclpy.spin_once(minimal_client)
+./yahboom_app_save_map/yahboom_app_save_map/yahboom_app_save_map_client.py:32:                response = minimal_client.future.result()
+./yahboomcar_astra/scripts/opencv/2_4.py:16:		cv2.imshow("frame",img)
+./yahboomcar_astra/scripts/opencv/2_4.py:17:		cv2.imshow('dst', dst)
+./yahboomcar_astra/scripts/opencv/2_4.py:18:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/2_3.py:11:		cv2.imshow("frame",img)
+./yahboomcar_astra/scripts/opencv/2_3.py:12:		cv2.imshow('dst', dst)
+./yahboomcar_astra/scripts/opencv/2_3.py:13:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/2_2.py:6:		cv2.imshow("frame",img)
+./yahboomcar_astra/scripts/opencv/2_2.py:7:		cv2.imshow('dst', dst)
+./yahboomcar_astra/scripts/opencv/2_2.py:8:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/3_5.py:7:		cv2.imshow("line",rect)
+./yahboomcar_astra/scripts/opencv/3_5.py:8:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/3_2.py:8:		cv2.imshow("frame",img)
+./yahboomcar_astra/scripts/opencv/3_2.py:9:		cv2.imshow('gray', gray)
+./yahboomcar_astra/scripts/opencv/3_2.py:10:		cv2.imshow("binary",thresh1)
+./yahboomcar_astra/scripts/opencv/3_2.py:11:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/4_1_2.py:19:		cv2.imshow("dam_img",dam_img)
+./yahboomcar_astra/scripts/opencv/4_1_2.py:20:		cv2.imshow("paint",paint)
+./yahboomcar_astra/scripts/opencv/4_1_2.py:21:		cv2.imshow("dst",dst_img)
+./yahboomcar_astra/scripts/opencv/4_1_2.py:22:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/4_3.py:20:		cv2.imshow("origin",img)
+./yahboomcar_astra/scripts/opencv/4_3.py:21:		cv2.imshow("dst",dst)
+./yahboomcar_astra/scripts/opencv/4_3.py:22:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/3_1.py:7:		cv2.imshow("frame",img)
+./yahboomcar_astra/scripts/opencv/3_1.py:8:		cv2.imshow('gray', gray)
+./yahboomcar_astra/scripts/opencv/3_1.py:9:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/3_4.py:7:		cv2.imshow("line",line)
+./yahboomcar_astra/scripts/opencv/3_4.py:8:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/3_3.py:9:		cv2.imshow("frame",img)
+./yahboomcar_astra/scripts/opencv/3_3.py:10:		cv2.imshow('gray', gray)
+./yahboomcar_astra/scripts/opencv/3_3.py:11:		cv2.imshow("canny",dst)
+./yahboomcar_astra/scripts/opencv/3_3.py:12:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/4_1_1.py:16:		cv2.imshow("dam_img",dam_img)
+./yahboomcar_astra/scripts/opencv/4_1_1.py:17:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/3_8.py:8:		cv2.imshow("polylines",polylines)
+./yahboomcar_astra/scripts/opencv/3_8.py:9:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/2_1.py:8:		cv2.imshow("frame",img)
+./yahboomcar_astra/scripts/opencv/2_1.py:9:		cv2.imshow('resize0', img_test1)
+./yahboomcar_astra/scripts/opencv/2_1.py:10:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/3_7.py:7:		cv2.imshow("ellipse",ellipse)
+./yahboomcar_astra/scripts/opencv/3_7.py:8:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/3_9.py:7:		cv2.imshow("img",img)
+./yahboomcar_astra/scripts/opencv/3_9.py:8:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/3_6.py:7:		cv2.imshow("circle",circle)
+./yahboomcar_astra/scripts/opencv/3_6.py:8:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/1_4.py:12:		cv2.imshow("frame",img)
+./yahboomcar_astra/scripts/opencv/1_4.py:13:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_astra/scripts/opencv/4_2.py:23:		cv2.imshow("dst",dst)
+./yahboomcar_astra/scripts/opencv/4_2.py:24:		action = cv2.waitKey(10) & 0xFF
+./yahboomcar_bringup/yahboomcar_bringup/test.py:53:        #time.sleep(2)
+./yahboomcar_bringup/yahboomcar_bringup/calibrate_linear_X3.py:53:        #time.sleep(2)
+./yahboomcar_bringup/yahboomcar_bringup/calibrate_linear_R2.py:53:        #time.sleep(2)
+./yahboomcar_bringup/yahboomcar_bringup/calibrate_angular_X3.py:54:        #time.sleep(2)
+./yahboomcar_bringup/yahboomcar_bringup/calibrate_angular_R2.py:54:        #time.sleep(2)
+./yahboomcar_bringup/yahboomcar_bringup/.ipynb_checkpoints/calibrate_angular_R2-checkpoint.py:54:        #time.sleep(2)
+./yahboomcar_bringup/yahboomcar_bringup/.ipynb_checkpoints/calibrate_linear_R2-checkpoint.py:53:        #time.sleep(2)
+./yahboomcar_bringup/yahboomcar_bringup/.ipynb_checkpoints/calibrate_linear_X3-checkpoint.py:53:        #time.sleep(2)
+./yahboomcar_bringup/yahboomcar_bringup/.ipynb_checkpoints/calibrate_angular_X3-checkpoint.py:54:        #time.sleep(2)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/Voice_Ctrl_Ackman_driver.py:193:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/Voice_Ctrl_Ackman_driver.py:206:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/Voice_Ctrl_Ackman_driver.py:219:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/Voice_Ctrl_Ackman_driver.py:232:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/Voice_Ctrl_Mcnamu_driver_X3.py:180:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/Voice_Ctrl_Mcnamu_driver_X3.py:193:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/Voice_Ctrl_Mcnamu_driver_X3.py:206:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/Voice_Ctrl_Mcnamu_driver_X3.py:219:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/.ipynb_checkpoints/Voice_Ctrl_Mcnamu_driver_X3-checkpoint.py:180:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/.ipynb_checkpoints/Voice_Ctrl_Mcnamu_driver_X3-checkpoint.py:193:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/.ipynb_checkpoints/Voice_Ctrl_Mcnamu_driver_X3-checkpoint.py:206:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/.ipynb_checkpoints/Voice_Ctrl_Mcnamu_driver_X3-checkpoint.py:219:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/.ipynb_checkpoints/Voice_Ctrl_Ackman_driver-checkpoint.py:193:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/.ipynb_checkpoints/Voice_Ctrl_Ackman_driver-checkpoint.py:206:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/.ipynb_checkpoints/Voice_Ctrl_Ackman_driver-checkpoint.py:219:			time.sleep(5)
+./yahboomcar_voice_ctrl/yahboomcar_voice_ctrl/.ipynb_checkpoints/Voice_Ctrl_Ackman_driver-checkpoint.py:232:			time.sleep(5)

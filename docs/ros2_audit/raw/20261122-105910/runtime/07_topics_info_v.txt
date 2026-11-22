@@ -1,0 +1,2352 @@
+=== /Buzzer
+Type: std_msgs/msg/Bool
+
+Publisher count: 1
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: std_msgs/msg/Bool
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.13.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: std_msgs/msg/Bool
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.13.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /RGBLight
+Type: std_msgs/msg/Int32
+
+Publisher count: 1
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: std_msgs/msg/Int32
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.14.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: std_msgs/msg/Int32
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.12.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /arm/joint_states
+Type: sensor_msgs/msg/JointState
+
+Publisher count: 0
+
+Subscription count: 1
+
+Node name: joint_state_publisher
+Node namespace: /
+Topic type: sensor_msgs/msg/JointState
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.8e.0d.ad.f3.00.00.00.00.00.00.12.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /arm/servo_angles
+Type: std_msgs/msg/Int32MultiArray
+
+Publisher count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: std_msgs/msg/Int32MultiArray
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.1c.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 2
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: std_msgs/msg/Int32MultiArray
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.59.10.61.25.00.00.00.00.00.00.18.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: director
+Node namespace: /
+Topic type: std_msgs/msg/Int32MultiArray
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.5c.10.4f.d9.00.00.00.00.00.00.13.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /camera/color/camera_info
+Type: sensor_msgs/msg/CameraInfo
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /camera
+Topic type: sensor_msgs/msg/CameraInfo
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.4d.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /camera/color/image_raw
+Type: sensor_msgs/msg/Image
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /camera
+Topic type: sensor_msgs/msg/Image
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.4c.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /camera/depth/camera_info
+Type: sensor_msgs/msg/CameraInfo
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /camera
+Topic type: sensor_msgs/msg/CameraInfo
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.49.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: camera
+Node namespace: /camera
+Topic type: sensor_msgs/msg/CameraInfo
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.67.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /camera/depth/image_raw
+Type: sensor_msgs/msg/Image
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /camera
+Topic type: sensor_msgs/msg/Image
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.48.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 2
+
+Node name: camera
+Node namespace: /camera
+Topic type: sensor_msgs/msg/Image
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.66.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: sentinel
+Node namespace: /
+Topic type: sensor_msgs/msg/Image
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.61.10.69.53.00.00.00.00.00.00.16.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /camera/depth/points
+Type: sensor_msgs/msg/PointCloud2
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /camera
+Topic type: sensor_msgs/msg/PointCloud2
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.68.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /camera/detection_image
+Type: sensor_msgs/msg/CompressedImage
+
+Publisher count: 0
+
+Subscription count: 1
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: sensor_msgs/msg/CompressedImage
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.19.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /camera/ir/camera_info
+Type: sensor_msgs/msg/CameraInfo
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /camera
+Topic type: sensor_msgs/msg/CameraInfo
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.4b.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /camera/ir/image_raw
+Type: sensor_msgs/msg/Image
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /camera
+Topic type: sensor_msgs/msg/Image
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.4a.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /client_count
+Type: std_msgs/msg/Int32
+
+Publisher count: 1
+
+Node name: rosbridge_websocket
+Node namespace: /
+Topic type: std_msgs/msg/Int32
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.c6.0d.44.d0.00.00.00.00.00.00.11.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /cmd_vel
+Type: geometry_msgs/msg/Twist
+
+Publisher count: 3
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.11.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: llm_bridge_node
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.58.10.44.bf.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: sentinel
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.61.10.69.53.00.00.00.00.00.00.13.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.59.10.61.25.00.00.00.00.00.00.14.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /cmd_vel_safe
+Type: geometry_msgs/msg/Twist
+
+Publisher count: 1
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.59.10.61.25.00.00.00.00.00.00.11.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /connected_clients
+Type: rosbridge_msgs/msg/ConnectedClients
+
+Publisher count: 1
+
+Node name: rosbridge_websocket
+Node namespace: /
+Topic type: rosbridge_msgs/msg/ConnectedClients
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.c6.0d.44.d0.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /detections
+Type: std_msgs/msg/String
+
+Publisher count: 0
+
+Subscription count: 1
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: std_msgs/msg/String
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.1a.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /diagnostics
+Type: diagnostic_msgs/msg/DiagnosticArray
+
+Publisher count: 1
+
+Node name: ekf_filter_node
+Node namespace: /
+Topic type: diagnostic_msgs/msg/DiagnosticArray
+Endpoint type: PUBLISHER
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.16.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /director/state
+Type: std_msgs/msg/String
+
+Publisher count: 1
+
+Node name: director
+Node namespace: /
+Topic type: std_msgs/msg/String
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5c.10.4f.d9.00.00.00.00.00.00.11.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: sentinel
+Node namespace: /
+Topic type: std_msgs/msg/String
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.61.10.69.53.00.00.00.00.00.00.15.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /edition
+Type: std_msgs/msg/Float32
+
+Publisher count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: std_msgs/msg/Float32
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.15.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /imu/data_raw
+Type: sensor_msgs/msg/Imu
+
+Publisher count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: sensor_msgs/msg/Imu
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.19.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 3
+
+Node name: ekf_filter_node
+Node namespace: /
+Topic type: sensor_msgs/msg/Imu
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.20.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: sensor_msgs/msg/Imu
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.16.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: sensor_msgs/msg/Imu
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.59.10.61.25.00.00.00.00.00.00.17.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /imu/mag
+Type: sensor_msgs/msg/MagneticField
+
+Publisher count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: sensor_msgs/msg/MagneticField
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.1a.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /joint_states
+Type: sensor_msgs/msg/JointState
+
+Publisher count: 2
+
+Node name: driver_node
+Node namespace: /
+Topic type: sensor_msgs/msg/JointState
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.17.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: joint_state_publisher
+Node namespace: /
+Topic type: sensor_msgs/msg/JointState
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.8e.0d.ad.f3.00.00.00.00.00.00.13.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: robot_state_publisher
+Node namespace: /
+Topic type: sensor_msgs/msg/JointState
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.87.0d.6b.65.00.00.00.00.00.00.15.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /map
+Type: nav_msgs/msg/OccupancyGrid
+
+Publisher count: 1
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: nav_msgs/msg/OccupancyGrid
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.18.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 2
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: nav_msgs/msg/OccupancyGrid
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.25.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: nav_msgs/msg/OccupancyGrid
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.18.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /map_metadata
+Type: nav_msgs/msg/MapMetaData
+
+Publisher count: 1
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: nav_msgs/msg/MapMetaData
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.19.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /odom
+Type: nav_msgs/msg/Odometry
+
+Publisher count: 1
+
+Node name: ekf_filter_node
+Node namespace: /
+Topic type: nav_msgs/msg/Odometry
+Endpoint type: PUBLISHER
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.21.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /odom_raw
+Type: nav_msgs/msg/Odometry
+
+Publisher count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: nav_msgs/msg/Odometry
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.1b.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: ekf_filter_node
+Node namespace: /
+Topic type: nav_msgs/msg/Odometry
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.1f.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /parameter_events
+Type: rcl_interfaces/msg/ParameterEvent
+
+Publisher count: 19
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.10.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: camera
+Node namespace: /wrist_camera
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.3e.3b.00.0b.03.9b.00.00.00.00.00.00.10.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: ekf_filter_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.10.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: launch_ros_1308
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.1c.05.7d.bf.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: ydlidar_ros2_driver_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.1e.0e.50.02.00.00.00.00.00.00.10.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: driver_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: llm_bridge_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.58.10.44.bf.00.00.00.00.00.00.10.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.59.10.61.25.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: director
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5c.10.4f.d9.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: camera
+Node namespace: /camera
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.10.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: sentinel
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.61.10.69.53.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: yolo_source_camera
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.72.05.e0.e7.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: robot_state_publisher
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.87.0d.6b.65.00.00.00.00.00.00.10.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: joint_state_publisher
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.8e.0d.ad.f3.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: rosbridge_websocket
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.c6.0d.44.d0.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: rosapi
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.cb.0d.1f.2c.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: rosapi_params
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.cb.0d.1f.2c.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.f6.df.be.eb.00.00.00.00.00.00.04.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 11
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: transform_listener_impl_aaab185aad50
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.13.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: camera
+Node namespace: /wrist_camera
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.3e.3b.00.0b.03.9b.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: camera
+Node namespace: /wrist_camera
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.3e.3b.00.0b.03.9b.00.00.00.00.00.00.19.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: ekf_filter_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: transform_listener_impl_aaaacd0c8c60
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.13.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: ydlidar_ros2_driver_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.1e.0e.50.02.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: llm_bridge_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.58.10.44.bf.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: camera
+Node namespace: /camera
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: robot_state_publisher
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.87.0d.6b.65.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: robot_state_publisher
+Node namespace: /
+Topic type: rcl_interfaces/msg/ParameterEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.87.0d.6b.65.00.00.00.00.00.00.16.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /point_cloud
+Type: sensor_msgs/msg/PointCloud
+
+Publisher count: 1
+
+Node name: ydlidar_ros2_driver_node
+Node namespace: /
+Topic type: sensor_msgs/msg/PointCloud
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.1e.0e.50.02.00.00.00.00.00.00.13.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /pose
+Type: geometry_msgs/msg/PoseWithCovarianceStamped
+
+Publisher count: 1
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: geometry_msgs/msg/PoseWithCovarianceStamped
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.17.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /robot_description
+Type: std_msgs/msg/String
+
+Publisher count: 1
+
+Node name: robot_state_publisher
+Node namespace: /
+Topic type: std_msgs/msg/String
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.87.0d.6b.65.00.00.00.00.00.00.14.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: joint_state_publisher
+Node namespace: /
+Topic type: std_msgs/msg/String
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.8e.0d.ad.f3.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /rosout
+Type: rcl_interfaces/msg/Log
+
+Publisher count: 21
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: transform_listener_impl_aaab185aad50
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: camera
+Node namespace: /wrist_camera
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.3e.3b.00.0b.03.9b.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: ekf_filter_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: transform_listener_impl_aaaacd0c8c60
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: launch_ros_1308
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.1c.05.7d.bf.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: ydlidar_ros2_driver_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.1e.0e.50.02.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: driver_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: llm_bridge_node
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.58.10.44.bf.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.59.10.61.25.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: director
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5c.10.4f.d9.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: camera
+Node namespace: /camera
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: sentinel
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.61.10.69.53.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: yolo_source_camera
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.72.05.e0.e7.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: robot_state_publisher
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.87.0d.6b.65.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: joint_state_publisher
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.8e.0d.ad.f3.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: rosbridge_websocket
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.c6.0d.44.d0.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: rosapi
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.cb.0d.1f.2c.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: rosapi_params
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.cb.0d.1f.2c.00.00.00.00.00.00.11.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: _ros2cli_daemon_28_69b9f2d344f54adcbe18314fb07263c6
+Node namespace: /
+Topic type: rcl_interfaces/msg/Log
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.f6.df.be.eb.00.00.00.00.00.00.03.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: 10000000000 nanoseconds
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /safety/hold
+Type: std_msgs/msg/Bool
+
+Publisher count: 1
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: std_msgs/msg/Bool
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.59.10.61.25.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /safety/state
+Type: std_msgs/msg/String
+
+Publisher count: 1
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: std_msgs/msg/String
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.59.10.61.25.00.00.00.00.00.00.13.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: director
+Node namespace: /
+Topic type: std_msgs/msg/String
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.5c.10.4f.d9.00.00.00.00.00.00.12.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /scan
+Type: sensor_msgs/msg/LaserScan
+
+Publisher count: 1
+
+Node name: ydlidar_ros2_driver_node
+Node namespace: /
+Topic type: sensor_msgs/msg/LaserScan
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.1e.0e.50.02.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 2
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: sensor_msgs/msg/LaserScan
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.22.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: sensor_msgs/msg/LaserScan
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.59.10.61.25.00.00.00.00.00.00.15.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /sentinel/event
+Type: std_msgs/msg/String
+
+Publisher count: 1
+
+Node name: sentinel
+Node namespace: /
+Topic type: std_msgs/msg/String
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.61.10.69.53.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /sentinel/state
+Type: std_msgs/msg/String
+
+Publisher count: 1
+
+Node name: sentinel
+Node namespace: /
+Topic type: std_msgs/msg/String
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.61.10.69.53.00.00.00.00.00.00.11.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /sentinel/transcript
+Type: std_msgs/msg/String
+
+Publisher count: 0
+
+Subscription count: 1
+
+Node name: sentinel
+Node namespace: /
+Topic type: std_msgs/msg/String
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.61.10.69.53.00.00.00.00.00.00.14.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /servo_ctrl
+Type: std_msgs/msg/Int32MultiArray
+
+Publisher count: 1
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: std_msgs/msg/Int32MultiArray
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: std_msgs/msg/Int32MultiArray
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.14.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /set_pose
+Type: geometry_msgs/msg/PoseWithCovarianceStamped
+
+Publisher count: 0
+
+Subscription count: 1
+
+Node name: ekf_filter_node
+Node namespace: /
+Topic type: geometry_msgs/msg/PoseWithCovarianceStamped
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.18.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /slam_toolbox/feedback
+Type: visualization_msgs/msg/InteractiveMarkerFeedback
+
+Publisher count: 0
+
+Subscription count: 1
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: visualization_msgs/msg/InteractiveMarkerFeedback
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.2f.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /slam_toolbox/graph_visualization
+Type: visualization_msgs/msg/MarkerArray
+
+Publisher count: 1
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: visualization_msgs/msg/MarkerArray
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.32.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /slam_toolbox/scan_visualization
+Type: sensor_msgs/msg/LaserScan
+
+Publisher count: 1
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: sensor_msgs/msg/LaserScan
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.2b.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /slam_toolbox/update
+Type: visualization_msgs/msg/InteractiveMarkerUpdate
+
+Publisher count: 1
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: visualization_msgs/msg/InteractiveMarkerUpdate
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.2e.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /tf
+Type: tf2_msgs/msg/TFMessage
+
+Publisher count: 5
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.16.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: slam_toolbox
+Node namespace: /
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: PUBLISHER
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.26.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: ekf_filter_node
+Node namespace: /
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: PUBLISHER
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.17.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: camera
+Node namespace: /camera
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.65.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: robot_state_publisher
+Node namespace: /
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.87.0d.6b.65.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 2
+
+Node name: transform_listener_impl_aaab185aad50
+Node namespace: /
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.14.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: transform_listener_impl_aaaacd0c8c60
+Node namespace: /
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.14.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /tf_static
+Type: tf2_msgs/msg/TFMessage
+
+Publisher count: 2
+
+Node name: camera
+Node namespace: /camera
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.5e.0e.82.c6.00.00.00.00.00.00.64.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: robot_state_publisher
+Node namespace: /
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.87.0d.6b.65.00.00.00.00.00.00.13.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 2
+
+Node name: transform_listener_impl_aaab185aad50
+Node namespace: /
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.23.db.01.0b.54.50.00.00.01.00.00.00.15.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: transform_listener_impl_aaaacd0c8c60
+Node namespace: /
+Topic type: tf2_msgs/msg/TFMessage
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.7f.01.35.05.b7.16.00.00.00.00.00.00.15.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: TRANSIENT_LOCAL
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /vel_raw
+Type: geometry_msgs/msg/Twist
+
+Publisher count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.18.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.17.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /voltage
+Type: std_msgs/msg/Float32
+
+Publisher count: 1
+
+Node name: driver_node
+Node namespace: /
+Topic type: std_msgs/msg/Float32
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.2b.0c.7a.37.00.00.00.00.00.00.16.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 2
+
+Node name: hardware_service_node
+Node namespace: /
+Topic type: std_msgs/msg/Float32
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.33.05.2d.21.00.00.00.00.00.00.15.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: std_msgs/msg/Float32
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.59.10.61.25.00.00.00.00.00.00.16.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /wrist_camera/camera_info
+Type: sensor_msgs/msg/CameraInfo
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /wrist_camera
+Topic type: sensor_msgs/msg/CameraInfo
+Endpoint type: PUBLISHER
+GID: 01.0f.3e.3b.00.0b.03.9b.00.00.00.00.00.00.16.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /wrist_camera/image_raw
+Type: sensor_msgs/msg/Image
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /wrist_camera
+Topic type: sensor_msgs/msg/Image
+Endpoint type: PUBLISHER
+GID: 01.0f.3e.3b.00.0b.03.9b.00.00.00.00.00.00.14.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: yolo_source_camera
+Node namespace: /
+Topic type: sensor_msgs/msg/Image
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.72.05.e0.e7.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /wrist_camera/image_raw/compressed
+Type: sensor_msgs/msg/CompressedImage
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /wrist_camera
+Topic type: sensor_msgs/msg/CompressedImage
+Endpoint type: PUBLISHER
+GID: 01.0f.3e.3b.00.0b.03.9b.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /wrist_camera/image_raw/compressedDepth
+Type: sensor_msgs/msg/CompressedImage
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /wrist_camera
+Topic type: sensor_msgs/msg/CompressedImage
+Endpoint type: PUBLISHER
+GID: 01.0f.3e.3b.00.0b.03.9b.00.00.00.00.00.00.13.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /wrist_camera/image_raw/theora
+Type: theora_image_transport/msg/Packet
+
+Publisher count: 1
+
+Node name: camera
+Node namespace: /wrist_camera
+Topic type: theora_image_transport/msg/Packet
+Endpoint type: PUBLISHER
+GID: 01.0f.3e.3b.00.0b.03.9b.00.00.00.00.00.00.15.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 0
+
+=== /ydlidar_ros2_driver_node/transition_event
+Type: lifecycle_msgs/msg/TransitionEvent
+
+Publisher count: 0
+
+Subscription count: 1
+
+Node name: launch_ros_1308
+Node namespace: /
+Topic type: lifecycle_msgs/msg/TransitionEvent
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.1c.05.7d.bf.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+

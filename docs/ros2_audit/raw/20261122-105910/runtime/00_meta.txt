@@ -1,0 +1,9 @@
+collecte=runtime
+horodatage=2026-11-22T10:59:33+01:00
+ROS_DOMAIN_ID=28
+ROS_DISTRO=humble
+RMW_IMPLEMENTATION=non defini (defaut rmw_fastrtps_cpp)
+FASTRTPS_DEFAULT_PROFILES_FILE=non defini
+CYCLONEDDS_URI=non defini
+uptime=up 6 days, 22 hours, 56 minutes
+charge=2.98 2.37 2.32 6/1170 3914960

@@ -1,0 +1,279 @@
+=== clawbot-description.service
+-- No entries --
+=== clawbot-director.service
+Nov 22 10:25:52 yahboom bash[3805276]: [INFO] [1795339552.427794612] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:26:52 yahboom bash[3805276]: [INFO] [1795339612.427998462] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:27:52 yahboom bash[3805276]: [INFO] [1795339672.428164109] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:28:52 yahboom bash[3805276]: [INFO] [1795339732.427699563] [director]: etat=IDLE safety=OK age=0.03
+Nov 22 10:29:52 yahboom bash[3805276]: [INFO] [1795339792.428047201] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:30:52 yahboom bash[3805276]: [INFO] [1795339852.428031705] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:31:52 yahboom bash[3805276]: [INFO] [1795339912.428071571] [director]: etat=IDLE safety=OK age=0.03
+Nov 22 10:32:52 yahboom bash[3805276]: [INFO] [1795339972.428006779] [director]: etat=IDLE safety=OK age=0.03
+Nov 22 10:33:52 yahboom bash[3805276]: [INFO] [1795340032.428187544] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:34:52 yahboom bash[3805276]: [INFO] [1795340092.428599091] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:35:52 yahboom bash[3805276]: [INFO] [1795340152.428256387] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:36:52 yahboom bash[3805276]: [INFO] [1795340212.427973530] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:37:52 yahboom bash[3805276]: [INFO] [1795340272.428493825] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:38:52 yahboom bash[3805276]: [INFO] [1795340332.427567636] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:39:52 yahboom bash[3805276]: [INFO] [1795340392.427629197] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:40:52 yahboom bash[3805276]: [INFO] [1795340452.428034703] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:41:52 yahboom bash[3805276]: [INFO] [1795340512.428336430] [director]: etat=IDLE safety=OK age=0.03
+Nov 22 10:42:52 yahboom bash[3805276]: [INFO] [1795340572.428078049] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:43:52 yahboom bash[3805276]: [INFO] [1795340632.428036687] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:44:52 yahboom bash[3805276]: [INFO] [1795340692.428192446] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:45:52 yahboom bash[3805276]: [INFO] [1795340752.427939163] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:46:52 yahboom bash[3805276]: [INFO] [1795340812.428047399] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:47:52 yahboom bash[3805276]: [INFO] [1795340872.427907136] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:48:52 yahboom bash[3805276]: [INFO] [1795340932.427393085] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:49:52 yahboom bash[3805276]: [INFO] [1795340992.428143842] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:50:52 yahboom bash[3805276]: [INFO] [1795341052.428070050] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:51:52 yahboom bash[3805276]: [INFO] [1795341112.428025049] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:52:52 yahboom bash[3805276]: [INFO] [1795341172.427079327] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:53:52 yahboom bash[3805276]: [INFO] [1795341232.428135678] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:54:52 yahboom bash[3805276]: [INFO] [1795341292.428128648] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:55:52 yahboom bash[3805276]: [INFO] [1795341352.428101533] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:56:52 yahboom bash[3805276]: [INFO] [1795341412.429477887] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:57:52 yahboom bash[3805276]: [INFO] [1795341472.428142129] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:58:52 yahboom bash[3805276]: [INFO] [1795341532.428016968] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 10:59:52 yahboom bash[3805276]: [INFO] [1795341592.426928733] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 11:00:52 yahboom bash[3805276]: [INFO] [1795341652.428006422] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 11:01:52 yahboom bash[3805276]: [INFO] [1795341712.428157095] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 11:02:52 yahboom bash[3805276]: [INFO] [1795341772.427970977] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 11:03:52 yahboom bash[3805276]: [INFO] [1795341832.428065550] [director]: etat=IDLE safety=OK age=0.04
+Nov 22 11:04:52 yahboom bash[3805276]: [INFO] [1795341892.428132442] [director]: etat=IDLE safety=OK age=0.04
+=== clawbot-docs.service
+Nov 22 10:47:45 yahboom mkdocs[3883819]:  │   analysis of the situation in this article:
+Nov 22 10:47:45 yahboom mkdocs[3883819]:  │ 
+Nov 22 10:47:45 yahboom mkdocs[3883819]:  │   https://squidfunk.github.io/mkdocs-material/blog/2026/02/18/mkdocs-2.0/
+Nov 22 10:47:45 yahboom mkdocs[3883819]: 
+Nov 22 10:47:46 yahboom mkdocs[3883819]: INFO    -  Building documentation...
+Nov 22 10:47:46 yahboom mkdocs[3883819]: INFO    -  Cleaning site directory
+Nov 22 10:47:46 yahboom mkdocs[3883819]: INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - ETAT-PROJET.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - api/ros2_llm_bridge.setup.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - api/ros2_llm_bridge.test.test_action_handler.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - api/ros2_llm_bridge.test.test_copyright.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - api/ros2_llm_bridge.test.test_flake8.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - api/ros2_llm_bridge.test.test_integration.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - api/ros2_llm_bridge.test.test_llm_handler.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - api/ros2_llm_bridge.test.test_pep257.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - api/ros2_llm_bridge.test.test_schemas.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - knowledge-base/01_Hardware/srs_xb100.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - knowledge-base/02_Software/acsl_frama_c_skills.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - knowledge-base/02_Software/mattpocock_engineering_skills.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - knowledge-base/02_Software/ros2_engineering_skills.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - knowledge-base/03_Operations/errors_traces/ERR-2026-11-11-010_base_non_proportionnelle.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - superpowers/plans/2026-11-11-architecture-s1-s2.md
+Nov 22 10:47:46 yahboom mkdocs[3883819]:   - superpowers/specs/2026-11-11-architecture-s1-s2-design.md
+Nov 22 10:47:47 yahboom mkdocs[3883819]: WARNING -  griffe: clawbot_monitoring/app.py:124: No type or annotation for returned value 'Response'
+Nov 22 10:47:47 yahboom mkdocs[3883819]: WARNING -  griffe: clawbot_monitoring/app.py:23: No type or annotation for returned value 'Response'
+Nov 22 10:47:47 yahboom mkdocs[3883819]: WARNING -  griffe: clawbot_monitoring/app.py:80: No type or annotation for returned value 'Response'
+Nov 22 10:47:48 yahboom mkdocs[3883819]: WARNING -  griffe: clawbot_monitoring/app.py:40: No type or annotation for returned value 'Response'
+Nov 22 10:47:48 yahboom mkdocs[3883819]: WARNING -  griffe: ros2_llm_bridge/hardware_service.py:788: Failed to get 'exception: description' pair from 'HTTPException 404 if no files found.'
+Nov 22 10:47:48 yahboom mkdocs[3883819]: WARNING -  griffe: ros2_llm_bridge/hardware_service.py:662: Failed to get 'exception: description' pair from 'HTTPException 404 if no map has been received yet.'
+Nov 22 10:47:48 yahboom mkdocs[3883819]: WARNING -  griffe: ros2_llm_bridge/hardware_service.py:751: Failed to get 'exception: description' pair from 'HTTPException 404 if map not found.'
+Nov 22 10:47:48 yahboom mkdocs[3883819]: WARNING -  griffe: ros2_llm_bridge/hardware_service.py:717: Failed to get 'exception: description' pair from 'HTTPException 500/504 if map_saver_cli fails or times out.'
+Nov 22 10:47:49 yahboom mkdocs[3883819]: WARNING -  Doc file 'hermes/index.md' contains a link 'skills/index.md', but the target 'hermes/skills/index.md' is not found among documentation files.
+Nov 22 10:47:49 yahboom mkdocs[3883819]: WARNING -  Doc file 'hermes/index.md' contains a link 'skills/index.md', but the target 'hermes/skills/index.md' is not found among documentation files.
+Nov 22 10:47:51 yahboom mkdocs[3883819]: WARNING -  Doc file 'knowledge-base/02_Software/slam_cartographie.md' contains a link '../assets/maps/carte_clawbot.png', but the target 'knowledge-base/assets/maps/carte_clawbot.png' is not found among documentation files.
+Nov 22 10:47:55 yahboom mkdocs[3883819]: Building prefix dict from the default dictionary ...
+Nov 22 10:47:55 yahboom mkdocs[3883819]: Loading model from cache /tmp/jieba.cache
+Nov 22 10:47:56 yahboom mkdocs[3883819]: Loading model cost 0.931 seconds.
+Nov 22 10:47:56 yahboom mkdocs[3883819]: Prefix dict has been built successfully.
+Nov 22 10:47:56 yahboom mkdocs[3883819]: INFO    -  Documentation built in 10.51 seconds
+Nov 22 10:47:56 yahboom mkdocs[3883819]: INFO    -  [10:47:56] Serving on http://0.0.0.0:8080/
+=== clawbot-ekf.service
+-- No entries --
+=== clawbot-lidar.service
+-- No entries --
+=== clawbot-safety-arbitrator.service
+Nov 22 11:02:27 yahboom bash[3805273]: [INFO] [1795341747.440949000] [safety_arbitrator]: tick 54700 etat=OK cmd=0.000
+Nov 22 11:02:32 yahboom bash[3805273]: [INFO] [1795341752.441116062] [safety_arbitrator]: tick 54800 etat=OK cmd=0.000
+Nov 22 11:02:37 yahboom bash[3805273]: [INFO] [1795341757.440147608] [safety_arbitrator]: tick 54900 etat=OK cmd=0.000
+Nov 22 11:02:42 yahboom bash[3805273]: [INFO] [1795341762.439404717] [safety_arbitrator]: tick 55000 etat=OK cmd=0.000
+Nov 22 11:02:47 yahboom bash[3805273]: [INFO] [1795341767.440459646] [safety_arbitrator]: tick 55100 etat=OK cmd=0.000
+Nov 22 11:02:52 yahboom bash[3805273]: [INFO] [1795341772.440533395] [safety_arbitrator]: tick 55200 etat=OK cmd=0.000
+Nov 22 11:02:57 yahboom bash[3805273]: [INFO] [1795341777.439578763] [safety_arbitrator]: tick 55300 etat=OK cmd=0.000
+Nov 22 11:03:02 yahboom bash[3805273]: [INFO] [1795341782.443392950] [safety_arbitrator]: tick 55400 etat=OK cmd=0.000
+Nov 22 11:03:07 yahboom bash[3805273]: [INFO] [1795341787.440959905] [safety_arbitrator]: tick 55500 etat=OK cmd=0.000
+Nov 22 11:03:12 yahboom bash[3805273]: [INFO] [1795341792.440810126] [safety_arbitrator]: tick 55600 etat=OK cmd=0.000
+Nov 22 11:03:17 yahboom bash[3805273]: [INFO] [1795341797.440593232] [safety_arbitrator]: tick 55700 etat=OK cmd=0.000
+Nov 22 11:03:22 yahboom bash[3805273]: [INFO] [1795341802.440631181] [safety_arbitrator]: tick 55800 etat=OK cmd=0.000
+Nov 22 11:03:27 yahboom bash[3805273]: [INFO] [1795341807.442306560] [safety_arbitrator]: tick 55900 etat=OK cmd=0.000
+Nov 22 11:03:32 yahboom bash[3805273]: [INFO] [1795341812.441117105] [safety_arbitrator]: tick 56000 etat=OK cmd=0.000
+Nov 22 11:03:37 yahboom bash[3805273]: [INFO] [1795341817.440544132] [safety_arbitrator]: tick 56100 etat=OK cmd=0.000
+Nov 22 11:03:42 yahboom bash[3805273]: [INFO] [1795341822.440798749] [safety_arbitrator]: tick 56200 etat=OK cmd=0.000
+Nov 22 11:03:47 yahboom bash[3805273]: [INFO] [1795341827.440463423] [safety_arbitrator]: tick 56300 etat=OK cmd=0.000
+Nov 22 11:03:52 yahboom bash[3805273]: [INFO] [1795341832.440605471] [safety_arbitrator]: tick 56400 etat=OK cmd=0.000
+Nov 22 11:03:57 yahboom bash[3805273]: [INFO] [1795341837.440521936] [safety_arbitrator]: tick 56500 etat=OK cmd=0.000
+Nov 22 11:04:02 yahboom bash[3805273]: [INFO] [1795341842.440357108] [safety_arbitrator]: tick 56600 etat=OK cmd=0.000
+Nov 22 11:04:07 yahboom bash[3805273]: [INFO] [1795341847.440510739] [safety_arbitrator]: tick 56700 etat=OK cmd=0.000
+Nov 22 11:04:12 yahboom bash[3805273]: [INFO] [1795341852.440403104] [safety_arbitrator]: tick 56800 etat=OK cmd=0.000
+Nov 22 11:04:17 yahboom bash[3805273]: [INFO] [1795341857.440057533] [safety_arbitrator]: tick 56900 etat=OK cmd=0.000
+Nov 22 11:04:22 yahboom bash[3805273]: [INFO] [1795341862.440824769] [safety_arbitrator]: tick 57000 etat=OK cmd=0.000
+Nov 22 11:04:27 yahboom bash[3805273]: [INFO] [1795341867.440231248] [safety_arbitrator]: tick 57100 etat=OK cmd=0.000
+Nov 22 11:04:32 yahboom bash[3805273]: [INFO] [1795341872.440741896] [safety_arbitrator]: tick 57200 etat=OK cmd=0.000
+Nov 22 11:04:37 yahboom bash[3805273]: [INFO] [1795341877.440003004] [safety_arbitrator]: tick 57300 etat=OK cmd=0.000
+Nov 22 11:04:42 yahboom bash[3805273]: [INFO] [1795341882.440652874] [safety_arbitrator]: tick 57400 etat=OK cmd=0.000
+Nov 22 11:04:47 yahboom bash[3805273]: [INFO] [1795341887.440924532] [safety_arbitrator]: tick 57500 etat=OK cmd=0.000
+Nov 22 11:04:52 yahboom bash[3805273]: [INFO] [1795341892.440547905] [safety_arbitrator]: tick 57600 etat=OK cmd=0.000
+Nov 22 11:04:57 yahboom bash[3805273]: [INFO] [1795341897.439872681] [safety_arbitrator]: tick 57700 etat=OK cmd=0.000
+Nov 22 11:05:02 yahboom bash[3805273]: [INFO] [1795341902.440156301] [safety_arbitrator]: tick 57800 etat=OK cmd=0.000
+Nov 22 11:05:07 yahboom bash[3805273]: [INFO] [1795341907.440942977] [safety_arbitrator]: tick 57900 etat=OK cmd=0.000
+Nov 22 11:05:12 yahboom bash[3805273]: [INFO] [1795341912.440639710] [safety_arbitrator]: tick 58000 etat=OK cmd=0.000
+Nov 22 11:05:17 yahboom bash[3805273]: [INFO] [1795341917.440578987] [safety_arbitrator]: tick 58100 etat=OK cmd=0.000
+Nov 22 11:05:22 yahboom bash[3805273]: [INFO] [1795341922.440758433] [safety_arbitrator]: tick 58200 etat=OK cmd=0.000
+Nov 22 11:05:27 yahboom bash[3805273]: [INFO] [1795341927.443180408] [safety_arbitrator]: tick 58300 etat=OK cmd=0.000
+Nov 22 11:05:32 yahboom bash[3805273]: [INFO] [1795341932.439600445] [safety_arbitrator]: tick 58400 etat=OK cmd=0.000
+Nov 22 11:05:37 yahboom bash[3805273]: [INFO] [1795341937.440122311] [safety_arbitrator]: tick 58500 etat=OK cmd=0.000
+Nov 22 11:05:42 yahboom bash[3805273]: [INFO] [1795341942.439533716] [safety_arbitrator]: tick 58600 etat=OK cmd=0.000
+=== clawbot-sentinel.service
+Nov 22 10:14:06 yahboom systemd[1]: Stopping Sentinel S1 - attention, mots d'arret, reveil S2...
+Nov 22 10:14:06 yahboom bash[1354]: Traceback (most recent call last):
+Nov 22 10:14:06 yahboom bash[1354]:   File "<string>", line 1, in <module>
+Nov 22 10:14:06 yahboom bash[1354]:   File "/home/jetson/clawbot/install/clawbot_sentinel/lib/python3.10/site-packages/clawbot_sentinel/sentinel_node.py", line 285, in main
+Nov 22 10:14:06 yahboom bash[1354]:     rclpy.spin(node)
+Nov 22 10:14:06 yahboom bash[1354]:   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 229, in spin
+Nov 22 10:14:06 yahboom bash[1354]:     executor.spin_once()
+Nov 22 10:14:06 yahboom bash[1354]:   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 776, in spin_once
+Nov 22 10:14:06 yahboom bash[1354]:     self._spin_once_impl(timeout_sec)
+Nov 22 10:14:06 yahboom bash[1354]:   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 765, in _spin_once_impl
+Nov 22 10:14:06 yahboom bash[1354]:     handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+Nov 22 10:14:06 yahboom bash[1354]:   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 748, in wait_for_ready_callbacks
+Nov 22 10:14:06 yahboom bash[1354]:     return next(self._cb_iter)
+Nov 22 10:14:06 yahboom bash[1354]:   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 649, in _wait_for_ready_callbacks
+Nov 22 10:14:06 yahboom bash[1354]:     raise ExternalShutdownException()
+Nov 22 10:14:06 yahboom bash[1354]: rclpy.executors.ExternalShutdownException
+Nov 22 10:14:06 yahboom systemd[1]: clawbot-sentinel.service: Main process exited, code=exited, status=1/FAILURE
+Nov 22 10:14:06 yahboom systemd[1]: clawbot-sentinel.service: Failed with result 'exit-code'.
+Nov 22 10:14:06 yahboom systemd[1]: Stopped Sentinel S1 - attention, mots d'arret, reveil S2.
+Nov 22 10:14:06 yahboom systemd[1]: clawbot-sentinel.service: Consumed 10h 33min 48.962s CPU time.
+Nov 22 10:16:50 yahboom systemd[1]: Started Sentinel S1 - attention, mots d'arret, reveil S2.
+Nov 22 10:16:52 yahboom bash[3805281]: [INFO] [1795339012.393876693] [sentinel]: sentinel pret
+=== clawbot-slam.service
+Nov 22 11:04:07 yahboom bash[2817]: [INFO] [1795341847.094401890] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341846.895 for reason 'discarding message because the queue is full'
+Nov 22 11:04:09 yahboom bash[2817]: [INFO] [1795341849.660893161] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341849.463 for reason 'discarding message because the queue is full'
+Nov 22 11:04:12 yahboom bash[2817]: [INFO] [1795341852.232447415] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341852.033 for reason 'discarding message because the queue is full'
+Nov 22 11:04:14 yahboom bash[2817]: [INFO] [1795341854.803950920] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341854.604 for reason 'discarding message because the queue is full'
+Nov 22 11:04:17 yahboom bash[2817]: [INFO] [1795341857.372273250] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341857.174 for reason 'discarding message because the queue is full'
+Nov 22 11:04:19 yahboom bash[2817]: [INFO] [1795341859.941656678] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341859.740 for reason 'discarding message because the queue is full'
+Nov 22 11:04:22 yahboom bash[2817]: [INFO] [1795341862.510228624] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341862.311 for reason 'discarding message because the queue is full'
+Nov 22 11:04:25 yahboom bash[2817]: [INFO] [1795341865.078821429] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341864.879 for reason 'discarding message because the queue is full'
+Nov 22 11:04:27 yahboom bash[2817]: [INFO] [1795341867.653980834] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341867.449 for reason 'discarding message because the queue is full'
+Nov 22 11:04:30 yahboom bash[2817]: [INFO] [1795341870.219234802] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341870.018 for reason 'discarding message because the queue is full'
+Nov 22 11:04:32 yahboom bash[2817]: [INFO] [1795341872.786394547] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341872.589 for reason 'discarding message because the queue is full'
+Nov 22 11:04:35 yahboom bash[2817]: [INFO] [1795341875.357833775] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341875.157 for reason 'discarding message because the queue is full'
+Nov 22 11:04:37 yahboom bash[2817]: [INFO] [1795341877.925711679] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341877.725 for reason 'discarding message because the queue is full'
+Nov 22 11:04:40 yahboom bash[2817]: [INFO] [1795341880.496487564] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341880.298 for reason 'discarding message because the queue is full'
+Nov 22 11:04:43 yahboom bash[2817]: [INFO] [1795341883.068218490] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341882.868 for reason 'discarding message because the queue is full'
+Nov 22 11:04:45 yahboom bash[2817]: [INFO] [1795341885.637738618] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341885.437 for reason 'discarding message because the queue is full'
+Nov 22 11:04:48 yahboom bash[2817]: [INFO] [1795341888.205383664] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341888.006 for reason 'discarding message because the queue is full'
+Nov 22 11:04:50 yahboom bash[2817]: [INFO] [1795341890.775668167] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341890.574 for reason 'discarding message because the queue is full'
+Nov 22 11:04:53 yahboom bash[2817]: [INFO] [1795341893.343797620] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341893.143 for reason 'discarding message because the queue is full'
+Nov 22 11:04:55 yahboom bash[2817]: [INFO] [1795341895.914299776] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341895.715 for reason 'discarding message because the queue is full'
+Nov 22 11:04:58 yahboom bash[2817]: [INFO] [1795341898.484269506] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341898.284 for reason 'discarding message because the queue is full'
+Nov 22 11:05:01 yahboom bash[2817]: [INFO] [1795341901.051628664] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341900.851 for reason 'discarding message because the queue is full'
+Nov 22 11:05:03 yahboom bash[2817]: [INFO] [1795341903.622262335] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341903.421 for reason 'discarding message because the queue is full'
+Nov 22 11:05:06 yahboom bash[2817]: [INFO] [1795341906.190213944] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341905.990 for reason 'discarding message because the queue is full'
+Nov 22 11:05:08 yahboom bash[2817]: [INFO] [1795341908.759174238] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341908.557 for reason 'discarding message because the queue is full'
+Nov 22 11:05:11 yahboom bash[2817]: [INFO] [1795341911.329413938] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341911.128 for reason 'discarding message because the queue is full'
+Nov 22 11:05:13 yahboom bash[2817]: [INFO] [1795341913.896520089] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341913.697 for reason 'discarding message because the queue is full'
+Nov 22 11:05:16 yahboom bash[2817]: [INFO] [1795341916.465687012] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341916.266 for reason 'discarding message because the queue is full'
+Nov 22 11:05:19 yahboom bash[2817]: [INFO] [1795341919.036100503] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341918.834 for reason 'discarding message because the queue is full'
+Nov 22 11:05:21 yahboom bash[2817]: [INFO] [1795341921.607306757] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341921.407 for reason 'discarding message because the queue is full'
+Nov 22 11:05:24 yahboom bash[2817]: [INFO] [1795341924.175731002] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341923.974 for reason 'discarding message because the queue is full'
+Nov 22 11:05:26 yahboom bash[2817]: [INFO] [1795341926.745102926] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341926.544 for reason 'discarding message because the queue is full'
+Nov 22 11:05:29 yahboom bash[2817]: [INFO] [1795341929.311148122] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341929.111 for reason 'discarding message because the queue is full'
+Nov 22 11:05:31 yahboom bash[2817]: [INFO] [1795341931.881489762] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341931.681 for reason 'discarding message because the queue is full'
+Nov 22 11:05:34 yahboom bash[2817]: [INFO] [1795341934.451516584] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341934.252 for reason 'discarding message because the queue is full'
+Nov 22 11:05:37 yahboom bash[2817]: [INFO] [1795341937.021077315] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341936.821 for reason 'discarding message because the queue is full'
+Nov 22 11:05:39 yahboom bash[2817]: [INFO] [1795341939.591091189] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341939.391 for reason 'discarding message because the queue is full'
+Nov 22 11:05:42 yahboom bash[2817]: [INFO] [1795341942.159778910] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341941.961 for reason 'discarding message because the queue is full'
+Nov 22 11:05:44 yahboom bash[2817]: [INFO] [1795341944.730589268] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341944.531 for reason 'discarding message because the queue is full'
+Nov 22 11:05:47 yahboom bash[2817]: [INFO] [1795341947.299293982] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1795341947.101 for reason 'discarding message because the queue is full'
+=== clawbot-wrist-camera.service
+-- No entries --
+=== ros2-driver-node.service
+-- No entries --
+=== ros2-hardware-service.service
+Nov 22 10:16:58 yahboom bash[1331]: INFO:     127.0.0.1:39582 - "GET / HTTP/1.1" 404 Not Found
+Nov 22 10:18:16 yahboom bash[1331]: INFO:     127.0.0.1:42686 - "GET /health HTTP/1.1" 200 OK
+Nov 22 10:18:19 yahboom bash[1331]: INFO:     127.0.0.1:42696 - "GET /system/status HTTP/1.1" 200 OK
+Nov 22 10:18:19 yahboom bash[1331]: INFO:     127.0.0.1:48722 - "GET /telemetry HTTP/1.1" 200 OK
+Nov 22 10:18:19 yahboom bash[1331]: INFO:     127.0.0.1:48738 - "POST /motion/stop HTTP/1.1" 200 OK
+Nov 22 10:18:26 yahboom bash[1331]: INFO:     127.0.0.1:49150 - "GET /battery HTTP/1.1" 200 OK
+Nov 22 10:18:26 yahboom bash[1331]: INFO:     127.0.0.1:49160 - "GET /yolo/status HTTP/1.1" 200 OK
+Nov 22 10:18:26 yahboom bash[1331]: INFO:     127.0.0.1:49170 - "GET /yolo/frame HTTP/1.1" 204 No Content
+Nov 22 10:18:26 yahboom bash[1331]: INFO:     127.0.0.1:49174 - "GET /slam/status HTTP/1.1" 200 OK
+Nov 22 10:18:26 yahboom bash[1331]: INFO:     127.0.0.1:49178 - "GET /maps HTTP/1.1" 200 OK
+Nov 22 10:18:26 yahboom bash[1331]: INFO:     127.0.0.1:49186 - "GET /map/live HTTP/1.1" 404 Not Found
+Nov 22 10:18:27 yahboom bash[1331]: INFO:     127.0.0.1:49192 - "GET /battery HTTP/1.1" 200 OK
+Nov 22 10:18:27 yahboom bash[1331]: INFO:     127.0.0.1:49208 - "GET /telemetry HTTP/1.1" 200 OK
+Nov 22 10:18:34 yahboom bash[1331]: INFO:     127.0.0.1:49210 - "GET /health HTTP/1.1" 200 OK
+Nov 22 10:18:37 yahboom bash[1331]: INFO:     127.0.0.1:49224 - "GET /system/status HTTP/1.1" 200 OK
+Nov 22 10:18:37 yahboom bash[1331]: INFO:     127.0.0.1:35452 - "GET /telemetry HTTP/1.1" 200 OK
+Nov 22 10:18:37 yahboom bash[1331]: INFO:     127.0.0.1:35462 - "POST /motion/stop HTTP/1.1" 200 OK
+Nov 22 10:18:44 yahboom bash[1331]: INFO:     127.0.0.1:35470 - "GET /battery HTTP/1.1" 200 OK
+Nov 22 10:18:44 yahboom bash[1331]: INFO:     127.0.0.1:35480 - "GET /yolo/status HTTP/1.1" 200 OK
+Nov 22 10:18:44 yahboom bash[1331]: INFO:     127.0.0.1:35482 - "GET /yolo/frame HTTP/1.1" 204 No Content
+Nov 22 10:18:44 yahboom bash[1331]: INFO:     127.0.0.1:35492 - "GET /slam/status HTTP/1.1" 200 OK
+Nov 22 10:18:45 yahboom bash[1331]: INFO:     127.0.0.1:35494 - "GET /maps HTTP/1.1" 200 OK
+Nov 22 10:18:45 yahboom bash[1331]: INFO:     127.0.0.1:35498 - "GET /map/live HTTP/1.1" 404 Not Found
+Nov 22 10:18:45 yahboom bash[1331]: INFO:     127.0.0.1:35502 - "GET /battery HTTP/1.1" 200 OK
+Nov 22 10:18:45 yahboom bash[1331]: INFO:     127.0.0.1:35506 - "GET /telemetry HTTP/1.1" 200 OK
+=== ros2-llm-bridge-cpp.service
+Nov 22 10:14:06 yahboom systemd[1]: Stopping Clawbot C++ LLM Bridge (port 8000)...
+Nov 22 10:14:06 yahboom systemd[1]: ros2-llm-bridge-cpp.service: Deactivated successfully.
+Nov 22 10:14:06 yahboom systemd[1]: Stopped Clawbot C++ LLM Bridge (port 8000).
+Nov 22 10:14:06 yahboom systemd[1]: ros2-llm-bridge-cpp.service: Consumed 36min 24.006s CPU time.
+Nov 22 10:16:50 yahboom systemd[1]: Started Clawbot C++ LLM Bridge (port 8000).
+Nov 22 10:16:51 yahboom bash[3805272]: [INFO] [1795339011.478456811] [llm_bridge_node]: BridgeNode initialised. Hardware service: http://localhost:8001
+Nov 22 10:16:51 yahboom bash[3805272]: [INFO] [1795339011.478743963] [llm_bridge_node]: YOLO service: http://localhost:8003
+Nov 22 10:16:51 yahboom bash[3805272]: C++ LLM Bridge API listening on port 8000
+Nov 22 10:18:19 yahboom bash[3805272]: [INFO] [1795339099.281316608] [llm_bridge_node]: [CID: 6417ac38-f301-4e1d-3db1-2ffc7f3d193a] Speak: 'Bonjour je suis Clawbot'
+Nov 22 10:18:21 yahboom bash[3805272]: [INFO] [1795339101.488670556] [llm_bridge_node]: [CID: 42b9b31f-cc93-45c9-770e-66d2d90b4663] Listen: recording 3 seconds...
+Nov 22 10:18:27 yahboom bash[3805272]: [INFO] [1795339107.261032426] [llm_bridge_node]: [CID: c925e072-0c63-4258-b7fc-b007a7fc6651] GetBatteryVoltage
+Nov 22 10:18:37 yahboom bash[3805272]: [INFO] [1795339117.597061774] [llm_bridge_node]: [CID: e19c5ac8-ba25-42d4-91ac-5ea815ebb2db] Speak: 'Bonjour je suis Clawbot'
+Nov 22 10:18:39 yahboom bash[3805272]: [INFO] [1795339119.654755752] [llm_bridge_node]: [CID: e45092da-1f97-4677-3fd2-632688cefb3b] Listen: recording 3 seconds...
+Nov 22 10:18:45 yahboom bash[3805272]: [INFO] [1795339125.427105799] [llm_bridge_node]: [CID: a113089d-0e1d-4894-ea6f-dc382a1a20e8] GetBatteryVoltage
+=== yolo-inference.service
+Nov 22 11:05:06 yahboom bash[1394]: INFO:     127.0.0.1:39324 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:07 yahboom bash[1394]: INFO:     127.0.0.1:45264 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:08 yahboom bash[1394]: INFO:     127.0.0.1:45280 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:09 yahboom bash[1394]: INFO:     127.0.0.1:45282 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:10 yahboom bash[1394]: INFO:     127.0.0.1:45284 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:11 yahboom bash[1394]: INFO:     127.0.0.1:45292 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:12 yahboom bash[1394]: INFO:     127.0.0.1:45302 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:13 yahboom bash[1394]: INFO:     127.0.0.1:45314 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:14 yahboom bash[1394]: INFO:     127.0.0.1:45318 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:15 yahboom bash[1394]: INFO:     127.0.0.1:45334 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:16 yahboom bash[1394]: INFO:     127.0.0.1:45350 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:17 yahboom bash[1394]: INFO:     127.0.0.1:38736 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:18 yahboom bash[1394]: INFO:     127.0.0.1:38744 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:19 yahboom bash[1394]: INFO:     127.0.0.1:38746 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:20 yahboom bash[1394]: INFO:     127.0.0.1:38750 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:21 yahboom bash[1394]: INFO:     127.0.0.1:38752 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:23 yahboom bash[1394]: INFO:     127.0.0.1:38756 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:24 yahboom bash[1394]: INFO:     127.0.0.1:38770 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:25 yahboom bash[1394]: INFO:     127.0.0.1:38784 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:26 yahboom bash[1394]: INFO:     127.0.0.1:38798 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:27 yahboom bash[1394]: INFO:     127.0.0.1:59596 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:28 yahboom bash[1394]: INFO:     127.0.0.1:59612 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:29 yahboom bash[1394]: INFO:     127.0.0.1:59626 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:30 yahboom bash[1394]: INFO:     127.0.0.1:59630 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:31 yahboom bash[1394]: INFO:     127.0.0.1:59634 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:32 yahboom bash[1394]: INFO:     127.0.0.1:59648 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:33 yahboom bash[1394]: INFO:     127.0.0.1:59654 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:34 yahboom bash[1394]: INFO:     127.0.0.1:59668 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:35 yahboom bash[1394]: INFO:     127.0.0.1:59676 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:36 yahboom bash[1394]: INFO:     127.0.0.1:41520 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:37 yahboom bash[1394]: INFO:     127.0.0.1:41530 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:38 yahboom bash[1394]: INFO:     127.0.0.1:41540 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:39 yahboom bash[1394]: INFO:     127.0.0.1:41556 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:41 yahboom bash[1394]: INFO:     127.0.0.1:41558 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:42 yahboom bash[1394]: INFO:     127.0.0.1:41574 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:43 yahboom bash[1394]: INFO:     127.0.0.1:41578 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:44 yahboom bash[1394]: INFO:     127.0.0.1:41586 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:45 yahboom bash[1394]: INFO:     127.0.0.1:41596 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:46 yahboom bash[1394]: INFO:     127.0.0.1:41608 - "GET /detect_raw HTTP/1.1" 200 OK
+Nov 22 11:05:47 yahboom bash[1394]: INFO:     127.0.0.1:57922 - "GET /detect_raw HTTP/1.1" 200 OK

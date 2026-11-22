@@ -1,0 +1,23 @@
+lrwxrwxrwx 1 root root   60 Nov 11 14:13 clawbot-arm-controller.service -> /home/jetson/clawbot/services/clawbot-arm-controller.service
+-rw-r--r-- 1 root root  681 Nov 10 07:57 clawbot-description.service
+lrwxrwxrwx 1 root root   54 Nov 11 14:13 clawbot-director.service -> /home/jetson/clawbot/services/clawbot-director.service
+lrwxrwxrwx 1 root root   50 Nov 11 14:13 clawbot-docs.service -> /home/jetson/clawbot/services/clawbot-docs.service
+lrwxrwxrwx 1 root root   49 Nov 11 16:20 clawbot-ekf.service -> /home/jetson/clawbot/services/clawbot-ekf.service
+lrwxrwxrwx 1 root root   52 Nov 11 14:13 clawbot-health.service -> /home/jetson/clawbot/services/clawbot-health.service
+lrwxrwxrwx 1 root root   56 Nov 15 13:02 clawbot-joy-teleop.service -> /home/jetson/clawbot/services/clawbot-joy-teleop.service
+lrwxrwxrwx 1 root root   51 Nov 11 14:13 clawbot-lidar.service -> /home/jetson/clawbot/services/clawbot-lidar.service
+lrwxrwxrwx 1 root root   56 Nov 11 14:13 clawbot-move-group.service -> /home/jetson/clawbot/services/clawbot-move-group.service
+lrwxrwxrwx 1 root root   50 Nov 11 16:20 clawbot-nav2.service -> /home/jetson/clawbot/services/clawbot-nav2.service
+lrwxrwxrwx 1 root root   63 Nov 11 14:13 clawbot-safety-arbitrator.service -> /home/jetson/clawbot/services/clawbot-safety-arbitrator.service
+lrwxrwxrwx 1 root root   54 Nov 11 14:13 clawbot-sentinel.service -> /home/jetson/clawbot/services/clawbot-sentinel.service
+lrwxrwxrwx 1 root root   50 Nov 11 16:20 clawbot-slam.service -> /home/jetson/clawbot/services/clawbot-slam.service
+lrwxrwxrwx 1 root root   58 Nov 11 16:49 clawbot-wrist-camera.service -> /home/jetson/clawbot/services/clawbot-wrist-camera.service
+lrwxrwxrwx 1 root root   51 Nov 11 14:13 orbbec-camera.service -> /home/jetson/clawbot/services/orbbec-camera.service
+lrwxrwxrwx 1 root root   54 Nov 11 14:13 ros2-driver-node.service -> /home/jetson/clawbot/services/ros2-driver-node.service
+lrwxrwxrwx 1 root root   59 Nov 11 14:13 ros2-hardware-service.service -> /home/jetson/clawbot/services/ros2-hardware-service.service
+lrwxrwxrwx 1 root root   57 Nov 11 14:13 ros2-llm-bridge-cpp.service -> /home/jetson/clawbot/services/ros2-llm-bridge-cpp.service
+lrwxrwxrwx 1 root root   53 Nov 11 14:13 ros2-llm-bridge.service -> /home/jetson/clawbot/services/ros2-llm-bridge.service
+lrwxrwxrwx 1 root root   47 Nov 11 14:13 rosbridge.service -> /home/jetson/clawbot/services/rosbridge.service
+-rw-r--r-- 1 root root  258 Feb 26  2025 yahboom_oled.service
+lrwxrwxrwx 1 root root   51 Nov 11 14:13 yolo-detector.service -> /home/jetson/clawbot/services/yolo-detector.service
+lrwxrwxrwx 1 root root   52 Nov 11 14:13 yolo-inference.service -> /home/jetson/clawbot/services/yolo-inference.service

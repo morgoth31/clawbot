@@ -1,0 +1,224 @@
+  accounts-daemon.service                               loaded    active   running Accounts Service
+  alsa-restore.service                                  loaded    active   exited  Save/Restore Sound Card State
+  alsa-state.service                                    loaded    inactive dead    Manage Sound Card State (restore and store)
+  anacron.service                                       loaded    inactive dead    Run anacron jobs
+  apparmor.service                                      loaded    inactive dead    Load AppArmor profiles
+● apport-autoreport.service                             loaded    failed   failed  Process error reports when automatic reporting is enabled
+  apport.service                                        loaded    active   exited  LSB: automatic crash report generation
+  apt-daily-upgrade.service                             loaded    inactive dead    Daily apt upgrade and clean activities
+  apt-daily.service                                     loaded    inactive dead    Daily apt download activities
+● auditd.service                                        not-found inactive dead    auditd.service
+● auto-cpufreq.service                                  not-found inactive dead    auto-cpufreq.service
+  avahi-daemon.service                                  loaded    active   running Avahi mDNS/DNS-SD Stack
+  binfmt-support.service                                loaded    active   exited  Enable support for additional executable binary formats
+  blk-availability.service                              loaded    active   exited  Availability of block devices
+  bluetooth.service                                     loaded    active   running Bluetooth service
+  clawbot-description.service                           loaded    active   running Clawbot X3 Plus - modele geometrique (/robot_description, /tf, /tf_static)
+  clawbot-director.service                              loaded    active   running Directeur S1 - Clawbot X3 Plus
+  clawbot-docs.service                                  loaded    active   running Clawbot documentation site (MkDocs Material, port 8080)
+  clawbot-ekf.service                                   loaded    active   running Filtre EKF (robot_localization) - /odom et TF odom -> base_link
+  clawbot-health.service                                loaded    inactive dead    Clawbot Health Check (etat des peripheriques vers Telegram)
+  clawbot-lidar.service                                 loaded    active   running Clawbot Lidar YDLIDAR TG30 (/scan)
+  clawbot-nav2.service                                  loaded    inactive dead    Nav2 - navigation sur la carte du catalogue de waypoints
+  clawbot-safety-arbitrator.service                     loaded    active   running Arbitre reflexe S1 - Clawbot X3 Plus
+  clawbot-sentinel.service                              loaded    active   running Sentinel S1 - attention, mots d'arret, reveil S2
+  clawbot-slam.service                                  loaded    active   running SLAM Toolbox (cartographie) - Clawbot X3 Plus
+  clawbot-wrist-camera.service                          loaded    active   running Caméra du poignet (USB 0c45:6340) dans ROS 2 - /wrist_camera/image_raw
+  colord.service                                        loaded    active   running Manage, Install and Generate Color Profiles
+● connman.service                                       not-found inactive dead    connman.service
+● console-screen.service                                not-found inactive dead    console-screen.service
+  console-setup.service                                 loaded    active   exited  Set console font and keymap
+  containerd.service                                    loaded    active   running containerd container runtime
+  cron.service                                          loaded    active   running Regular background program processing daemon
+  dbus.service                                          loaded    active   running D-Bus System Message Bus
+  dm-event.service                                      loaded    inactive dead    Device-mapper event daemon
+  dmesg.service                                         loaded    inactive dead    Save initial kernel messages after boot
+  docker.service                                        loaded    active   running Docker Application Container Engine
+  dpkg-db-backup.service                                loaded    inactive dead    Daily dpkg database backup service
+● dracut-shutdown.service                               not-found inactive dead    dracut-shutdown.service
+  e2scrub_all.service                                   loaded    inactive dead    Online ext4 Metadata Check for All Filesystems
+  e2scrub_reap.service                                  loaded    inactive dead    Remove Stale Online ext4 Metadata Check Snapshots
+  emergency.service                                     loaded    inactive dead    Emergency Shell
+● fcoe.service                                          not-found inactive dead    fcoe.service
+● firewalld.service                                     not-found inactive dead    firewalld.service
+  fstrim.service                                        loaded    inactive dead    Discard unused blocks on filesystems from /etc/fstab
+  fwupd-refresh.service                                 loaded    inactive dead    Refresh fwupd metadata and update motd
+  gdm.service                                           loaded    active   running GNOME Display Manager
+  getty-static.service                                  loaded    inactive dead    getty on tty2-tty6 if dbus and logind are not available
+  getty@tty1.service                                    loaded    inactive dead    Getty on tty1
+● grub-common.service                                   masked    inactive dead    grub-common.service
+● grub-initrd-fallback.service                          masked    inactive dead    grub-initrd-fallback.service
+  haveged.service                                       loaded    active   running Entropy Daemon based on the HAVEGE algorithm
+● iscsi-shutdown.service                                not-found inactive dead    iscsi-shutdown.service
+● iscsi.service                                         not-found inactive dead    iscsi.service
+● iscsid.service                                        not-found inactive dead    iscsid.service
+  jtop.service                                          loaded    active   running jtop service
+  jupyterlab.service                                    loaded    active   running jupyterlab
+● kbd.service                                           not-found inactive dead    kbd.service
+  kerneloops.service                                    loaded    active   running Tool to automatically collect and submit kernel crash signatures
+  kexec-load.service                                    loaded    active   exited  LSB: Load kernel image with kexec
+  kexec.service                                         loaded    active   exited  LSB: Execute the kexec -e command to reboot system
+  keyboard-setup.service                                loaded    active   exited  Set the console keyboard layout
+  kmod-static-nodes.service                             loaded    active   exited  Create List of Static Device Nodes
+  l4t-rootfs-validation-config.service                  loaded    inactive dead    Checking root filesystem boot successful
+● lightdm.service                                       not-found inactive dead    lightdm.service
+● logrotate.service                                     loaded    failed   failed  Rotate log files
+  lpd.service                                           loaded    active   exited  LSB: BSD lpr/lpd line printer spooling system
+● lvm2-activation.service                               not-found inactive dead    lvm2-activation.service
+  lvm2-lvmpolld.service                                 loaded    inactive dead    LVM2 poll daemon
+  lvm2-monitor.service                                  loaded    active   exited  Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling
+  man-db.service                                        loaded    inactive dead    Daily man-db regeneration
+  ModemManager.service                                  loaded    active   running Modem Manager
+  modprobe@configfs.service                             loaded    inactive dead    Load Kernel Module configfs
+  modprobe@drm.service                                  loaded    inactive dead    Load Kernel Module drm
+  modprobe@efi_pstore.service                           loaded    inactive dead    Load Kernel Module efi_pstore
+  modprobe@fuse.service                                 loaded    inactive dead    Load Kernel Module fuse
+  motd-news.service                                     loaded    inactive dead    Message of the Day
+  networkd-dispatcher.service                           loaded    active   running Dispatcher daemon for systemd-networkd
+  NetworkManager.service                                loaded    active   running Network Manager
+  nv-ftpm-device-provision.service                      loaded    inactive dead    fTPM Device Provisioning Service
+  nv-l4t-bootloader-config.service                      loaded    inactive dead    Configure bootloader service
+  nv-l4t-usb-device-mode.service                        loaded    active   exited  Configure USB flashing port for device mode
+  nv-late-init.service                                  loaded    inactive dead    NVIDIA Late Init Script
+  nv-oem-config-debconf@nvfancontrol.service            loaded    inactive dead    End-user configuration after initial OEM installation (Debconf UI)
+  nv-oem-config-debconf@nvfb-early.service              loaded    inactive dead    End-user configuration after initial OEM installation (Debconf UI)
+  nv-oem-config-debconf@nvpmodel.service                loaded    inactive dead    End-user configuration after initial OEM installation (Debconf UI)
+  nv-oem-config-debconf@nvpower.service                 loaded    inactive dead    End-user configuration after initial OEM installation (Debconf UI)
+  nv-oem-config-debconf@nvweston.service                loaded    inactive dead    End-user configuration after initial OEM installation (Debconf UI)
+  nv-oem-config-gui.service                             loaded    inactive dead    End-user configuration after initial OEM installation (GUI)
+● nv-spi-server.service                                 not-found inactive dead    nv-spi-server.service
+  nv-tee-supplicant.service                             loaded    active   running OP-TEE Client Supplicant
+  nv.service                                            loaded    inactive dead    NVIDIA specific script
+  nv_nvsciipc_init.service                              loaded    inactive dead    NvSciIpc initialization
+  nvargus-daemon.service                                loaded    active   running Argus daemon
+  nvfancontrol.service                                  loaded    active   running nvfancontrol service
+  nvfb-early.service                                    loaded    inactive dead    NVIDIA specific early first-boot script
+  nvfb-udev.service                                     loaded    active   exited  NVIDIA specific first-boot udev script
+  nvfb.service                                          loaded    inactive dead    NVIDIA specific first-boot script
+  nvgetty.service                                       loaded    inactive dead    UART on ttyTHS0
+  nvidia-pva-allowd.service                             loaded    active   running service for managing PVA allowlists
+  nvmefc-boot-connections.service                       loaded    inactive dead    Auto-connect to subsystems on FC-NVME devices found during boot
+  nvmemwarning.service                                  loaded    inactive dead    Display Low memory warning
+  nvmf-autoconnect.service                              loaded    inactive dead    Connect NVMe-oF subsystems automatically during boot
+  nvphs.service                                         loaded    active   running PHS daemon
+  nvpmodel.service                                      loaded    inactive dead    nvpmodel service
+  nvpower.service                                       loaded    inactive dead    NVIDIA specific power script
+  nvramoopsconfig.service                               loaded    inactive dead    ramoops module
+  nvs-service.service                                   loaded    active   running NVS-SERVICE Embedded Sensor HAL Daemon
+● nvuser.service                                        not-found inactive dead    nvuser.service
+  nvweston.service                                      loaded    inactive dead    NVIDIA weston service
+  nvzramconfig.service                                  loaded    inactive dead    ZRAM configuration
+  ollama.service                                        loaded    active   running Ollama Service
+  openvpn.service                                       loaded    active   exited  OpenVPN service
+  orbbec-camera.service                                 loaded    active   running Clawbot Orbbec Astra Pro+ Camera (depth + RGB → ROS2 topics)
+  packagekit.service                                    loaded    active   running PackageKit Daemon
+  plymouth-halt.service                                 loaded    inactive dead    Show Plymouth Halt Screen
+  plymouth-kexec.service                                loaded    inactive dead    Show Plymouth Reboot with kexec Screen
+  plymouth-poweroff.service                             loaded    inactive dead    Show Plymouth Power Off Screen
+  plymouth-quit-wait.service                            loaded    active   exited  Hold until boot process finishes up
+  plymouth-quit.service                                 loaded    inactive dead    Terminate Plymouth Boot Screen
+  plymouth-read-write.service                           loaded    active   exited  Tell Plymouth To Write Out Runtime Data
+  plymouth-reboot.service                               loaded    inactive dead    Show Plymouth Reboot Screen
+  plymouth-start.service                                loaded    inactive dead    Show Plymouth Boot Screen
+  plymouth-switch-root-initramfs.service                loaded    inactive dead    Tell Plymouth To Jump To initramfs
+  polkit.service                                        loaded    active   running Authorization Manager
+  power-profiles-daemon.service                         loaded    active   running Power Profiles daemon
+● rbdmap.service                                        not-found inactive dead    rbdmap.service
+  rc-local.service                                      loaded    inactive dead    /etc/rc.local Compatibility
+  rescue.service                                        loaded    inactive dead    Rescue Shell
+  resolvconf-pull-resolved.service                      loaded    inactive dead    resolvconf-pull-resolved.service
+  resolvconf.service                                    loaded    active   exited  Nameserver information manager
+  ros2-driver-node.service                              loaded    active   running Clawbot ROS2 Driver Node (Mcnamu_driver_X3 — cmd_vel → serial)
+  ros2-hardware-service.service                         loaded    active   running Clawbot Hardware Service (ROS2 bridge — no serial conflict)
+  ros2-llm-bridge-cpp.service                           loaded    active   running Clawbot C++ LLM Bridge (port 8000)
+  rosbridge.service                                     loaded    active   running Clawbot ROS2 WebSocket Bridge (Foxglove / rosbridge port 9090)
+  rpcbind.service                                       loaded    active   running RPC bind portmap service
+  rsyslog.service                                       loaded    active   running System Logging Service
+  rtkit-daemon.service                                  loaded    active   running RealtimeKit Scheduling Policy Service
+  seatd.service                                         loaded    active   running Seat management daemon
+  secureboot-db.service                                 loaded    inactive dead    Secure Boot updates for DB and DBX
+  serial-getty@ttyGS0.service                           loaded    active   running Serial Getty on ttyGS0
+  serial-getty@ttyS0.service                            loaded    inactive dead    Serial Getty on ttyS0
+  serial-getty@ttyTCU0.service                          loaded    active   running Serial Getty on ttyTCU0
+  setvtrgb.service                                      loaded    active   exited  Set console scheme
+  snap.cups.cups-browsed.service                        loaded    active   running Service for snap application cups.cups-browsed
+  snap.cups.cupsd.service                               loaded    active   running Service for snap application cups.cupsd
+● snapd.aa-prompt-listener.service                      not-found inactive dead    snapd.aa-prompt-listener.service
+  snapd.apparmor.service                                loaded    inactive dead    Load AppArmor profiles managed internally by snapd
+  snapd.autoimport.service                              loaded    inactive dead    Auto import assertions from block devices
+  snapd.core-fixup.service                              loaded    inactive dead    Automatically repair incorrect owner/permissions on core devices
+  snapd.failure.service                                 loaded    inactive dead    Failure handling of the snapd snap
+  snapd.recovery-chooser-trigger.service                loaded    inactive dead    Wait for the Ubuntu Core chooser trigger
+  snapd.seeded.service                                  loaded    active   exited  Wait until snapd is fully seeded
+  snapd.service                                         loaded    active   running Snap Daemon
+  snapd.snap-repair.service                             loaded    inactive dead    Automatically fetch and run repair assertions
+  snapd.system-shutdown.service                         loaded    inactive dead    Ubuntu core (all-snaps) system shutdown helper setup service
+  ssh.service                                           loaded    active   running OpenBSD Secure Shell server
+  sssd-autofs.service                                   loaded    inactive dead    SSSD AutoFS Service responder
+  sssd-nss.service                                      loaded    inactive dead    SSSD NSS Service responder
+  sssd-pac.service                                      loaded    inactive dead    SSSD PAC Service responder
+  sssd-pam.service                                      loaded    inactive dead    SSSD PAM Service responder
+  sssd-ssh.service                                      loaded    inactive dead    SSSD SSH Service responder
+  sssd-sudo.service                                     loaded    inactive dead    SSSD Sudo Service responder
+  sssd.service                                          loaded    inactive dead    System Security Services Daemon
+  switcheroo-control.service                            loaded    active   running Switcheroo Control Proxy service
+● system76-power.service                                not-found inactive dead    system76-power.service
+  systemd-ask-password-console.service                  loaded    inactive dead    Dispatch Password Requests to Console
+  systemd-ask-password-plymouth.service                 loaded    inactive dead    Forward Password Requests to Plymouth
+  systemd-ask-password-wall.service                     loaded    inactive dead    Forward Password Requests to Wall
+  systemd-binfmt.service                                loaded    active   exited  Set Up Additional Binary Formats
+  systemd-boot-system-token.service                     loaded    inactive dead    Store a System Token in an EFI Variable
+  systemd-fsck-root.service                             loaded    inactive dead    File System Check on Root Device
+  systemd-fsck@dev-disk-by\x2duuid-0D91\x2dEE13.service loaded    active   exited  File System Check on /dev/disk/by-uuid/0D91-EE13
+  systemd-fsckd.service                                 loaded    inactive dead    File System Check Daemon to report status
+  systemd-halt.service                                  loaded    inactive dead    System Halt
+● systemd-hwdb-update.service                           not-found inactive dead    systemd-hwdb-update.service
+  systemd-initctl.service                               loaded    inactive dead    initctl Compatibility Daemon
+  systemd-journal-flush.service                         loaded    active   exited  Flush Journal to Persistent Storage
+  systemd-journald.service                              loaded    active   running Journal Service
+  systemd-kexec.service                                 loaded    inactive dead    Reboot via kexec
+  systemd-logind.service                                loaded    active   running User Login Management
+  systemd-machine-id-commit.service                     loaded    inactive dead    Commit a transient machine-id on disk
+  systemd-modules-load.service                          loaded    active   exited  Load Kernel Modules
+  systemd-networkd.service                              loaded    inactive dead    Network Configuration
+  systemd-oomd.service                                  loaded    inactive dead    Userspace Out-Of-Memory (OOM) Killer
+  systemd-poweroff.service                              loaded    inactive dead    System Power Off
+  systemd-pstore.service                                loaded    inactive dead    Platform Persistent Storage Archival
+  systemd-quotacheck.service                            loaded    inactive dead    File System Quota Check
+  systemd-random-seed.service                           loaded    active   exited  Load/Save Random Seed
+  systemd-reboot.service                                loaded    inactive dead    System Reboot
+  systemd-remount-fs.service                            loaded    active   exited  Remount Root and Kernel File Systems
+  systemd-resolved.service                              loaded    active   running Network Name Resolution
+  systemd-rfkill.service                                loaded    inactive dead    Load/Save RF Kill Switch Status
+  systemd-sysctl.service                                loaded    active   exited  Apply Kernel Variables
+  systemd-sysusers.service                              loaded    active   exited  Create System Users
+  systemd-timesyncd.service                             loaded    active   running Network Time Synchronization
+  systemd-tmpfiles-clean.service                        loaded    inactive dead    Cleanup of Temporary Directories
+  systemd-tmpfiles-setup-dev.service                    loaded    active   exited  Create Static Device Nodes in /dev
+  systemd-tmpfiles-setup.service                        loaded    active   exited  Create Volatile Files and Directories
+  systemd-udev-trigger.service                          loaded    active   exited  Coldplug All udev Devices
+  systemd-udevd.service                                 loaded    active   running Rule-based Manager for Device Events and Files
+● systemd-update-done.service                           not-found inactive dead    systemd-update-done.service
+  systemd-update-utmp-runlevel.service                  loaded    inactive dead    Record Runlevel Change in UTMP
+  systemd-update-utmp.service                           loaded    active   exited  Record System Boot/Shutdown in UTMP
+  systemd-user-sessions.service                         loaded    active   exited  Permit User Sessions
+● systemd-vconsole-setup.service                        not-found inactive dead    systemd-vconsole-setup.service
+  tailscaled.service                                    loaded    active   running Tailscale node agent
+● tuned.service                                         not-found inactive dead    tuned.service
+● ua-auto-attach.service                                not-found inactive dead    ua-auto-attach.service
+  ua-reboot-cmds.service                                loaded    inactive dead    Ubuntu Pro reboot cmds
+  ua-timer.service                                      loaded    inactive dead    Ubuntu Pro Timer for running repeated jobs
+● ubuntu-advantage-cloud-id-shim.service                not-found inactive dead    ubuntu-advantage-cloud-id-shim.service
+  ubuntu-advantage.service                              loaded    inactive dead    Ubuntu Pro Background Auto Attach
+  udisks2.service                                       loaded    active   running Disk Manager
+  ufw.service                                           loaded    active   exited  Uncomplicated firewall
+  update-notifier-download.service                      loaded    inactive dead    Download data for packages that failed at package install time
+  update-notifier-motd.service                          loaded    inactive dead    Check to see whether there is a new version of Ubuntu available
+  upower.service                                        loaded    active   running Daemon for power management
+  user-runtime-dir@1000.service                         loaded    active   exited  User Runtime Directory /run/user/1000
+  user@1000.service                                     loaded    active   running User Manager for UID 1000
+  uuidd.service                                         loaded    inactive dead    Daemon for generating UUIDs
+  wpa_supplicant.service                                loaded    active   running WPA supplicant
+  yahboom_oled.service                                  loaded    active   running transbot_oled start service
+  yolo-inference.service                                loaded    active   running Clawbot YOLO Inference Service (port 8003, CUDA)
+● zfs-mount.service                                     not-found inactive dead    zfs-mount.service

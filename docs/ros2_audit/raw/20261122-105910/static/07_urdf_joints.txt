@@ -1,0 +1,697 @@
+./yahboomcar_rviz/urdf/yahboomcar.urdf:49:  <joint name="base_joint" type="fixed">
+./yahboomcar_rviz/urdf/yahboomcar.urdf:50:        <parent link="base_footprint"/>
+./yahboomcar_rviz/urdf/yahboomcar.urdf:51:        <child link="base_link"/>
+./yahboomcar_rviz/urdf/yahboomcar.urdf:94:  <joint
+./yahboomcar_rviz/urdf/yahboomcar.urdf:100:    <parent
+./yahboomcar_rviz/urdf/yahboomcar.urdf:102:    <child
+./yahboomcar_rviz/urdf/yahboomcar.urdf:152:  <joint
+./yahboomcar_rviz/urdf/yahboomcar.urdf:158:    <parent
+./yahboomcar_rviz/urdf/yahboomcar.urdf:160:    <child
+./yahboomcar_rviz/urdf/yahboomcar.urdf:210:  <joint
+./yahboomcar_rviz/urdf/yahboomcar.urdf:216:    <parent
+./yahboomcar_rviz/urdf/yahboomcar.urdf:218:    <child
+./yahboomcar_rviz/urdf/yahboomcar.urdf:268:  <joint
+./yahboomcar_rviz/urdf/yahboomcar.urdf:274:    <parent
+./yahboomcar_rviz/urdf/yahboomcar.urdf:276:    <child
+./yahboomcar_rviz/urdf/yahboomcar.urdf:326:  <joint
+./yahboomcar_rviz/urdf/yahboomcar.urdf:332:    <parent
+./yahboomcar_rviz/urdf/yahboomcar.urdf:334:    <child
+./yahboomcar_rviz/urdf/yahboomcar.urdf:384:  <joint
+./yahboomcar_rviz/urdf/yahboomcar.urdf:390:    <parent
+./yahboomcar_rviz/urdf/yahboomcar.urdf:392:    <child
+./yahboomcar_rviz/urdf/yahboomcar.urdf:442:  <joint
+./yahboomcar_rviz/urdf/yahboomcar.urdf:448:    <parent
+./yahboomcar_rviz/urdf/yahboomcar.urdf:450:    <child
+./yahboomcar_rviz/urdf/yahboomcar.urdf:495:  <joint
+./yahboomcar_rviz/urdf/yahboomcar.urdf:501:    <parent
+./yahboomcar_rviz/urdf/yahboomcar.urdf:503:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf.xacro:10:    <link name="${ns}/base_footprint"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf.xacro:11:    <link name="${ns}/imu_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf.xacro:14:        <link name="${ns}/${name}">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf.xacro:33:        <joint name="${ns}/${name}" type="continuous">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf.xacro:34:            <parent link="${ns}/${parent}"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf.xacro:35:            <child link="${ns}/${child}"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf.xacro:43:        <joint name="${ns}/${name}" type="fixed">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf.xacro:44:            <parent link="${ns}/${parent}"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf.xacro:45:            <child link="${ns}/${child}"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:8:  <link name="${ns}/imu_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:89:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:95:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:97:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:142:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:148:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:150:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:195:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:201:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:203:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:253:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:259:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:261:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:306:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:312:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:314:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:364:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:370:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:372:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:417:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:423:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:425:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:470:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:476:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:478:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:484:  <joint name="${ns}base_imu" type="fixed">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:485:    <parent link="${ns}/base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:486:    <child link="${ns}/imu_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:490:  <link name="${ns}/base_footprint"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:491:  <joint name="${ns}base_joint" type="fixed">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:492:    <parent link="${ns}/base_footprint"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro:493:    <child link="${ns}/base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:7:  <link name="imu_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:88:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:94:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:96:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:141:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:147:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:149:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:194:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:200:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:202:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:252:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:258:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:260:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:305:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:311:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:313:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:363:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:369:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:371:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:416:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:422:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:424:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:469:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:475:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:477:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:483:  <joint name="base_imu" type="fixed">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:484:    <parent link="base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:485:    <child link="imu_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:489:  <link name="base_footprint"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:490:  <joint name="base_joint" type="fixed">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:491:    <parent link="base_footprint"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:492:    <child link="base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:498:    <joint name="front_right_steer_joint" >
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:510:    <joint name="front_left_steer_joint" >
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:521:    <joint name="back_right_joint" >
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro:532:    <joint name="back_left_joint" >
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:6:    <link name="base_footprint"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:7:    <link name="imu_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:8:    <link name="base_link">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:36:    <joint name="base_joint" type="fixed">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:37:        <parent link="base_footprint"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:38:        <child link="base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:41:    <joint name="base_imu" type="fixed">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:42:        <parent link="base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:43:        <child link="imu_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:46:    <link name="front_right_wheel">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:69:    <joint name="front_right_joint" type="continuous">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:71:        <parent link="base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:72:        <child link="front_right_wheel"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:76:    <link name="front_left_wheel">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:99:    <joint name="front_left_joint" type="continuous">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:101:        <parent link="base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:102:        <child link="front_left_wheel"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:106:    <link name="back_right_wheel">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:129:    <joint name="back_right_joint" type="continuous">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:131:        <parent link="base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:132:        <child link="back_right_wheel"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:136:    <link name="back_left_wheel">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:159:    <joint name="back_left_joint" type="continuous">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:161:        <parent link="base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:162:        <child link="back_left_wheel"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:166:    <link name="laser_link">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:189:    <joint name="laser_joint" type="fixed">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:191:        <parent link="base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:192:        <child link="laser_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:194:    <link name="camera_link">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:216:    <joint name="camera_joint" type="fixed">
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:218:        <parent link="base_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_X3.urdf:219:        <child link="camera_link"/>
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:87:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:93:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:95:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:140:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:146:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:148:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:193:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:199:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:201:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:251:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:257:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:259:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:304:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:310:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:312:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:362:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:368:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:370:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:415:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:421:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:423:    <child
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:468:  <joint
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:474:    <parent
+./yahboomcar_description/yahboomcar_description/urdf/yahboomcar_R2.urdf:476:    <child
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:10:    <link name="${ns}/base_footprint"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:11:    <link name="${ns}/imu_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:14:        <link name="${ns}/${name}">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:33:        <joint name="${ns}/${name}" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:34:            <parent link="${ns}/${parent}"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:35:            <child link="${ns}/${child}"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:44:        <joint name="${ns}/${name}" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:45:            <parent link="${ns}/${parent}"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:46:            <child link="${ns}/${child}"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:55:        <joint name="${ns}/${name}" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:56:            <parent link="${ns}/${parent}"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro:57:            <child link="${ns}/${child}"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:3:    <link name="base_footprint"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:4:    <link name="imu_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:5:    <link name="base_link">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:33:    <joint name="base_joint" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:34:        <parent link="base_footprint"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:35:        <child link="base_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:38:    <joint name="base_imu" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:39:        <parent link="base_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:40:        <child link="imu_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:43:    <link name="camera_link">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:71:    <joint name="astra_joint" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:73:        <parent link="base_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:74:        <child link="camera_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:76:    <link name="laser_link">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:104:    <joint name="laser_joint" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:106:        <parent link="base_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:107:        <child link="laser_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:110:    <link name="arm_link1">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:138:    <joint name="arm_joint1" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:140:        <parent link="base_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:141:        <child link="arm_link1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:145:    <link name="arm_link2">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:173:    <joint name="arm_joint2" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:175:        <parent link="arm_link1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:176:        <child link="arm_link2"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:180:    <link name="arm_link3">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:208:    <joint name="arm_joint3" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:210:        <parent link="arm_link2"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:211:        <child link="arm_link3"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:215:    <link name="arm_link4">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:243:    <joint name="arm_joint4" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:245:        <parent link="arm_link3"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:246:        <child link="arm_link4"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:250:    <link name="arm_link5">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:278:    <joint name="arm_joint5" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:280:        <parent link="arm_link4"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:281:        <child link="arm_link5"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:286:    <link name="rlink1">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:314:    <joint name="grip_joint" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:316:        <parent link="arm_link5"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:317:        <child link="rlink1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:321:    <link name="rlink2">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:349:    <joint name="rlink_joint2" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:351:        <parent link="rlink1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:352:        <child link="rlink2"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:356:    <link name="rlink3">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:384:    <joint name="rlink_joint3" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:386:        <parent link="arm_link5"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:387:        <child link="rlink3"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:391:    <link name="llink1">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:419:    <joint name="llink_joint1" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:421:        <parent link="arm_link5"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:422:        <child link="llink1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:426:    <link name="llink2">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:449:    <joint name="llink_joint2" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:451:        <parent link="llink1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:452:        <child link="llink2"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:456:    <link name="llink3">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:479:    <joint name="llink_joint3" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:481:        <parent link="arm_link5"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:482:        <child link="llink3"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:487:    <link name="mono_link">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:510:    <joint name="mono_joint" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:512:        <parent link="arm_link4"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.urdf:513:        <child link="mono_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:4:    <link name="base_footprint"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:5:    <link name="imu_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:6:    <link name="base_link">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:34:    <joint name="base_joint" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:35:        <parent link="base_footprint"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:36:        <child link="base_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:39:    <joint name="base_imu" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:40:        <parent link="base_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:41:        <child link="imu_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:44:    <link name="camera_link">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:72:    <joint name="astra_joint" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:74:        <parent link="base_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:75:        <child link="camera_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:77:    <link name="laser_link">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:105:    <joint name="laser_joint" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:107:        <parent link="base_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:108:        <child link="laser_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:111:    <link name="arm_link1">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:139:    <joint name="arm_joint1" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:141:        <parent link="base_link"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:142:        <child link="arm_link1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:146:    <link name="arm_link2">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:174:    <joint name="arm_joint2" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:176:        <parent link="arm_link1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:177:        <child link="arm_link2"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:181:    <link name="arm_link3">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:209:    <joint name="arm_joint3" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:211:        <parent link="arm_link2"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:212:        <child link="arm_link3"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:216:    <link name="arm_link4">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:244:    <joint name="arm_joint4" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:246:        <parent link="arm_link3"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:247:        <child link="arm_link4"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:251:    <link name="arm_link5">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:279:    <joint name="arm_joint5" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:281:        <parent link="arm_link4"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:282:        <child link="arm_link5"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:287:    <link name="rlink1">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:315:    <joint name="grip_joint" type="revolute">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:317:        <parent link="arm_link5"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:318:        <child link="rlink1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:322:    <link name="rlink2">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:350:    <joint name="rlink_joint2" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:352:        <parent link="rlink1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:353:        <child link="rlink2"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:357:    <link name="rlink3">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:385:    <joint name="rlink_joint3" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:387:        <parent link="arm_link5"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:388:        <child link="rlink3"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:392:    <link name="llink1">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:420:    <joint name="llink_joint1" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:422:        <parent link="arm_link5"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:423:        <child link="llink1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:427:    <link name="llink2">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:450:    <joint name="llink_joint2" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:452:        <parent link="llink1"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:453:        <child link="llink2"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:457:    <link name="llink3">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:480:    <joint name="llink_joint3" type="continuous">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:482:        <parent link="arm_link5"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:483:        <child link="llink3"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:488:    <link name="mono_link">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:511:    <joint name="mono_joint" type="fixed">
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:513:        <parent link="arm_link4"/>
+./yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro:514:        <child link="mono_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:6:    <link name="robot1/base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:7:    <link name="robot1/imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:8:    <link name="robot1/base_link">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:36:    <joint name="robot1/base_joint" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:37:        <parent link="robot1/base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:38:        <child link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:41:    <joint name="robot1/base_imu" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:42:        <parent link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:43:        <child link="robot1/imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:46:    <link name="robot1/front_right_wheel">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:69:    <joint name="robot1/front_right_joint" type="continuous">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:71:        <parent link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:72:        <child link="robot1/front_right_wheel"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:76:    <link name="robot1/front_left_wheel">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:99:    <joint name="robot1/front_left_joint" type="continuous">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:101:        <parent link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:102:        <child link="robot1/front_left_wheel"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:106:    <link name="robot1/back_right_wheel">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:129:    <joint name="robot1/back_right_joint" type="continuous">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:131:        <parent link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:132:        <child link="robot1/back_right_wheel"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:136:    <link name="robot1/back_left_wheel">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:159:    <joint name="robot1/back_left_joint" type="continuous">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:161:        <parent link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:162:        <child link="robot1/back_left_wheel"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:166:    <link name="robot1/laser_link">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:189:    <joint name="robot1/laser_joint" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:191:        <parent link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:192:        <child link="robot1/laser_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:194:    <link name="robot1/camera_link">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:216:    <joint name="robot1/camera_joint" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:218:        <parent link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot1-checkpoint.urdf:219:        <child link="robot1/camera_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:6:    <link name="robot2/base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:7:    <link name="robot2/imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:8:    <link name="robot2/base_link">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:36:    <joint name="robot2/base_joint" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:37:        <parent link="robot2/base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:38:        <child link="robot2/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:41:    <joint name="robot2/base_imu" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:42:        <parent link="robot2/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:43:        <child link="robot2/imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:46:    <link name="robot2/front_right_wheel">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:69:    <joint name="robot2/front_right_joint" type="continuous">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:71:        <parent link="robot2/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:72:        <child link="robot2/front_right_wheel"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:76:    <link name="robot2/front_left_wheel">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:99:    <joint name="robot2/front_left_joint" type="continuous">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:101:        <parent link="robot2/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:102:        <child link="robot2/front_left_wheel"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:106:    <link name="robot2/back_right_wheel">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:129:    <joint name="robot2/back_right_joint" type="continuous">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:131:        <parent link="robot2/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:132:        <child link="robot2/back_right_wheel"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:136:    <link name="robot2/back_left_wheel">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:159:    <joint name="robot2/back_left_joint" type="continuous">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:161:        <parent link="robot2/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:162:        <child link="robot2/back_left_wheel"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:166:    <link name="robot2/laser_link">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:189:    <joint name="robot2/laser_joint" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:191:        <parent link="robot2/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:192:        <child link="robot2/laser_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:194:    <link name="robot2/camera_link">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:216:    <joint name="robot2/camera_joint" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:218:        <parent link="robot2/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_X3_robot2-checkpoint.urdf:219:        <child link="robot2/camera_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:7:  <link name="robot1/imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:47:      <joint name="robot1/base_imu" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:48:    <parent link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:49:    <child link="robot1/imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:53:  <link name="robot1/base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:54:  <joint name="robot1/base_joint" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:55:    <parent link="robot1/base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:56:    <child link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:100:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:106:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:108:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:153:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:159:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:161:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:206:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:212:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:214:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:264:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:270:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:272:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:317:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:323:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:325:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:375:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:381:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:383:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:428:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:434:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:436:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:481:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:487:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1-checkpoint.urdf:489:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:7:  <link name="robot1/imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:88:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:94:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:96:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:141:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:147:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:149:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:194:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:200:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:202:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:252:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:258:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:260:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:305:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:311:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:313:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:363:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:369:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:371:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:416:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:422:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:424:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:469:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:475:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:477:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:483:  <joint name="robot1/base_imu" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:484:    <parent link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:485:    <child link="robot1/imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:489:  <link name="robot1/base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:490:  <joint name="robot1/base_joint" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:491:    <parent link="robot1/base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2.urdf-checkpoint.xacro:492:    <child link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:7:  <link name="imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:88:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:94:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:96:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:141:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:147:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:149:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:194:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:200:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:202:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:252:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:258:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:260:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:305:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:311:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:313:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:363:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:369:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:371:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:416:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:422:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:424:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:469:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:475:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:477:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:483:  <joint name="base_imu" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:484:    <parent link="base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:485:    <child link="imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:489:  <link name="base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:490:  <joint name="base_joint" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:491:    <parent link="base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:492:    <child link="base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:498:    <joint name="front_right_steer_joint" >
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:510:    <joint name="front_left_steer_joint" >
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:521:    <joint name="back_right_joint" >
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2.urdf-checkpoint.xacro:532:    <joint name="back_left_joint" >
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:87:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:93:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:95:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:140:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:146:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:148:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:193:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:199:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:201:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:251:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:257:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:259:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:304:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:310:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:312:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:362:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:368:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:370:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:415:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:421:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:423:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:468:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:474:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot2-checkpoint.urdf:476:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:87:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:93:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:95:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:140:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:146:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:148:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:193:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:199:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:201:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:251:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:257:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:259:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:304:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:310:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:312:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:362:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:368:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:370:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:415:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:421:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:423:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:468:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:474:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2-checkpoint.urdf:476:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:7:  <link name="robot1/imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:88:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:94:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:96:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:141:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:147:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:149:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:194:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:200:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:202:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:252:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:258:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:260:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:305:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:311:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:313:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:363:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:369:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:371:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:416:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:422:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:424:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:469:  <joint
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:475:    <parent
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:477:    <child
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:483:  <joint name="robot1/base_imu" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:484:    <parent link="robot1/base_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:485:    <child link="robot1/imu_link"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:489:  <link name="robot1/base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:490:  <joint name="robot1/base_joint" type="fixed">
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:491:    <parent link="robot1/base_footprint"/>
+./yahboomcar_description/urdf/.ipynb_checkpoints/yahboomcar_R2_robot1.urdf-checkpoint.xacro:492:    <child link="robot1/base_link"/>
+./urdf/clawbot_X3.urdf:6:    <link name="base_footprint"/>
+./urdf/clawbot_X3.urdf:7:    <link name="imu_link"/>
+./urdf/clawbot_X3.urdf:8:    <link name="base_link">
+./urdf/clawbot_X3.urdf:36:    <joint name="base_joint" type="fixed">
+./urdf/clawbot_X3.urdf:37:        <parent link="base_footprint"/>
+./urdf/clawbot_X3.urdf:38:        <child link="base_link"/>
+./urdf/clawbot_X3.urdf:41:    <joint name="base_imu" type="fixed">
+./urdf/clawbot_X3.urdf:42:        <parent link="base_link"/>
+./urdf/clawbot_X3.urdf:43:        <child link="imu_link"/>
+./urdf/clawbot_X3.urdf:46:    <link name="front_right_wheel">
+./urdf/clawbot_X3.urdf:69:    <joint name="front_right_joint" type="continuous">
+./urdf/clawbot_X3.urdf:71:        <parent link="base_link"/>
+./urdf/clawbot_X3.urdf:72:        <child link="front_right_wheel"/>
+./urdf/clawbot_X3.urdf:76:    <link name="front_left_wheel">
+./urdf/clawbot_X3.urdf:99:    <joint name="front_left_joint" type="continuous">
+./urdf/clawbot_X3.urdf:101:        <parent link="base_link"/>
+./urdf/clawbot_X3.urdf:102:        <child link="front_left_wheel"/>
+./urdf/clawbot_X3.urdf:106:    <link name="back_right_wheel">
+./urdf/clawbot_X3.urdf:129:    <joint name="back_right_joint" type="continuous">
+./urdf/clawbot_X3.urdf:131:        <parent link="base_link"/>
+./urdf/clawbot_X3.urdf:132:        <child link="back_right_wheel"/>
+./urdf/clawbot_X3.urdf:136:    <link name="back_left_wheel">
+./urdf/clawbot_X3.urdf:159:    <joint name="back_left_joint" type="continuous">
+./urdf/clawbot_X3.urdf:161:        <parent link="base_link"/>
+./urdf/clawbot_X3.urdf:162:        <child link="back_left_wheel"/>
+./urdf/clawbot_X3.urdf:166:    <link name="laser_link">
+./urdf/clawbot_X3.urdf:189:    <joint name="laser_joint" type="fixed">
+./urdf/clawbot_X3.urdf:191:        <parent link="base_link"/>
+./urdf/clawbot_X3.urdf:192:        <child link="laser_link"/>
+./urdf/clawbot_X3.urdf:194:    <link name="camera_link">
+./urdf/clawbot_X3.urdf:216:    <joint name="camera_joint" type="fixed">
+./urdf/clawbot_X3.urdf:218:        <parent link="base_link"/>
+./urdf/clawbot_X3.urdf:219:        <child link="camera_link"/>
+./urdf/clawbot_X3.urdf:223:    <link name="arm_base_link">
+./urdf/clawbot_X3.urdf:233:    <joint name="joint1" type="revolute">
+./urdf/clawbot_X3.urdf:234:        <parent link="base_link"/>
+./urdf/clawbot_X3.urdf:235:        <child link="arm_base_link"/>
+./urdf/clawbot_X3.urdf:242:    <link name="arm_link2">
+./urdf/clawbot_X3.urdf:252:    <joint name="joint2" type="revolute">
+./urdf/clawbot_X3.urdf:253:        <parent link="arm_base_link"/>
+./urdf/clawbot_X3.urdf:254:        <child link="arm_link2"/>
+./urdf/clawbot_X3.urdf:261:    <link name="arm_link3">
+./urdf/clawbot_X3.urdf:269:    <joint name="joint3" type="revolute">
+./urdf/clawbot_X3.urdf:270:        <parent link="arm_link2"/>
+./urdf/clawbot_X3.urdf:271:        <child link="arm_link3"/>
+./urdf/clawbot_X3.urdf:278:    <link name="arm_link4">
+./urdf/clawbot_X3.urdf:286:    <joint name="joint4" type="revolute">
+./urdf/clawbot_X3.urdf:287:        <parent link="arm_link3"/>
+./urdf/clawbot_X3.urdf:288:        <child link="arm_link4"/>
+./urdf/clawbot_X3.urdf:295:    <link name="arm_link5">
+./urdf/clawbot_X3.urdf:303:    <joint name="joint5" type="revolute">
+./urdf/clawbot_X3.urdf:304:        <parent link="arm_link4"/>
+./urdf/clawbot_X3.urdf:305:        <child link="arm_link5"/>
+./urdf/clawbot_X3.urdf:312:    <link name="claw_link">
+./urdf/clawbot_X3.urdf:322:    <joint name="joint6" type="revolute">
+./urdf/clawbot_X3.urdf:323:        <parent link="arm_link5"/>
+./urdf/clawbot_X3.urdf:324:        <child link="claw_link"/>
+./urdf/clawbot_X3.urdf:334:        <joint name="joint1">
+./urdf/clawbot_X3.urdf:342:        <joint name="joint2">
+./urdf/clawbot_X3.urdf:350:        <joint name="joint3">
+./urdf/clawbot_X3.urdf:358:        <joint name="joint4">
+./urdf/clawbot_X3.urdf:366:        <joint name="joint5">
+./urdf/clawbot_X3.urdf:374:        <joint name="joint6">
+./urdf/clawbot_x3plus.urdf:3:    <link name="base_footprint" />
+./urdf/clawbot_x3plus.urdf:4:    <link name="imu_link" />
+./urdf/clawbot_x3plus.urdf:5:    <link name="base_link">
+./urdf/clawbot_x3plus.urdf:27:    <joint name="base_joint" type="fixed">
+./urdf/clawbot_x3plus.urdf:28:        <parent link="base_footprint" />
+./urdf/clawbot_x3plus.urdf:29:        <child link="base_link" />
+./urdf/clawbot_x3plus.urdf:32:    <joint name="base_imu" type="fixed">
+./urdf/clawbot_x3plus.urdf:33:        <parent link="base_link" />
+./urdf/clawbot_x3plus.urdf:34:        <child link="imu_link" />
+./urdf/clawbot_x3plus.urdf:37:    <link name="camera_link">
+./urdf/clawbot_x3plus.urdf:59:    <joint name="astra_joint" type="fixed">
+./urdf/clawbot_x3plus.urdf:61:        <parent link="base_link" />
+./urdf/clawbot_x3plus.urdf:62:        <child link="camera_link" />
+./urdf/clawbot_x3plus.urdf:64:    <link name="laser_link">
+./urdf/clawbot_x3plus.urdf:91:    <joint name="laser_joint" type="fixed">
+./urdf/clawbot_x3plus.urdf:93:        <parent link="base_link" />
+./urdf/clawbot_x3plus.urdf:94:        <child link="laser_link" />
+./urdf/clawbot_x3plus.urdf:97:    <link name="arm_link1">
+./urdf/clawbot_x3plus.urdf:119:    <joint name="arm_joint1" type="revolute">
+./urdf/clawbot_x3plus.urdf:121:        <parent link="base_link" />
+./urdf/clawbot_x3plus.urdf:122:        <child link="arm_link1" />
+./urdf/clawbot_x3plus.urdf:126:    <link name="arm_link2">
+./urdf/clawbot_x3plus.urdf:148:    <joint name="arm_joint2" type="revolute">
+./urdf/clawbot_x3plus.urdf:150:        <parent link="arm_link1" />
+./urdf/clawbot_x3plus.urdf:151:        <child link="arm_link2" />
+./urdf/clawbot_x3plus.urdf:155:    <link name="arm_link3">
+./urdf/clawbot_x3plus.urdf:177:    <joint name="arm_joint3" type="revolute">
+./urdf/clawbot_x3plus.urdf:179:        <parent link="arm_link2" />
+./urdf/clawbot_x3plus.urdf:180:        <child link="arm_link3" />
+./urdf/clawbot_x3plus.urdf:184:    <link name="arm_link4">
+./urdf/clawbot_x3plus.urdf:206:    <joint name="arm_joint4" type="revolute">
+./urdf/clawbot_x3plus.urdf:208:        <parent link="arm_link3" />
+./urdf/clawbot_x3plus.urdf:209:        <child link="arm_link4" />
+./urdf/clawbot_x3plus.urdf:213:    <link name="arm_link5">
+./urdf/clawbot_x3plus.urdf:235:    <joint name="arm_joint5" type="revolute">
+./urdf/clawbot_x3plus.urdf:237:        <parent link="arm_link4" />
+./urdf/clawbot_x3plus.urdf:238:        <child link="arm_link5" />
+./urdf/clawbot_x3plus.urdf:243:    <link name="rlink1">
+./urdf/clawbot_x3plus.urdf:265:    <joint name="grip_joint" type="revolute">
+./urdf/clawbot_x3plus.urdf:267:        <parent link="arm_link5" />
+./urdf/clawbot_x3plus.urdf:268:        <child link="rlink1" />
+./urdf/clawbot_x3plus.urdf:272:    <link name="rlink2">
+./urdf/clawbot_x3plus.urdf:294:    <joint name="rlink_joint2" type="continuous">
+./urdf/clawbot_x3plus.urdf:296:        <parent link="rlink1" />
+./urdf/clawbot_x3plus.urdf:297:        <child link="rlink2" />
+./urdf/clawbot_x3plus.urdf:301:    <link name="rlink3">
+./urdf/clawbot_x3plus.urdf:323:    <joint name="rlink_joint3" type="continuous">
+./urdf/clawbot_x3plus.urdf:325:        <parent link="arm_link5" />
+./urdf/clawbot_x3plus.urdf:326:        <child link="rlink3" />
+./urdf/clawbot_x3plus.urdf:330:    <link name="llink1">
+./urdf/clawbot_x3plus.urdf:352:    <joint name="llink_joint1" type="continuous">
+./urdf/clawbot_x3plus.urdf:354:        <parent link="arm_link5" />
+./urdf/clawbot_x3plus.urdf:355:        <child link="llink1" />
+./urdf/clawbot_x3plus.urdf:359:    <link name="llink2">
+./urdf/clawbot_x3plus.urdf:381:    <joint name="llink_joint2" type="continuous">
+./urdf/clawbot_x3plus.urdf:383:        <parent link="llink1" />
+./urdf/clawbot_x3plus.urdf:384:        <child link="llink2" />
+./urdf/clawbot_x3plus.urdf:388:    <link name="llink3">
+./urdf/clawbot_x3plus.urdf:410:    <joint name="llink_joint3" type="continuous">
+./urdf/clawbot_x3plus.urdf:412:        <parent link="arm_link5" />
+./urdf/clawbot_x3plus.urdf:413:        <child link="llink3" />
+./urdf/clawbot_x3plus.urdf:418:    <link name="mono_link">
+./urdf/clawbot_x3plus.urdf:438:    <joint name="mono_joint" type="fixed">
+./urdf/clawbot_x3plus.urdf:440:        <parent link="arm_link4" />
+./urdf/clawbot_x3plus.urdf:441:        <child link="mono_link" />
+./urdf/clawbot_x3plus.urdf:443:<link name="front_left_wheel">
+./urdf/clawbot_x3plus.urdf:465:    <joint name="front_left_joint" type="continuous">
+./urdf/clawbot_x3plus.urdf:467:        <parent link="base_link" />
+./urdf/clawbot_x3plus.urdf:468:        <child link="front_left_wheel" />
+./urdf/clawbot_x3plus.urdf:472:    <link name="front_right_wheel">
+./urdf/clawbot_x3plus.urdf:494:    <joint name="front_right_joint" type="continuous">
+./urdf/clawbot_x3plus.urdf:496:        <parent link="base_link" />
+./urdf/clawbot_x3plus.urdf:497:        <child link="front_right_wheel" />
+./urdf/clawbot_x3plus.urdf:501:    <link name="back_left_wheel">
+./urdf/clawbot_x3plus.urdf:523:    <joint name="back_left_joint" type="continuous">
+./urdf/clawbot_x3plus.urdf:525:        <parent link="base_link" />
+./urdf/clawbot_x3plus.urdf:526:        <child link="back_left_wheel" />
+./urdf/clawbot_x3plus.urdf:530:    <link name="back_right_wheel">
+./urdf/clawbot_x3plus.urdf:552:    <joint name="back_right_joint" type="continuous">
+./urdf/clawbot_x3plus.urdf:554:        <parent link="base_link" />
+./urdf/clawbot_x3plus.urdf:555:        <child link="back_right_wheel" />
+./urdf/clawbot_x3plus.urdf:568:    <link name="wrist_camera_optical_frame"/>
+./urdf/clawbot_x3plus.urdf:576:    <joint name="wrist_camera_optical_joint" type="fixed">
+./urdf/clawbot_x3plus.urdf:578:        <parent link="mono_link" />
+./urdf/clawbot_x3plus.urdf:579:        <child link="wrist_camera_optical_frame" />

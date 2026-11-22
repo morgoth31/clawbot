@@ -1,0 +1,114 @@
+./slam3d/launch/slam3d.launch.py:4:Tout est place dans le namespace /slam3d pour ne pas se melanger aux topics du robot
+./slam3d/launch/slam3d.launch.py:26:    icp = Node(
+./slam3d/launch/slam3d.launch.py:30:        namespace=ns,
+./slam3d/launch/slam3d.launch.py:32:        parameters=[{
+./slam3d/launch/slam3d.launch.py:52:        remappings=[('scan_cloud', cloud)],
+./slam3d/launch/slam3d.launch.py:55:    slam = Node(
+./slam3d/launch/slam3d.launch.py:59:        namespace=ns,
+./slam3d/launch/slam3d.launch.py:61:        parameters=[{
+./slam3d/launch/slam3d.launch.py:91:        remappings=[('scan_cloud', cloud)],
+./yahboomcar_laser/launch/laser_Tracker_a1_X3.launch.py:11:    laser_Avoidance_node = Node(
+./yahboomcar_laser/launch/laser_Avoidance_a1_X3.launch.py:11:    laser_Avoidance_node = Node(
+./yahboomcar_laser/launch/laser_Warning_a1_X3.launch.py:11:    laser_Avoidance_node = Node(
+./yahboomcar_mediapipe/launch/mediapipe_points.launch.py:15:    pub_point_node = Node(
+./yahboomcar_mediapipe/launch/mediapipe_points.launch.py:20:    rviz_node = Node(
+./yahboomcar_astra/launch/colorTracker_X3.launch.py:17:    colorIdentify_node =  Node(
+./yahboomcar_astra/launch/colorTracker_X3.launch.py:22:    '''colorTracker_node = Node(
+./yahboomcar_description/launch/description_R2_multi_robot2.launch.py:26:    robot_state_publisher_node = Node(
+./yahboomcar_description/launch/description_R2_multi_robot2.launch.py:29:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_R2_multi_robot2.launch.py:30:        parameters=[{'robot_description': robot_description}]
+./yahboomcar_description/launch/description_R2_multi_robot2.launch.py:34:    joint_state_publisher_node = Node(
+./yahboomcar_description/launch/description_R2_multi_robot2.launch.py:37:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_R2_multi_robot2.launch.py:41:    joint_state_publisher_gui_node = Node(
+./yahboomcar_description/launch/description_R2_multi_robot2.launch.py:44:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_R2_multi_robot2.launch.py:48:    rviz_node = Node(
+./yahboomcar_description/launch/display_X3.launch.py:26:    robot_state_publisher_node = Node(
+./yahboomcar_description/launch/display_X3.launch.py:29:        parameters=[{'robot_description': robot_description}]
+./yahboomcar_description/launch/display_X3.launch.py:33:    joint_state_publisher_node = Node(
+./yahboomcar_description/launch/display_X3.launch.py:39:    joint_state_publisher_gui_node = Node(
+./yahboomcar_description/launch/display_X3.launch.py:45:    rviz_node = Node(
+./yahboomcar_description/launch/display_R2.launch.py:26:    robot_state_publisher_node = Node(
+./yahboomcar_description/launch/display_R2.launch.py:29:        parameters=[{'robot_description': robot_description}]
+./yahboomcar_description/launch/display_R2.launch.py:33:    joint_state_publisher_node = Node(
+./yahboomcar_description/launch/display_R2.launch.py:39:    joint_state_publisher_gui_node = Node(
+./yahboomcar_description/launch/display_R2.launch.py:45:    rviz_node = Node(
+./yahboomcar_description/launch/description_X3_multi_robot1.launch.py:26:    robot_state_publisher_node = Node(
+./yahboomcar_description/launch/description_X3_multi_robot1.launch.py:29:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_X3_multi_robot1.launch.py:30:        parameters=[{'robot_description': robot_description}]
+./yahboomcar_description/launch/description_X3_multi_robot1.launch.py:34:    joint_state_publisher_node = Node(
+./yahboomcar_description/launch/description_X3_multi_robot1.launch.py:37:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_X3_multi_robot1.launch.py:41:    joint_state_publisher_gui_node = Node(
+./yahboomcar_description/launch/description_X3_multi_robot1.launch.py:44:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_X3_multi_robot1.launch.py:48:    rviz_node = Node(
+./yahboomcar_description/launch/display_X3plus.launch.py:26:    robot_state_publisher_node = Node(
+./yahboomcar_description/launch/display_X3plus.launch.py:29:        parameters=[{'robot_description': robot_description}]
+./yahboomcar_description/launch/display_X3plus.launch.py:33:    joint_state_publisher_node = Node(
+./yahboomcar_description/launch/display_X3plus.launch.py:39:    joint_state_publisher_gui_node = Node(
+./yahboomcar_description/launch/display_X3plus.launch.py:45:    rviz_node = Node(
+./yahboomcar_description/launch/description_X3_multi_robot2.launch.py:26:    robot_state_publisher_node = Node(
+./yahboomcar_description/launch/description_X3_multi_robot2.launch.py:29:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_X3_multi_robot2.launch.py:30:        parameters=[{'robot_description': robot_description}]
+./yahboomcar_description/launch/description_X3_multi_robot2.launch.py:34:    joint_state_publisher_node = Node(
+./yahboomcar_description/launch/description_X3_multi_robot2.launch.py:37:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_X3_multi_robot2.launch.py:41:    joint_state_publisher_gui_node = Node(
+./yahboomcar_description/launch/description_X3_multi_robot2.launch.py:44:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_X3_multi_robot2.launch.py:48:    rviz_node = Node(
+./yahboomcar_description/launch/description_R2_multi_robot1.launch.py:26:    robot_state_publisher_node = Node(
+./yahboomcar_description/launch/description_R2_multi_robot1.launch.py:29:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_R2_multi_robot1.launch.py:30:        parameters=[{'robot_description': robot_description}]
+./yahboomcar_description/launch/description_R2_multi_robot1.launch.py:34:    joint_state_publisher_node = Node(
+./yahboomcar_description/launch/description_R2_multi_robot1.launch.py:37:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_R2_multi_robot1.launch.py:41:    joint_state_publisher_gui_node = Node(
+./yahboomcar_description/launch/description_R2_multi_robot1.launch.py:44:        namespace=LaunchConfiguration('robot_name'),
+./yahboomcar_description/launch/description_R2_multi_robot1.launch.py:48:    rviz_node = Node(
+./launch/ekf.launch.py:20:        Node(
+./launch/ekf.launch.py:25:            parameters=[config],
+./launch/ekf.launch.py:28:            remappings=[("odometry/filtered", "odom")],
+./launch/robot_description.launch.py:26:    rsp = Node(
+./launch/robot_description.launch.py:31:        parameters=[{'robot_description': ParameterValue(description, value_type=str)}],
+./launch/robot_description.launch.py:39:    jsp = Node(
+./launch/robot_description.launch.py:44:        parameters=[{
+./yahboomcar_KCFTracker/launch/KCFTracker_X3.launch.py:11:    KCFTracker_node = Node(
+./pkg_tf/launch/turtle_following.launch.py:10:        Node(
+./pkg_tf/launch/turtle_following.launch.py:14:        Node(
+./pkg_tf/launch/turtle_following.launch.py:18:            parameters=[
+./pkg_tf/launch/turtle_following.launch.py:22:        Node(
+./pkg_tf/launch/turtle_following.launch.py:26:            parameters=[
+./pkg_tf/launch/turtle_following.launch.py:30:        Node(
+./pkg_tf/launch/turtle_following.launch.py:34:            parameters=[
+./yahboomcar_multi/launch/X3_joy_ctrl.launch.py:15:    joy_node = Node(
+./yahboomcar_multi/launch/X3_joy_ctrl.launch.py:20:    robot1_joy_ctrl_node = Node(
+./yahboomcar_multi/launch/X3_joy_ctrl.launch.py:25:        remappings=[
+./yahboomcar_multi/launch/X3_joy_ctrl.launch.py:33:    robot2_joy_ctrl_node = Node(
+./yahboomcar_multi/launch/X3_joy_ctrl.launch.py:38:        remappings=[
+./yahboomcar_multi/launch/X3_joy_ctrl.launch.py:46:    robot3_joy_ctrl_node = Node(
+./yahboomcar_multi/launch/X3_joy_ctrl.launch.py:51:        remappings=[
+./yahboomcar_multi/launch/R2_joy_ctrl.launch.py:15:    joy_node = Node(
+./yahboomcar_multi/launch/R2_joy_ctrl.launch.py:20:    robot1_joy_ctrl_node = Node(
+./yahboomcar_multi/launch/R2_joy_ctrl.launch.py:25:        remappings=[
+./yahboomcar_multi/launch/R2_joy_ctrl.launch.py:33:    robot2_joy_ctrl_node = Node(
+./yahboomcar_multi/launch/R2_joy_ctrl.launch.py:38:        remappings=[
+./yahboomcar_multi/launch/R2_joy_ctrl.launch.py:46:    robot3_joy_ctrl_node = Node(
+./yahboomcar_multi/launch/R2_joy_ctrl.launch.py:51:        remappings=[
+./clawbot_hardware_interface/launch/hardware_control.launch.py:32:    control_node = Node(
+./clawbot_hardware_interface/launch/hardware_control.launch.py:35:        parameters=[robot_description, robot_controllers],
+./clawbot_hardware_interface/launch/hardware_control.launch.py:39:    robot_state_pub_node = Node(
+./clawbot_hardware_interface/launch/hardware_control.launch.py:43:        parameters=[robot_description],
+./clawbot_hardware_interface/launch/hardware_control.launch.py:46:    joint_state_broadcaster_spawner = Node(
+./clawbot_hardware_interface/launch/hardware_control.launch.py:52:    joint_trajectory_controller_spawner = Node(
+./clawbot_hardware_interface/launch/vision_pipeline.launch.py:5:    usb_cam_node = Node(
+./clawbot_hardware_interface/launch/vision_pipeline.launch.py:9:        parameters=[{
+./clawbot_hardware_interface/launch/vision_pipeline.launch.py:17:        remappings=[
+./clawbot_hardware_interface/launch/vision_pipeline.launch.py:25:    static_tf = Node(
+./yahboom_app_save_map/launch/yahboom_app_save_map.launch.py:12:    yahboom_app_save_map_node = Node(
+./clawbot_moveit_config/launch/move_group.launch.py:75:        Node(
+./clawbot_moveit_config/launch/move_group.launch.py:80:            parameters=parameters,
+./clawbot_moveit_config/launch/move_group.launch.py:84:        Node(
+./clawbot_moveit_config/launch/move_group.launch.py:89:            parameters=[mast],
+./yahboomcar_linefollow/launch/linefollow_X3.launch.py:11:    linefollow_node = Node(
+./yahboomcar_linefollow/launch/linefollow_X3.launch.py:21:    Joy_node = Node(
+./clawbot_arm_controller/launch/arm_controller.launch.py:26:        Node(
+./clawbot_arm_controller/launch/arm_controller.launch.py:31:            parameters=[LaunchConfiguration('params_file')],
+./yahboomcar_nav/launch/localization_imu_odom.launch.py:38:    cartographer_node = Node(
+./yahboomcar_nav/launch/localization_imu_odom.launch.py:51:    cartographer_occupancy_grid_node = Node(
+./yahboomcar_nav/launch/localization_imu_odom.launch.py:59:    rviz_node = Node(
