@@ -14,6 +14,9 @@ Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
 Environment=ROS_LOG_DIR=/var/lib/clawbot/ros-log
 Environment=YOLO_MODEL_PATH=/home/jetson/software/yolov5-7.0/yolov5s.pt
+# torch.hub ecrit dans ~/.cache/torch, interdit par ProtectHome=read-only
+Environment=TORCH_HOME=/var/lib/clawbot/torch
+Environment=MPLCONFIGDIR=/var/lib/clawbot/mpl
 WorkingDirectory=/home/jetson/clawbot
 # Le venv yolov5 porte torch CUDA ; ROS est source pour rclpy (python 3.10 des deux cotes).
 # La facade HTTP 8003 est servie dans le meme processus (thread), pas un second service.

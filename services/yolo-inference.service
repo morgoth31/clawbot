@@ -31,4 +31,4 @@ Environment=WORKSPACE_PATH=/home/jetson/clawbot/workspace
 TimeoutStopSec=10
 
 [Install]
-WantedBy=multi-user.target
+# WantedBy retire en P12 : le gestionnaire de capacites est seul proprietaire (INV-08).
