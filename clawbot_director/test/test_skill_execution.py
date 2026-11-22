@@ -42,8 +42,7 @@ ETAPE = {'skill': 'arm_move',
 
 @pytest.fixture()
 def monde():
-    rclpy.init()
-    node = DirectorNode()
+    node = DirectorNode()        # contexte rclpy fourni par conftest.py
     executeur = SingleThreadedExecutor()
     executeur.add_node(node)
 
@@ -75,7 +74,7 @@ def monde():
         executeur.shutdown()
         node.destroy_node()
         sonde.destroy_node()
-        rclpy.try_shutdown()
+        # contexte partagé : ne pas l'éteindre (cf. conftest.py)
 
 
 def _attendre(predicate, timeout=3.0, period=0.005):

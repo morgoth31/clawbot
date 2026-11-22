@@ -41,7 +41,8 @@ def _point(positions, seconds):
 
 @pytest.fixture()
 def stack():
-    rclpy.init()
+    if not rclpy.ok():        # contexte partagé par la session de test
+        rclpy.init()
     node = ArmTrajectoryServer()
     executor = MultiThreadedExecutor(num_threads=4)
     executor.add_node(node)
@@ -65,7 +66,7 @@ def stack():
         executor.shutdown()
         node.destroy_node()
         probe.destroy_node()
-        rclpy.shutdown()
+        # contexte partagé : ne pas l'éteindre entre deux fichiers
 
 
 def _send(probe, action_name, joint_names, points, timeout_s=15.0):

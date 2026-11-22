@@ -46,8 +46,7 @@ from clawbot_interfaces.srv import DirectorCommand  # noqa: E402
 
 @pytest.fixture()
 def stack():
-    rclpy.init()
-    node = DirectorNode()
+    node = DirectorNode()        # contexte rclpy fourni par conftest.py
     executor = MultiThreadedExecutor(num_threads=2)
     executor.add_node(node)
 
@@ -91,7 +90,7 @@ def stack():
         executor.shutdown()
         node.destroy_node()
         probe.destroy_node()
-        rclpy.try_shutdown()
+        # contexte partagé : ne pas l'éteindre (cf. conftest.py)
 
 
 def _attendre(predicate, timeout=2.0, period=0.002):
