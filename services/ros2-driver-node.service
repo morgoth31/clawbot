@@ -6,17 +6,15 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
 Group=jetson
 WorkingDirectory=/home/jetson/clawbot
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
-  source /home/jetson/clawbot/install/setup.bash && \
-  exec ros2 run clawbot_base_driver driver_node"
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup base.launch.py"
 Restart=on-failure
 RestartSec=2
-Environment=ROS_DOMAIN_ID=28
 TimeoutStopSec=10
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

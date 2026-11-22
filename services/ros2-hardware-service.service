@@ -5,16 +5,14 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
 Group=jetson
 WorkingDirectory=/home/jetson/clawbot/ros2_llm_bridge
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
-  source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash && \
-  python3 /home/jetson/clawbot/ros2_llm_bridge/hardware_service.py"
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup hardware.launch.py"
 Restart=on-failure
 RestartSec=2
-Environment=ROS_DOMAIN_ID=28
 Environment=WORKSPACE_PATH=/home/jetson/clawbot/workspace
 Environment=CAMERA_FRONT_INDEX=0
 # Caméra du bras = seul périphérique UVC du bus, sur /dev/video0 (0c45:6340). L'index 2
@@ -30,4 +28,4 @@ TimeoutStopSec=10
 KillSignal=SIGINT
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

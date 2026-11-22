@@ -7,16 +7,17 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
+TimeoutStopSec=10
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
-Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
 Environment=MANETTE_CONFIG=/home/jetson/clawbot/config/manette.yaml
 # Attend la manette puis lance le teleop
-ExecStart=/home/jetson/clawbot/joy_teleop/joy_teleop_wait.sh
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup teleop.launch.py"
 # Redémarre si la manette disparaît (déconnexion BT)
 Restart=on-failure
 RestartSec=5
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

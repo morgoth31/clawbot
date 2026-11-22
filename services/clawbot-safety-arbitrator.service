@@ -6,13 +6,13 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
 Group=jetson
-Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
 WorkingDirectory=/home/jetson/clawbot
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec python3 -c 'from clawbot_safety.arbitrator import main; main()' --ros-args --params-file /home/jetson/clawbot/install/clawbot_safety/share/clawbot_safety/config/arbitrator.yaml"
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup safety.launch.py"
 # Boucle de sûreté à 20 Hz mono-thread : priorité d'ordonnancement et cœur dédié.
 # CPUAffinity=4 : cœur le moins chargé mesuré en P01-M07 (22,1 %).
 Nice=-10
@@ -23,4 +23,4 @@ TimeoutStopSec=10
 KillSignal=SIGINT
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

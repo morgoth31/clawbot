@@ -7,19 +7,19 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
 Group=jetson
-Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
 WorkingDirectory=/home/jetson/clawbot
 # N'utilise pas clawbot-health.service : celle-ci est un oneshot Telegram
 # (bridge_mcp.health), sans rapport avec la surveillance des flux.
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec /home/jetson/clawbot/install/clawbot_health/lib/clawbot_health/health_monitor"
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup health.launch.py"
 Restart=on-failure
 RestartSec=2
 TimeoutStopSec=10
 KillSignal=SIGINT
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from clawbot_safety import arbitrator  # noqa: E402
 from soutien_arbitre import capteurs_sains, contexte, fermer, twist  # noqa: E402
 
-ENTREES = {"teleop": 100, "nav": 50, "skill": 40, "legacy": 10}
+ENTREES = {"teleop": 100, "nav": 50, "skill": 40}   # P14 : entree legacy retiree
 ORDRE = sorted(ENTREES, key=ENTREES.get)       # priorité croissante
 PAIRES = list(itertools.combinations(ORDRE, 2))  # (basse, haute)
 

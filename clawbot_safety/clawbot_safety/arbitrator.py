@@ -1,10 +1,10 @@
 """Arbitre réflexe du Système 1 : propriétaire unique de la sortie actionneurs.
 
 20 Hz, aucune allocation en boucle, aucune planification. Il reçoit des entrées
-nommées (`/cmd_vel/teleop`, `/cmd_vel/nav`, `/cmd_vel/skill`, `/cmd_vel` en
-héritage), retient la plus prioritaire non expirée, applique les garde-fous de
-`decide()` et publie la consigne réellement exécutable sur `/cmd_vel_safe`.
-Le driver n'écoute plus que ce topic : un seul écrivain par actionneur.
+nommées (`/cmd_vel/teleop`, `/cmd_vel/nav`, `/cmd_vel/skill` ; l'ancienne entrée
+`legacy` /cmd_vel a été retirée en P14), retient la plus prioritaire non expirée,
+applique les garde-fous de `decide()` et publie la consigne réellement exécutable sur
+`/cmd_vel_safe`. Le driver n'écoute plus que ce topic : un seul écrivain par actionneur.
 
 Un arrêt d'urgence (`/safety/estop`) annule la sortie et reste verrouillé ; il ne
 se lève que par `/safety/reset_estop`, et seulement si le signal est retombé.
@@ -34,7 +34,6 @@ ENTREES_PAR_DEFAUT = (
     ("teleop", "/cmd_vel/teleop", 100, 0.5),
     ("nav", "/cmd_vel/nav", 50, 0.5),
     ("skill", "/cmd_vel/skill", 40, 0.5),
-    ("legacy", "/cmd_vel", 10, 0.5),
 )
 
 FENETRE_MESURE_S = 10.0

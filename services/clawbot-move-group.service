@@ -1,4 +1,6 @@
 [Unit]
+StartLimitBurst=5
+StartLimitIntervalSec=60
 Description=Clawbot MoveIt 2 move_group (planification du bras, domaine 28)
 Documentation=file:///home/jetson/clawbot/clawbot_moveit_config
 # Unite optionnelle : elle ne demarre pas au boot. La lancer pour manipuler :
@@ -9,17 +11,15 @@ After=network.target clawbot-description.service ros2-driver-node.service
 Requires=clawbot-arm-controller.service
 
 [Service]
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
 Group=jetson
 WorkingDirectory=/home/jetson/clawbot
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
-  source /home/jetson/clawbot/install/setup.bash && \
-  ros2 launch clawbot_moveit_config move_group.launch.py"
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup move_group.launch.py"
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=15
-Environment=ROS_DOMAIN_ID=28
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

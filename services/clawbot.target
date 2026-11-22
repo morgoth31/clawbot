@@ -1,0 +1,19 @@
+# Point d'entree unique du robot (P14, REQ-OPS-040).
+#
+# Tout ce qui doit tourner au demarrage est accroche ici : les capacites `always_on`
+# (base, lidar, description), l'executif (arbitre -> capacites -> skills -> mission ->
+# directeur -> sentinelle) et la camera du poignet. Les unites a la demande
+# (navigation, cartographie, bras, detection, teleoperation) ne sont PAS dans Wants= :
+# le gestionnaire de capacites les demarre (`set <capacite> true`).
+#
+# `Wants=` sur une seule ligne : un fichier d'unite accepte les lignes repetees, mais un
+# lecteur de configuration n'en garde qu'une — et le test de REQ-OPS-040 en est un.
+[Unit]
+Description=Clawbot X3 Plus - cible de demarrage de production
+Documentation=file:///home/jetson/clawbot/docs/ops/inventaire_demarrage.md
+After=network.target
+
+Wants=ros2-hardware-service.service ros2-driver-node.service clawbot-lidar.service clawbot-description.service clawbot-ekf.service clawbot-safety-arbitrator.service clawbot-capability-manager.service clawbot-skill-server.service clawbot-mission-executive.service clawbot-director.service clawbot-sentinel.service clawbot-health-monitor.service clawbot-wrist-camera.service
+
+[Install]
+WantedBy=multi-user.target

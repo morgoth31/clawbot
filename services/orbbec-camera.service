@@ -9,16 +9,16 @@ StartLimitBurst=5
 # elle n'est pas activee au boot, le gestionnaire la demarre a la demande.
 
 [Service]
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
 Group=jetson
-Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
 Environment=FASTRTPS_DEFAULT_PROFILES_FILE=/home/jetson/clawbot/fastdds_profile.xml
 # ProtectHome=read-only interdit ~/.ros : les journaux rclpy vont dans l'etat du service
 Environment=ROS_LOG_DIR=/var/lib/clawbot/ros-log
 WorkingDirectory=/home/jetson/clawbot
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source /home/jetson/yahboomcar_ros2_ws/software/library_ws/install/setup.bash && exec ros2 launch astra_camera astro_pro_plus.launch.xml"
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/yahboomcar_ros2_ws/software/library_ws/install/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup depth_camera.launch.py"
 Restart=on-failure
 RestartSec=2
 TimeoutStopSec=10
@@ -41,4 +41,4 @@ LockPersonality=yes
 # échouait en « Input/output error » (essai du 2026-11-22).
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

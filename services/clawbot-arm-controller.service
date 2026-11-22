@@ -1,4 +1,6 @@
 [Unit]
+StartLimitBurst=5
+StartLimitIntervalSec=60
 Description=Clawbot arm trajectory controller (FollowJointTrajectory -> /servo_ctrl)
 Documentation=file:///home/jetson/clawbot/clawbot_arm_controller
 After=network.target ros2-driver-node.service
@@ -7,18 +9,15 @@ After=network.target ros2-driver-node.service
 Requires=ros2-driver-node.service
 
 [Service]
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
 Group=jetson
 WorkingDirectory=/home/jetson/clawbot
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
-  source /home/jetson/clawbot/install/setup.bash && \
-  ros2 launch clawbot_arm_controller arm_controller.launch.py \
-    params_file:=/home/jetson/clawbot/clawbot_arm_controller/config/arm_controller.yaml"
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup arm_controller.launch.py"
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=10
-Environment=ROS_DOMAIN_ID=28
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

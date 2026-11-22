@@ -7,15 +7,15 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
 Group=jetson
-Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
 # ProtectHome=read-only interdit ~/.ros : les journaux rclpy vont dans l'état du service
 Environment=ROS_LOG_DIR=/var/lib/clawbot/ros-log
 WorkingDirectory=/home/jetson/clawbot
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec /home/jetson/clawbot/install/clawbot_executive/lib/clawbot_executive/skill_server"
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup executive.launch.py"
 # Le serveur publie uniquement /cmd_vel/skill : l'arbitre décide de /cmd_vel_safe.
 Restart=on-failure
 RestartSec=3
@@ -33,4 +33,4 @@ ReadWritePaths=/var/lib/clawbot
 RestrictSUIDSGID=yes
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

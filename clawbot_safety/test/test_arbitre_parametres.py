@@ -23,7 +23,6 @@ NOMS = [
     "inputs.teleop.topic", "inputs.teleop.priority", "inputs.teleop.timeout_s",
     "inputs.nav.topic", "inputs.nav.priority", "inputs.nav.timeout_s",
     "inputs.skill.topic", "inputs.skill.priority", "inputs.skill.timeout_s",
-    "inputs.legacy.topic", "inputs.legacy.priority", "inputs.legacy.timeout_s",
 ]
 
 
@@ -51,8 +50,10 @@ def test_valeurs_par_defaut_de_la_table(arbitre):
     assert arbitre.get_parameter("inputs.teleop.priority").value == 100
     assert arbitre.get_parameter("inputs.nav.priority").value == 50
     assert arbitre.get_parameter("inputs.skill.priority").value == 40
-    assert arbitre.get_parameter("inputs.legacy.topic").value == "/cmd_vel"
-    assert arbitre.get_parameter("inputs.legacy.priority").value == 10
+    # P14 (REQ-OPS-044) : l'entree `legacy` /cmd_vel est retiree, aucun editeur ne la
+    # publie plus. Trois entrees, pas quatre.
+    assert [n for n in arbitre.get_parameter("inputs.names").value] == [
+        "teleop", "nav", "skill"]
 
 
 @pytest.mark.req("REQ-OPS-020")
@@ -68,4 +69,5 @@ def test_yaml_de_configuration_coherent():
         entree = params["inputs"][nom]
         assert {"topic", "priority", "timeout_s"} <= set(entree)
     assert params["inputs"]["teleop"]["priority"] == 100
-    assert params["inputs"]["legacy"]["topic"] == "/cmd_vel"
+    assert "legacy" not in params["inputs"], "l'entree legacy est retiree (REQ-OPS-044)"
+    assert set(params["inputs"]["names"]) == {"teleop", "nav", "skill"}

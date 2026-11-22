@@ -8,14 +8,14 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
 Group=jetson
-Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
 Environment=ROS_LOG_DIR=/var/lib/clawbot/ros-log
 WorkingDirectory=/home/jetson/clawbot
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec /home/jetson/clawbot/install/clawbot_executive/lib/clawbot_executive/mission_executive"
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup mission.launch.py"
 # Journal des missions : /var/lib/clawbot/missions/<date>/<mission_id>.jsonl (§6.5)
 StateDirectory=clawbot
 Restart=on-failure
@@ -32,4 +32,4 @@ ReadWritePaths=/var/lib/clawbot
 RestrictSUIDSGID=yes
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

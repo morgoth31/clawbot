@@ -20,7 +20,6 @@ Type=oneshot
 User=jetson
 Group=jetson
 WorkingDirectory=/home/jetson/clawbot
-Environment=ROS_DOMAIN_ID=28
 ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec /usr/bin/python3 -m bridge_mcp.health --notify --reason demarrage --service-mode"
 StandardOutput=journal
 StandardError=journal

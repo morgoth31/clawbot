@@ -9,9 +9,9 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
+EnvironmentFile=/home/jetson/clawbot/deploy/env/clawbot.env
 Type=simple
 User=jetson
-Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
 # `brightness`/`gain` sont des paramètres de démarrage, pas des réglages d'ambiance : sans eux, un
 # redémarrage ramène l'image à une luminance de 19 (mesuré) et la caméra devient inutilisable dans
@@ -24,7 +24,7 @@ Environment=HOME=/home/jetson
 #
 # Chemin by-id et non /dev/videoN : l'index dépend de l'ordre d'énumération USB, le nom by-id non.
 # L'appareil expose deux nœuds (video0 = capture, video1 = métadonnées) : index0 est le bon.
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec ros2 run v4l2_camera v4l2_camera_node --ros-args -r __ns:=/wrist_camera -r __node:=camera -p video_device:=/dev/v4l/by-id/usb-Sonix_Technology_Co.__Ltd._USB_2.0_Camera-video-index0 -p image_size:='[640, 480]' -p time_per_frame:='[1, 15]' -p pixel_format:=YUYV -p output_encoding:=yuv422_yuy2 -p camera_frame_id:=wrist_camera_optical_frame -p brightness:=0 -p gain:=0 -p camera_info_url:=file:///home/jetson/clawbot/config/wrist_camera_info.yaml"
+ExecStart=/bin/bash -c "set +u; source /opt/ros/humble/setup.bash; source /home/jetson/clawbot/install/setup.bash; set -u; exec ros2 launch clawbot_bringup wrist_camera.launch.py"
 Restart=on-failure
 RestartSec=2
 # Un arrêt doit rendre le périphérique proprement : sans SIGINT, le descripteur reste mappé
@@ -33,4 +33,4 @@ KillSignal=SIGINT
 TimeoutStopSec=10
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=clawbot.target

@@ -9,7 +9,8 @@ safety_arbitrator:
     stale_s: 2.0            # STALE_S de thresholds.py
     cmd_timeout_s: 0.5      # CMD_TIMEOUT_S de thresholds.py
     inputs:
-      names: [teleop, nav, skill, legacy]
+      # P14 (REQ-OPS-044) : l'entree `legacy` /cmd_vel est retiree — plus aucun editeur.
+      names: [teleop, nav, skill]
       teleop:
         topic: /cmd_vel/teleop
         priority: 100
@@ -21,8 +22,4 @@ safety_arbitrator:
       skill:
         topic: /cmd_vel/skill
         priority: 40
-        timeout_s: 0.5
-      legacy:
-        topic: /cmd_vel
-        priority: 10
         timeout_s: 0.5

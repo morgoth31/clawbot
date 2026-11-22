@@ -16,33 +16,63 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[1]
 
-# Les 14 unités du dépôt liées dans /etc/systemd/system et actives le 2026-11-22
-# (systemctl list-units + ls -l /etc/systemd/system).
+# Les unités du robot qui suivent la politique P02 (RestartSec=2, TimeoutStopSec=10).
+# Exceptions assumées, chacune avec sa raison : `clawbot-skill-server` et
+# `clawbot-capability-manager` (KillSignal=SIGINT, 3 s / 15 s pour laisser le nœud
+# rendre la main), `clawbot-mission-executive` (3/15), `clawbot-move-group` (5/15,
+# MoveIt), `clawbot-nav2` (10/30, Nav2), `clawbot-arm-controller`, `clawbot-joy-teleop`
+# et `clawbot-lidar` (5 s avant relance, matériel).
 UNITES_ACTIVES = [
     "clawbot-director.service",
-    "clawbot-docs.service",
     "clawbot-ekf.service",
-    "clawbot-lidar.service",
+    "clawbot-health-monitor.service",
     "clawbot-safety-arbitrator.service",
     "clawbot-sentinel.service",
     "clawbot-slam.service",
     "clawbot-wrist-camera.service",
+    "clawbot-yolo.service",
     "orbbec-camera.service",
     "ros2-driver-node.service",
     "ros2-hardware-service.service",
     "ros2-llm-bridge-cpp.service",
-    "rosbridge.service",
-    "clawbot-yolo.service",
 ]
 
-# Deux unités actives dont /etc porte encore une copie et non un lien : le
-# dépôt doit tout de même les décrire (la bascule est une écriture dans /etc).
+# Unités à la demande ou hors cible : décrites dans le dépôt, politiques propres.
+UNITES_A_LA_DEMANDE = [
+    "clawbot-arm-controller.service",
+    "clawbot-capability-manager.service",
+    "clawbot-joy-teleop.service",
+    "clawbot-mission-executive.service",
+    "clawbot-move-group.service",
+    "clawbot-nav2.service",
+    "clawbot-skill-server.service",
+    "clawbot-lidar.service",
+]
+
+# Deux unités actives dont /etc porte encore une copie et non un lien : le dépôt doit tout
+# de même les décrire (la bascule est une écriture dans /etc).
 UNITES_HORS_LIEN = [
     "clawbot-description.service",
     "yahboom_oled.service",
 ]
 
-UNITES_ROBOT = UNITES_ACTIVES + UNITES_HORS_LIEN
+# Unités à la demande et hors lien, vérifiées avec les autres.
+UNITES_ROBOT = UNITES_ACTIVES + UNITES_HORS_LIEN + UNITES_A_LA_DEMANDE
+
+# Les unités soumises à la politique standard (REQ-OPS-010). Les exceptions de
+# UNITES_A_LA_DEMANDE ont leurs propres valeurs, vérifiées juste après.
+UNITES_POLITIQUE = UNITES_ACTIVES + UNITES_HORS_LIEN
+
+EXCEPTIONS = {
+    "clawbot-arm-controller.service": ("5", "10"),
+    "clawbot-capability-manager.service": ("3", "15"),
+    "clawbot-joy-teleop.service": ("5", "10"),
+    "clawbot-lidar.service": ("5", "10"),
+    "clawbot-mission-executive.service": ("3", "15"),
+    "clawbot-move-group.service": ("5", "15"),
+    "clawbot-nav2.service": ("10", "30"),
+    "clawbot-skill-server.service": ("3", "15"),
+}
 
 
 def _chemin(nom: str) -> Path:
@@ -63,7 +93,7 @@ def _lire(nom: str) -> configparser.ConfigParser:
 # ── REQ-OPS-010 ──────────────────────────────────────────────────────────────
 
 @pytest.mark.req("REQ-OPS-010")
-@pytest.mark.parametrize("nom", UNITES_ROBOT, ids=UNITES_ROBOT)
+@pytest.mark.parametrize("nom", UNITES_POLITIQUE, ids=UNITES_POLITIQUE)
 def test_politique_de_redemarrage_normalisee(nom):
     """Redémarrage sur panne avec délai, et arrêt borné."""
     cp = _lire(nom)
@@ -77,6 +107,23 @@ def test_politique_de_redemarrage_normalisee(nom):
         f"{nom} : RestartSec=2 attendu")
     assert cp.get("Service", "TimeoutStopSec", fallback=None) == "10", (
         f"{nom} : TimeoutStopSec=10 attendu")
+
+
+@pytest.mark.req("REQ-OPS-010")
+@pytest.mark.parametrize("nom", sorted(EXCEPTIONS), ids=sorted(EXCEPTIONS))
+def test_exceptions_de_politique_documentees(nom):
+    """Une unité hors politique standard doit au moins porter les valeurs annoncées."""
+    cp = _lire(nom)
+    restart_sec, timeout = EXCEPTIONS[nom]
+    assert cp.get("Service", "Restart", fallback=None) == "on-failure", nom
+    assert cp.get("Unit", "StartLimitIntervalSec", fallback=None) == "60", nom
+    assert cp.get("Unit", "StartLimitBurst", fallback=None) == "5", nom
+    assert cp.get("Service", "RestartSec", fallback=None) == restart_sec, (
+        f"{nom} : RestartSec={restart_sec} attendu, "
+        f"lu {cp.get('Service', 'RestartSec', fallback=None)}")
+    assert cp.get("Service", "TimeoutStopSec", fallback=None) == timeout, (
+        f"{nom} : TimeoutStopSec={timeout} attendu, "
+        f"lu {cp.get('Service', 'TimeoutStopSec', fallback=None)}")
 
 
 # ── REQ-OPS-012 ──────────────────────────────────────────────────────────────
