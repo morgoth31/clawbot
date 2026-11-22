@@ -1,0 +1,268 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+#public lib
+import sys
+import math
+import random
+import threading
+from math import pi
+from time import sleep
+from Rosmaster_Lib import Rosmaster
+
+#ros lib
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String,Float32,Int32,Bool,Int32MultiArray
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Imu,MagneticField, JointState
+from nav_msgs.msg import Odometry
+import time as _time
+try:
+	from .cmd_scaling import RAMP_STEP, feedback, kick_boost, ramp_cmd, scale_cmd_vel
+except ImportError:  # exécution directe du fichier
+	from cmd_scaling import RAMP_STEP, feedback, kick_boost, ramp_cmd, scale_cmd_vel
+from rclpy.clock import Clock
+
+#from dynamic_reconfigure.server import Server
+car_type_dic={
+    'R2':5,
+    'X3':1,
+    'NONE':-1
+}
+class yahboomcar_driver(Node):
+	def __init__(self, name):
+		super().__init__(name)
+		global car_type_dic
+		self.RA2DE = 180 / pi
+		# X3 Plus : moteurs 520, cinématique Mecanum. La trame de set_car_motion embarque ce
+		# type ; avec le type par défaut (1 = X3, moteurs 370) le PID interne du STM32 recevait
+		# les encodeurs à l'envers et partait en contre-réaction positive (ERR-010).
+		self.car = Rosmaster(car_type=2)
+		# Séquence validée sur le matériel : le fil de réception doit tourner et le report
+		# automatique doit être armé AVANT set_car_type, sinon le STM32 ignore la trame.
+		self.car.create_receive_threading()
+		self.car.set_auto_report_state(True, forever=False)
+		self.car.set_car_type(2)
+		sleep(0.2)
+		self._car_type_ok = False
+		for _ in range(20):
+			# renvoye a chaque tour : la premiere trame tombe pendant le boot du STM32
+			self.car.set_car_type(2)
+			sleep(0.15)
+			if self.car.get_car_type_from_machine() == 2:
+				self._car_type_ok = True
+				break
+		if not self._car_type_ok:
+			self.get_logger().error("car_type != 2 : mouvement refuse (ERR-010)")
+
+		#get parameter
+		self.declare_parameter('car_type', 'X3PLUS')
+		self.car_type = self.get_parameter('car_type').get_parameter_value().string_value
+		print (self.car_type)
+		self.declare_parameter('imu_link', 'imu_link')
+		self.imu_link = self.get_parameter('imu_link').get_parameter_value().string_value
+		print (self.imu_link)
+		self.declare_parameter('Prefix', "")
+		self.Prefix = self.get_parameter('Prefix').get_parameter_value().string_value
+		print (self.Prefix)
+		self.declare_parameter('xlinear_limit', 1.0)
+		self.xlinear_limit = self.get_parameter('xlinear_limit').get_parameter_value().double_value
+		print (self.xlinear_limit)
+		self.declare_parameter('ylinear_limit', 1.0)
+		self.ylinear_limit = self.get_parameter('ylinear_limit').get_parameter_value().double_value
+		print (self.ylinear_limit)
+		self.declare_parameter('angular_limit', 5.0)
+		self.angular_limit = self.get_parameter('angular_limit').get_parameter_value().double_value
+		print (self.angular_limit)
+
+		#create subcriber
+		self.sub_cmd_vel = self.create_subscription(Twist,"cmd_vel_safe",self.cmd_vel_callback,1)
+		self.sub_RGBLight = self.create_subscription(Int32,"RGBLight",self.RGBLightcallback,100)
+		self.sub_BUzzer = self.create_subscription(Bool,"Buzzer",self.Buzzercallback,100)
+		self.sub_Servo = self.create_subscription(Int32MultiArray,"servo_ctrl",self.Servocallback,10)
+
+		#create publisher
+		self.EdiPublisher = self.create_publisher(Float32,"edition",100)
+		self.volPublisher = self.create_publisher(Float32,"voltage",100)
+		self.staPublisher = self.create_publisher(JointState,"joint_states",100)
+		self.velPublisher = self.create_publisher(Twist,"vel_raw",50)
+		self.imuPublisher = self.create_publisher(Imu,"imu/data_raw",100)
+		self.magPublisher = self.create_publisher(MagneticField,"imu/mag",100)
+		self.odomPublisher = self.create_publisher(Odometry,"odom_raw",20)
+
+		#create timer
+		self.timer = self.create_timer(0.1, self.pub_data)
+
+		#create and init variable
+		self.edition = Float32()
+		self.edition.data = 1.0
+		self.car.create_receive_threading()
+		# Enable UART Servo Torque (Required for Arm)
+		self.car.set_uart_servo_torque(True)
+	#callback function
+	def cmd_vel_callback(self,msg):
+        # 小车运动控制，订阅者回调函数
+        # Car motion control, subscriber callback function
+		if not isinstance(msg, Twist): return
+        # 下发线速度和角速度
+        # Issue linear vel and angular vel
+		# ERR-009 : bande morte et butées appliquées avant le MCU
+		# rampe : un echelon brutal fait winduper l'integrateur du MCU (pic 4,9x mesuré)
+		r = ramp_cmd(getattr(self, "_ramp", (0.0, 0.0, 0.0)),
+		              (msg.linear.x, msg.linear.y, msg.angular.z), RAMP_STEP)
+		self._ramp = r
+		if r[0] != 0.0 and getattr(self, "_moving", False) is False:
+			self._kick_start = _time.monotonic()
+			self._moving = True
+		elif r[0] == 0.0:
+			self._moving = False
+		r = (kick_boost(r[0], _time.monotonic() - getattr(self, "_kick_start", 0.0)), r[1], r[2])
+		vx, vy, angular = scale_cmd_vel(*r)
+		self.car.set_car_motion(vx, vy, angular)
+		'''print("cmd_vx: ",vx)
+		print("cmd_vy: ",vy)
+		print("cmd_angular: ",angular)'''
+        #rospy.loginfo("nav_use_rot:{}".format(self.nav_use_rotvel))
+        #print(self.nav_use_rotvel)
+	def RGBLightcallback(self,msg):
+        # 流水灯控制，服务端回调函数 RGBLight control
+		if not isinstance(msg, Int32): return
+		# print ("RGBLight: ", msg.data)
+		for i in range(3): self.car.set_colorful_effect(msg.data, 6, parm=1)
+	def Buzzercallback(self,msg):
+		if not isinstance(msg, Bool): return
+		if msg.data:
+			for i in range(3): self.car.set_beep(1)
+		else:
+			for i in range(3): self.car.set_beep(0)
+
+	def Servocallback(self, msg):
+		# msg.data[0] = servo_id (1-6 for UART Arm)
+		# msg.data[1] = angle
+		if not isinstance(msg, Int32MultiArray): return
+		if len(msg.data) >= 2:
+			servo_id = msg.data[0]
+			angle = msg.data[1]
+			
+			# X3 Plus Arm uses UART servos 1-6
+			if 1 <= servo_id <= 6:
+				self.car.set_uart_servo_angle(servo_id, angle)
+			else:
+				# Fallback for PWM servos if any (e.g. camera pan/tilt might be PWM on some models, 
+				# but X3 Plus usually has the arm. If camera is on arm, it's UART).
+				# Just in case, keep PWM for other IDs.
+				self.car.set_pwm_servo(servo_id, angle)
+
+	#pub data
+	def pub_data(self):
+		if not getattr(self, "_type_logged", False):
+			# lu sur la carte, une fois la boucle stable
+			self._type_logged = True
+			try:
+				self.get_logger().info(
+					f"carte : car_type={self.car.get_car_type_from_machine()} "
+					f"firmware={self.car.get_version()} pid={self.car.get_motion_pid()}")
+			except Exception as exc:  # noqa: BLE001
+				self.get_logger().warn(f"lecture carte impossible : {exc}")
+		time_stamp = Clock().now()
+		imu = Imu()
+		twist = Twist()
+		battery = Float32()
+		edition = Float32()
+		mag = MagneticField()
+		state = JointState()
+		state.header.stamp = time_stamp.to_msg()
+		state.header.frame_id = "joint_states"
+		if len(self.Prefix)==0:
+			state.name = ["back_right_joint", "back_left_joint","front_left_steer_joint","front_left_wheel_joint",
+							"front_right_steer_joint", "front_right_wheel_joint"]
+		else:
+			state.name = [self.Prefix+"back_right_joint",self.Prefix+ "back_left_joint",self.Prefix+"front_left_steer_joint",self.Prefix+"front_left_wheel_joint",
+							self.Prefix+"front_right_steer_joint", self.Prefix+"front_right_wheel_joint"]
+		
+		#print ("mag: ",self.car.get_magnetometer_data())		
+		edition.data = self.car.get_version()*1.0
+		battery.data = self.car.get_battery_voltage()*1.0
+		ax, ay, az = self.car.get_accelerometer_data()
+		gx, gy, gz = self.car.get_gyroscope_data()
+		mx, my, mz = self.car.get_magnetometer_data()
+		mx = mx * 1.0
+		my = my * 1.0
+		mz = mz * 1.0
+		vx, vy, angular = self.car.get_motion_data()
+		'''print("vx: ",vx)
+		print("vy: ",vy)
+		print("angular: ",angular)'''
+		# 发布陀螺仪的数据
+		# Publish gyroscope data
+		imu.header.stamp = time_stamp.to_msg()
+		imu.header.frame_id = self.imu_link
+		imu.linear_acceleration.x = ax*1.0
+		imu.linear_acceleration.y = ay*1.0
+		imu.linear_acceleration.z = az*1.0
+		imu.angular_velocity.x = gx*1.0
+		imu.angular_velocity.y = gy*1.0
+		imu.angular_velocity.z = gz*1.0
+
+		mag.header.stamp = time_stamp.to_msg()
+		mag.header.frame_id = self.imu_link
+		mag.magnetic_field.x = mx*1.0
+		mag.magnetic_field.y = my*1.0
+		mag.magnetic_field.z = mz*1.0
+		
+		# 将小车当前的线速度和角速度发布出去
+		# Publish the current linear vel and angular vel of the car
+		twist.linear.x = feedback(vx)
+		twist.linear.y = feedback(vy)
+		twist.angular.z = angular*1.0    
+		self.velPublisher.publish(twist)
+		# /odom_raw : Odometry pour robot_localization (Twist nu inutilisable par l'EKF)
+		odom = Odometry()
+		odom.header.stamp = time_stamp.to_msg()
+		odom.header.frame_id = "odom"
+		odom.child_frame_id = "base_link"
+		odom.twist.twist = twist
+		# covariances : encodeurs mecanum, glissement réel non modélisé
+		for i, var in enumerate([0.02, 0.02, 1e6, 1e6, 1e6, 0.05]):
+			odom.twist.covariance[i * 7] = var
+		# la pose n'est pas mesurée : variance énorme pour que l'EKF ne la fusionne pas
+		for i in range(6):
+			odom.pose.covariance[i * 7] = 1e6
+		self.odomPublisher.publish(odom)
+		# print("ax: %.5f, ay: %.5f, az: %.5f" % (ax, ay, az))
+		# print("gx: %.5f, gy: %.5f, gz: %.5f" % (gx, gy, gz))
+		# print("mx: %.5f, my: %.5f, mz: %.5f" % (mx, my, mz))
+		# rospy.loginfo("battery: {}".format(battery))
+		# rospy.loginfo("vx: {}, vy: {}, angular: {}".format(twist.linear.x, twist.linear.y, twist.angular.z))
+		self.imuPublisher.publish(imu)
+		self.magPublisher.publish(mag)
+		# proprietary : une lecture de servo par tick (15-20 ms), cycle complet ~600 ms
+		if not hasattr(self, "_rr"):
+			self._rr = 0
+			self._angles = [-1, -1, -1, -1, -1, -1]
+			self._servo_pub = self.create_publisher(Int32MultiArray, "arm/servo_angles", 10)
+		sid = (self._rr % 6) + 1
+		self._rr += 1
+		try:
+			self._angles[sid - 1] = int(self.car.get_uart_servo_angle(sid))
+		except Exception:
+			self._angles[sid - 1] = -1
+		_msg_angles = Int32MultiArray()
+		_msg_angles.data = list(self._angles)
+		self._servo_pub.publish(_msg_angles)
+		self.volPublisher.publish(battery)
+		self.EdiPublisher.publish(edition)
+		
+		
+			
+def main():
+	rclpy.init() 
+	driver = yahboomcar_driver('driver_node')
+	rclpy.spin(driver)
+
+'''if __name__ == '__main__':
+	main()'''
+
+		
+		
