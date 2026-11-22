@@ -37,8 +37,7 @@ from soutien_actions import FauxBras  # noqa: E402
 
 @pytest.fixture()
 def directeur():
-    rclpy.init()
-    node = DirectorNode()
+    node = DirectorNode()        # contexte rclpy fourni par conftest.py
     executor = MultiThreadedExecutor(num_threads=2)
     executor.add_node(node)
     sonde = Node('sonde_client')
@@ -70,7 +69,7 @@ def directeur():
         executor.shutdown()
         node.destroy_node()
         sonde.destroy_node()
-        rclpy.try_shutdown()
+        # contexte partagé : ne pas l'éteindre (cf. conftest.py)
 
 
 def _client(charge: dict, timeout=10.0):

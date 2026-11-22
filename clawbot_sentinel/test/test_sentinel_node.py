@@ -54,7 +54,8 @@ class FauxDirecteur:
 
 @pytest.fixture()
 def monde():
-    rclpy.init()
+    if not rclpy.ok():        # contexte partagé par la session de test
+        rclpy.init()
     observations = SimpleNamespace(detections=[], distance=None)
     reveils = []
 
@@ -91,7 +92,7 @@ def monde():
         executeur.shutdown()
         node.destroy_node()
         sonde.destroy_node()
-        rclpy.try_shutdown()
+        # contexte partagé : ne pas l'éteindre entre deux fichiers
 
 
 def _attendre(predicate, timeout=3.0, period=0.01):

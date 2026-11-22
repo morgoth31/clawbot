@@ -88,11 +88,12 @@ class Banc:
 
 @pytest.fixture()
 def banc():
-    rclpy.init()
+    if not rclpy.ok():        # contexte partagé par la session de test
+        rclpy.init()
     b = Banc()
     yield b
     b.fermer()
-    rclpy.try_shutdown()
+    # contexte partagé : ne pas l'éteindre entre deux fichiers
 
 
 # ── La configuration décide ─────────────────────────────────────────────────
@@ -107,13 +108,11 @@ def test_les_noms_resolvent_les_index_du_yaml():
 
 def test_sans_configuration_le_noeud_refuse_de_demarrer(tmp_path):
     """Un pad mal mappé vaut moins qu'un pad absent."""
-    rclpy.init()
-    try:
-        with pytest.raises(SystemExit) as err:
-            teleop.ClawbotJoyTeleop(config=tmp_path / "absent.yaml")
-        assert err.value.code == 1
-    finally:
-        rclpy.try_shutdown()
+    if not rclpy.ok():        # contexte partagé par la session de test
+        rclpy.init()
+    with pytest.raises(SystemExit) as err:
+        teleop.ClawbotJoyTeleop(config=tmp_path / "absent.yaml")
+    assert err.value.code == 1
 
 
 def test_aucune_table_d_indices_dans_le_noeud():

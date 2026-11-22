@@ -40,6 +40,11 @@ def _point(positions, seconds):
 
 
 def test_le_servo_passif_ne_recoit_aucune_consigne():
+    # Ce test a besoin des arguments --ros-args du contexte : il ne peut pas
+    # réutiliser le contexte partagé de la session. On repart d'un contexte neuf
+    # et on en rend un neutre aux fichiers suivants (cf. finally).
+    if rclpy.ok():
+        rclpy.shutdown()
     rclpy.init(args=['--ros-args', '-p', 'passive_joints:=["arm_joint4"]'])
     node = ArmTrajectoryServer()
     assert node._passive == {'arm_joint4'}, 'parametre passive_joints non applique'
@@ -91,3 +96,4 @@ def test_le_servo_passif_ne_recoit_aucune_consigne():
         node.destroy_node()
         probe.destroy_node()
         rclpy.shutdown()
+        rclpy.init()          # contexte neutre pour les fichiers suivants
