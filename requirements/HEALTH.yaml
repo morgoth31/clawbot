@@ -100,7 +100,7 @@ requirements:
     sources: [O03]
     safety: false
     method: demonstration
-    level: demonstration
+    level: hardware
     criterion: >
       pidstat 2 10 sur le processus du moniteur, robot en fonctionnement :
       %CPU < 5 %. Consigné dans deploy/journal/2026-11-22_p05_sante.md.
