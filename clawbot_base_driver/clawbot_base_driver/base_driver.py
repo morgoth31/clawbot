@@ -16,7 +16,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String,Float32,Int32,Bool,Int32MultiArray
 from geometry_msgs.msg import Twist
-from sensor_msgs.msg import Imu,MagneticField, JointState
+from sensor_msgs.msg import Imu,MagneticField
 from nav_msgs.msg import Odometry
 import time as _time
 try:
@@ -115,7 +115,10 @@ class yahboomcar_driver(Node):
 		#create publisher
 		self.EdiPublisher = self.create_publisher(Float32,"edition",100)
 		self.volPublisher = self.create_publisher(Float32,"voltage",100)
-		self.staPublisher = self.create_publisher(JointState,"joint_states",100)
+		# Pas d'editeur /joint_states ici (P13, REQ-ARM-001) : il etait declare mais
+		# jamais publie, ce qui faisait croire a deux sources. La seule source est
+		# joint_state_publisher (source_list /arm/joint_states, voir
+		# launch/robot_description.launch.py).
 		self.velPublisher = self.create_publisher(Twist,"vel_raw",50)
 		self.imuPublisher = self.create_publisher(Imu,"imu/data_raw",100)
 		self.magPublisher = self.create_publisher(MagneticField,"imu/mag",100)
@@ -205,15 +208,8 @@ class yahboomcar_driver(Node):
 		battery = Float32()
 		edition = Float32()
 		mag = MagneticField()
-		state = JointState()
-		state.header.stamp = time_stamp.to_msg()
-		state.header.frame_id = "joint_states"
-		if len(self.Prefix)==0:
-			state.name = ["back_right_joint", "back_left_joint","front_left_steer_joint","front_left_wheel_joint",
-							"front_right_steer_joint", "front_right_wheel_joint"]
-		else:
-			state.name = [self.Prefix+"back_right_joint",self.Prefix+ "back_left_joint",self.Prefix+"front_left_steer_joint",self.Prefix+"front_left_wheel_joint",
-							self.Prefix+"front_right_steer_joint", self.Prefix+"front_right_wheel_joint"]
+		# Le JointState construit ici n'etait publie par personne (P01-M13) : retire
+		# avec l'editeur mort, pour qu'aucun code ne laisse croire a une seconde source.
 		
 		#print ("mag: ",self.car.get_magnetometer_data())		
 		edition.data = self.car.get_version()*1.0
