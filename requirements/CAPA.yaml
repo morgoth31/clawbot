@@ -1,0 +1,121 @@
+# Exigences de capacités — activation à la demande, liste blanche, conflits.
+# Format et règles : requirements/README.md.
+
+domain: CAPA
+requirements:
+  - id: REQ-CAPA-001
+    title: Liste blanche des unités pilotables
+    statement: >
+      Le gestionnaire ne doit démarrer ou arrêter que des unités listées dans
+      capabilities.yaml ; toute autre demande est refusée.
+    rationale: >
+      hardware_service.py pilotait des processus par motif (pgrep -f, pkill -9 -f,
+      S33), ce qui peut tuer un processus qui n'était pas la cible.
+    sources: [S33, INV-08]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_capabilities/test/test_controleur.py::test_liste_blanche_refuse_un_nom_inconnu
+      et ::test_aucun_shell (subprocess en liste d'arguments, jamais shell=True).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P07
+
+  - id: REQ-CAPA-002
+    title: ACTIVE seulement quand les sondes sont prêtes
+    statement: >
+      Une capacité passe ACTIVE seulement quand toutes ses conditions ready_when
+      sont vraies ; sinon FAILED après timeout_s.
+    rationale: >
+      Démarrer une unité ne prouve pas qu'elle sert : la profondeur Astra tournait
+      sans publier (S09). L'état doit suivre la sonde, pas le code de retour systemd.
+    sources: [S09, O07]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_capabilities/test/test_controleur.py::test_active_quand_les_sondes_repondent
+      et ::test_failed_apres_timeout (horloge simulée, sonde qui ne répond jamais).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P07
+
+  - id: REQ-CAPA-003
+    title: Conflit refusé
+    statement: >
+      Activer une capacité en conflit avec une capacité active est refusé avec
+      CAPABILITY_CONFLICT.
+    rationale: >
+      clawbot-slam et clawbot-nav2 sont mutuellement exclusifs (Conflicts=, S25) :
+      l'erreur doit être explicite, pas un échec systemd obscur.
+    sources: [S25]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_capabilities/test/test_controleur.py::test_conflit_refuse.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P07
+
+  - id: REQ-CAPA-004
+    title: Dépendances activées d'abord
+    statement: >
+      Les capacités de requires inactives sont activées d'abord, dans l'ordre.
+    rationale: >
+      Nav2 sans EKF ni lidar démarre puis échoue ; l'ordre est une propriété du
+      manifeste, pas une convention d'appelant.
+    sources: [§5.2]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_capabilities/test/test_controleur.py::test_dependances_activees_dans_l_ordre.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P07
+
+  - id: REQ-CAPA-005
+    title: always_on non arrêtable
+    statement: >
+      Une capacité always_on ne peut pas être arrêtée par le service.
+    rationale: >
+      base et lidar portent la sûreté : les couper par un appel de service
+      supprimerait /scan et /cmd_vel_safe sans passer par l'arbitre.
+    sources: [S25, INV-01]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      clawbot_capabilities/test/test_controleur.py::test_always_on_refuse_l_arret
+      (message explicite, état inchangé) et
+      ::test_arret_refuse_si_une_capacite_active_en_depend.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P07
+
+  - id: REQ-CAPA-006
+    title: État publié à chaque changement
+    statement: >
+      L'état est publié sur /clawbot/capabilities/state à chaque changement,
+      RELIABLE + TRANSIENT_LOCAL.
+    rationale: >
+      health_monitor et l'exécutif doivent lire l'état sans interroger le service ;
+      TRANSIENT_LOCAL permet à un abonné tardif de recevoir le dernier état.
+    sources: [§3.5, §5.2]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_capabilities/test/test_etat.py::test_etat_publie_a_chaque_changement
+      et ::test_qos_transient_local.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P07
