@@ -46,3 +46,13 @@ def test_le_noeud_se_construit_avec_un_backend_factice():
         assert noeud.pub_json.topic_name == "/detections"
     finally:
         noeud.destroy_node()
+
+
+@pytest.mark.req("REQ-PERC-014")
+def test_encodage_yuv422_donne_trois_canaux():
+    """La caméra du poignet publie en yuv422 : 2 octets/pixel, pas 3 (constat déploiement)."""
+    from yolo_node.noeud import vers_bgr
+
+    image = vers_bgr(bytes(640 * 480 * 2), 480, 640, "yuv422")
+    assert image is not None
+    assert image.shape == (480, 640, 3)

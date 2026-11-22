@@ -67,10 +67,8 @@ class YoloNode(Node):
 
     # ── image ────────────────────────────────────────────────────────────────
     def _sur_image(self, message: Image) -> None:
-        image = np.frombuffer(message.data, dtype=np.uint8)
-        try:
-            image = image.reshape(message.height, message.width, -1)
-        except ValueError:
+        image = vers_bgr(message.data, message.height, message.width, message.encoding)
+        if image is None:
             return
         self.tampon.deposer((image, message.header), time.monotonic())
 
@@ -117,6 +115,48 @@ class YoloNode(Node):
         fil = threading.Thread(target=servir, args=(application, port), daemon=True)
         fil.start()
         self.get_logger().info(f"façade HTTP sur le port {port}")
+
+
+def vers_bgr(donnees, hauteur: int, largeur: int, encodage: str):
+    """Convertit un message Image en BGR 8 bits à 3 canaux, quel que soit son encodage.
+
+    La caméra du poignet publie en `yuv422` (2 octets par pixel) : un simple
+    `reshape(h, w, -1)` donne 2 canaux et l'inférence lève « expected input[1, 2,
+    480, 640] to have 3 channels » (constaté au déploiement du 2026-11-22).
+    """
+    if not hauteur or not largeur:
+        return None
+    tampon = np.frombuffer(donnees, dtype=np.uint8)
+    if encodage in ("rgb8", "bgr8"):
+        try:
+            image = tampon.reshape(hauteur, largeur, 3)
+        except ValueError:
+            return None
+        return image if encodage == "bgr8" else cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    if encodage in ("mono8",):
+        try:
+            gris = tampon.reshape(hauteur, largeur)
+        except ValueError:
+            return None
+        return cv2.cvtColor(gris, cv2.COLOR_GRAY2BGR)
+    if encodage in ("mono16", "16UC1", "rgb16"):
+        try:
+            gris16 = tampon.view(np.uint16).reshape(hauteur, largeur)
+        except ValueError:
+            return None
+        return cv2.cvtColor(cv2.convertScaleAbs(gris16, alpha=255.0 / 65535.0),
+                            cv2.COLOR_GRAY2BGR)
+    if encodage in ("yuv422", "yuyv", "yuv422_yuy2"):
+        try:
+            yuyv = tampon.reshape(hauteur, largeur, 2)
+        except ValueError:
+            return None
+        return cv2.cvtColor(yuyv, cv2.COLOR_YUV2BGR_YUYV)
+    # dernier recours : 2 octets par pixel supposé YUYV
+    try:
+        return cv2.cvtColor(tampon.reshape(hauteur, largeur, 2), cv2.COLOR_YUV2BGR_YUYV)
+    except ValueError:
+        return None
 
 
 def doit_encoder(n_abonnes: int) -> bool:
