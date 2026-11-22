@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>clawbot_mcp</name>
+  <version>0.1.0</version>
+  <description>Serveur MCP du Clawbot : facade de l'executif (P10)</description>
+  <maintainer email="jetson@clawbot.local">Clawbot</maintainer>
+  <license>Proprietary</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>clawbot_interfaces</exec_depend>
+  <exec_depend>clawbot_common</exec_depend>
+  <exec_depend>clawbot_executive</exec_depend>
+  <exec_depend>python3-mcp</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

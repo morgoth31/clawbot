@@ -1,0 +1,140 @@
+# Exigences du serveur MCP (`clawbot_mcp`, P10). Format : requirements/README.md.
+
+domain: MCP
+requirements:
+  - id: REQ-MCP-001
+    title: Douze outils, exactement ceux du référentiel
+    statement: >
+      La liste des outils exposés par le serveur MCP est exactement celle du §9 :
+      douze noms, aucun en plus, aucun en moins.
+    rationale: >
+      Un outil oublié laisse le LLM sans moyen d'agir ; un outil en trop est une
+      surface d'attaque non prévue par le référentiel (S21).
+    sources: [S21, §9]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_mcp/test/test_contrat_outils.py::test_exactement_douze_outils et
+      ::test_aucun_outil_en_plus.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P10
+
+  - id: REQ-MCP-002
+    title: Aucun accès direct aux actionneurs
+    statement: >
+      Aucun outil ne publie de Twist ni d'angle de servo, ne réarme l'e-stop, ne
+      modifie un paramètre ROS ni n'exécute de commande shell.
+    rationale: >
+      INV-04 : le LLM ne parle qu'à l'exécutif. Un outil qui publierait une consigne
+      contournerait l'arbitre, les skills et les budgets.
+    sources: [INV-04, S21, §9]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      clawbot_mcp/test/test_inspection.py : inspection des éditeurs (aucun Twist ni
+      Int32MultiArray), des clients (aucun /safety/reset_estop, aucun set_parameters),
+      des imports (aucun subprocess, aucun os.system), et des sources (`Twist(` absent).
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P10
+
+  - id: REQ-MCP-003
+    title: start_skill et start_mission rendent la main
+    statement: >
+      start_skill et start_mission rendent la main en moins de 1 s avec un mission_id.
+    rationale: >
+      Le LLM doit pouvoir suivre une mission longue sans bloquer son tour de parole.
+    sources: [§9]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_mcp/test/test_outils.py::test_start_mission_rend_la_main (mesure du délai)
+      et ::test_start_skill_rend_la_main.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P10
+
+  - id: REQ-MCP-004
+    title: stop_robot ne dépend de personne
+    statement: >
+      stop_robot publie /safety/estop=true et répond ok même si l'exécutif est absent.
+    rationale: >
+      C'est l'outil d'arrêt d'urgence du profil pilote : il ne peut pas dépendre d'un
+      service qui serait justement indisponible.
+    sources: [INV-05, §9]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      clawbot_mcp/test/test_stop_robot.py : Bool(True) publié sur /safety/estop avec un
+      éditeur factice, réponse ok=true alors que l'exécutif est absent.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P10
+
+  - id: REQ-MCP-005
+    title: Toujours du JSON, jamais d'exception
+    statement: >
+      Toute erreur renvoie {"ok": false, "error_code": <code §6.1>, "message": …} ;
+      aucune exception ne remonte au client MCP.
+    rationale: >
+      Un client MCP qui reçoit une trace Python ne peut pas décider d'un repli ; un
+      code de §6.1 si.
+    sources: [§9, §6.1]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_mcp/test/test_outils.py::test_executif_absent_rend_un_code (délai),
+      ::test_entree_invalide_rend_invalid_params, ::test_exception_interne_capturee.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P10
+
+  - id: REQ-MCP-006
+    title: Descriptions utilisables par un LLM
+    statement: >
+      Chaque description d'outil tient en moins de 400 caractères et dit quand
+      l'utiliser et ce qu'elle renvoie.
+    rationale: >
+      La description est le seul mode d'emploi dont le LLM dispose ; au-delà de
+      400 caractères elle est tronquée ou ignorée par certains clients.
+    sources: [§9]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_mcp/test/test_contrat_outils.py::test_descriptions_bornees_et_informatives.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P10
+
+  - id: REQ-MCP-007
+    title: HTTP lié à une interface, jeton exigé
+    statement: >
+      En HTTP, le serveur n'écoute que sur l'adresse configurée et refuse toute
+      requête sans le jeton attendu.
+    rationale: >
+      Le serveur commande un robot : une écoute sur 0.0.0.0 sans jeton serait une
+      porte ouverte sur le réseau de l'opérateur.
+    sources: [§9, INV-04]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_mcp/test/test_http_jeton.py::test_sans_jeton_401,
+      ::test_jeton_faux_401, ::test_jeton_valide_accepte, ::test_hote_lu_du_parametre.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P10
