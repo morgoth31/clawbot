@@ -5,12 +5,16 @@
 
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start clawbot-arm-controller.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl stop clawbot-arm-controller.service
+jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start clawbot-ekf.service
+jetson ALL=(root) NOPASSWD: /usr/bin/systemctl stop clawbot-ekf.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start clawbot-lidar.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl stop clawbot-lidar.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start clawbot-move-group.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl stop clawbot-move-group.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start clawbot-nav2.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl stop clawbot-nav2.service
+jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start clawbot-safety-arbitrator.service
+jetson ALL=(root) NOPASSWD: /usr/bin/systemctl stop clawbot-safety-arbitrator.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start clawbot-slam.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl stop clawbot-slam.service
 jetson ALL=(root) NOPASSWD: /usr/bin/systemctl start clawbot-wrist-camera.service
