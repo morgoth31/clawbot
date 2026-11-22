@@ -44,10 +44,10 @@ def imu_saine():
 def capteurs_sains(arb, t):
     """Alimente scan, imu et tension pour que decide() rende OK, à l'instant t."""
     arb._now = lambda: float(t)
-    arb._on_scan(scan_sain())
-    arb._on_imu(imu_saine())
+    arb.on_scan(scan_sain())
+    arb.on_imu(imu_saine())
     for _ in range(20):
-        arb._on_volt(Float32(data=11.9))
+        arb.on_volt(Float32(data=11.9))
 
 
 def twist(vx):

@@ -14,13 +14,15 @@ from clawbot_safety import arbitrator  # noqa: E402
 from soutien_arbitre import capteurs_sains, contexte, fermer, twist  # noqa: E402
 
 ENTREES = {"teleop": 100, "nav": 50, "skill": 40, "legacy": 10}
-PAIRES = list(itertools.combinations(ENTREES, 2))
+ORDRE = sorted(ENTREES, key=ENTREES.get)       # priorité croissante
+PAIRES = list(itertools.combinations(ORDRE, 2))  # (basse, haute)
 
 
 @pytest.fixture
 def arbitre():
     ctx = contexte()
     node = arbitrator.Arbitrator(context=ctx)
+    node._now = lambda: 1000.0          # horloge simulée dès la construction
     yield node
     fermer(node, ctx)
 

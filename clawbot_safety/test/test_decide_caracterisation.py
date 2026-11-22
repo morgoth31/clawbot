@@ -20,6 +20,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from clawbot_safety.arbitrator import decide  # noqa: E402
 
+pytestmark = pytest.mark.req("REQ-SAFETY-014")
+
 FRAIS = (0.1, 0.0, 0.0)          # consigne de 0,1 m/s
 ZERO = (0.0, 0.0, 0.0)
 SAIN = [11.9] * 20
