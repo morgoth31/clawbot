@@ -1,0 +1,150 @@
+domain: ARM
+requirements:
+  - id: REQ-ARM-001
+    title: Une seule source par joint sur /joint_states
+    statement: >
+      Un seul nœud doit publier `/joint_states` : `joint_state_publisher`, alimenté
+      par `source_list: [/arm/joint_states]` ; les joints du bras viennent du
+      contrôleur de trajectoire, et le pilote ne doit déclarer aucun éditeur sur ce
+      topic.
+    rationale: >
+      L'audit (S07, P01-M13) relève deux éditeurs déclarés et un seul qui publie :
+      `joint_state_publisher` à 20 Hz avec 15 joints à 0,0, et l'éditeur du pilote
+      créé (l. 118) mais jamais publié. Les deux se contrediraient sur l'arbre TF du
+      bras si le pilote publiait. L'énoncé du prompt attribuait les joints du bras au
+      pilote ; la mesure montre que le pilote ne lit que des angles de servo
+      entrelacés (~1,7 Hz par servo) et que le contrôleur publie déjà des consignes à
+      20 Hz : c'est lui la source, `joint_state_publisher` le seul éditeur sur le
+      fil. Écart consigné au rapport P13 §2.
+    sources: [S07, P01-M13]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      `base_driver.py` ne contient aucun `create_publisher(JointState, 'joint_states')` ;
+      `launch/robot_description.launch.py` déclare `source_list: ['/arm/joint_states']`
+      et `rate: 20.0`. Au déploiement : `ros2 topic info /joint_states` annonce un seul
+      éditeur (`joint_state_publisher`) et `ros2 topic hz` reste au-dessus de 18 Hz.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P13
+
+  - id: REQ-ARM-002
+    title: /arm/joint_states publié à au moins 8 Hz bras actif
+    statement: >
+      Quand la capacité `arm` est active, `/arm/joint_states` doit être publié à au
+      moins 8 Hz.
+    rationale: >
+      Le manifeste sonde `/arm/joint_states` à 8 Hz pour déclarer `arm` active
+      (`ready_when`, S25). Sans ce flux, MoveIt n'a pas d'état courant et la capacité
+      ne peut pas être servie. Le contrôleur est configuré à 20 Hz
+      (`joint_state_rate_hz`), soit 2,5 fois le seuil.
+    sources: [S07, S25]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      Au déploiement, `ros2 topic hz /arm/joint_states` ≥ 8 Hz pendant 30 s, capacité
+      `arm` active (`/clawbot/capabilities/state`). En domaine 99, le test
+      d'intégration mesure la même cadence sur le contrôleur réel et exige ≥ 8 Hz.
+    evidence: deploy/journal/2026-11-22_p13_bras.md
+    status: approved
+    approved_by: null
+    prompt: P13
+
+  - id: REQ-ARM-003
+    title: Aucune pose hors de la liste validée par l'opérateur
+    statement: >
+      Toute pose commandée par un skill du bras doit appartenir à la liste
+      `named_poses` validée par l'opérateur ; aucun angle libre n'est accepté.
+    rationale: >
+      Les zéros mécaniques des servos ne sont pas identifiés (base OKF
+      `bras_6dof.md`) : une consigne calculée n'est pas une position connue. Seule
+      une pose vue et acceptée sur le robot est sûre. La liste vit dans
+      `config/arm_poses.yaml` ; une pose sans `validated_by` ni `validated_at` n'est
+      pas chargeable, donc jamais commandable.
+    sources: [C10, R03]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      `arm_named_pose` avec une pose absente de la liste rend `INVALID_PARAMS` sans
+      envoyer de trajectoire ; une entrée de `propositions` (non validée) est refusée
+      de la même façon ; chaque pose validée, convertie en radians, reste dans les
+      limites de `urdf/clawbot_x3plus.urdf`.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P13
+
+  - id: REQ-ARM-004
+    title: ARM_NOT_AT_REST avant tout déplacement de la base
+    statement: >
+      Avant tout déplacement de la base par un skill, si le bras est hors de
+      l'enveloppe de repos ±5 °, le skill doit échouer `ARM_NOT_AT_REST`.
+    rationale: >
+      Nav2 ne connaît le bras que par un rayon d'encombrement de 0,16 m (C10) : un
+      bras en extension est invisible dans son costmap. L'enveloppe validée le
+      2026-11-11 est [90, 180, 0, 0, 90] degrés de servo ±5. Le silence n'est pas un
+      feu vert : angles jamais reçus ou périmés valent refus.
+    sources: [C10, R03]
+    safety: true
+    method: test
+    level: unit
+    criterion: >
+      `move_relative`, `rotate` et `navigate_to` rendent `ARM_NOT_AT_REST` quand
+      `/arm/servo_angles` est hors bande, périmé (> 1 s) ou jamais reçu, et n'émettent
+      aucune consigne sur `/cmd_vel/skill` ; les mêmes skills passent quand les cinq
+      angles sont dans la bande.
+    evidence: null
+    status: draft
+    approved_by: null
+    prompt: P13
+
+  - id: REQ-ARM-005
+    title: SERVO_NO_FEEDBACK sur retour servo invalide
+    statement: >
+      Une valeur `-1`, ou hors de [0, 270] degrés, sur un servo pendant plus de 0,5 s
+      doit faire échouer le skill de bras en cours avec `SERVO_NO_FEEDBACK`.
+    rationale: >
+      Le pilote publie `-1` quand la carte ne répond pas (03 §3). Une consigne
+      envoyée sur un servo muet n'a pas d'effet observable et le skill ne doit pas
+      rendre `SUCCEEDED` sur une position supposée. 0,5 s couvre trois cycles de
+      lecture entrelacée (~1,7 Hz par servo) sans transformer une absence isolée en
+      échec.
+    sources: [S02, P01-M11]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      Retour `-1` (ou 300 °) simulé pendant une trajectoire : le goal est annulé et le
+      résultat porte `SERVO_NO_FEEDBACK` en moins de 1 s après le début de
+      l'invalidité ; un retour valide ne déclenche rien.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P13
+
+  - id: REQ-ARM-006
+    title: arm_rest amène le bras dans l'enveloppe C10, vérifié sur la mesure
+    statement: >
+      `arm_rest` doit amener le bras dans l'enveloppe de repos C10 et ne rendre
+      `SUCCEEDED` qu'après vérification sur `/arm/servo_angles`.
+    rationale: >
+      Le contrôleur ne reçoit aucun retour de position : ses `/arm/joint_states` sont
+      des consignes. Seule la relecture des angles par le pilote prouve que le bras a
+      bougé. Le skill échoue donc `ARM_NOT_AT_REST` si les cinq angles mesurés ne
+      rentrent pas dans la bande ±5 ° avant l'échéance.
+    sources: [C10, S02]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      Procédure `tests/hardware/HW-ARM-001.md` §(b) : depuis le repos, `arm_rest`
+      laisse les cinq angles mesurés à ±5 ° de [90, 180, 0, 0, 90] ; le journal
+      consigne les valeurs lues avant et après.
+    evidence: tests/hardware/HW-ARM-001.md
+    status: approved
+    approved_by: null
+    prompt: P13
