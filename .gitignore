@@ -32,3 +32,16 @@ index-*.js
 yahboomcar_visual/detection/frozen_inference_graph.pb
 yahboomcar_mediapipe/yahboomcar_mediapipe/file/shape_predictor_68_face_landmarks.dat
 yahboomcar_slam/params/ORBvoc.txt
+
+# P14 : binaires vendor archives sous attic/ — trop gros pour un depot distant.
+# Trois d'entre eux ont ete ajoutes par erreur en P14 (git add -A sur le deplacement
+# du paquet) et ont fait refuser le push : ORBvoc.txt 138 Mo, shape_predictor 95 Mo,
+# frozen_inference_graph 66 Mo. On ignore les types binaires, pas tous les .txt :
+# attic/ contient aussi des CMakeLists.txt et des notes de quatre lignes.
+attic/**/*.dat
+attic/**/*.pb
+attic/**/*.bin
+attic/**/*.pcd
+attic/**/*.STL
+attic/**/*.stl
+attic/**/ORBvoc.txt
