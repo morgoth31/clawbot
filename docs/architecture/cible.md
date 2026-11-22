@@ -249,10 +249,14 @@ capabilities:
     units: [clawbot-wrist-camera.service]
     ready_when: [{topic: /wrist_camera/image_raw, min_hz: 25.0}]
   depth_vision:
-    units: [clawbot-astra.service]          # unité à créer en P11 ; aujourd'hui lancée par hardware_service
+    units: [orbbec-camera.service]           # ADR-001 (P11) : unité réelle, active depuis le 2026-11-12
     ready_when: [{topic: /camera/depth/image_raw, min_hz: 10.0}]
+  voice:
+    units: []                                # décrite, non pilotable : aucune unité sur ce poste
+    managed: false
+    ready_when: [{topic: /voice/command, min_hz: 0.2}]
   detection:
-    units: [yolo-inference.service]
+    units: [clawbot-yolo.service]
     requires: [wrist_vision]
     ready_when: [{topic: /perception/detections, min_hz: 2.0}]
 ```

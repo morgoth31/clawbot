@@ -43,6 +43,14 @@ class SystemdBackend:
         return subprocess.run(argv, check=False, capture_output=True,
                               timeout=self.timeout_s).returncode == 0
 
+    def est_en_echec(self, unite: str) -> bool:
+        """Vrai si systemd considere l'unite en echec (etat `failed`)."""
+        try:
+            self._executer("is-failed", "--quiet", unite)
+            return True
+        except ErreurBackend:
+            return False
+
 
 class FauxBackend(SystemdBackend):
     """Backend en mémoire, pour les tests d'intégration (domaine 99)."""
