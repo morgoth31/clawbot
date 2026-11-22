@@ -37,19 +37,32 @@ class Skill:
         self.nom = definition.nom
 
     # ── préconditions ────────────────────────────────────────────────────────
-    def capacite_manquante(self, etats) -> str | None:
-        for capacite in self.definition.requires:
+    def capacites_requises(self, params=None) -> list[str]:
+        """Capacités exigées, éventuellement dépendantes d'un paramètre.
+
+        `requires_by_param: {camera: {wrist: [...], astra: [...]}}` : la valeur du
+        paramètre choisit la liste (REQ-PERC-005). Sans paramètre, on retombe sur
+        `requires`, ce qui garde le comportement d'avant P11.
+        """
+        par_param = getattr(self.definition, "requires_by_param", None) or {}
+        for nom, valeurs in par_param.items():
+            if params is not None and nom in params and params[nom] in valeurs:
+                return list(valeurs[params[nom]])
+        return list(self.definition.requires)
+
+    def capacite_manquante(self, etats, params=None) -> str | None:
+        for capacite in self.capacites_requises(params):
             if not etats.capacite_active(capacite):
                 return capacite
         return None
 
-    def detail_precondition(self, etats) -> str:
-        manquante = self.capacite_manquante(etats)
+    def detail_precondition(self, etats, params=None) -> str:
+        manquante = self.capacite_manquante(etats, params)
         return f"capacité {manquante} inactive" if manquante else ""
 
-    def check_preconditions(self, etats) -> str | None:
+    def check_preconditions(self, etats, params=None) -> str | None:
         """Code d'erreur si le skill ne peut pas démarrer, sinon None."""
-        if self.capacite_manquante(etats):
+        if self.capacite_manquante(etats, params):
             return "CAPABILITY_INACTIVE"
         return None
 
@@ -160,6 +173,11 @@ class Rotate(Skill):
 
 
 class CaptureImage(Skill):
+    """Prend la prochaine image de la caméra demandée et l'écrit en JPEG.
+
+    La capacité exigée dépend de la caméra (`requires_by_param`), pour que l'Astra
+    ne soit jamais refusée parce que la caméra du poignet est indisponible.
+    """
     """Prend la prochaine image de la caméra demandée et l'écrit en JPEG."""
 
     def execute(self, ctx) -> Resultat:

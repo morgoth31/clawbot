@@ -1,0 +1,100 @@
+# Exigences de perception — Astra (P11).
+# Format et règles : requirements/README.md.
+#
+# L'Astra a été mesurée vivante le 2026-11-22 (profondeur 19,4 Hz sur 60 s, 19,6 Hz sur 10 min,
+# couleur 20,1 Hz) alors que l'audit la décrivait muette. La décision est donc de **conserver**
+# la profondeur : REQ-PERC-002 (retrait complet) est non applicable et n'est pas créée.
+# Décision et mesures : docs/architecture/decisions/ADR-001-profondeur-astra.md.
+
+domain: PERC
+requirements:
+  - id: REQ-PERC-001
+    title: /camera/depth/image_raw publie au moins 10 Hz pendant dix minutes
+    statement: >
+      Lorsque la capacité depth_vision est active, /camera/depth/image_raw doit publier
+      au moins 10 Hz en moyenne sur une fenêtre de dix minutes consécutives, sans trou
+      de plus de 1 s.
+    rationale: >
+      Q01 demandait de trancher par la mesure si la profondeur peut fonctionner sur ce
+      matériel. Le budget de 10 Hz est celui du manifeste (ready_when) et du moniteur.
+    sources: [Q01, S09, P01-M12]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      Fenêtre de 640 s de ros2 topic hz sur /camera/depth/image_raw : moyenne ≥ 10 Hz et
+      écart maximal entre messages ≤ 1 s. Mesure consignée dans
+      deploy/journal/2026-11-22_p11_mesures.md.
+    evidence: deploy/journal/2026-11-22_p11_mesures.md
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      Conservation de la profondeur décidée sur la mesure du 2026-11-22, sans réglage.
+    prompt: P11
+
+  - id: REQ-PERC-003
+    title: L'Astra est pilotée par le gestionnaire de capacités
+    statement: >
+      La capacité depth_vision doit être managed: true, déclarer orbbec-camera.service
+      dans units, ne pas être always_on ; aucun autre composant — en particulier
+      hardware_service — ne doit lancer le pilote Astra.
+    rationale: >
+      Une caméra qui tourne en permanence sans consommateur coûte 68,5 % de CPU. Le
+      gestionnaire doit pouvoir l'arrêter (INV-08 : tout pilotage passe par systemd).
+    sources: [P01-M12, S02, S12]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_p11_astra.py::test_depth_vision_est_geree_par_le_gestionnaire,
+      ::test_hardware_service_ne_lance_plus_lastra et
+      clawbot_capabilities/test/test_auth.py::test_chaque_unite_geree_est_autorisee_en_start_et_stop.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P11
+
+  - id: REQ-PERC-004
+    title: Aucun processus Astra quand la profondeur est inactive
+    statement: >
+      Quand depth_vision est inactive, aucun processus astra_camera_node ne doit tourner
+      sur le poste, et la couleur Astra ne doit plus être publiée.
+    rationale: >
+      L'objectif du prompt est que l'Astra ne tourne plus si personne ne la consomme ;
+      seul le gestionnaire peut le garantir.
+    sources: [Q01, S12]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      Procédure HW-PERC-001 : après set depth_vision false, systemctl is-active
+      orbbec-camera rend inactive, pgrep -af astra_camera_node rend 0 ligne, et aucun
+      message n'arrive sur /camera/depth/image_raw ni /camera/color/image_raw en 10 s.
+    evidence: tests/hardware/HW-PERC-001.md
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      Procédure à exécuter par l'opérateur au déploiement (robot sur cales).
+    prompt: P11
+
+  - id: REQ-PERC-005
+    title: capture_image astra ne dépend pas de la caméra du poignet
+    statement: >
+      Le skill capture_image doit exiger depth_vision pour la caméra astra et
+      wrist_vision pour la caméra wrist ; une capacité inactive ne doit pas refuser la
+      capture de l'autre caméra.
+    rationale: >
+      À l'essai P10, get_snapshot {camera: wrist} et toute capture Astra étaient refusés
+      en CAPABILITY_INACTIVE parce que wrist_vision était FAILED, alors que l'Astra
+      publiait à 19 Hz : la dépendance était globale au lieu d'être par caméra.
+    sources: [Q01, P10-essai]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_p11_astra.py::test_capture_image_depend_de_la_camera_demandee et
+      clawbot_executive/test/test_exec_preconditions.py (dépendance par paramètre).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P11

@@ -21,6 +21,8 @@ class Definition:
     description: str = ""
     params_schema: dict = field(default_factory=dict)
     requires: list[str] = field(default_factory=list)
+    # Dépendances qui varient selon un paramètre (ex. `camera`) : {param: {valeur: [capacités]}}
+    requires_by_param: dict = field(default_factory=dict)
     timeout_s: float = 30.0
     bornes: dict = field(default_factory=dict)
 
@@ -43,6 +45,7 @@ def charger(chemin: str | Path) -> dict[str, Definition]:
             description=str(donnees.get("description", "")),
             params_schema=schema,
             requires=list(donnees.get("requires") or []),
+            requires_by_param=dict(donnees.get("requires_by_param") or {}),
             timeout_s=float(donnees.get("timeout_s", 30.0)),
             bornes=dict(donnees.get("bornes") or {}),
         )

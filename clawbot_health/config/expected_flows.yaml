@@ -13,6 +13,8 @@ flows:
   - {topic: /arm/servo_angles,         type: std_msgs/msg/Int32MultiArray,   min_hz: 9.0,  max_age_s: 2.0, capability: base,         critical: false}
   - {topic: /cmd_vel_safe,             type: geometry_msgs/msg/Twist,        min_hz: 18.0, max_age_s: 0.5, capability: base,         critical: true}
   - {topic: /wrist_camera/image_raw,   type: sensor_msgs/msg/Image,          min_hz: 25.0, max_age_s: 1.0, capability: wrist_vision, critical: false}
-  - {topic: /camera/color/image_raw,   type: sensor_msgs/msg/Image,          min_hz: 25.0, max_age_s: 1.0, capability: depth_vision, critical: false}
+  # Couleur Astra : 30 fps demandés au lancement, 20,1 Hz mesurés sur USB 2.0 (P11).
+  # Seuil = mesure − 10 % (C12), et non les 25 Hz du mode théorique.
+  - {topic: /camera/color/image_raw,   type: sensor_msgs/msg/Image,          min_hz: 18.0, max_age_s: 1.0, capability: depth_vision, critical: false}
   - {topic: /camera/depth/image_raw,   type: sensor_msgs/msg/Image,          min_hz: 10.0, max_age_s: 1.0, capability: depth_vision, critical: false}
   - {topic: /perception/detections,    type: std_msgs/msg/String,            min_hz: 2.0,  max_age_s: 2.0, capability: detection,    critical: false}
