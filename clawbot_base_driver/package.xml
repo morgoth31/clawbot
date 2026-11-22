@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>clawbot_base_driver</name>
+  <version>0.1.0</version>
+  <description>Pilote du chassis Clawbot X3 Plus : source unique, port serie nomme, arret sur silence</description>
+  <maintainer email="jetson@clawbot.local">jetson</maintainer>
+  <license>Proprietary</license>
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
+  <test_depend>pytest</test_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>
