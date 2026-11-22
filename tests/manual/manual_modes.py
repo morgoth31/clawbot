@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
-"""Test the C++ bridge modes (STANDBY, NAVIGATION, MANIPULATION, EVOLUTION)."""
+# SCRIPT MANUEL — pas un test pytest (REQ-TEST-004).
+#
+# Attend un service : le pont C++ doit écouter sur http://localhost:8002
+# (il expose /mode, /health, /tools et /command).
+# Sans service, l'import échoue en httpx.ConnectError et toute la collecte
+# pytest tomberait (constat S42).
+#
+# Lancement :
+#     python3 tests/manual/manual_modes.py
+#
+# Hors collecte : pytest.ini contient norecursedirs = tests/manual, et le
+# fichier n'a plus le préfixe test_.
+
+"""Vérification manuelle des modes du pont C++ (STANDBY, NAVIGATION, MANIPULATION, EVOLUTION)."""
 import httpx, json, sys
 
 BRIDGE_URL = "http://localhost:8002"

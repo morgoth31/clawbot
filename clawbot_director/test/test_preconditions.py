@@ -113,9 +113,12 @@ def test_une_configuration_malformee_est_refusee(tmp_path, contenu, motif):
 
 
 # ── domaine 99 : le directeur applique la précondition ─────────────────────
+# Domaine 99 exigé. Sous pytest en domaine 98 (suite unitaire), le module
+# est ignoré au lieu de faire échouer la collecte de tout le dépôt.
+pytestmark = pytest.mark.integration
 if os.environ.get("ROS_DOMAIN_ID") not in (None, "", "99"):
-    raise RuntimeError(
-        f"tests du directeur : ROS_DOMAIN_ID={os.environ['ROS_DOMAIN_ID']} interdit, 99 exigé")
+    pytest.skip(
+        f"tests du directeur : ROS_DOMAIN_ID={os.environ['ROS_DOMAIN_ID']} interdit, 99 exigé", allow_module_level=True)
 os.environ["ROS_DOMAIN_ID"] = "99"
 
 rclpy = pytest.importorskip("rclpy")

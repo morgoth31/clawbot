@@ -23,9 +23,12 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 # ENV-01 du dépôt : jamais 28 pendant un test, et jamais silencieusement.
-if os.environ.get('ROS_DOMAIN_ID') not in (None, '', '99'):
-    raise RuntimeError(
-        f"tests du directeur : ROS_DOMAIN_ID={os.environ['ROS_DOMAIN_ID']} interdit, 99 exigé")
+# Domaine 99 exigé. Sous pytest en domaine 98 (suite unitaire), le module
+# est ignoré au lieu de faire échouer la collecte de tout le dépôt.
+pytestmark = pytest.mark.integration
+if os.environ.get("ROS_DOMAIN_ID") not in (None, "", "99"):
+    pytest.skip(
+        f"tests du directeur : ROS_DOMAIN_ID={os.environ['ROS_DOMAIN_ID']} interdit, 99 exigé", allow_module_level=True)
 os.environ['ROS_DOMAIN_ID'] = '99'
 
 rclpy = pytest.importorskip('rclpy')

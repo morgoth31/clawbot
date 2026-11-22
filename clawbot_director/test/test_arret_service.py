@@ -49,9 +49,12 @@ def test_le_script_est_executable_et_annule_sans_se_deguiser_en_securite():
 
 
 # ── le comportement, en domaine 99 ──────────────────────────────────────────
+# Domaine 99 exigé. Sous pytest en domaine 98 (suite unitaire), le module
+# est ignoré au lieu de faire échouer la collecte de tout le dépôt.
+pytestmark = pytest.mark.integration
 if os.environ.get("ROS_DOMAIN_ID") not in (None, "", "99"):
-    raise RuntimeError(
-        f"tests du directeur : ROS_DOMAIN_ID={os.environ['ROS_DOMAIN_ID']} interdit, 99 exigé")
+    pytest.skip(
+        f"tests du directeur : ROS_DOMAIN_ID={os.environ['ROS_DOMAIN_ID']} interdit, 99 exigé", allow_module_level=True)
 os.environ["ROS_DOMAIN_ID"] = "99"
 
 rclpy = pytest.importorskip("rclpy")
