@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Vérification unique du dépôt Clawbot (P00, REQ-TEST-001 à 005).
 #
-#   scripts/check.sh                     # lint, unitaires, traçabilité, doublons
+#   scripts/check.sh                     # lint, unitaires, cpp, traçabilité, interdits, doublons
 #   scripts/check.sh tests               # idem, en limitant pytest au chemin donné
 #   scripts/check.sh --self-test         # annonce les étapes et sort 0
 #   scripts/check.sh --integration       # pytest -m integration en domaine 99
@@ -155,6 +155,32 @@ run_trace() {
     python3 scripts/trace_check.py --repo . --max-untraced "$plafond"
 }
 
+run_interdits() {
+    echo "── interdits ───────────────────────────────────────────────────────"
+    # INV-08 : aucun pilotage de processus par motif. Un motif peut tuer un
+    # processus qui n'était pas la cible (S33). Exceptions nommées, et rien d'autre :
+    #   - scripts/check.sh et tests/test_units.py portent la règle eux-mêmes ;
+    #   - joy_teleop/clawbot_restart_teleop.sh est un outil manuel de l'opérateur,
+    #     hors périmètre P07 (fichier modifié hors de la zone de travail) : signalé
+    #     dans le rapport, à arbitrer.
+    local trouves
+    # `pgrep` seul est refusé aussi : la forme liste `["pgrep", "-f"]` échappe à un
+    # motif littéral « pgrep -f », et un pgrep sans -f reste un pilotage par motif.
+    trouves=$(grep -rnE 'pkill|killall|pgrep' \
+        --include='*.py' --include='*.sh' --include='*.service' \
+        --exclude-dir=install --exclude-dir=build --exclude-dir=log \
+        --exclude-dir=.git --exclude-dir=docs --exclude-dir=manual \
+        . 2>/dev/null \
+        | grep -vE '^\./(scripts/check\.sh|tests/test_units\.py):' \
+        | grep -vE '^\./joy_teleop/clawbot_restart_teleop\.sh:' || true)
+    if [[ -n "$trouves" ]]; then
+        echo "ERREUR : pilotage de processus par motif interdit (INV-08, S33) :" >&2
+        echo "$trouves" | head -10 >&2
+        return 1
+    fi
+    echo "OK     aucun pkill/killall/pgrep hors exceptions nommées"
+}
+
 run_duplicates() {
     echo "── doublons ────────────────────────────────────────────────────────"
     local strict=0
@@ -226,6 +252,7 @@ run_lint
 run_unit
 run_cpp
 run_trace
+run_interdits
 run_duplicates
 
 echo "Vérification terminée : code 0"

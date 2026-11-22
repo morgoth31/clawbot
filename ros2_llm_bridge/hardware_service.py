@@ -20,7 +20,6 @@ import json
 import subprocess
 import logging
 import os
-import signal
 import threading
 import time
 
@@ -40,6 +39,11 @@ from nav_msgs.msg import OccupancyGrid
 from sensor_msgs.msg import CompressedImage, Imu
 from std_srvs.srv import Trigger
 from std_msgs.msg import Bool, Float32, Int32, Int32MultiArray, String
+
+try:                                     # P07 : gestionnaire de capacités
+    from clawbot_interfaces.srv import SetCapability
+except ImportError:                      # pragma: no cover - installation incomplète
+    SetCapability = None
 
 logging.basicConfig(
     level=logging.INFO,
@@ -97,6 +101,15 @@ class HardwareNode(Node):
         # plus /cmd_vel avec le pont LLM et la sentinelle.
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel/teleop", 10)
         self.cli_reset_estop = self.create_client(Trigger, "/safety/reset_estop")
+        # Capacités (P07) : le service HTTP délègue le pilotage, il ne tue plus de
+        # processus lui-même (INV-08, REQ-OPS-030).
+        self.cli_capacite = (self.create_client(SetCapability, "/clawbot/capabilities/set")
+                             if SetCapability is not None else None)
+        self.capacites: dict[str, dict] = {}
+        self.create_subscription(
+            String, "/clawbot/capabilities/state", self._sur_capacites,
+            QoSProfile(depth=1, reliability=ReliabilityPolicy.RELIABLE,
+                       durability=DurabilityPolicy.TRANSIENT_LOCAL))
         self.servo_pub   = self.create_publisher(Int32MultiArray, "/servo_ctrl", 10)
         self.buzzer_pub  = self.create_publisher(Bool,            "/Buzzer",     10)
         self.rgb_pub     = self.create_publisher(Int32,           "/RGBLight",   10)
@@ -188,7 +201,6 @@ class HardwareNode(Node):
 
 ros_node: HardwareNode | None = None
 _last_motion_t: float = 0.0
-_slam_process: subprocess.Popen | None = None
 
 
 def _watchdog_thread():
@@ -582,247 +594,77 @@ async def get_telemetry() -> dict:
     }
 
 
-# ── SLAM Map ─────────────────────────────────────────────────────────────────
+# ── SLAM (délégué au gestionnaire de capacités) ──────────────────────────────
+# INV-08 / REQ-OPS-030 : plus aucun pilotage par motif de nom de processus ici.
+# `mapping` est une capacité du
+# manifeste (clawbot-slam.service) ; ce service HTTP ne fait que demander son
+# activation et lire son état (REQ-CAPA-001, REQ-CAPA-006).
 
-def _is_slam_running() -> bool:
+CAPACITE_SLAM = "mapping"
+QOS_CAPACITES = QoSProfile(depth=1, reliability=ReliabilityPolicy.RELIABLE,
+                           durability=DurabilityPolicy.TRANSIENT_LOCAL)
+
+
+def demander_capacite(client, capacite: str, actif: bool, timeout_s: float = 90.0,
+                      attente_s: float = 120.0) -> dict:
+    """Appelle /clawbot/capabilities/set et rend la réponse du gestionnaire.
+
+    Fonction pure vis-à-vis du processus : elle ne connaît que le client injecté,
+    ce qui la rend testable sans robot.
+    """
+    if client is None:
+        raise HTTPException(503, "gestionnaire de capacités indisponible "
+                                 "(clawbot_interfaces non installé ?)")
+    if not client.wait_for_service(timeout_sec=3.0):
+        raise HTTPException(503, "service /clawbot/capabilities/set injoignable")
     try:
-        # Check if slam_launch.py is in the process list
-        out = subprocess.check_output(["pgrep", "-f", "slam_launch.py"])
-        return len(out.strip()) > 0
-    except subprocess.CalledProcessError:
-        return False
+        from clawbot_interfaces.srv import SetCapability
+        requete = SetCapability.Request()
+    except ImportError:                                # pragma: no cover
+        raise HTTPException(503, "clawbot_interfaces/SetCapability manquant")
+    requete.name = capacite
+    requete.active = bool(actif)
+    requete.timeout_s = float(timeout_s)
+    futur = client.call_async(requete)
+    limite = time.monotonic() + attente_s
+    while not futur.done() and time.monotonic() < limite:
+        time.sleep(0.05)
+    if not futur.done():
+        raise HTTPException(504, f"{capacite} : aucune réponse en {attente_s:.0f} s")
+    return {"success": bool(futur.result().success),
+            "state": futur.result().state,
+            "message": futur.result().message}
+
 
 @app.post("/slam/start")
 async def start_slam() -> dict:
-    """Start the SLAM background process using slam_launch.py.
-    
-    Returns:
-        Status indicating whether SLAM was started or already running.
-    """
-    global _slam_process
-    if _is_slam_running():
-        return {"status": "ok", "message": "SLAM is already running."}
-    
-    import shlex
-    cmd = shlex.split(f"bash -c 'source /opt/ros/humble/setup.bash && ROS_DOMAIN_ID={ROS_DOMAIN_ID} ros2 launch /home/jetson/clawbot/slam_launch.py'")
-    
-    try:
-        _slam_process = subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except Exception as e:
-        raise HTTPException(500, f"Failed to start SLAM: {e}")
-    
-    return {"status": "ok", "message": "SLAM started."}
+    """Active la capacité `mapping` (unité clawbot-slam.service)."""
+    if ros_node is None:
+        raise HTTPException(503, "ROS 2 node not ready.")
+    reponse = demander_capacite(ros_node.cli_capacite, CAPACITE_SLAM, True)
+    return {"status": "ok" if reponse["success"] else "refuse", **reponse}
 
 
 @app.post("/slam/stop")
 async def stop_slam() -> dict:
-    """Stop the SLAM background process and its children.
-    
-    Returns:
-        Status indicating whether SLAM was stopped or not running.
-    """
-    global _slam_process
-    
+    """Désactive la capacité `mapping` ; l'arrêt passe par systemd."""
+    if ros_node is None:
+        raise HTTPException(503, "ROS 2 node not ready.")
     try:
-        # Find the PID of the slam_launch.py script
-        pid_bytes = subprocess.check_output(["pgrep", "-f", "slam_launch.py"])
-        pids = pid_bytes.decode().strip().split('\n')
-        
-        for pid_str in pids:
-            if pid_str:
-                pid = int(pid_str)
-                try:
-                    # Get the process group ID
-                    pgid_bytes = subprocess.check_output(["ps", "-o", "pgid=", "-p", str(pid)])
-                    pgid = int(pgid_bytes.decode().strip())
-                    # Kill the entire process group
-                    os.killpg(pgid, signal.SIGTERM)
-                except Exception:
-                    # Fallback to killing just the process if pgid fails
-                    os.kill(pid, signal.SIGTERM)
-    except subprocess.CalledProcessError:
-        pass  # pgrep found nothing, slam_launch.py is not running
-        
-    try:
-        # Give cartographer nodes a moment to cleanly shutdown, then force kill if needed
-        await asyncio.sleep(1.0)
-        nodes_to_kill = [
-            "slam_launch.py",
-            "cartographer_node", 
-            "cartographer_occupancy_grid_node",
-            "ydlidar_ros2_driver_node",
-            "static_transform_publisher"
-        ]
-        for node in nodes_to_kill:
-            subprocess.run(["pkill", "-9", "-f", node], timeout=2.0)
-    except Exception as e:
-        raise HTTPException(500, f"Error stopping SLAM processes: {e}")
+        reponse = demander_capacite(ros_node.cli_capacite, CAPACITE_SLAM, False)
     finally:
-        _slam_process = None
         if ros_node:
-            ros_node.map_data = None  # Clear the stale map data
-            
-    return {"status": "ok", "message": "SLAM stopped."}
+            ros_node.map_data = None              # la carte n'est plus servie
+    return {"status": "ok" if reponse["success"] else "refuse", **reponse}
 
 
 @app.get("/slam/status")
 async def slam_status() -> dict:
-    """Check the status of the SLAM process.
-    
-    Returns:
-        Dict with 'active' indicating if SLAM is currently running.
-    """
-    active = _is_slam_running()
-    return {"active": active}
-
-
-@app.get("/map/live")
-async def get_live_map() -> dict:
-    """Return the current live SLAM map as a base64 PNG.
-
-    Converts the last received /map OccupancyGrid to a PNG image.
-
-    Returns:
-        Dict with image_base64, dimensions, resolution and timestamp.
-
-    Raises:
-        HTTPException 404 if no map has been received yet.
-    """
-    if ros_node is None:
-        raise HTTPException(503, "ROS 2 node not ready.")
-    if ros_node.map_data is None:
-        raise HTTPException(404, "No map received yet — is SLAM running?")
-    try:
-        png = _occupancy_grid_to_png_bytes(ros_node.map_data)
-    except Exception as e:
-        raise HTTPException(500, f"Map conversion error: {e}")
-    b64 = base64.b64encode(png).decode()
-    return {
-        "image_base64": b64,
-        "format":       "png",
-        "width":        ros_node.map_data.info.width,
-        "height":       ros_node.map_data.info.height,
-        "resolution":   ros_node.map_data.info.resolution,
-        "stamp":        ros_node.map_stamp,
-    }
-
-
-@app.get("/maps")
-async def list_maps() -> dict:
-    """List all saved maps in MAPS_DIR.
-
-    Returns:
-        Dict with a 'maps' list of {name, has_pgm, mtime}.
-    """
-    os.makedirs(MAPS_DIR, exist_ok=True)
-    maps = []
-    for f in sorted(os.listdir(MAPS_DIR)):
-        if f.endswith(".yaml"):
-            name      = f[:-5]
-            pgm_path  = os.path.join(MAPS_DIR, name + ".pgm")
-            yaml_path = os.path.join(MAPS_DIR, f)
-            mtime     = os.path.getmtime(yaml_path) if os.path.exists(yaml_path) else 0
-            maps.append({"name": name, "has_pgm": os.path.exists(pgm_path), "mtime": mtime})
-    return {"maps": maps}
-
-
-class SaveMapRequest(BaseModel):
-    name: str = Field(..., min_length=1, max_length=64, pattern=r"^[a-zA-Z0-9_\-]+$")
-
-
-@app.post("/maps/save")
-async def save_map(req: SaveMapRequest) -> dict:
-    """Save the current SLAM map to disk using nav2 map_saver_cli.
-
-    Args:
-        req: SaveMapRequest with the map name (alphanumeric + _ -).
-
-    Returns:
-        Status and saved file path.
-
-    Raises:
-        HTTPException 500/504 if map_saver_cli fails or times out.
-    """
-    os.makedirs(MAPS_DIR, exist_ok=True)
-    out_path = os.path.join(MAPS_DIR, req.name)
-    cmd = [
-        "bash", "-c",
-        f"source /opt/ros/humble/setup.bash && "
-        f"ROS_DOMAIN_ID={ROS_DOMAIN_ID} "
-        f"ros2 run nav2_map_server map_saver_cli -f {out_path} "
-        f"--ros-args -p map_subscribe_transient_local:=true"
-    ]
-    loop = asyncio.get_event_loop()
-    try:
-        result = await loop.run_in_executor(None, lambda: subprocess.run(
-            cmd, capture_output=True, text=True, timeout=15.0
-        ))
-        if result.returncode != 0:
-            raise HTTPException(500, f"map_saver_cli failed: {result.stderr.strip()}")
-    except subprocess.TimeoutExpired:
-        raise HTTPException(504, "map_saver_cli timed out (15s)")
-    return {"status": "ok", "name": req.name, "path": out_path}
-
-
-@app.get("/maps/{name}/image")
-async def get_map_image(name: str) -> dict:
-    """Load a saved map PGM and return it as a base64 PNG.
-
-    Args:
-        name: Map name (without extension).
-
-    Returns:
-        Dict with image_base64, dimensions, resolution and name.
-
-    Raises:
-        HTTPException 404 if map not found.
-    """
-    pgm_path  = os.path.join(MAPS_DIR, name + ".pgm")
-    yaml_path = os.path.join(MAPS_DIR, name + ".yaml")
-    if not os.path.exists(pgm_path):
-        raise HTTPException(404, f"Map not found: {name}")
-    img = cv2.imread(pgm_path, cv2.IMREAD_GRAYSCALE)
-    if img is None:
-        raise HTTPException(500, "Failed to read PGM file.")
-    rgb = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-    _, buf = cv2.imencode(".png", rgb)
-    b64  = base64.b64encode(buf.tobytes()).decode()
-    meta: dict = {}
-    if os.path.exists(yaml_path):
-        with open(yaml_path) as f:
-            meta = _yaml.safe_load(f) or {}
-    return {
-        "image_base64": b64,
-        "format":       "png",
-        "width":        img.shape[1],
-        "height":       img.shape[0],
-        "resolution":   meta.get("resolution"),
-        "name":         name,
-    }
-
-
-@app.delete("/maps/{name}")
-async def delete_map(name: str) -> dict:
-    """Delete a saved map (.pgm + .yaml files).
-
-    Args:
-        name: Map name (without extension).
-
-    Returns:
-        List of deleted files.
-
-    Raises:
-        HTTPException 404 if no files found.
-    """
-    deleted = []
-    for ext in [".pgm", ".yaml"]:
-        p = os.path.join(MAPS_DIR, name + ext)
-        if os.path.exists(p):
-            os.remove(p)
-            deleted.append(p)
-    if not deleted:
-        raise HTTPException(404, f"Map not found: {name}")
-    return {"status": "ok", "deleted": deleted}
+    """État de la capacité `mapping`, d'après /clawbot/capabilities/state."""
+    etat = ""
+    if ros_node is not None:
+        etat = (ros_node.capacites.get(CAPACITE_SLAM) or {}).get("state", "")
+    return {"active": etat in ("ACTIVE", "STARTING"), "state": etat or None}
 
 
 # ── System Status ────────────────────────────────────────────────────────────
