@@ -1,0 +1,130 @@
+# Exigences de santé des flux — moniteur, péremption, niveau.
+# Format et règles : requirements/README.md.
+
+domain: HEALTH
+requirements:
+  - id: REQ-HEALTH-001
+    title: Péremption d'un flux déclaré
+    statement: >
+      Un flux déclaré dans expected_flows.yaml, critique ou non, dont la capacité
+      est active, doit apparaître dans stale_flows de /clawbot/health au plus 3 s
+      après son dernier message.
+    rationale: >
+      Deux flux sont muets sans que rien ne le signale : la profondeur Astra
+      (0 message en 12 s, S09) et la détection (aucun éditeur, S07). Les SPOF
+      astra_camera et ydlidar n'ont de détection automatique que pour /scan, et
+      seulement dans l'arbitre (03 §2).
+    sources: [S07, S09, R09, INV-09, O07]
+    safety: false
+    method: test
+    level: integration
+    criterion: >
+      tests/integration/test_sante.py::test_flux_qui_s_arrete_devient_perime :
+      /test_flux publié à 10 Hz puis arrêté, /clawbot/health.stale_flows contient
+      /test_flux en moins de 3 s (mesure à l'horloge du test).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P05
+
+  - id: REQ-HEALTH-002
+    title: Cadence mesurée sous le seuil
+    statement: >
+      Un flux dont la cadence mesurée sur 5 s est inférieure à son min_hz doit
+      être signalé en WARN, avec la cadence mesurée dans le diagnostic.
+    rationale: >
+      Un flux qui ralentit (USB saturé, caméra en repli) reste « frais » au sens
+      de l'âge alors qu'il ne tient plus sa cadence C12 : l'âge seul ne le voit pas.
+    sources: [C12, S08, S09]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_health/test/test_estimateur.py::test_cadence_nominale,
+      ::test_cadence_a_moins_20_pour_cent et
+      clawbot_health/test/test_niveau.py::test_flux_lent_seul_donne_warn.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P05
+
+  - id: REQ-HEALTH-003
+    title: Niveau global de RobotHealth
+    statement: >
+      RobotHealth.level doit valoir ERROR si un flux critique est périmé, WARN si
+      un flux non critique est périmé ou trop lent, OK sinon.
+    rationale: >
+      Le niveau porte la gravité pour l'humain et pour l'exécutif : confondre un
+      flux critique avec un flux de confort ferait ignorer une perte de /scan.
+    sources: [INV-09, O07]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_health/test/test_niveau.py, paramétré sur les combinaisons
+      (critique périmé, non critique périmé, lent, tout sain).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P05
+
+  - id: REQ-HEALTH-004
+    title: Aucune désérialisation des flux surveillés
+    statement: >
+      Le moniteur doit s'abonner à chaque flux en mode brut (raw=True), QoS
+      BEST_EFFORT profondeur 1, sans désérialiser les messages.
+    rationale: >
+      Surveiller /camera/color/image_raw en désérialisant coûterait la bande
+      passante et le CPU d'un second consommateur d'images ; un abonné BEST_EFFORT
+      reste compatible avec un éditeur RELIABLE.
+    sources: [S09, O03]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_health/test/test_abonnements_bruts.py::test_chaque_flux_brut_en_best_effort
+      (create_subscription enveloppé, raw=True et QoS vérifiés par flux).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P05
+
+  - id: REQ-HEALTH-005
+    title: Coût CPU du moniteur
+    statement: >
+      Le moniteur doit consommer moins de 5 % d'un cœur en régime établi.
+    rationale: >
+      Un moniteur qui coûte plus que les flux qu'il surveille se ferait
+      désactiver : le budget est celui d'une boucle à 1 Hz sur des abonnements
+      bruts.
+    sources: [O03]
+    safety: false
+    method: demonstration
+    level: demonstration
+    criterion: >
+      pidstat 2 10 sur le processus du moniteur, robot en fonctionnement :
+      %CPU < 5 %. Consigné dans deploy/journal/2026-11-22_p05_sante.md.
+    evidence: deploy/journal/2026-11-22_p05_sante.md
+    status: implemented
+    approved_by: null
+    prompt: P05
+
+  - id: REQ-HEALTH-006
+    title: Capacité inactive, flux non signalé
+    statement: >
+      Un flux dont la capacité n'est pas active ne doit pas être signalé, ni
+      périmé ni trop lent.
+    rationale: >
+      Sans cette règle, un bras ou une caméra non montés produiraient des alertes
+      permanentes et le niveau resterait WARN en fonctionnement normal.
+    sources: [INV-09]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      clawbot_health/test/test_niveau.py::test_capacite_inactive_ignoree et
+      ::test_capacite_active_mais_flux_absent_est_perime.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: P05
