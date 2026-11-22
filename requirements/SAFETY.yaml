@@ -23,6 +23,6 @@ requirements:
       ::test_on_shutdown_ne_propage_pas_une_erreur_de_publication (contexte fermé :
       avertissement journalisé, aucune exception) sortent verts.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
     prompt: P02
