@@ -7,6 +7,8 @@ de demander : un code sans liste laisserait passer n'importe quelle décision.
 """
 from __future__ import annotations
 
+import time
+
 from dataclasses import dataclass
 from types import MappingProxyType
 
@@ -98,3 +100,37 @@ def as_json() -> dict:
             for code, spec in CODES.items()
         },
     }
+
+
+def rapport_echec(*, mission_id: str, objective: str, step_index: int, skill: str,
+                  params: dict | None, error_code: str, message: str,
+                  health: dict, budget: dict, attempts: int = 1,
+                  auto_retries_done: int = 0, last_events: list | None = None,
+                  stamp: str | None = None) -> dict:
+    """Rapport d'échec conforme au schéma §6.2 (`failure_report.schema.json`).
+
+    Construit à partir de la table d'erreurs : la catégorie et les décisions
+    autorisées ne sont jamais recopiées à la main, elles découlent du code.
+    """
+    spec = _spec_de(error_code)                 # lève KeyError si le code est inconnu
+    document = {
+        "schema": "clawbot.failure_report/1",
+        "mission_id": mission_id,
+        "objective": objective,
+        "step_index": int(step_index),
+        "skill": skill,
+        "error_code": error_code,
+        "error_category": spec.category,
+        "message": message,
+        "attempts": int(attempts),
+        "auto_retries_done": int(auto_retries_done),
+        "health": health,
+        "allowed_decisions": list(spec.decisions),
+        "budget": budget,
+        "stamp": stamp or time.strftime("%Y-%m-%dT%H:%M:%S%z") or "1970-01-01T00:00:00Z",
+    }
+    if params is not None:
+        document["params"] = params
+    if last_events:
+        document["last_events"] = last_events
+    return document
