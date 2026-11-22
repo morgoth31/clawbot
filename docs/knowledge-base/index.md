@@ -80,6 +80,7 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
     ├── 2026-11-10_mise_en_service_manipulation.md
     ├── etat_noeuds_et_services.md
     ├── mise_a_jour_firmware_carte_rosmaster.md
+    ├── 2026-11-22_audit_inventaire_poste.md
     └── errors_traces/
         ├── ERR-2026-11-10-001_absence_topic_scan.md
         ├── ERR-2026-11-10-002_espace_disque_critique.md
@@ -156,3 +157,4 @@ Document racine du graphe de connaissances du robot mobile autonome **Clawbot X3
 | 2026-11-11 18:00 | Bras : les servos n'exécutent plus les consignes depuis 17:20 alors que le MCU les enregistre et les renvoie à la lecture ; la relecture `/arm/servo_angles` n'est donc plus une mesure de position. Chaîne, faits datés, pièges et protocole de test consolidés dans une page unique | [[bras_remise_en_service]] |
 | 2026-11-11 16:41 | Préconditions de mouvement : `navigate_to` exige désormais un bras **mesuré** dans son enveloppe de repos (refus si angles périmés ou jamais reçus), `ExecStop` du directeur annule la tâche en vol, absences du contexte MCP dérivées de l'observation ; 293 tests verts | [[preconditions_mouvement]] |
 | 2026-11-11 16:17 | Lot 5 : navigation sur carte — catalogue de waypoints fermé (`ouest`, `centre`, `est`), `navigate_to` devient un adaptateur `NavigateToPose`, EKF et Nav2 en unités persistantes ; 3 waypoints atteints à 0,000 / 0,121 / 0,082 m en simulation, 268 tests verts | [[navigation_nav2_waypoints]] |
+| 2026-11-22 10:47 | Inventaire du poste classé en quatre catégories sur preuves (unités → chemins, empreintes, imports, autostart) ; palier 1 exécuté : journaux ROS de plus de 24 h, builds intermédiaires, doublon de navigateur, résidus ; reconstruction propre de `clawbot` (38 paquets, code 0), 16/16 unités actives, 54 topics, 238 tests verts, 3 Gio libérés | [[2026-11-22_audit_inventaire_poste]] |
