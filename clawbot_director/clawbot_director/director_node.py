@@ -311,7 +311,15 @@ class DirectorNode(Node):
 
     # ── sécurité ─────────────────────────────────────────────────────────
     def on_safety(self, msg):
-        etat = msg.data.strip().upper()
+        # L'arbitre publie un JSON enrichi depuis P04 ; les anciens publieurs
+        # (tests, scripts) envoient encore la chaîne nue. On accepte les deux.
+        brut = msg.data.strip()
+        if brut.startswith("{"):
+            try:
+                brut = json.loads(brut).get("state", "")
+            except ValueError:
+                brut = ""
+        etat = brut.upper()
         self.safety = etat
         self.last_safety_t = time.monotonic()
         if etat == SAFETY_OK:
