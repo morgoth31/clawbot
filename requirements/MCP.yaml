@@ -39,8 +39,11 @@ requirements:
       Int32MultiArray), des clients (aucun /safety/reset_estop, aucun set_parameters),
       des imports (aucun subprocess, aucun os.system), et des sources (`Twist(` absent).
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      « Aucune écriture de mouvement, aucun réarmement possible depuis le MCP. »
+      Décision de l'opérateur du 2026-11-22, avec REQ-MCP-004.
     prompt: P10
 
   - id: REQ-MCP-003
@@ -76,8 +79,12 @@ requirements:
       clawbot_mcp/test/test_stop_robot.py : Bool(True) publié sur /safety/estop avec un
       éditeur factice, réponse ok=true alors que l'exécutif est absent.
     evidence: null
-    status: draft
-    approved_by: null
+    status: approved
+    approved_by: "opérateur 2026-11-22"
+    approval_note: >
+      « stop_robot qui répond toujours » — approuvée telle qu'écrite. Décision de
+      l'opérateur du 2026-11-22 ; le réarmement de l'e-stop reste un geste humain,
+      délégué au tableau de bord (POST /estop/reset sur 8001) pour l'essai P10.
     prompt: P10
 
   - id: REQ-MCP-005

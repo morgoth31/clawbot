@@ -51,3 +51,31 @@ def test_seul_editeur_est_le_verrou_d_estop():
     publications = [ligne for ligne in source.splitlines() if "create_publisher(" in ligne]
     assert len(publications) == 1, publications
     assert "/safety/estop" in publications[0]
+
+
+def test_le_noeud_se_construit_pour_de_vrai():
+    """Défaut trouvé à l'essai : `self.clients` entre en collision avec rclpy.Node.
+
+    Charger le module ne suffit pas — il faut instancier le nœud.
+    """
+    import os
+
+    import pytest
+
+    if os.environ.get("ROS_DOMAIN_ID") != "98":
+        pytest.skip("nœud rclpy : domaine 98 requis", allow_module_level=False)
+
+    import rclpy
+
+    from clawbot_mcp.serveur import ClawbotMCP
+
+    if not rclpy.ok():
+        rclpy.init()
+    noeud = ClawbotMCP()
+    try:
+        assert set(noeud.clients_services) == {"capacites_list", "capacites_set",
+                                               "mission_report", "mission_decide"}
+        assert noeud.pub_estop is not None
+        assert len(noeud.registre) >= 7
+    finally:
+        noeud.destroy_node()
