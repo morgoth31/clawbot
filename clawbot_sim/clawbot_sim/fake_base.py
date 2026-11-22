@@ -24,6 +24,9 @@ class FakeBase(Node):
         self.vx = 0.0
         self.vy = 0.0
         self.wz = 0.0
+        # `bloque` : la base n'obéit plus (roue bloquée, câble arraché) — l'odométrie
+        # ne bouge plus alors que les consignes continuent d'arriver.
+        self.bloque = False
 
         self.create_subscription(Twist, "/cmd_vel_safe", self._sur_cmd, 10)
         self.pub_odom = self.create_publisher(Odometry, "/odom", 20)
@@ -35,6 +38,8 @@ class FakeBase(Node):
         self.vx, self.vy, self.wz = msg.linear.x, msg.linear.y, msg.angular.z
 
     def _tick_odom(self) -> None:
+        if self.bloque:
+            self.vx = self.vy = self.wz = 0.0
         self.x += (self.vx * math.cos(self.yaw) - self.vy * math.sin(self.yaw)) * self.periode_s
         self.y += (self.vx * math.sin(self.yaw) + self.vy * math.cos(self.yaw)) * self.periode_s
         self.yaw += self.wz * self.periode_s

@@ -103,6 +103,11 @@ class MoveRelative(Skill):
             if ctx.annule():
                 ctx.publier(0.0, 0.0, 0.0)
                 return Resultat(CANCELED, message="déplacement annulé")
+            if ctx.expire():
+                ctx.publier(0.0, 0.0, 0.0)
+                return Resultat(FAILED, "TIMEOUT",
+                                f"cible non atteinte en {ctx.timeout_s:.1f} s",
+                                detail={"avance_m": avance})
             code = code_safety(ctx.etats.safety_state, ctx.etats.estop_latched)
             avance = math.hypot(ctx.etats.x - depart[0], ctx.etats.y - depart[1])
             pas = boucle.pas(avance, code)
@@ -135,6 +140,10 @@ class Rotate(Skill):
             if ctx.annule():
                 ctx.publier(0.0, 0.0, 0.0)
                 return Resultat(CANCELED, message="rotation annulée")
+            if ctx.expire():
+                ctx.publier(0.0, 0.0, 0.0)
+                return Resultat(FAILED, "TIMEOUT",
+                                f"angle non atteint en {ctx.timeout_s:.1f} s")
             code = code_safety(ctx.etats.safety_state, ctx.etats.estop_latched)
             parcouru = _ecart_angle(ctx.etats.yaw - depart)
             pas = boucle.pas(parcouru, code)

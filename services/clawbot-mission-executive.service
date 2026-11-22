@@ -1,0 +1,35 @@
+[Unit]
+Description=Executif de mission (action /clawbot/execute_mission) - Clawbot X3 Plus
+Documentation=file:///home/jetson/clawbot/docs/architecture/cible.md
+After=network.target clawbot-skill-server.service clawbot-health-monitor.service
+Requires=clawbot-skill-server.service
+Wants=clawbot-health-monitor.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+Environment=ROS_DOMAIN_ID=28
+Environment=HOME=/home/jetson
+Environment=ROS_LOG_DIR=/var/lib/clawbot/ros-log
+WorkingDirectory=/home/jetson/clawbot
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec /home/jetson/clawbot/install/clawbot_executive/lib/clawbot_executive/mission_executive"
+# Journal des missions : /var/lib/clawbot/missions/<date>/<mission_id>.jsonl (§6.5)
+StateDirectory=clawbot
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+KillSignal=SIGINT
+
+# Durcissement : même socle que le serveur de skills.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/var/lib/clawbot
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=multi-user.target
