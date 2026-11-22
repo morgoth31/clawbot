@@ -1,0 +1,104 @@
+2026-11-22T21:06:58+01:00
+cmd: git diff --name-status $BASE..HEAD | grep -E '^(D|R)'; ls attic; find . -name COLCON_IGNORE -not -path './install/*' -not -path './build/*'
+ROS_DOMAIN_ID=(non utilisé)
+R100	clawbot_hardware_interface/CMakeLists.txt	attic/clawbot_hardware_interface/CMakeLists.txt
+R100	laserscan_to_point_pulisher/laserscan_to_point_pulisher/__init__.py	attic/clawbot_hardware_interface/COLCON_IGNORE
+R100	clawbot_hardware_interface/README.md	attic/clawbot_hardware_interface/README.md
+R100	clawbot_hardware_interface/clawbot_hardware_interface.xml	attic/clawbot_hardware_interface/clawbot_hardware_interface.xml
+R100	clawbot_hardware_interface/config/clawbot_controllers.yaml	attic/clawbot_hardware_interface/config/clawbot_controllers.yaml
+R100	clawbot_hardware_interface/include/clawbot_hardware_interface/clawbot_system_hardware.hpp	attic/clawbot_hardware_interface/include/clawbot_hardware_interface/clawbot_system_hardware.hpp
+R100	clawbot_hardware_interface/launch/hardware_control.launch.py	attic/clawbot_hardware_interface/launch/hardware_control.launch.py
+R100	clawbot_hardware_interface/launch/vision_pipeline.launch.py	attic/clawbot_hardware_interface/launch/vision_pipeline.launch.py
+R100	clawbot_hardware_interface/package.xml	attic/clawbot_hardware_interface/package.xml
+R100	clawbot_hardware_interface/src/clawbot_system_hardware.cpp	attic/clawbot_hardware_interface/src/clawbot_system_hardware.cpp
+R100	docker-compose.yml	attic/docker-compose.yml
+R100	laserscan_to_point_pulisher/resource/laserscan_to_point_pulisher	attic/docker-compose.yml.COLCON_IGNORE
+R100	pkg_action/pkg_action/__init__.py	attic/laserscan_to_point_pulisher/COLCON_IGNORE
+R100	pkg_helloworld_py/pkg_helloworld_py/__init__.py	attic/laserscan_to_point_pulisher/laserscan_to_point_pulisher/__init__.py
+R100	laserscan_to_point_pulisher/laserscan_to_point_pulisher/laserscan_to_point_publish.py	attic/laserscan_to_point_pulisher/laserscan_to_point_pulisher/laserscan_to_point_publish.py
+R100	laserscan_to_point_pulisher/package.xml	attic/laserscan_to_point_pulisher/package.xml
+R100	pkg_action/resource/pkg_action	attic/laserscan_to_point_pulisher/resource/laserscan_to_point_pulisher
+R100	laserscan_to_point_pulisher/setup.cfg	attic/laserscan_to_point_pulisher/setup.cfg
+R100	laserscan_to_point_pulisher/setup.py	attic/laserscan_to_point_pulisher/setup.py
+R100	laserscan_to_point_pulisher/test/test_copyright.py	attic/laserscan_to_point_pulisher/test/test_copyright.py
+R100	laserscan_to_point_pulisher/test/test_flake8.py	attic/laserscan_to_point_pulisher/test/test_flake8.py
+R100	laserscan_to_point_pulisher/test/test_pep257.py	attic/laserscan_to_point_pulisher/test/test_pep257.py
+R100	pkg_helloworld_py/resource/pkg_helloworld_py	attic/launch.COLCON_IGNORE
+R100	launch/ekf.launch.py	attic/launch/ekf.launch.py
+R100	launch/navigation.launch.py	attic/launch/navigation.launch.py
+R100	launch/robot_description.launch.py	attic/launch/robot_description.launch.py
+R100	manage_robot.sh	attic/manage_robot.sh
+R100	pkg_param/pkg_param/__init__.py	attic/manage_robot.sh.COLCON_IGNORE
+R100	pkg_param/resource/pkg_param	attic/moveit.COLCON_IGNORE
+R100	moveit/cyclonedds.xml	attic/moveit/cyclonedds.xml
+R100	moveit/installation_moveit.md	attic/moveit/installation_moveit.md
+R100	pkg_service/pkg_service/__init__.py	attic/pkg_action/COLCON_IGNORE
+R100	pkg_action/package.xml	attic/pkg_action/package.xml
+R100	pkg_tf/pkg_tf/__init__.py	attic/pkg_action/pkg_action/__init__.py
+R100	pkg_action/pkg_action/action_client_demo.py	attic/pkg_action/pkg_action/action_client_demo.py
+R100	pkg_action/pkg_action/action_server_demo.py	attic/pkg_action/pkg_action/action_server_demo.py
+R100	pkg_service/resource/pkg_service	attic/pkg_action/resource/pkg_action
+R100	pkg_action/setup.cfg	attic/pkg_action/setup.cfg
+R100	pkg_action/setup.py	attic/pkg_action/setup.py
+R100	pkg_action/test/test_copyright.py	attic/pkg_action/test/test_copyright.py
+R100	pkg_action/test/test_flake8.py	attic/pkg_action/test/test_flake8.py
+R100	pkg_action/test/test_pep257.py	attic/pkg_action/test/test_pep257.py
+R100	pkg_tf/resource/pkg_tf	attic/pkg_helloworld_py/COLCON_IGNORE
+R100	pkg_helloworld_py/launch/single_node_launch.py	attic/pkg_helloworld_py/launch/single_node_launch.py
+R100	pkg_helloworld_py/package.xml	attic/pkg_helloworld_py/package.xml
+R100	pkg_topic/pkg_topic/__init__.py	attic/pkg_helloworld_py/pkg_helloworld_py/__init__.py
+R100	pkg_helloworld_py/pkg_helloworld_py/helloworld.py	attic/pkg_helloworld_py/pkg_helloworld_py/helloworld.py
+R100	pkg_topic/resource/pkg_topic	attic/pkg_helloworld_py/resource/pkg_helloworld_py
+R100	pkg_helloworld_py/setup.cfg	attic/pkg_helloworld_py/setup.cfg
+R100	pkg_helloworld_py/setup.py	attic/pkg_helloworld_py/setup.py
+R100	pkg_helloworld_py/test/test_copyright.py	attic/pkg_helloworld_py/test/test_copyright.py
+R100	pkg_helloworld_py/test/test_flake8.py	attic/pkg_helloworld_py/test/test_flake8.py
+R100	pkg_helloworld_py/test/test_pep257.py	attic/pkg_helloworld_py/test/test_pep257.py
+R100	pkg_interfaces/CMakeLists.txt	attic/pkg_interfaces/CMakeLists.txt
+R100	ros2_llm_bridge/fastdds_profile.xml	attic/pkg_interfaces/COLCON_IGNORE
+R100	pkg_interfaces/action/Progress.action	attic/pkg_interfaces/action/Progress.action
+R100	pkg_interfaces/msg/Person.msg	attic/pkg_interfaces/msg/Person.msg
+R100	pkg_interfaces/package.xml	attic/pkg_interfaces/package.xml
+R100	pkg_interfaces/srv/Add.srv	attic/pkg_interfaces/srv/Add.srv
+R100	pkg_metapackage/CMakeLists.txt	attic/pkg_metapackage/CMakeLists.txt
+--- nombres ---
+35
+587
+--- attic ---
+clawbot_hardware_interface docker-compose.yml docker-compose.yml.COLCON_IGNORE laserscan_to_point_pulisher launch launch.COLCON_IGNORE manage_robot.sh manage_robot.sh.COLCON_IGNORE moveit moveit.COLCON_IGNORE pkg_action pkg_helloworld_py pkg_interfaces pkg_metapackage pkg_param pkg_service pkg_tf pkg_topic robot_pose_publisher_ros2 slam3d slam_launch.py slam_launch.py.COLCON_IGNORE tests yahboom_app_save_map yahboomcar_astra yahboomcar_base_node yahboomcar_bringup yahboomcar_ctrl yahboomcar_KCFTracker yahboomcar_laser yahboomcar_linefollow yahboomcar_mediapipe yahboomcar_msgs yahboomcar_multi yahboomcar_nav yahboomcar_point yahboomcar_rviz yahboomcar_slam yahboomcar_visual yahboomcar_voice_ctrl yahboom_web_savmap_interfaces 
+--- COLCON_IGNORE ---
+./attic/clawbot_hardware_interface/COLCON_IGNORE
+./attic/laserscan_to_point_pulisher/COLCON_IGNORE
+./attic/pkg_action/COLCON_IGNORE
+./attic/pkg_helloworld_py/COLCON_IGNORE
+./attic/pkg_interfaces/COLCON_IGNORE
+./attic/pkg_metapackage/COLCON_IGNORE
+./attic/pkg_param/COLCON_IGNORE
+./attic/pkg_service/COLCON_IGNORE
+./attic/pkg_tf/COLCON_IGNORE
+./attic/pkg_topic/COLCON_IGNORE
+./attic/robot_pose_publisher_ros2/COLCON_IGNORE
+./attic/slam3d/COLCON_IGNORE
+./attic/tests/COLCON_IGNORE
+./attic/yahboom_app_save_map/COLCON_IGNORE
+./attic/yahboomcar_astra/COLCON_IGNORE
+./attic/yahboomcar_base_node/COLCON_IGNORE
+./attic/yahboomcar_bringup/COLCON_IGNORE
+./attic/yahboomcar_ctrl/COLCON_IGNORE
+./attic/yahboomcar_KCFTracker/COLCON_IGNORE
+./attic/yahboomcar_laser/COLCON_IGNORE
+./attic/yahboomcar_linefollow/COLCON_IGNORE
+./attic/yahboomcar_mediapipe/COLCON_IGNORE
+./attic/yahboomcar_msgs/COLCON_IGNORE
+./attic/yahboomcar_multi/COLCON_IGNORE
+./attic/yahboomcar_nav/COLCON_IGNORE
+./attic/yahboomcar_point/COLCON_IGNORE
+./attic/yahboomcar_rviz/COLCON_IGNORE
+./attic/yahboomcar_slam/COLCON_IGNORE
+./attic/yahboomcar_visual/COLCON_IGNORE
+./attic/yahboomcar_voice_ctrl/COLCON_IGNORE
+./attic/yahboom_web_savmap_interfaces/COLCON_IGNORE
+./log/COLCON_IGNORE
+./ros2_llm_bridge/build/COLCON_IGNORE
+./ros2_llm_bridge/install/COLCON_IGNORE
+./ros2_llm_bridge/log/COLCON_IGNORE

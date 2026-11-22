@@ -1,0 +1,5 @@
+# 2026-11-22T21:14:55+01:00
+# $ df -h / /dev/shm
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p1  147G   93G   47G  67% /
+tmpfs           7.7G   22M  7.7G   1% /dev/shm

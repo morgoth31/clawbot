@@ -1,0 +1,30 @@
+2026-11-22T21:06:51+01:00
+cmd: base=1111bee (dernier commit avant P14); git diff --stat $BASE..HEAD
+ROS_DOMAIN_ID=(non utilisé)
+ services/clawbot-sentinel.service                  |       6 +-
+ services/clawbot-skill-server.service              |       6 +-
+ services/clawbot-slam.service                      |       6 +-
+ services/clawbot-wrist-camera.service              |       6 +-
+ services/clawbot-yolo.service                      |       6 +-
+ services/clawbot.target                            |      19 +
+ services/orbbec-camera.service                     |       6 +-
+ services/ros2-driver-node.service                  |       8 +-
+ services/ros2-hardware-service.service             |       8 +-
+ services/ros2-llm-bridge-cpp.service               |      12 +-
+ services/ros2-llm-bridge.service                   |      17 -
+ services/rosbridge.service                         |      21 -
+ services/yolo-detector.service                     |      19 -
+ services/yolo-inference.service                    |      34 -
+ systemd/clawbot-description.service                |       6 +-
+ systemd/clawbot-lidar.service                      |       8 +-
+ tests/test_arm_joint_sources.py                    |      11 +-
+ tests/test_camera_poignet.py                       |      19 +-
+ tests/test_p07_delegation.py                       |       2 +-
+ tests/test_p11_astra.py                            |       2 +-
+ tests/test_p14_demarrage.py                        |     190 +
+ tests/test_units.py                                |      71 +-
+ yahboomcar_voice_ctrl/test/test_flake8.py          |      25 -
+ yahboomcar_voice_ctrl/test/test_pep257.py          |      23 -
+ 736 files changed, 1083902 insertions(+), 2779 deletions(-)
+--- total ---
+ 736 files changed, 1083902 insertions(+), 2779 deletions(-)

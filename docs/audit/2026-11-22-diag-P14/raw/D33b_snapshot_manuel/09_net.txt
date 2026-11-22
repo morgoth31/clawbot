@@ -1,0 +1,27 @@
+# 2026-11-22T21:14:55+01:00
+# $ ss -ltnp
+State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                      
+LISTEN 0      4096       127.0.0.1:11434      0.0.0.0:*                                                
+LISTEN 0      2048       127.0.0.1:60589      0.0.0.0:*    users:(("hermes",pid=1722636,fd=21))        
+LISTEN 0      5          127.0.0.1:11539      0.0.0.0:*    users:(("python3",pid=3792886,fd=6))        
+LISTEN 0      128          0.0.0.0:8644       0.0.0.0:*    users:(("hermes",pid=1722636,fd=36))        
+LISTEN 0      128          0.0.0.0:22         0.0.0.0:*                                                
+LISTEN 0      4096         0.0.0.0:111        0.0.0.0:*                                                
+LISTEN 0      128          0.0.0.0:9090       0.0.0.0:*    users:(("python3",pid=649559,fd=32))        
+LISTEN 0      4096         0.0.0.0:631        0.0.0.0:*                                                
+LISTEN 0      128          0.0.0.0:8888       0.0.0.0:*                                                
+LISTEN 0      4096         0.0.0.0:8889       0.0.0.0:*                                                
+LISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*                                                
+LISTEN 0      16           0.0.0.0:8000       0.0.0.0:*    users:(("api_server",pid=649186,fd=29))     
+LISTEN 0      2048         0.0.0.0:8001       0.0.0.0:*    users:(("python3",pid=649168,fd=42))        
+LISTEN 0      2048         0.0.0.0:8003       0.0.0.0:*    users:(("pt_main_thread",pid=1058797,fd=77))
+LISTEN 0      2048         0.0.0.0:8081       0.0.0.0:*                                                
+LISTEN 0      5          127.0.0.1:8080       0.0.0.0:*    users:(("mkdocs",pid=43927,fd=6))           
+LISTEN 0      10                 *:3389             *:*    users:(("gnome-remote-de",pid=2381,fd=22))  
+LISTEN 0      128             [::]:8644          [::]:*    users:(("hermes",pid=1722636,fd=35))        
+LISTEN 0      128             [::]:22            [::]:*                                                
+LISTEN 0      4096            [::]:111           [::]:*                                                
+LISTEN 0      128             [::]:9090          [::]:*    users:(("python3",pid=649559,fd=33))        
+LISTEN 0      4096            [::]:631           [::]:*                                                
+LISTEN 0      4096            [::]:8889          [::]:*                                                
+LISTEN 0      10                 *:5900             *:*    users:(("gnome-remote-de",pid=2381,fd=23))  

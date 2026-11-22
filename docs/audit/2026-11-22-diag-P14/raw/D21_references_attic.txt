@@ -1,0 +1,40 @@
+2026-11-22T21:11:37+01:00
+cmd: colcon list --names-only ; grep -rn <paquet> --include=*.py --include=*.xml --include=*.launch.py --include=*.service
+ROS_DOMAIN_ID=(non utilisé)
+--- paquets construits ---
+clawbot_arm_controller clawbot_base_driver clawbot_bringup clawbot_capabilities clawbot_common clawbot_director clawbot_executive clawbot_health clawbot_interfaces clawbot_mcp clawbot_moveit_config clawbot_safety clawbot_sentinel clawbot_sim ros2_llm_bridge_cpp yahboomcar_description yolo_node 
+--- paquets sous attic ---
+clawbot_hardware_interface docker-compose.yml laserscan_to_point_pulisher launch manage_robot.sh moveit pkg_action pkg_helloworld_py pkg_interfaces pkg_metapackage pkg_param pkg_service pkg_tf pkg_topic robot_pose_publisher_ros2 slam3d slam_launch.py tests yahboom_app_save_map yahboomcar_astra yahboomcar_base_node yahboomcar_bringup yahboomcar_ctrl yahboomcar_KCFTracker yahboomcar_laser yahboomcar_linefollow yahboomcar_mediapipe yahboomcar_msgs yahboomcar_multi yahboomcar_nav yahboomcar_point yahboomcar_rviz yahboomcar_slam yahboomcar_visual yahboomcar_voice_ctrl yahboom_web_savmap_interfaces 
+--- references vers un paquet deplace ---
+clawbot_hardware_interface -> 1
+laserscan_to_point_pulisher -> 1
+launch -> 293
+moveit -> 59
+pkg_action -> 1
+pkg_helloworld_py -> 1
+pkg_interfaces -> 1
+pkg_metapackage -> 1
+pkg_param -> 1
+pkg_service -> 1
+pkg_tf -> 1
+pkg_topic -> 1
+robot_pose_publisher_ros2 -> 1
+slam_launch.py -> 1
+yahboom_app_save_map -> 1
+yahboomcar_astra -> 1
+yahboomcar_base_node -> 1
+yahboomcar_bringup -> 5
+yahboomcar_ctrl -> 1
+yahboomcar_KCFTracker -> 1
+yahboomcar_laser -> 1
+yahboomcar_linefollow -> 1
+yahboomcar_mediapipe -> 1
+yahboomcar_msgs -> 1
+yahboomcar_multi -> 1
+yahboomcar_nav -> 1
+yahboomcar_point -> 1
+yahboomcar_rviz -> 1
+yahboomcar_slam -> 1
+yahboomcar_visual -> 1
+yahboomcar_voice_ctrl -> 1
+yahboom_web_savmap_interfaces -> 1

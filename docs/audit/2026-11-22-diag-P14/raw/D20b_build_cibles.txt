@@ -1,0 +1,30 @@
+2026-11-22T21:10:50+01:00
+cmd: colcon build --packages-select clawbot_interfaces yahboomcar_description yolo_node --build-base /tmp/diag_build2 --install-base /tmp/diag_install2 (sortie complete)
+ROS_DOMAIN_ID=(non utilisé)
+[1.676s] colcon.colcon_core.package_selection WARNING Some selected packages are already built in one or more underlay workspaces:
+	'clawbot_interfaces' is in: /home/jetson/clawbot/install/clawbot_interfaces
+If a package in a merged underlay workspace is overridden and it installs headers, then all packages in the overlay must sort their include directories by workspace order. Failure to do so may result in build failures or undefined behavior at run time.
+If the overridden package is used by another package in any underlay, then the overriding package in the overlay must be API and ABI compatible or undefined behavior at run time may occur.
+
+If you understand the risks and want to override a package anyways, add the following to the command line:
+	--allow-overriding clawbot_interfaces
+
+This may be promoted to an error in a future release of colcon-override-check.
+Starting >>> clawbot_interfaces
+Starting >>> yahboomcar_description
+Starting >>> yolo_node
+Finished <<< yolo_node [4.63s]
+Finished <<< yahboomcar_description [4.77s]
+--- stderr: clawbot_interfaces
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    OpenCV_DIR
+
+
+---
+Finished <<< clawbot_interfaces [29.9s]
+
+Summary: 3 packages finished [31.3s]
+  1 package had stderr output: clawbot_interfaces
+EXIT=0

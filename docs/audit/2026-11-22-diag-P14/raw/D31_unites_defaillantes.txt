@@ -1,0 +1,35 @@
+2026-11-22T21:10:40+01:00
+cmd: systemctl cat clawbot.target ; journalctl -u clawbot.target -n 120; systemctl cat clawbot-docs.service | head -20; ls -l /etc/systemd/system/ | grep -c clawbot
+ROS_DOMAIN_ID=(non utilisé)
+=== cat clawbot.target ===
+No files found for clawbot.target.
+=== journal ===
+-- No entries --
+=== liens /etc ===
+clawbot-arm-controller.service -> /home/jetson/clawbot/services/clawbot-arm-controller.service
+clawbot-capability-manager.service -> /home/jetson/clawbot/services/clawbot-capability-manager.service
+clawbot-description.service -> /home/jetson/clawbot/systemd/clawbot-description.service
+clawbot-director.service -> /home/jetson/clawbot/services/clawbot-director.service
+clawbot-docs.service -> /home/jetson/clawbot/services/clawbot-docs.service
+clawbot-ekf.service -> /home/jetson/clawbot/services/clawbot-ekf.service
+clawbot-health-monitor.service -> /home/jetson/clawbot/services/clawbot-health-monitor.service
+clawbot-health.service -> /home/jetson/clawbot/services/clawbot-health.service
+clawbot-joy-teleop.service -> /home/jetson/clawbot/services/clawbot-joy-teleop.service
+clawbot-lidar.service -> /home/jetson/clawbot/services/clawbot-lidar.service
+clawbot-mission-executive.service -> /home/jetson/clawbot/services/clawbot-mission-executive.service
+clawbot-move-group.service -> /home/jetson/clawbot/services/clawbot-move-group.service
+clawbot-nav2.service -> /home/jetson/clawbot/services/clawbot-nav2.service
+clawbot-safety-arbitrator.service -> /home/jetson/clawbot/services/clawbot-safety-arbitrator.service
+clawbot-sentinel.service -> /home/jetson/clawbot/services/clawbot-sentinel.service
+clawbot-skill-server.service -> /home/jetson/clawbot/services/clawbot-skill-server.service
+clawbot-slam.service -> /home/jetson/clawbot/services/clawbot-slam.service
+clawbot-wrist-camera.service -> /home/jetson/clawbot/services/clawbot-wrist-camera.service
+clawbot-yolo.service -> /home/jetson/clawbot/services/clawbot-yolo.service
+orbbec-camera.service -> /home/jetson/clawbot/services/orbbec-camera.service
+ros2-driver-node.service -> /home/jetson/clawbot/services/ros2-driver-node.service
+ros2-hardware-service.service -> /home/jetson/clawbot/services/ros2-hardware-service.service
+ros2-llm-bridge-cpp.service -> /home/jetson/clawbot/services/ros2-llm-bridge-cpp.service
+ros2-llm-bridge.service -> /home/jetson/clawbot/services/ros2-llm-bridge.service
+rosbridge.service -> /home/jetson/clawbot/services/rosbridge.service
+yahboom_oled.service -> /home/jetson/clawbot/services/yahboom_oled.service
+yolo-detector.service -> /home/jetson/clawbot/services/yolo-detector.service

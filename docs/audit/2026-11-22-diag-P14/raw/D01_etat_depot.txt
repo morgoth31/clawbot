@@ -1,0 +1,101 @@
+2026-11-22T21:06:42+01:00
+cmd: git status --short ; git branch --show-current ; git branch -a
+ROS_DOMAIN_ID=(non utilisé)
+ M config/manette.yaml
+ M docs/knowledge-base/02_Software/manipulation_moveit.md
+ M joy_teleop/README.md
+ M joy_teleop/clawbot_restart_teleop.sh
+ M joy_teleop/identify_mapping.py
+ M joy_teleop/pair_procontroller.sh
+ D yahboomcar_description/meshes/Ackermann/back_left_link.STL
+ D yahboomcar_description/meshes/Ackermann/back_right_link.STL
+ D yahboomcar_description/meshes/Ackermann/base_link.STL
+ D yahboomcar_description/meshes/Ackermann/camera_link.STL
+ D yahboomcar_description/meshes/Ackermann/front_left_steer.STL
+ D yahboomcar_description/meshes/Ackermann/front_left_wheel.STL
+ D yahboomcar_description/meshes/Ackermann/front_right_steer.STL
+ D yahboomcar_description/meshes/Ackermann/front_right_wheel.STL
+ D yahboomcar_description/meshes/Ackermann/laser_link.STL
+ D yahboomcar_description/meshes/back_left_link.STL
+ D yahboomcar_description/meshes/back_left_wheel_X3.STL
+ D yahboomcar_description/meshes/back_right_link.STL
+ D yahboomcar_description/meshes/back_right_wheel_X3.STL
+ D yahboomcar_description/meshes/base_link.STL
+ D yahboomcar_description/meshes/base_link_X3.STL
+ D yahboomcar_description/meshes/camera_link.STL
+ D yahboomcar_description/meshes/camera_link_R2.STL
+ D yahboomcar_description/meshes/front_left_steer.STL
+ D yahboomcar_description/meshes/front_left_wheel.STL
+ D yahboomcar_description/meshes/front_left_wheel_X3.STL
+ D yahboomcar_description/meshes/front_right_steer.STL
+ D yahboomcar_description/meshes/front_right_wheel.STL
+ D yahboomcar_description/meshes/front_right_wheel_X3.STL
+ D yahboomcar_description/meshes/laser_link.STL
+ D yahboomcar_description/meshes/laser_link_R2.STL
+ D yahboomcar_description/urdf/yahboomcar_R2.urdf
+ D yahboomcar_description/urdf/yahboomcar_R2.urdf.xacro
+ D yahboomcar_description/urdf/yahboomcar_R2_multi.urdf.xacro
+ D yahboomcar_description/urdf/yahboomcar_R2_robot1.urdf
+ D yahboomcar_description/urdf/yahboomcar_R2_robot1.urdf.xacro
+ D yahboomcar_description/urdf/yahboomcar_R2_robot2.urdf
+ D yahboomcar_description/urdf/yahboomcar_R2_robot2.urdf.xacro
+ D yahboomcar_description/urdf/yahboomcar_X3.urdf
+ D yahboomcar_description/urdf/yahboomcar_X3.urdf.xacro
+ D yahboomcar_description/urdf/yahboomcar_X3_robot1.urdf
+ D yahboomcar_description/urdf/yahboomcar_X3_robot2.urdf
+ D yahboomcar_description_x1/config/joint_names_yahboomcar.yaml
+ D yahboomcar_description_x1/launch/display.launch.py
+ D yahboomcar_description_x1/meshes/mecanum/back_left_wheel.STL
+ D yahboomcar_description_x1/meshes/mecanum/back_right_wheel.STL
+ D yahboomcar_description_x1/meshes/mecanum/base_link.STL
+ D yahboomcar_description_x1/meshes/mecanum/front_left_wheel.STL
+ D yahboomcar_description_x1/meshes/mecanum/front_right_wheel.STL
+ D yahboomcar_description_x1/meshes/sensor/camera_link.STL
+ D yahboomcar_description_x1/meshes/sensor/laser_link.STL
+ D yahboomcar_description_x1/package.xml
+ D yahboomcar_description_x1/resource/yahboomcar_description_x1
+ D yahboomcar_description_x1/rviz/yahboomcar.rviz
+ D yahboomcar_description_x1/setup.cfg
+ D yahboomcar_description_x1/setup.py
+ D yahboomcar_description_x1/test/test_copyright.py
+ D yahboomcar_description_x1/test/test_flake8.py
+ D yahboomcar_description_x1/test/test_pep257.py
+ D yahboomcar_description_x1/urdf/yahboomcar_X1.urdf
+ D yahboomcar_description_x1/urdf/yahboomcar_X1.urdf.xacro
+ D yahboomcar_description_x1/urdf/yahboomcar_X3.urdf
+ D yahboomcar_description_x1/urdf/yahboomcar_X3.urdf.xacro
+ D yahboomcar_description_x1/yahboomcar_description_x1/__init__.py
+?? .hermes/
+?? config/manette.yaml.bak-20261115-152624
+?? config/manette.yaml.bak-20261115-233517
+?? config/manette.yaml.bak-20261115-233606
+?? docs/audit/2026-11-22-diag-P14/
+?? index.html
+?? user_test/
+?? workspace/
+?? yahboomcar_description/launch/display_X3plus.launch.py
+?? yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.urdf.xacro
+?? yahboomcar_description/urdf/yahboomcar_X3plus.gazebo.xacro
+?? yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro
+?? yahboomcar_description/urdf/yahboomcar_X3plus.urdf.xacro_bk
+--- branche ---
+refactor/REQ-OPS-040-demarrage
+--- branches ---
+  docs/REQ-OPS-001-mesures
+  docs/site-okf-merge
+  feat/REQ-ARCH-010-interfaces
+  feat/REQ-ARM-001-bras
+  feat/REQ-CAPA-001-gestionnaire
+  feat/REQ-DRV-001-pilote
+  feat/REQ-EXEC-001-skills
+  feat/REQ-HEALTH-001-moniteur
+  feat/REQ-PERC-010-detection
+  feat/REQ-SAFETY-010-multiplexeur
+  feat/REQ-TEST-001-cadre
+  fix/REQ-OPS-010-systemd
+  fix/REQ-PERC-001-astra
+  main
+* refactor/REQ-OPS-040-demarrage
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/docs/site-okf-merge
+  remotes/origin/main

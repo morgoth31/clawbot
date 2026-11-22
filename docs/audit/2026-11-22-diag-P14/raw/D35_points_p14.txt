@@ -1,0 +1,134 @@
+2026-11-22T21:07:19+01:00
+cmd: ROS_DOMAIN_ID=28 ; ros2 topic info -v /cmd_vel ; ros2 topic info -v /cmd_vel_safe ; ros2 node list ; ros2 param get /safety_arbitrator inputs.names ; ss -ltnp | grep -E '8000|8001|8003|8080|9090'
+ROS_DOMAIN_ID=28
+=== /cmd_vel ===
+Type: geometry_msgs/msg/Twist
+
+Publisher count: 1
+
+Node name: llm_bridge_node
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.e2.e7.f3.75.00.00.00.00.00.00.12.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 1
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.d9.e7.eb.38.00.00.00.00.00.00.17.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== /cmd_vel_safe ===
+Type: geometry_msgs/msg/Twist
+
+Publisher count: 1
+
+Node name: safety_arbitrator
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: PUBLISHER
+GID: 01.0f.af.e3.d9.e7.eb.38.00.00.00.00.00.00.11.03.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Subscription count: 3
+
+Node name: health_monitor
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.1d.ce.b9.f6.00.00.00.00.00.00.17.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: capability_manager
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.27.ce.a6.5a.00.00.00.00.00.00.18.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+Node name: driver_node
+Node namespace: /
+Topic type: geometry_msgs/msg/Twist
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.af.e3.3e.e9.a2.01.00.00.00.00.00.00.11.04.00.00.00.00.00.00.00.00
+QoS profile:
+  Reliability: RELIABLE
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+=== nodes ===
+/camera/camera
+/capability_manager
+/director
+/driver_node
+/ekf_filter_node
+/hardware_service_node
+/health_monitor
+/joint_state_publisher
+/launch_ros_1308
+/llm_bridge_node
+/robot_state_publisher
+/rosapi
+/rosapi_params
+/rosbridge_websocket
+/safety_arbitrator
+/sentinel
+/skill_server
+/slam_toolbox
+/transform_listener_impl_aaaae6a7e1e0
+/transform_listener_impl_aaaaea81dfa0
+/wrist_camera/camera
+/ydlidar_ros2_driver_node
+/yolo_node
+=== param arbitre ===
+String values are: ['teleop', 'nav', 'skill', 'legacy']
+=== sockets ===
+LISTEN 0      128          0.0.0.0:9090       0.0.0.0:*    users:(("python3",pid=649559,fd=32))        
+LISTEN 0      16           0.0.0.0:8000       0.0.0.0:*    users:(("api_server",pid=649186,fd=29))     
+LISTEN 0      2048         0.0.0.0:8001       0.0.0.0:*    users:(("python3",pid=649168,fd=42))        
+LISTEN 0      2048         0.0.0.0:8003       0.0.0.0:*    users:(("pt_main_thread",pid=1058797,fd=77))
+LISTEN 0      5          127.0.0.1:8080       0.0.0.0:*    users:(("mkdocs",pid=43927,fd=6))           
+LISTEN 0      128             [::]:9090          [::]:*    users:(("python3",pid=649559,fd=33))        

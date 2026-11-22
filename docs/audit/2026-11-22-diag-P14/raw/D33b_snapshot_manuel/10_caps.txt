@@ -1,0 +1,7 @@
+# 2026-11-22T21:14:55+01:00
+# $ ros2 service call /clawbot/capabilities/list clawbot_interfaces/srv/ListCapabilities {}
+requester: making request: clawbot_interfaces.srv.ListCapabilities_Request()
+
+response:
+clawbot_interfaces.srv.ListCapabilities_Response(capabilities_json='[{"name": "base", "state": "ACTIVE", "units": ["ros2-driver-node.service"], "requires": [], "conflicts": [], "stale_flows": []}, {"name": "lidar", "state": "ACTIVE", "units": ["clawbot-lidar.service"], "requires": ["base"], "conflicts": [], "stale_flows": []}, {"name": "mapping", "state": "INACTIVE", "units": ["clawbot-slam.service"], "requires": ["base", "lidar"], "conflicts": ["navigation"], "stale_flows": []}, {"name": "navigation", "state": "INACTIVE", "units": ["clawbot-nav2.service"], "requires": ["base", "lidar"], "conflicts": ["mapping"], "stale_flows": []}, {"name": "arm", "state": "INACTIVE", "units": ["clawbot-arm-controller.service", "clawbot-move-group.service"], "requires": ["base"], "conflicts": [], "stale_flows": []}, {"name": "wrist_vision", "state": "ACTIVE", "units": ["clawbot-wrist-camera.service"], "requires": ["base"], "conflicts": [], "stale_flows": []}, {"name": "depth_vision", "state": "INACTIVE", "units": ["orbbec-camera.service"], "requires": ["base"], "conflicts": [], "stale_flows": []}, {"name": "detection", "state": "ACTIVE", "units": ["clawbot-yolo.service"], "requires": ["wrist_vision"], "conflicts": [], "stale_flows": []}, {"name": "voice", "state": "INACTIVE", "units": [], "requires": [], "conflicts": [], "stale_flows": []}]')
+

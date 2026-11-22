@@ -1,0 +1,48 @@
+2026-11-22T21:11:58+01:00
+cmd: systemctl show clawbot-mission-executive -p Requires -p After -p ActiveState ; journalctl -b --since '2026-11-22 18:48' --until '2026-11-22 18:51' --no-pager
+ROS_DOMAIN_ID=(non utilisé)
+Result=success
+Requires=system.slice
+sysinit.target
+clawbot-skill-server.service
+-.mount
+Wants=tmp.mount
+clawbot-health-monitor.service
+After=system.slice
+-.mount
+tmp.mount
+systemd-tmpfiles-setup.service
+basic.target
+network.target
+systemd-remount-fs.service
+clawbot-skill-server.service
+sysinit.target
+clawbot-health-monitor.service
+systemd-journald.socket
+ActiveState=inactive
+=== journal 18:48-18:51 ===
+Nov 22 18:48:39 yahboom systemd-fstab-generator[1034380]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:48:39 yahboom systemd-fstab-generator[1034380]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:48:40 yahboom systemd-fstab-generator[1034450]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:48:40 yahboom systemd-fstab-generator[1034450]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:48:40 yahboom systemd[1]: Stopping yolo-inference.service...
+Nov 22 18:48:40 yahboom systemd[1]: Stopped yolo-inference.service.
+Nov 22 18:49:01 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:49:03 yahboom systemd[1]: Stopped Detection d'objets YOLO dans le graphe (yolo_node + facade HTTP 8003) - Clawbot X3 Plus.
+Nov 22 18:49:06 yahboom systemd[1]: Stopping Gestionnaire de capacites (liste blanche, conflits, etats) - Clawbot X3 Plus...
+Nov 22 18:49:06 yahboom systemd[1]: Stopping Executif de mission (action /clawbot/execute_mission) - Clawbot X3 Plus...
+Nov 22 18:49:06 yahboom systemd[1]: Stopped Gestionnaire de capacites (liste blanche, conflits, etats) - Clawbot X3 Plus.
+Nov 22 18:49:07 yahboom systemd[1]: clawbot-mission-executive.service: Deactivated successfully.
+Nov 22 18:49:07 yahboom systemd[1]: Stopped Executif de mission (action /clawbot/execute_mission) - Clawbot X3 Plus.
+Nov 22 18:49:07 yahboom systemd[1]: clawbot-mission-executive.service: Consumed 10.207s CPU time.
+Nov 22 18:49:07 yahboom systemd[1]: Stopping Moniteur de sante des flux - Clawbot X3 Plus...
+Nov 22 18:49:07 yahboom systemd[1]: Stopping Serveur de skills (action /clawbot/execute_skill) - Clawbot X3 Plus...
+Nov 22 18:49:07 yahboom systemd[1]: Stopped Moniteur de sante des flux - Clawbot X3 Plus.
+Nov 22 18:49:07 yahboom systemd[1]: Stopped Serveur de skills (action /clawbot/execute_skill) - Clawbot X3 Plus.
+Nov 22 18:49:10 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:49:13 yahboom systemd[1]: Stopping Executif de mission (action /clawbot/execute_mission) - Clawbot X3 Plus...
+Nov 22 18:49:14 yahboom systemd[1]: clawbot-mission-executive.service: Deactivated successfully.
+Nov 22 18:49:14 yahboom systemd[1]: Stopped Executif de mission (action /clawbot/execute_mission) - Clawbot X3 Plus.
+Nov 22 18:49:14 yahboom systemd[1]: clawbot-mission-executive.service: Consumed 2.381s CPU time.
+Nov 22 18:49:14 yahboom systemd[1]: Stopped Serveur de skills (action /clawbot/execute_skill) - Clawbot X3 Plus.
+Nov 22 18:49:16 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.

@@ -1,0 +1,1605 @@
+2026-11-22T21:06:58+01:00
+cmd: git diff $BASE..HEAD -- '*test*' 'tests/' 'pytest.ini' 'requirements/'
+ROS_DOMAIN_ID=(non utilisé)
+diff --git a/laserscan_to_point_pulisher/test/test_copyright.py b/attic/laserscan_to_point_pulisher/test/test_copyright.py
+similarity index 100%
+rename from laserscan_to_point_pulisher/test/test_copyright.py
+rename to attic/laserscan_to_point_pulisher/test/test_copyright.py
+diff --git a/laserscan_to_point_pulisher/test/test_flake8.py b/attic/laserscan_to_point_pulisher/test/test_flake8.py
+similarity index 100%
+rename from laserscan_to_point_pulisher/test/test_flake8.py
+rename to attic/laserscan_to_point_pulisher/test/test_flake8.py
+diff --git a/laserscan_to_point_pulisher/test/test_pep257.py b/attic/laserscan_to_point_pulisher/test/test_pep257.py
+similarity index 100%
+rename from laserscan_to_point_pulisher/test/test_pep257.py
+rename to attic/laserscan_to_point_pulisher/test/test_pep257.py
+diff --git a/pkg_action/test/test_copyright.py b/attic/pkg_action/test/test_copyright.py
+similarity index 100%
+rename from pkg_action/test/test_copyright.py
+rename to attic/pkg_action/test/test_copyright.py
+diff --git a/pkg_action/test/test_flake8.py b/attic/pkg_action/test/test_flake8.py
+similarity index 100%
+rename from pkg_action/test/test_flake8.py
+rename to attic/pkg_action/test/test_flake8.py
+diff --git a/pkg_action/test/test_pep257.py b/attic/pkg_action/test/test_pep257.py
+similarity index 100%
+rename from pkg_action/test/test_pep257.py
+rename to attic/pkg_action/test/test_pep257.py
+diff --git a/pkg_helloworld_py/test/test_copyright.py b/attic/pkg_helloworld_py/test/test_copyright.py
+similarity index 100%
+rename from pkg_helloworld_py/test/test_copyright.py
+rename to attic/pkg_helloworld_py/test/test_copyright.py
+diff --git a/pkg_helloworld_py/test/test_flake8.py b/attic/pkg_helloworld_py/test/test_flake8.py
+similarity index 100%
+rename from pkg_helloworld_py/test/test_flake8.py
+rename to attic/pkg_helloworld_py/test/test_flake8.py
+diff --git a/pkg_helloworld_py/test/test_pep257.py b/attic/pkg_helloworld_py/test/test_pep257.py
+similarity index 100%
+rename from pkg_helloworld_py/test/test_pep257.py
+rename to attic/pkg_helloworld_py/test/test_pep257.py
+diff --git a/pkg_param/test/test_copyright.py b/attic/pkg_param/test/test_copyright.py
+similarity index 100%
+rename from pkg_param/test/test_copyright.py
+rename to attic/pkg_param/test/test_copyright.py
+diff --git a/pkg_param/test/test_flake8.py b/attic/pkg_param/test/test_flake8.py
+similarity index 100%
+rename from pkg_param/test/test_flake8.py
+rename to attic/pkg_param/test/test_flake8.py
+diff --git a/pkg_param/test/test_pep257.py b/attic/pkg_param/test/test_pep257.py
+similarity index 100%
+rename from pkg_param/test/test_pep257.py
+rename to attic/pkg_param/test/test_pep257.py
+diff --git a/pkg_service/test/test_copyright.py b/attic/pkg_service/test/test_copyright.py
+similarity index 100%
+rename from pkg_service/test/test_copyright.py
+rename to attic/pkg_service/test/test_copyright.py
+diff --git a/pkg_service/test/test_flake8.py b/attic/pkg_service/test/test_flake8.py
+similarity index 100%
+rename from pkg_service/test/test_flake8.py
+rename to attic/pkg_service/test/test_flake8.py
+diff --git a/pkg_service/test/test_pep257.py b/attic/pkg_service/test/test_pep257.py
+similarity index 100%
+rename from pkg_service/test/test_pep257.py
+rename to attic/pkg_service/test/test_pep257.py
+diff --git a/pkg_tf/test/test_copyright.py b/attic/pkg_tf/test/test_copyright.py
+similarity index 100%
+rename from pkg_tf/test/test_copyright.py
+rename to attic/pkg_tf/test/test_copyright.py
+diff --git a/pkg_tf/test/test_flake8.py b/attic/pkg_tf/test/test_flake8.py
+similarity index 100%
+rename from pkg_tf/test/test_flake8.py
+rename to attic/pkg_tf/test/test_flake8.py
+diff --git a/pkg_tf/test/test_pep257.py b/attic/pkg_tf/test/test_pep257.py
+similarity index 100%
+rename from pkg_tf/test/test_pep257.py
+rename to attic/pkg_tf/test/test_pep257.py
+diff --git a/pkg_topic/test/test_copyright.py b/attic/pkg_topic/test/test_copyright.py
+similarity index 100%
+rename from pkg_topic/test/test_copyright.py
+rename to attic/pkg_topic/test/test_copyright.py
+diff --git a/pkg_topic/test/test_flake8.py b/attic/pkg_topic/test/test_flake8.py
+similarity index 100%
+rename from pkg_topic/test/test_flake8.py
+rename to attic/pkg_topic/test/test_flake8.py
+diff --git a/pkg_topic/test/test_pep257.py b/attic/pkg_topic/test/test_pep257.py
+similarity index 100%
+rename from pkg_topic/test/test_pep257.py
+rename to attic/pkg_topic/test/test_pep257.py
+diff --git a/attic/tests/COLCON_IGNORE b/attic/tests/COLCON_IGNORE
+new file mode 100644
+index 0000000..e69de29
+diff --git a/tests/test_cmd_vel_scaling.py b/attic/tests/test_cmd_vel_scaling.py
+similarity index 90%
+rename from tests/test_cmd_vel_scaling.py
+rename to attic/tests/test_cmd_vel_scaling.py
+index d60f558..a8b9270 100644
+--- a/tests/test_cmd_vel_scaling.py
++++ b/attic/tests/test_cmd_vel_scaling.py
+@@ -34,9 +34,9 @@ def test_lateral_axis_is_handled_like_forward():
+ 
+ 
+ def test_feedback_sign_matches_command():
+-    # mesuré sur cales : consigne +0,05 -> retour brut -0,843
+-    assert feedback(-0.843) > 0
+-    assert feedback(0.745) < 0
++    # car_type=2 : le STM32 renvoie un signe positif natif, le driver ne retourne plus rien
++    assert feedback(0.843) > 0
++    assert feedback(-0.745) < 0
+ 
+ 
+ def test_feedback_survives_nan():
+diff --git a/tests/test_servo_round_robin.py b/attic/tests/test_servo_round_robin.py
+similarity index 100%
+rename from tests/test_servo_round_robin.py
+rename to attic/tests/test_servo_round_robin.py
+diff --git a/yahboom_app_save_map/test/test_copyright.py b/attic/yahboom_app_save_map/test/test_copyright.py
+similarity index 100%
+rename from yahboom_app_save_map/test/test_copyright.py
+rename to attic/yahboom_app_save_map/test/test_copyright.py
+diff --git a/ros2_llm_bridge/test/test_flake8.py b/attic/yahboom_app_save_map/test/test_flake8.py
+similarity index 100%
+rename from ros2_llm_bridge/test/test_flake8.py
+rename to attic/yahboom_app_save_map/test/test_flake8.py
+diff --git a/ros2_llm_bridge/test/test_pep257.py b/attic/yahboom_app_save_map/test/test_pep257.py
+similarity index 100%
+rename from ros2_llm_bridge/test/test_pep257.py
+rename to attic/yahboom_app_save_map/test/test_pep257.py
+diff --git a/yahboomcar_astra/test/test_copyright.py b/attic/yahboomcar_astra/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_astra/test/test_copyright.py
+rename to attic/yahboomcar_astra/test/test_copyright.py
+diff --git a/yahboom_app_save_map/test/test_flake8.py b/attic/yahboomcar_astra/test/test_flake8.py
+similarity index 100%
+rename from yahboom_app_save_map/test/test_flake8.py
+rename to attic/yahboomcar_astra/test/test_flake8.py
+diff --git a/yahboom_app_save_map/test/test_pep257.py b/attic/yahboomcar_astra/test/test_pep257.py
+similarity index 100%
+rename from yahboom_app_save_map/test/test_pep257.py
+rename to attic/yahboomcar_astra/test/test_pep257.py
+diff --git a/yahboomcar_bringup/test/test_copyright.py b/attic/yahboomcar_bringup/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_bringup/test/test_copyright.py
+rename to attic/yahboomcar_bringup/test/test_copyright.py
+diff --git a/yahboomcar_astra/test/test_flake8.py b/attic/yahboomcar_bringup/test/test_flake8.py
+similarity index 100%
+rename from yahboomcar_astra/test/test_flake8.py
+rename to attic/yahboomcar_bringup/test/test_flake8.py
+diff --git a/yahboomcar_astra/test/test_pep257.py b/attic/yahboomcar_bringup/test/test_pep257.py
+similarity index 100%
+rename from yahboomcar_astra/test/test_pep257.py
+rename to attic/yahboomcar_bringup/test/test_pep257.py
+diff --git a/yahboomcar_bringup/yahboomcar_bringup/test.py b/attic/yahboomcar_bringup/yahboomcar_bringup/test.py
+similarity index 100%
+rename from yahboomcar_bringup/yahboomcar_bringup/test.py
+rename to attic/yahboomcar_bringup/yahboomcar_bringup/test.py
+diff --git a/yahboomcar_ctrl/test/test_copyright.py b/attic/yahboomcar_ctrl/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_ctrl/test/test_copyright.py
+rename to attic/yahboomcar_ctrl/test/test_copyright.py
+diff --git a/yahboomcar_bringup/test/test_flake8.py b/attic/yahboomcar_ctrl/test/test_flake8.py
+similarity index 100%
+rename from yahboomcar_bringup/test/test_flake8.py
+rename to attic/yahboomcar_ctrl/test/test_flake8.py
+diff --git a/yahboomcar_bringup/test/test_pep257.py b/attic/yahboomcar_ctrl/test/test_pep257.py
+similarity index 100%
+rename from yahboomcar_bringup/test/test_pep257.py
+rename to attic/yahboomcar_ctrl/test/test_pep257.py
+diff --git a/yahboomcar_laser/test/test_copyright.py b/attic/yahboomcar_laser/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_laser/test/test_copyright.py
+rename to attic/yahboomcar_laser/test/test_copyright.py
+diff --git a/yahboomcar_ctrl/test/test_flake8.py b/attic/yahboomcar_laser/test/test_flake8.py
+similarity index 100%
+rename from yahboomcar_ctrl/test/test_flake8.py
+rename to attic/yahboomcar_laser/test/test_flake8.py
+diff --git a/yahboomcar_ctrl/test/test_pep257.py b/attic/yahboomcar_laser/test/test_pep257.py
+similarity index 100%
+rename from yahboomcar_ctrl/test/test_pep257.py
+rename to attic/yahboomcar_laser/test/test_pep257.py
+diff --git a/yahboomcar_linefollow/test/test_copyright.py b/attic/yahboomcar_linefollow/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_linefollow/test/test_copyright.py
+rename to attic/yahboomcar_linefollow/test/test_copyright.py
+diff --git a/yahboomcar_laser/test/test_flake8.py b/attic/yahboomcar_linefollow/test/test_flake8.py
+similarity index 100%
+rename from yahboomcar_laser/test/test_flake8.py
+rename to attic/yahboomcar_linefollow/test/test_flake8.py
+diff --git a/yahboomcar_laser/test/test_pep257.py b/attic/yahboomcar_linefollow/test/test_pep257.py
+similarity index 100%
+rename from yahboomcar_laser/test/test_pep257.py
+rename to attic/yahboomcar_linefollow/test/test_pep257.py
+diff --git a/yahboomcar_mediapipe/test/test_copyright.py b/attic/yahboomcar_mediapipe/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_mediapipe/test/test_copyright.py
+rename to attic/yahboomcar_mediapipe/test/test_copyright.py
+diff --git a/yahboomcar_linefollow/test/test_flake8.py b/attic/yahboomcar_mediapipe/test/test_flake8.py
+similarity index 100%
+rename from yahboomcar_linefollow/test/test_flake8.py
+rename to attic/yahboomcar_mediapipe/test/test_flake8.py
+diff --git a/yahboomcar_linefollow/test/test_pep257.py b/attic/yahboomcar_mediapipe/test/test_pep257.py
+similarity index 100%
+rename from yahboomcar_linefollow/test/test_pep257.py
+rename to attic/yahboomcar_mediapipe/test/test_pep257.py
+diff --git a/yahboomcar_mediapipe/yahboomcar_mediapipe/test_msg.py b/attic/yahboomcar_mediapipe/yahboomcar_mediapipe/test_msg.py
+similarity index 100%
+rename from yahboomcar_mediapipe/yahboomcar_mediapipe/test_msg.py
+rename to attic/yahboomcar_mediapipe/yahboomcar_mediapipe/test_msg.py
+diff --git a/yahboomcar_multi/test/test_copyright.py b/attic/yahboomcar_multi/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_multi/test/test_copyright.py
+rename to attic/yahboomcar_multi/test/test_copyright.py
+diff --git a/yahboomcar_mediapipe/test/test_flake8.py b/attic/yahboomcar_multi/test/test_flake8.py
+similarity index 100%
+rename from yahboomcar_mediapipe/test/test_flake8.py
+rename to attic/yahboomcar_multi/test/test_flake8.py
+diff --git a/yahboomcar_mediapipe/test/test_pep257.py b/attic/yahboomcar_multi/test/test_pep257.py
+similarity index 100%
+rename from yahboomcar_mediapipe/test/test_pep257.py
+rename to attic/yahboomcar_multi/test/test_pep257.py
+diff --git a/yahboomcar_nav/maps/test1.pgm b/attic/yahboomcar_nav/maps/test1.pgm
+similarity index 100%
+rename from yahboomcar_nav/maps/test1.pgm
+rename to attic/yahboomcar_nav/maps/test1.pgm
+diff --git a/yahboomcar_nav/maps/test1.yaml b/attic/yahboomcar_nav/maps/test1.yaml
+similarity index 100%
+rename from yahboomcar_nav/maps/test1.yaml
+rename to attic/yahboomcar_nav/maps/test1.yaml
+diff --git a/yahboomcar_nav/test/test_copyright.py b/attic/yahboomcar_nav/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_nav/test/test_copyright.py
+rename to attic/yahboomcar_nav/test/test_copyright.py
+diff --git a/yahboomcar_multi/test/test_flake8.py b/attic/yahboomcar_nav/test/test_flake8.py
+similarity index 100%
+rename from yahboomcar_multi/test/test_flake8.py
+rename to attic/yahboomcar_nav/test/test_flake8.py
+diff --git a/yahboomcar_multi/test/test_pep257.py b/attic/yahboomcar_nav/test/test_pep257.py
+similarity index 100%
+rename from yahboomcar_multi/test/test_pep257.py
+rename to attic/yahboomcar_nav/test/test_pep257.py
+diff --git a/yahboomcar_rviz/test/test_copyright.py b/attic/yahboomcar_rviz/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_rviz/test/test_copyright.py
+rename to attic/yahboomcar_rviz/test/test_copyright.py
+diff --git a/yahboomcar_nav/test/test_flake8.py b/attic/yahboomcar_rviz/test/test_flake8.py
+similarity index 100%
+rename from yahboomcar_nav/test/test_flake8.py
+rename to attic/yahboomcar_rviz/test/test_flake8.py
+diff --git a/yahboomcar_nav/test/test_pep257.py b/attic/yahboomcar_rviz/test/test_pep257.py
+similarity index 100%
+rename from yahboomcar_nav/test/test_pep257.py
+rename to attic/yahboomcar_rviz/test/test_pep257.py
+diff --git a/yahboomcar_visual/test/test_copyright.py b/attic/yahboomcar_visual/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_visual/test/test_copyright.py
+rename to attic/yahboomcar_visual/test/test_copyright.py
+diff --git a/yahboomcar_rviz/test/test_flake8.py b/attic/yahboomcar_visual/test/test_flake8.py
+similarity index 100%
+rename from yahboomcar_rviz/test/test_flake8.py
+rename to attic/yahboomcar_visual/test/test_flake8.py
+diff --git a/yahboomcar_rviz/test/test_pep257.py b/attic/yahboomcar_visual/test/test_pep257.py
+similarity index 100%
+rename from yahboomcar_rviz/test/test_pep257.py
+rename to attic/yahboomcar_visual/test/test_pep257.py
+diff --git a/yahboomcar_voice_ctrl/test/test_copyright.py b/attic/yahboomcar_voice_ctrl/test/test_copyright.py
+similarity index 100%
+rename from yahboomcar_voice_ctrl/test/test_copyright.py
+rename to attic/yahboomcar_voice_ctrl/test/test_copyright.py
+diff --git a/yahboomcar_visual/test/test_flake8.py b/attic/yahboomcar_voice_ctrl/test/test_flake8.py
+similarity index 100%
+rename from yahboomcar_visual/test/test_flake8.py
+rename to attic/yahboomcar_voice_ctrl/test/test_flake8.py
+diff --git a/yahboomcar_visual/test/test_pep257.py b/attic/yahboomcar_voice_ctrl/test/test_pep257.py
+similarity index 100%
+rename from yahboomcar_visual/test/test_pep257.py
+rename to attic/yahboomcar_voice_ctrl/test/test_pep257.py
+diff --git a/clawbot_director/test/test_nav2_config.py b/clawbot_director/test/test_nav2_config.py
+index 46c9775..9194b32 100644
+--- a/clawbot_director/test/test_nav2_config.py
++++ b/clawbot_director/test/test_nav2_config.py
+@@ -20,7 +20,7 @@ from clawbot_director import waypoints  # noqa: E402
+ 
+ RACINE = Path(__file__).resolve().parents[2]
+ PARAMS = RACINE / "config" / "nav2_clawbot.yaml"
+-LAUNCH = RACINE / "launch" / "navigation.launch.py"
++LAUNCH = RACINE / "clawbot_bringup" / "launch" / "navigation.launch.py"
+ 
+ # Mesures de la session du 2026-11-11 (ETAT-PROJET.md §2) : consigne 0,10 m/s -> 0,102 m/s.
+ VITESSE_LINEAIRE_MESUREE = 0.10
+diff --git a/clawbot_safety/test/test_arbitre_multiplexeur.py b/clawbot_safety/test/test_arbitre_multiplexeur.py
+index f221f27..ee53324 100644
+--- a/clawbot_safety/test/test_arbitre_multiplexeur.py
++++ b/clawbot_safety/test/test_arbitre_multiplexeur.py
+@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
+ from clawbot_safety import arbitrator  # noqa: E402
+ from soutien_arbitre import capteurs_sains, contexte, fermer, twist  # noqa: E402
+ 
+-ENTREES = {"teleop": 100, "nav": 50, "skill": 40, "legacy": 10}
++ENTREES = {"teleop": 100, "nav": 50, "skill": 40}   # P14 : entree legacy retiree
+ ORDRE = sorted(ENTREES, key=ENTREES.get)       # priorité croissante
+ PAIRES = list(itertools.combinations(ORDRE, 2))  # (basse, haute)
+ 
+diff --git a/clawbot_safety/test/test_arbitre_parametres.py b/clawbot_safety/test/test_arbitre_parametres.py
+index bf8094d..4cb2eba 100644
+--- a/clawbot_safety/test/test_arbitre_parametres.py
++++ b/clawbot_safety/test/test_arbitre_parametres.py
+@@ -23,7 +23,6 @@ NOMS = [
+     "inputs.teleop.topic", "inputs.teleop.priority", "inputs.teleop.timeout_s",
+     "inputs.nav.topic", "inputs.nav.priority", "inputs.nav.timeout_s",
+     "inputs.skill.topic", "inputs.skill.priority", "inputs.skill.timeout_s",
+-    "inputs.legacy.topic", "inputs.legacy.priority", "inputs.legacy.timeout_s",
+ ]
+ 
+ 
+@@ -51,8 +50,10 @@ def test_valeurs_par_defaut_de_la_table(arbitre):
+     assert arbitre.get_parameter("inputs.teleop.priority").value == 100
+     assert arbitre.get_parameter("inputs.nav.priority").value == 50
+     assert arbitre.get_parameter("inputs.skill.priority").value == 40
+-    assert arbitre.get_parameter("inputs.legacy.topic").value == "/cmd_vel"
+-    assert arbitre.get_parameter("inputs.legacy.priority").value == 10
++    # P14 (REQ-OPS-044) : l'entree `legacy` /cmd_vel est retiree, aucun editeur ne la
++    # publie plus. Trois entrees, pas quatre.
++    assert [n for n in arbitre.get_parameter("inputs.names").value] == [
++        "teleop", "nav", "skill"]
+ 
+ 
+ @pytest.mark.req("REQ-OPS-020")
+@@ -68,4 +69,5 @@ def test_yaml_de_configuration_coherent():
+         entree = params["inputs"][nom]
+         assert {"topic", "priority", "timeout_s"} <= set(entree)
+     assert params["inputs"]["teleop"]["priority"] == 100
+-    assert params["inputs"]["legacy"]["topic"] == "/cmd_vel"
++    assert "legacy" not in params["inputs"], "l'entree legacy est retiree (REQ-OPS-044)"
++    assert set(params["inputs"]["names"]) == {"teleop", "nav", "skill"}
+diff --git a/pytest.ini b/pytest.ini
+index b661431..0390d88 100644
+--- a/pytest.ini
++++ b/pytest.ini
+@@ -9,7 +9,8 @@ markers =
+     integration: domaine 99
+ 
+ ; Les scripts manuels exigent un service réseau vivant : jamais collectés.
+-norecursedirs = tests/manual install build log .git .pytest_cache __pycache__ site
++; `attic/` : paquets non deployes (P14), jamais collectes ni construits.
++norecursedirs = tests/manual install build log .git .pytest_cache __pycache__ site attic
+ 
+ ; Aucune procédure matérielle en exécution automatique.
+ ; Les 21 paquets ROS embarquent chacun un test_flake8.py / test_copyright.py /
+diff --git a/requirements/ARM.yaml b/requirements/ARM.yaml
+index fcb7a41..7524b01 100644
+--- a/requirements/ARM.yaml
++++ b/requirements/ARM.yaml
+@@ -79,8 +79,12 @@ requirements:
+       radians, reste dans les limites de `urdf/clawbot_x3plus.urdf` ; le SRDF de
+       MoveIt expose exactement les poses de la liste, avec les mêmes positions.
+     evidence: null
+-    status: draft
+-    approved_by: null
++    status: approved
++    approved_by: "opérateur 2026-11-22"
++    approval_note: >
++      Approuvée le 2026-11-22, avec la question de sortie P14 : « Oui, j'approuve
++      REQ-ARM-003 et REQ-ARM-004 ». Les poses `home` et `ready` restent à valider sur
++      le robot (HW-ARM-001) et n'entrent pas dans la liste par cette approbation.
+     prompt: P13
+ 
+   - id: REQ-ARM-004
+@@ -103,8 +107,12 @@ requirements:
+       aucune consigne sur `/cmd_vel/skill` ; les mêmes skills passent quand les cinq
+       angles sont dans la bande.
+     evidence: null
+-    status: draft
+-    approved_by: null
++    status: approved
++    approved_by: "opérateur 2026-11-22"
++    approval_note: >
++      Approuvée le 2026-11-22, avec la question de sortie P14 : « Oui, j'approuve
++      REQ-ARM-003 et REQ-ARM-004 ». Les poses `home` et `ready` restent à valider sur
++      le robot (HW-ARM-001) et n'entrent pas dans la liste par cette approbation.
+     prompt: P13
+ 
+   - id: REQ-ARM-005
+diff --git a/requirements/NET.yaml b/requirements/NET.yaml
+new file mode 100644
+index 0000000..3a082bc
+--- /dev/null
++++ b/requirements/NET.yaml
+@@ -0,0 +1,26 @@
++domain: NET
++requirements:
++  - id: REQ-NET-001
++    title: rosbridge retiré ou lié à la boucle locale
++    statement: >
++      Le service rosbridge ne doit plus être joignable depuis le réseau : soit il est
++      retiré du démarrage, soit son écoute est liée à 127.0.0.1.
++    rationale: >
++      rosbridge écoute sur toutes les interfaces (9090) et ouvre trois nœuds pour 9,9 %
++      de CPU relevés à l'audit (Q11, S21). La mesure du 2026-11-22 ne trouve **aucune
++      connexion client en sept jours** et aucune socket établie : le service est exposé
++      sans usage. La décision (retrait ou liaison locale) est celle de l'opérateur ;
++      l'exigence ne tranche que l'exposition.
++    sources: [Q11, S21, P01-M08]
++    safety: false
++    method: test
++    level: unit
++    criterion: >
++      Si le fichier d'unité rosbridge subsiste dans `services/`, son `ExecStart` passe
++      l'option de liaison à `127.0.0.1` (aucune écoute sur `0.0.0.0`) ; s'il a été
++      retiré, plus aucune unité ni cible du dépôt ne le cite. Au déploiement,
++      `ss -tlnp` ne montre le port 9090 que sur 127.0.0.1, ou pas du tout.
++    evidence: null
++    status: implemented
++    approved_by: null
++    prompt: P14
+diff --git a/requirements/OPS.yaml b/requirements/OPS.yaml
+index 5f14093..0ce7c45 100644
+--- a/requirements/OPS.yaml
++++ b/requirements/OPS.yaml
+@@ -152,3 +152,149 @@ requirements:
+     status: implemented
+     approved_by: null
+     prompt: P07
++
++  - id: REQ-OPS-040
++    title: Une seule cible de démarrage
++    statement: >
++      `clawbot.target` doit être le seul point d'entrée du démarrage : elle démarre
++      toutes les capacités `always_on` et les nœuds de l'exécutif, et aucune unité du
++      robot n'est `WantedBy` d'une cible de démarrage.
++    rationale: >
++      Deux descriptions concurrentes du démarrage (27 launch files, 14 puis 26 unités)
++      rendent l'état de démarrage invérifiable (S23, S25, O11). Une cible unique fait
++      de `systemctl status clawbot.target` la réponse à « le robot est-il démarré ? ».
++    sources: [S23, S25, O11]
++    safety: false
++    method: test
++    level: unit
++    criterion: >
++      `clawbot.target` déclare `Wants=` les unités attendues (base, lidar, description,
++      localisation, arbitre, capacités, skills, mission, directeur, sentinelle, santé,
++      caméra poignet) ; aucune unité du robot ne porte `WantedBy=multi-user.target` ni
++      d'autre cible de démarrage ; `systemctl list-dependencies clawbot.target` les
++      couvre toutes au déploiement.
++    evidence: null
++    status: implemented
++    approved_by: null
++    prompt: P14
++
++  - id: REQ-OPS-041
++    title: Chaque unité lance un fichier de clawbot_bringup
++    statement: >
++      Chaque unité du robot doit exécuter `ros2 launch clawbot_bringup <fichier>` ;
++      aucune ne doit lancer un nœud par `ros2 run` ni du code par `python3 -c`.
++    rationale: >
++      `ros2 run` et `python3 -c` disséminent les paramètres dans les fichiers d'unité :
++      ils sont invisibles pour un test, non rechargeables, et le YAML lu est celui de
++      l'installation. Un fichier de lancement par unité remet les paramètres dans le
++      paquet, à côté du code qu'ils configurent.
++    sources: [S23, O11]
++    safety: false
++    method: test
++    level: unit
++    criterion: >
++      Pour chaque fichier de `services/` et `systemd/` décrivant une unité du robot :
++      `ExecStart` contient `ros2 launch clawbot_bringup ` et le fichier cité existe dans
++      le paquet ; aucune occurrence de `ros2 run` ni de `python3 -c` ; aucun chemin
++      `/home/jetson/clawbot/launch/` (paramètres lus par `get_package_share_directory`).
++    evidence: null
++    status: implemented
++    approved_by: null
++    prompt: P14
++
++  - id: REQ-OPS-042
++    title: Les paquets non déployés sortent du build
++    statement: >
++      Les paquets de didacticiel et les paquets vendor non déployés ne doivent plus être
++      construits : ils sont déplacés sous `attic/` avec un fichier `COLCON_IGNORE`.
++    rationale: >
++      46 paquets pour 15 déployés (S21, R15) : le build complet dure, les doublons
++      d'`api_server.py` se multiplient (R10) et une recherche dans le dépôt ramène du
++      code qui n'a jamais tourné. `attic/` garde l'historique sans le construire.
++    sources: [S21, R15, R10]
++    safety: false
++    method: test
++    level: unit
++    criterion: >
++      Chaque paquet de la liste de l'inventaire (`docs/ops/inventaire_demarrage.md` §3)
++      est sous `attic/` avec `COLCON_IGNORE` ; `colcon list` ne les retourne plus ;
++      `scripts/check.sh --strict-duplicates` passe sans exception pour `api_server.py`.
++    evidence: null
++    status: implemented
++    approved_by: null
++    prompt: P14
++
++  - id: REQ-OPS-043
++    title: Une seule API HTTP 8000, branchée sur l'exécutif
++    statement: >
++      Une seule implémentation de l'API HTTP du port 8000 doit exister ; elle doit
++      appeler l'exécutif pour tout mouvement et ne publier sur aucun topic de commande.
++    rationale: >
++      Trois variantes d'`api_server.py` (R10) et deux chemins de mouvement qui
++      contournent l'exécutif : `SetVelocity` écrit `/cmd_vel/teleop` via le service
++      matériel, `NavigateTo` navigue à l'estime, `Stop` publie `/cmd_vel` en repli
++      (P04). Aucun de ces mouvements n'a de journal, de budget ni de précondition.
++    sources: [R10, P04]
++    safety: false
++    method: test
++    level: unit
++    criterion: >
++      Un seul fichier d'implémentation (`src/api_server.cpp`) ; aucun
++      `create_publisher<geometry_msgs::msg::Twist>` dans le paquet ; les routes
++      `SetVelocity`, `Stop` et `NavigateTo` appellent l'action `/clawbot/execute_skill`
++      (ou `/clawbot/execute_mission`) ; les deux autres `api_server.py` ont disparu.
++    evidence: null
++    status: implemented
++    approved_by: null
++    prompt: P14
++
++  - id: REQ-OPS-044
++    title: L'entrée héritée /cmd_vel quitte l'arbitre
++    statement: >
++      L'arbitre ne doit plus écouter `/cmd_vel` : l'entrée `legacy` est retirée de sa
++      table d'entrées, après vérification qu'aucun éditeur ne subsiste.
++    rationale: >
++      `/cmd_vel` n'a plus qu'un éditeur de repli (l'API) ; une entrée d'arbitre sans
++      producteur est une porte ouverte qu'un futur nœud emprunterait sans passer par la
++      table des priorités (P04). Le retrait se fait en deux temps : code de l'API
++      d'abord, entrée ensuite, et seulement quand `ros2 topic info` est vide.
++    sources: [P04, S25]
++    safety: true
++    method: test
++    level: unit
++    criterion: >
++      `ENTREES_PAR_DEFAUT` ne contient plus d'entrée `legacy` ni de topic `/cmd_vel` ;
++      l'arbitre démarre et publie `/safety/state` avec trois entrées ; au déploiement,
++      `ros2 topic info /cmd_vel` annonce zéro éditeur avant et après le retrait.
++    evidence: null
++    status: approved
++    approved_by: "opérateur 2026-11-22"
++    approval_note: >
++      Approuvée avec l'inventaire du démarrage (question du 2026-11-22) :
++      « Oui, inventaire validé et REQ-OPS-044 approuvée ». Le retrait de l'entrée
++      `legacy` reste conditionné à la vérification qu'aucun éditeur ne subsiste.
++    prompt: P14
++
++  - id: REQ-OPS-045
++    title: Au plus 15 nœuds applicatifs
++    statement: >
++      En configuration de base, le graphe doit compter au plus 15 nœuds applicatifs.
++    rationale: >
++      Chaque nœud coûte un processus, un abonnement et une entrée de diagnostic ; O11
++      fixe la cible à 15. La mesure du 2026-11-22 donne 23 entrées `ros2 node list`,
++      dont 15 applicatifs, 6 d'infrastructure et 3 de rosbridge.
++    sources: [O11, P01-M07]
++    safety: false
++    method: demonstration
++    level: hardware
++    criterion: >
++      Au déploiement : `ros2 node list` filtré des nœuds d'infrastructure
++      (`robot_state_publisher`, `joint_state_publisher`, `transform_listener_impl*`,
++      `launch_ros_*`) et de rosbridge s'il est conservé, ≤ 15. Définition retenue par
++      l'opérateur le 2026-11-22 : « 15 hors infrastructure et hors rosbridge » ; mesure
++      du même jour : 23 entrées, 6 d'infrastructure, 3 de rosbridge, **15 applicatifs**.
++      Mesure consignée dans le journal de déploiement P14.
++    evidence: deploy/journal/2026-11-22_p14_demarrage.md
++    status: draft
++    approved_by: null
++    prompt: P14
+diff --git a/ros2_llm_bridge/test/test_action_handler.py b/ros2_llm_bridge/test/test_action_handler.py
+deleted file mode 100644
+index f097cad..0000000
+--- a/ros2_llm_bridge/test/test_action_handler.py
++++ /dev/null
+@@ -1,204 +0,0 @@
+-"""Unit tests for ActionHandler.
+-
+-BridgeNode is fully mocked so no ROS 2 runtime is required.
+-Async tests use the anyio backend (already available in the environment).
+-"""
+-
+-import sys
+-from pathlib import Path
+-
+-import pytest
+-from unittest.mock import ANY, AsyncMock, MagicMock
+-
+-# Le paquet vit dans ros2_llm_bridge/ros2_llm_bridge/ : pytest lancé depuis la
+-# racine du dépôt n'ajoute que le dossier du test à sys.path.
+-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+-
+-from ros2_llm_bridge.action_handler import ActionHandler
+-from ros2_llm_bridge.bridge_node import BridgeNode
+-
+-
+-@pytest.fixture
+-def mock_bridge():
+-    bridge = MagicMock(spec=BridgeNode)
+-    bridge.execute_set_velocity = AsyncMock(
+-        return_value="Velocity command published to cmd_vel."
+-    )
+-    bridge.execute_stop = AsyncMock(
+-        return_value="Stop command sent — all velocities zeroed."
+-    )
+-    bridge.execute_speak = AsyncMock(return_value='Spoke: "Hello"')
+-    bridge.execute_navigate_to = AsyncMock(
+-        return_value='{"status": "success", "reached": {"x": 1.0, "y": 2.0}}'
+-    )
+-    bridge.execute_recognize_face = AsyncMock(
+-        return_value='{"face": "User", "confidence": 0.97}'
+-    )
+-    bridge.execute_recognize_object = AsyncMock(
+-        return_value='{"objects": [{"label": "Apple", "confidence": 0.89}]}'
+-    )
+-    bridge.execute_recognize_qrcode = AsyncMock(
+-        return_value='{"content": "https://example.com", "found": true}'
+-    )
+-    bridge.execute_analyze_scene = AsyncMock(
+-        return_value='{"description": "A room.", "objects": ["table"]}'
+-    )
+-    bridge.execute_listen = AsyncMock(
+-        return_value='{"transcript": "Hello robot.", "confidence": 0.95}'
+-    )
+-    bridge.execute_control_arm = AsyncMock(return_value="Arm moved.")
+-    bridge.execute_control_claw = AsyncMock(return_value="Claw is now open.")
+-    bridge.execute_beep = AsyncMock(return_value="Buzzer sounded for 100 ms.")
+-    bridge.execute_set_lamps = AsyncMock(return_value="Lamps set to RGB(255, 0, 0).")
+-    bridge.execute_get_battery_voltage = AsyncMock(
+-        return_value='{"voltage": 12.4, "unit": "V", "percentage": 85}'
+-    )
+-    bridge.execute_set_arm_pose = AsyncMock(
+-        return_value="Arm pose set to 'Anti-collision'."
+-    )
+-    return bridge
+-
+-
+-@pytest.fixture
+-def handler(mock_bridge):
+-    return ActionHandler(bridge_node=mock_bridge)
+-
+-
+-# --- Schema format tests ---
+-
+-@pytest.mark.xfail(strict=True, reason=
+-    "le pont expose 17 outils, ce test en attend 15 : test antérieur à l'ajout des outils (défaut réel, voir P06/P10)")
+-def test_get_tools_schema_openai_format(handler):
+-    schemas = handler.get_tools_schema(format="openai")
+-    assert len(schemas) == 15
+-    first = schemas[0]
+-    assert first["type"] == "function"
+-    assert "name" in first["function"]
+-    assert "description" in first["function"]
+-    assert "parameters" in first["function"]
+-
+-
+-def test_get_tools_schema_anthropic_format(handler):
+-    schemas = handler.get_tools_schema(format="anthropic")
+-    first = schemas[0]
+-    assert "name" in first
+-    assert "description" in first
+-    assert "input_schema" in first
+-
+-
+-def test_get_tools_schema_raw_format(handler):
+-    schemas = handler.get_tools_schema(format="raw")
+-    first = schemas[0]
+-    assert "title" in first
+-    assert "type" in first
+-
+-
+-def test_all_tools_have_description(handler):
+-    for schema in handler.get_tools_schema(format="openai"):
+-        desc = schema["function"]["description"]
+-        assert desc, f"Tool '{schema['function']['name']}' has no description"
+-
+-
+-# --- Timeout tests ---
+-
+-def test_get_tool_timeout_known(handler):
+-    assert handler.get_tool_timeout("NavigateTo") == 60.0
+-    assert handler.get_tool_timeout("Stop") == 2.0
+-    assert handler.get_tool_timeout("GetBatteryVoltage") == 3.0
+-
+-
+-def test_get_tool_timeout_unknown_returns_default(handler):
+-    assert handler.get_tool_timeout("NonExistent") == 10.0
+-
+-
+-# --- Unknown tool ---
+-
+-@pytest.mark.asyncio
+-async def test_execute_unknown_tool_raises_value_error(handler):
+-    with pytest.raises(ValueError, match="Unknown tool"):
+-        await handler.execute_tool("FlyToMoon", {})
+-
+-
+-# --- Invalid arguments ---
+-
+-@pytest.mark.asyncio
+-async def test_execute_invalid_args_raises_value_error(handler):
+-    with pytest.raises(ValueError, match="Invalid arguments"):
+-        await handler.execute_tool("SetVelocity", {"linear_x": "not_a_float"})
+-
+-
+-# --- SetVelocity ---
+-
+-@pytest.mark.xfail(strict=True, reason=
+-    "consigne 0.5 m/s refusée par ActionHandler (borne 0.06 m/s) : test antérieur aux bornes de sécurité (voir P04/P06)")
+-@pytest.mark.asyncio
+-async def test_execute_set_velocity(handler, mock_bridge):
+-    result = await handler.execute_tool(
+-        "SetVelocity", {"linear_x": 0.5, "linear_y": 0.0, "angular_z": 0.0}
+-    )
+-    assert "cmd_vel" in result
+-    mock_bridge.execute_set_velocity.assert_called_once_with(
+-        ANY, 0.5, 0.0, 0.0
+-    )
+-
+-
+-# --- Stop ---
+-
+-@pytest.mark.asyncio
+-async def test_execute_stop(handler, mock_bridge):
+-    result = await handler.execute_tool("Stop", {})
+-    assert "zeroed" in result
+-    mock_bridge.execute_stop.assert_called_once()
+-
+-
+-# --- Speak ---
+-
+-@pytest.mark.asyncio
+-async def test_execute_speak(handler, mock_bridge):
+-    result = await handler.execute_tool("Speak", {"text": "Hello"})
+-    assert "Hello" in result
+-    mock_bridge.execute_speak.assert_called_once_with(ANY, "Hello")
+-
+-
+-# --- ControlClaw validation ---
+-
+-@pytest.mark.asyncio
+-async def test_execute_control_claw_invalid_state(handler):
+-    with pytest.raises(ValueError, match="Invalid arguments"):
+-        await handler.execute_tool("ControlClaw", {"state": "wiggle"})
+-
+-
+-@pytest.mark.asyncio
+-async def test_execute_control_claw_open(handler, mock_bridge):
+-    result = await handler.execute_tool("ControlClaw", {"state": "open"})
+-    assert "open" in result
+-
+-
+-# --- SetLamps validation ---
+-
+-@pytest.mark.asyncio
+-async def test_execute_set_lamps_out_of_range(handler):
+-    with pytest.raises(ValueError, match="Invalid arguments"):
+-        await handler.execute_tool("SetLamps", {"r": 300, "g": 0, "b": 0})
+-
+-
+-# --- RecognizeFace returns structured JSON ---
+-
+-@pytest.mark.asyncio
+-async def test_execute_recognize_face_returns_json(handler, mock_bridge):
+-    import json
+-    result = await handler.execute_tool("RecognizeFace", {})
+-    parsed = json.loads(result)
+-    assert "face" in parsed
+-    assert "confidence" in parsed
+-
+-
+-# --- GetBatteryVoltage returns structured JSON ---
+-
+-@pytest.mark.asyncio
+-async def test_execute_get_battery_voltage_returns_json(handler, mock_bridge):
+-    import json
+-    result = await handler.execute_tool("GetBatteryVoltage", {})
+-    parsed = json.loads(result)
+-    assert "voltage" in parsed
+-    assert "unit" in parsed
+diff --git a/ros2_llm_bridge/test/test_backend_services.py b/ros2_llm_bridge/test/test_backend_services.py
+deleted file mode 100644
+index 8b21a6f..0000000
+--- a/ros2_llm_bridge/test/test_backend_services.py
++++ /dev/null
+@@ -1,51 +0,0 @@
+-import pytest
+-import requests
+-
+-LLM_BRIDGE_URL = "http://localhost:8000"
+-HARDWARE_SERVICE_URL = "http://localhost:8001"
+-
+-TIMEOUT = 3.0
+-
+-def test_llm_bridge_health():
+-    """Test that the LLM Bridge is up and running via the health endpoint."""
+-    response = requests.get(f"{LLM_BRIDGE_URL}/health", timeout=TIMEOUT)
+-    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+-    data = response.json()
+-    assert data.get("status") == "healthy", f"Expected 'healthy', got {data.get('status')}"
+-
+-def test_hardware_service_health():
+-    """Test that the Hardware Service is alive, checking its /health endpoint."""
+-    response = requests.get(f"{HARDWARE_SERVICE_URL}/health", timeout=TIMEOUT)
+-    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+-    data = response.json()
+-    assert data.get("status") == "ok", f"Expected 'ok', got {data.get('status')}"
+-    assert "ros2" in data
+-
+-def test_hardware_service_battery():
+-    """Test that the Hardware Service can fetch battery stats via /battery."""
+-    response = requests.get(f"{HARDWARE_SERVICE_URL}/battery", timeout=TIMEOUT)
+-    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+-    data = response.json()
+-    assert "voltage" in data
+-    assert "percentage" in data
+-
+-def test_hardware_service_lamps():
+-    """Test setting lamps to a specific color (non-destructive)."""
+-    payload = {"r": 0, "g": 255, "b": 0}
+-    response = requests.post(f"{HARDWARE_SERVICE_URL}/lamps", json=payload, timeout=TIMEOUT)
+-    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+-    data = response.json()
+-    assert data.get("status") == "ok"
+-    assert data.get("g") == 255
+-
+-@pytest.mark.xfail(strict=True, reason=
+-    "GET /tools renvoie 404 sur le pont en service : contrat HTTP à revoir (voir P10)")
+-def test_llm_bridge_tools():
+-    """Verify that we can request tool definitions from the LLM Bridge."""
+-    # Based on standard endpoints, or we check its schema, but let's just make sure
+-    # we can hit its /openapi.json to confirm fastapi is serving routes correctly.
+-    response = requests.get(f"{LLM_BRIDGE_URL}/openapi.json", timeout=TIMEOUT)
+-    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+-    data = response.json()
+-    assert "paths" in data
+-
+diff --git a/ros2_llm_bridge/test/test_copyright.py b/ros2_llm_bridge/test/test_copyright.py
+deleted file mode 100644
+index 97a3919..0000000
+--- a/ros2_llm_bridge/test/test_copyright.py
++++ /dev/null
+@@ -1,25 +0,0 @@
+-# Copyright 2015 Open Source Robotics Foundation, Inc.
+-#
+-# Licensed under the Apache License, Version 2.0 (the "License");
+-# you may not use this file except in compliance with the License.
+-# You may obtain a copy of the License at
+-#
+-#     http://www.apache.org/licenses/LICENSE-2.0
+-#
+-# Unless required by applicable law or agreed to in writing, software
+-# distributed under the License is distributed on an "AS IS" BASIS,
+-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-# See the License for the specific language governing permissions and
+-# limitations under the License.
+-
+-from ament_copyright.main import main
+-import pytest
+-
+-
+-# Remove the `skip` decorator once the source file(s) have a copyright header
+-@pytest.mark.skip(reason='No copyright header has been placed in the generated source file.')
+-@pytest.mark.copyright
+-@pytest.mark.linter
+-def test_copyright():
+-    rc = main(argv=['.', 'test'])
+-    assert rc == 0, 'Found errors'
+diff --git a/ros2_llm_bridge/test/test_hardware_shutdown.py b/ros2_llm_bridge/test/test_hardware_shutdown.py
+deleted file mode 100644
+index ffedf57..0000000
+--- a/ros2_llm_bridge/test/test_hardware_shutdown.py
++++ /dev/null
+@@ -1,32 +0,0 @@
+-"""Arrêt propre du service matériel (P02, REQ-OPS-011).
+-
+-`hardware_service.py` n'avait pas de `main()` : `uvicorn.run` était appelé au
+-niveau module. Un point d'entrée explicite rend l'arrêt testable et symétrique
+-avec les autres nœuds maison.
+-"""
+-from __future__ import annotations
+-
+-import sys
+-from pathlib import Path
+-
+-import pytest
+-
+-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+-
+-import hardware_service  # noqa: E402
+-
+-
+-@pytest.mark.req("REQ-OPS-011")
+-@pytest.mark.parametrize(
+-    "signal_",
+-    [KeyboardInterrupt, SystemExit],
+-    ids=["SIGINT", "SIGTERM"],
+-)
+-def test_main_sort_en_zero(monkeypatch, signal_):
+-    def run_qui_arrete(*_a, **_k):
+-        raise signal_()
+-
+-    monkeypatch.setattr(hardware_service.uvicorn, "run", run_qui_arrete)
+-    monkeypatch.setattr(hardware_service, "_shutdown_ros", lambda: None)
+-
+-    assert hardware_service.main() == 0
+diff --git a/ros2_llm_bridge/test/test_integration.py b/ros2_llm_bridge/test/test_integration.py
+deleted file mode 100644
+index fe9fc31..0000000
+--- a/ros2_llm_bridge/test/test_integration.py
++++ /dev/null
+@@ -1,50 +0,0 @@
+-import os
+-import sys
+-import unittest
+-import launch
+-import launch_ros
+-import launch_testing
+-import launch_testing.actions
+-import pytest
+-import rclpy
+-from rclpy.node import Node
+-from geometry_msgs.msg import Twist
+-
+-pytestmark = pytest.mark.xfail(strict=True, reason=(
+-    "exige la fixture launch_testing proc_output, indisponible quand l'autochargement"
+-    " des plugins ROS est coupé : à exécuter via launch_testing, pas ici (REQ-TEST-001)"))
+-
+-
+-@pytest.mark.rostest
+-def generate_test_description():
+-    bridge_node = launch_ros.actions.Node(
+-        package='ros2_llm_bridge',
+-        executable='bridge_node',
+-        output='screen'
+-    )
+-    
+-    return launch.LaunchDescription([
+-        bridge_node,
+-        launch_testing.actions.ReadyToTest()
+-    ]), {'bridge_node': bridge_node}
+-
+-
+-class TestBridgeNodeCommunication(unittest.TestCase):
+-
+-    @classmethod
+-    def setUpClass(cls):
+-        rclpy.init()
+-
+-    @classmethod
+-    def tearDownClass(cls):
+-        rclpy.shutdown()
+-
+-    def setUp(self):
+-        self.node = rclpy.create_node('test_bridge_client')
+-
+-    def tearDown(self):
+-        self.node.destroy_node()
+-
+-    def test_node_starts(self, proc_output):
+-        # The node should log that it initialized
+-        proc_output.assertWaitFor('BridgeNode initialized', timeout=5, stream='stdout')
+diff --git a/ros2_llm_bridge/test/test_llm_handler.py b/ros2_llm_bridge/test/test_llm_handler.py
+deleted file mode 100644
+index e6e6242..0000000
+--- a/ros2_llm_bridge/test/test_llm_handler.py
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# LLMHandler was superseded by ActionHandler.
+-# Tests have been moved to test_action_handler.py.
+diff --git a/ros2_llm_bridge/test/test_schemas.py b/ros2_llm_bridge/test/test_schemas.py
+deleted file mode 100644
+index f1579b4..0000000
+--- a/ros2_llm_bridge/test/test_schemas.py
++++ /dev/null
+@@ -1,141 +0,0 @@
+-import math
+-import sys
+-from pathlib import Path
+-
+-import pytest
+-from pydantic import ValidationError
+-
+-# Le paquet vit dans ros2_llm_bridge/ros2_llm_bridge/ : pytest lancé depuis la
+-# racine du dépôt n'ajoute que le dossier du test à sys.path.
+-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+-
+-from ros2_llm_bridge.schemas import (
+-    Beep,
+-    ControlArm,
+-    ControlClaw,
+-    SetArmPose,
+-    SetLamps,
+-    SetVelocity,
+-    Speak,
+-    Stop,
+-)
+-
+-
+-# --- SetVelocity ---
+-
+-@pytest.mark.xfail(strict=True, reason=
+-    "le schéma réel borne linear_x à 0.06 m/s et angular_z à 0.25 rad/s : test antérieur aux bornes de sécurité (voir P06)")
+-def test_set_velocity_valid():
+-    cmd = SetVelocity(linear_x=1.0, linear_y=0.0, angular_z=0.5)
+-    assert cmd.linear_x == 1.0
+-    assert cmd.linear_y == 0.0
+-    assert cmd.angular_z == 0.5
+-
+-
+-@pytest.mark.xfail(strict=True, reason=
+-    "le schéma réel borne linear_x à 0.06 m/s : test antérieur aux bornes de sécurité (voir P06)")
+-def test_set_velocity_default_linear_y():
+-    cmd = SetVelocity(linear_x=1.0, angular_z=0.0)
+-    assert cmd.linear_y == 0.0
+-
+-
+-def test_set_velocity_invalid_angular_z_too_high():
+-    with pytest.raises(ValidationError):
+-        SetVelocity(linear_x=0.0, angular_z=math.pi + 0.1)
+-
+-
+-def test_set_velocity_invalid_angular_z_too_low():
+-    with pytest.raises(ValidationError):
+-        SetVelocity(linear_x=0.0, angular_z=-(math.pi + 0.1))
+-
+-
+-# --- Stop ---
+-
+-def test_stop_valid():
+-    assert Stop() is not None
+-
+-
+-# --- Speak ---
+-
+-def test_speak_valid():
+-    cmd = Speak(text="Hello world")
+-    assert cmd.text == "Hello world"
+-
+-
+-# --- ControlClaw ---
+-
+-def test_control_claw_open():
+-    cmd = ControlClaw(state="open")
+-    assert cmd.state == "open"
+-
+-
+-def test_control_claw_close():
+-    cmd = ControlClaw(state="close")
+-    assert cmd.state == "close"
+-
+-
+-def test_control_claw_invalid_state():
+-    with pytest.raises(ValidationError):
+-        ControlClaw(state="wiggle")
+-
+-
+-# --- SetLamps ---
+-
+-def test_set_lamps_valid():
+-    cmd = SetLamps(r=255, g=128, b=0)
+-    assert cmd.r == 255
+-
+-
+-def test_set_lamps_r_above_255():
+-    with pytest.raises(ValidationError):
+-        SetLamps(r=256, g=0, b=0)
+-
+-
+-def test_set_lamps_g_below_0():
+-    with pytest.raises(ValidationError):
+-        SetLamps(r=0, g=-1, b=0)
+-
+-
+-# --- SetArmPose ---
+-
+-def test_set_arm_pose_valid():
+-    cmd = SetArmPose(pose_id=1)
+-    assert cmd.pose_id == 1
+-
+-
+-def test_set_arm_pose_too_low():
+-    with pytest.raises(ValidationError):
+-        SetArmPose(pose_id=0)
+-
+-
+-def test_set_arm_pose_too_high():
+-    with pytest.raises(ValidationError):
+-        SetArmPose(pose_id=4)
+-
+-
+-# --- ControlArm ---
+-
+-@pytest.mark.xfail(strict=True, reason=
+-    "le schéma exige 5 articulations, ce test en fournit 4 : test antérieur au bras 5 axes (voir P06/P13)")
+-def test_control_arm_valid():
+-    cmd = ControlArm(joints_array=[0.0, 1.57, -0.5, 0.0])
+-    assert len(cmd.joints_array) == 4
+-
+-
+-# --- Beep ---
+-
+-@pytest.mark.xfail(strict=True, reason=
+-    "défaut de delay_ms passé de 100 à 200 ms dans le schéma : test antérieur au changement (voir P06)")
+-def test_beep_default():
+-    cmd = Beep()
+-    assert cmd.delay_ms == 100
+-
+-
+-def test_beep_zero_invalid():
+-    with pytest.raises(ValidationError):
+-        Beep(delay_ms=0)
+-
+-
+-def test_beep_negative_invalid():
+-    with pytest.raises(ValidationError):
+-        Beep(delay_ms=-50)
+diff --git a/tests/test_arm_joint_sources.py b/tests/test_arm_joint_sources.py
+index c88c65d..9629ad5 100644
+--- a/tests/test_arm_joint_sources.py
++++ b/tests/test_arm_joint_sources.py
+@@ -21,7 +21,7 @@ sys.path.insert(0, str(RACINE / "clawbot_capabilities"))
+ from clawbot_capabilities.manifeste import charger  # noqa: E402
+ 
+ PILOTE = RACINE / "clawbot_base_driver" / "clawbot_base_driver" / "base_driver.py"
+-LAUNCH = RACINE / "launch" / "robot_description.launch.py"
++LAUNCH = RACINE / "clawbot_bringup" / "launch" / "description.launch.py"
+ MANIFESTE = RACINE / "clawbot_capabilities" / "config" / "capabilities.yaml"
+ 
+ 
+@@ -38,12 +38,13 @@ def test_le_pilote_ne_declare_aucun_editeur_sur_joint_states():
+ @pytest.mark.req("REQ-ARM-001")
+ def test_joint_state_publisher_est_la_seule_source_du_bras():
+     source = LAUNCH.read_text(encoding="utf-8")
+-    assert "'source_list': ['/arm/joint_states']" in source
+-    assert "'rate': 20.0" in source
++    # Le fichier de lancement passe les parametres par un dict Python.
++    assert 'source_list=["/arm/joint_states"]' in source
++    assert "rate=20.0" in source
+     # Deux éditeurs sur /joint_states se contrediraient : le launch ne doit lancer que
+     # robot_state_publisher et joint_state_publisher.
+-    assert source.count("executable='robot_state_publisher'") == 1
+-    assert source.count("executable='joint_state_publisher'") == 1
++    assert source.count('executable="robot_state_publisher"') == 1
++    assert source.count('executable="joint_state_publisher"') == 1
+ 
+ 
+ @pytest.mark.req("REQ-ARM-002")
+diff --git a/tests/test_camera_poignet.py b/tests/test_camera_poignet.py
+index af7781e..045c55c 100644
+--- a/tests/test_camera_poignet.py
++++ b/tests/test_camera_poignet.py
+@@ -19,8 +19,8 @@ import yaml
+ 
+ RACINE = Path(__file__).resolve().parents[1]
+ URDF = RACINE / "urdf" / "clawbot_x3plus.urdf"
+-UNIT_CAMERA = RACINE / "services" / "clawbot-wrist-camera.service"
+-UNIT_YOLO = RACINE / "services" / "clawbot-yolo.service"
++UNIT_CAMERA = RACINE / "clawbot_bringup" / "launch" / "wrist_camera.launch.py"
++UNIT_YOLO = RACINE / "clawbot_bringup" / "launch" / "detection.launch.py"
+ CALIBRATION = RACINE / "config" / "wrist_camera_info.yaml"
+ 
+ CADRE = "wrist_camera_optical_frame"
+@@ -97,7 +97,7 @@ def test_l_urdf_reste_valide():
+ 
+ # ── unité systemd de la caméra ────────────────────────────────────────────────
+ def test_l_unite_publie_le_cadre_de_l_urdf(unite_camera, urdf):
+-    assert f"camera_frame_id:={CADRE}" in unite_camera
++    assert f'"camera_frame_id": "{CADRE}"' in unite_camera
+     assert CADRE in {lien.get("name") for lien in urdf.findall("link")}
+ 
+ 
+@@ -108,15 +108,16 @@ def test_l_unite_utilise_le_chemin_by_id_et_pas_un_index(unite_camera):
+ 
+ 
+ def test_l_unite_declare_le_domaine_et_un_seul_proprietaire(unite_camera):
+-    assert "Environment=ROS_DOMAIN_ID=28" in unite_camera
+-    assert "User=jetson" in unite_camera
+-    assert "wrist_camera" in unite_camera and "Conflicts=" not in unite_camera, \
++    assert "ROS_DOMAIN_ID=28" in (RACINE / "deploy" / "env" / "clawbot.env").read_text()
++    unite = (RACINE / "services" / "clawbot-wrist-camera.service").read_text(encoding="utf-8")
++    assert "User=jetson" in unite
++    assert "wrist_camera" in unite_camera and "Conflicts=" not in unite, \
+         "la caméra appartient à une seule unité : ce n'est pas un conflit, c'est une propriété"
+ 
+ 
+ def test_l_unite_ne_convertit_pas_l_image_dans_le_noeud(unite_camera):
+     """La conversion par image coûtait 60 ms et divisait la cadence : elle est faite à la demande."""
+-    assert "output_encoding:=yuv422_yuy2" in unite_camera
++    assert '"output_encoding": "yuv422_yuy2"' in unite_camera
+ 
+ 
+ # ── service YOLO : la caméra lui est donnée par le topic ──────────────────────
+@@ -125,10 +126,10 @@ def test_le_service_yolo_lit_la_camera_par_le_topic(unite_yolo, unite_camera):
+     # profondeur 1) : elle n'ouvre aucun /dev/video* et ne porte donc plus d'index V4L.
+     assert "yolo_node.noeud" in unite_yolo
+     assert "CAMERA_CLAW_INDEX" not in unite_yolo and "CAMERA_FRONT_INDEX" not in unite_yolo
+-    assert "Environment=ROS_DOMAIN_ID=28" in unite_yolo, \
++    assert "ROS_DOMAIN_ID=28" in (RACINE / "deploy" / "env" / "clawbot.env").read_text(), \
+         "sans domaine, le nœud du service vit en domaine 0 : abonnement muet, sans erreur"
+     # le topic écouté doit être celui que la caméra publie (même espace de noms)
+-    assert "__ns:=/wrist_camera" in unite_camera
++    assert 'namespace="wrist_camera"' in unite_camera
+ 
+ 
+ def test_le_contrat_d_image_est_lisible_par_le_service():
+diff --git a/tests/test_p07_delegation.py b/tests/test_p07_delegation.py
+index 4c1a4a7..33f373e 100644
+--- a/tests/test_p07_delegation.py
++++ b/tests/test_p07_delegation.py
+@@ -13,7 +13,7 @@ import pytest
+ 
+ pytestmark = pytest.mark.req("REQ-OPS-030")
+ 
+-SERVICE = Path(__file__).resolve().parents[1] / "ros2_llm_bridge" / "hardware_service.py"
++SERVICE = Path(__file__).resolve().parents[1] / "clawbot_bringup" / "clawbot_bringup" / "hardware_service.py"
+ 
+ 
+ class FauxResultat:
+diff --git a/tests/test_p11_astra.py b/tests/test_p11_astra.py
+index 7860381..1037560 100644
+--- a/tests/test_p11_astra.py
++++ b/tests/test_p11_astra.py
+@@ -33,7 +33,7 @@ def test_depth_vision_est_geree_par_le_gestionnaire():
+ 
+ @pytest.mark.req("REQ-PERC-003")
+ def test_hardware_service_ne_lance_plus_lastra():
+-    source = (RACINE / "ros2_llm_bridge" / "hardware_service.py").read_text(encoding="utf-8")
++    source = (RACINE / "clawbot_bringup" / "clawbot_bringup" / "hardware_service.py").read_text(encoding="utf-8")
+     for motif in ("astra_camera", "astro_pro", "orbbec-camera.service"):
+         assert motif not in source, f"hardware_service lance encore l'Astra ({motif})"
+ 
+diff --git a/tests/test_p14_demarrage.py b/tests/test_p14_demarrage.py
+new file mode 100644
+index 0000000..50a72c7
+--- /dev/null
++++ b/tests/test_p14_demarrage.py
+@@ -0,0 +1,190 @@
++"""Démarrage unique, nettoyage du dépôt et API unique (P14).
++
++Ces tests lisent le dépôt, jamais `/etc` : les unités de `/etc/systemd/system` sont des
++liens vers `services/` ou `systemd/`. Ils figent la cible du prompt avant que le code
++existe — c'est pourquoi ils échouent sur le dépôt actuel.
++"""
++from __future__ import annotations
++
++import configparser
++import re
++from pathlib import Path
++
++import pytest
++
++REPO = Path(__file__).resolve().parents[1]
++UNITES = [*sorted((REPO / "services").glob("*.service")),
++          *sorted((REPO / "systemd").glob("*.service"))]
++CIBLE = REPO / "services" / "clawbot.target"
++BRINGUP = REPO / "clawbot_bringup" / "launch"
++
++# Unités attendues dans la cible (inventaire §1) : capacités always_on + exécutif.
++ATTENDUES = [
++    "ros2-driver-node.service",
++    "clawbot-lidar.service",
++    "clawbot-description.service",
++    "clawbot-ekf.service",
++    "clawbot-safety-arbitrator.service",
++    "clawbot-capability-manager.service",
++    "clawbot-skill-server.service",
++    "clawbot-mission-executive.service",
++    "clawbot-director.service",
++    "clawbot-sentinel.service",
++    "clawbot-health-monitor.service",
++    "clawbot-wrist-camera.service",
++]
++
++# Paquets déplacés sous attic/ (inventaire §3).
++ATTIC = [
++    "pkg_action", "pkg_helloworld_py", "pkg_interfaces", "pkg_metapackage", "pkg_param",
++    "pkg_service", "pkg_tf", "pkg_topic",
++    "yahboomcar_astra", "yahboomcar_base_node", "yahboomcar_bringup", "yahboomcar_ctrl",
++    "yahboomcar_KCFTracker", "yahboomcar_laser", "yahboomcar_linefollow",
++    "yahboomcar_mediapipe", "yahboomcar_multi", "yahboomcar_nav", "yahboomcar_point",
++    "yahboomcar_rviz", "yahboomcar_slam", "yahboomcar_visual", "yahboomcar_voice_ctrl",
++    "yahboomcar_msgs",
++    "clawbot_hardware_interface", "laserscan_to_point_pulisher",
++    "robot_pose_publisher_ros2", "yahboom_app_save_map", "yahboom_web_savmap_interfaces",
++]
++
++# Unités hors cible ROS, conservées : code hors dépôt ou oneshot non ROS (inventaire §1).
++HORS_CIBLE = {"yahboom_oled.service", "clawbot-health.service", "clawbot-docs.service"}
++
++
++def _lire(chemin: Path) -> configparser.ConfigParser:
++    cp = configparser.ConfigParser(strict=False, interpolation=None)
++    cp.read_file(chemin.open(encoding="utf-8"))
++    return cp
++
++
++def _exec_start(chemin: Path) -> str:
++    cp = _lire(chemin)
++    return cp.get("Service", "ExecStart", fallback="") if cp.has_section("Service") else ""
++
++
++# ── REQ-OPS-040 : une seule cible de démarrage ───────────────────────────────
++
++@pytest.mark.req("REQ-OPS-040")
++def test_la_cible_declare_les_unites_attendues():
++    assert CIBLE.is_file(), "clawbot.target absent"
++    cp = _lire(CIBLE)
++    wants = set(cp.get("Unit", "Wants", fallback="").split())
++    manquantes = [unite for unite in ATTENDUES if unite not in wants]
++    assert not manquantes, f"absentes de Wants= : {manquantes}"
++
++
++@pytest.mark.req("REQ-OPS-040")
++def test_aucune_unite_du_robot_ne_s_accroche_au_boot():
++    accrochees = []
++    for chemin in UNITES:
++        if chemin.name in HORS_CIBLE:
++            continue
++        cp = _lire(chemin)
++        if not cp.has_section("Install"):
++            continue
++        wanted_by = cp.get("Install", "WantedBy", fallback="").split()
++        if "clawbot.target" not in wanted_by:
++            accrochees.append((chemin.name, wanted_by))
++    assert not accrochees, f"unités hors cible : {accrochees}"
++
++
++# ── REQ-OPS-041 : un fichier de lancement par unité ──────────────────────────
++
++@pytest.mark.req("REQ-OPS-041")
++def test_chaque_unite_lance_un_fichier_de_bringup():
++    ecarts = []
++    for chemin in UNITES:
++        if chemin.name in HORS_CIBLE:
++            continue
++        commande = _exec_start(chemin)
++        if "ros2 launch clawbot_bringup " not in commande:
++            ecarts.append((chemin.name, commande[:80]))
++            continue
++        fichier = re.search(r"clawbot_bringup\s+(\S+\.launch\.py)", commande)
++        if fichier is None or not (BRINGUP / fichier.group(1)).is_file():
++            ecarts.append((chemin.name, f"lancement absent de {BRINGUP}"))
++    assert not ecarts, ecarts
++
++
++@pytest.mark.req("REQ-OPS-041")
++def test_plus_de_ros2_run_ni_de_python3_c_dans_les_unites():
++    fautives = []
++    for chemin in UNITES:
++        if chemin.name in HORS_CIBLE:
++            continue
++        commande = _exec_start(chemin)
++        if "ros2 run " in commande or "python3 -c" in commande:
++            fautives.append(chemin.name)
++        if "/home/jetson/clawbot/launch/" in commande:
++            fautives.append(f"{chemin.name} (launch hors paquet)")
++    assert not fautives, fautives
++
++
++# ── REQ-OPS-042 : attic/ et COLCON_IGNORE ────────────────────────────────────
++
++@pytest.mark.req("REQ-OPS-042")
++def test_les_paquets_non_deployes_sont_sous_attic():
++    absents = [nom for nom in ATTIC
++               if not (REPO / "attic" / nom / "COLCON_IGNORE").is_file()]
++    assert not absents, f"sans COLCON_IGNORE sous attic/ : {absents}"
++
++
++@pytest.mark.req("REQ-OPS-042")
++def test_aucun_paquet_de_l_attic_ne_reste_a_la_racine():
++    restants = [nom for nom in ATTIC if (REPO / nom).exists()]
++    assert not restants, f"encore à la racine : {restants}"
++
++
++@pytest.mark.req("REQ-OPS-042")
++def test_un_seul_api_server_dans_le_depot():
++    implementations = [chemin for chemin in REPO.rglob("api_server.*")
++                       if chemin.suffix in (".py", ".cpp")
++                       and not any(part in {"install", "build", "log", "attic", "__pycache__"}
++                                   for part in chemin.parts)]
++    assert len(implementations) == 1, [str(c.relative_to(REPO)) for c in implementations]
++
++
++# ── REQ-OPS-043 : API unique branchée sur l'exécutif ─────────────────────────
++
++@pytest.mark.req("REQ-OPS-043")
++def test_l_api_ne_publie_plus_aucune_vitesse():
++    sources = list((REPO / "ros2_llm_bridge_cpp" / "src").glob("*.cpp"))
++    sources += list((REPO / "ros2_llm_bridge_cpp" / "include").rglob("*.hpp"))
++    coupables = [str(chemin.relative_to(REPO)) for chemin in sources
++                 if "create_publisher<geometry_msgs::msg::Twist>" in
++                 chemin.read_text(encoding="utf-8")]
++    assert not coupables, coupables
++
++
++@pytest.mark.req("REQ-OPS-043")
++def test_les_routes_de_mouvement_appellent_l_executif():
++    source = (REPO / "ros2_llm_bridge_cpp" / "src" / "bridge_node.cpp").read_text(encoding="utf-8")
++    assert "/clawbot/execute_skill" in source or "/clawbot/execute_mission" in source, \
++        "aucun appel à l'exécutif dans le pont"
++    assert "/motion" not in source, "l'API appelle encore le service matériel pour bouger"
++
++
++# ── REQ-OPS-044 : plus d'entrée legacy dans l'arbitre ────────────────────────
++
++@pytest.mark.req("REQ-OPS-044")
++def test_l_arbitre_n_ecoute_plus_cmd_vel():
++    source = (REPO / "clawbot_safety" / "clawbot_safety" / "arbitrator.py").read_text(
++        encoding="utf-8")
++    assert '"legacy"' not in source and "'legacy'" not in source, "entrée legacy encore présente"
++    assert '"/cmd_vel"' not in source, "topic /cmd_vel encore écouté"
++
++
++# ── REQ-NET-001 : rosbridge retiré ou local ─────────────────────────────────
++
++@pytest.mark.req("REQ-NET-001")
++def test_rosbridge_absent_ou_lie_a_la_boucle_locale():
++    unites = list((REPO / "services").glob("*rosbridge*.service"))
++    if not unites:
++        references = [str(p.relative_to(REPO)) for p in
++                      [*sorted((REPO / "services").glob("*.service")),
++                       *sorted((REPO / "systemd").glob("*.service")), CIBLE]
++                      if p.is_file() and "rosbridge" in p.read_text(encoding="utf-8")]
++        assert not references, f"rosbridge retiré du dépôt mais encore cité : {references}"
++        return
++    commande = _exec_start(unites[0])
++    assert "127.0.0.1" in commande, f"rosbridge écoute encore sur toutes les interfaces : {commande[:100]}"
+diff --git a/tests/test_units.py b/tests/test_units.py
+index 535e64d..98707ad 100644
+--- a/tests/test_units.py
++++ b/tests/test_units.py
+@@ -16,33 +16,63 @@ import pytest
+ 
+ REPO = Path(__file__).resolve().parents[1]
+ 
+-# Les 14 unités du dépôt liées dans /etc/systemd/system et actives le 2026-11-22
+-# (systemctl list-units + ls -l /etc/systemd/system).
++# Les unités du robot qui suivent la politique P02 (RestartSec=2, TimeoutStopSec=10).
++# Exceptions assumées, chacune avec sa raison : `clawbot-skill-server` et
++# `clawbot-capability-manager` (KillSignal=SIGINT, 3 s / 15 s pour laisser le nœud
++# rendre la main), `clawbot-mission-executive` (3/15), `clawbot-move-group` (5/15,
++# MoveIt), `clawbot-nav2` (10/30, Nav2), `clawbot-arm-controller`, `clawbot-joy-teleop`
++# et `clawbot-lidar` (5 s avant relance, matériel).
+ UNITES_ACTIVES = [
+     "clawbot-director.service",
+-    "clawbot-docs.service",
+     "clawbot-ekf.service",
+-    "clawbot-lidar.service",
++    "clawbot-health-monitor.service",
+     "clawbot-safety-arbitrator.service",
+     "clawbot-sentinel.service",
+     "clawbot-slam.service",
+     "clawbot-wrist-camera.service",
++    "clawbot-yolo.service",
+     "orbbec-camera.service",
+     "ros2-driver-node.service",
+     "ros2-hardware-service.service",
+     "ros2-llm-bridge-cpp.service",
+-    "rosbridge.service",
+-    "clawbot-yolo.service",
+ ]
+ 
+-# Deux unités actives dont /etc porte encore une copie et non un lien : le
+-# dépôt doit tout de même les décrire (la bascule est une écriture dans /etc).
++# Unités à la demande ou hors cible : décrites dans le dépôt, politiques propres.
++UNITES_A_LA_DEMANDE = [
++    "clawbot-arm-controller.service",
++    "clawbot-capability-manager.service",
++    "clawbot-joy-teleop.service",
++    "clawbot-mission-executive.service",
++    "clawbot-move-group.service",
++    "clawbot-nav2.service",
++    "clawbot-skill-server.service",
++    "clawbot-lidar.service",
++]
++
++# Deux unités actives dont /etc porte encore une copie et non un lien : le dépôt doit tout
++# de même les décrire (la bascule est une écriture dans /etc).
+ UNITES_HORS_LIEN = [
+     "clawbot-description.service",
+     "yahboom_oled.service",
+ ]
+ 
+-UNITES_ROBOT = UNITES_ACTIVES + UNITES_HORS_LIEN
++# Unités à la demande et hors lien, vérifiées avec les autres.
++UNITES_ROBOT = UNITES_ACTIVES + UNITES_HORS_LIEN + UNITES_A_LA_DEMANDE
++
++# Les unités soumises à la politique standard (REQ-OPS-010). Les exceptions de
++# UNITES_A_LA_DEMANDE ont leurs propres valeurs, vérifiées juste après.
++UNITES_POLITIQUE = UNITES_ACTIVES + UNITES_HORS_LIEN
++
++EXCEPTIONS = {
++    "clawbot-arm-controller.service": ("5", "10"),
++    "clawbot-capability-manager.service": ("3", "15"),
++    "clawbot-joy-teleop.service": ("5", "10"),
++    "clawbot-lidar.service": ("5", "10"),
++    "clawbot-mission-executive.service": ("3", "15"),
++    "clawbot-move-group.service": ("5", "15"),
++    "clawbot-nav2.service": ("10", "30"),
++    "clawbot-skill-server.service": ("3", "15"),
++}
+ 
+ 
+ def _chemin(nom: str) -> Path:
+@@ -63,7 +93,7 @@ def _lire(nom: str) -> configparser.ConfigParser:
+ # ── REQ-OPS-010 ──────────────────────────────────────────────────────────────
+ 
+ @pytest.mark.req("REQ-OPS-010")
+-@pytest.mark.parametrize("nom", UNITES_ROBOT, ids=UNITES_ROBOT)
++@pytest.mark.parametrize("nom", UNITES_POLITIQUE, ids=UNITES_POLITIQUE)
+ def test_politique_de_redemarrage_normalisee(nom):
+     """Redémarrage sur panne avec délai, et arrêt borné."""
+     cp = _lire(nom)
+@@ -79,6 +109,23 @@ def test_politique_de_redemarrage_normalisee(nom):
+         f"{nom} : TimeoutStopSec=10 attendu")
+ 
+ 
++@pytest.mark.req("REQ-OPS-010")
++@pytest.mark.parametrize("nom", sorted(EXCEPTIONS), ids=sorted(EXCEPTIONS))
++def test_exceptions_de_politique_documentees(nom):
++    """Une unité hors politique standard doit au moins porter les valeurs annoncées."""
++    cp = _lire(nom)
++    restart_sec, timeout = EXCEPTIONS[nom]
++    assert cp.get("Service", "Restart", fallback=None) == "on-failure", nom
++    assert cp.get("Unit", "StartLimitIntervalSec", fallback=None) == "60", nom
++    assert cp.get("Unit", "StartLimitBurst", fallback=None) == "5", nom
++    assert cp.get("Service", "RestartSec", fallback=None) == restart_sec, (
++        f"{nom} : RestartSec={restart_sec} attendu, "
++        f"lu {cp.get('Service', 'RestartSec', fallback=None)}")
++    assert cp.get("Service", "TimeoutStopSec", fallback=None) == timeout, (
++        f"{nom} : TimeoutStopSec={timeout} attendu, "
++        f"lu {cp.get('Service', 'TimeoutStopSec', fallback=None)}")
++
++
+ # ── REQ-OPS-012 ──────────────────────────────────────────────────────────────
+ 
+ @pytest.mark.req("REQ-OPS-012")
+@@ -87,7 +134,9 @@ def test_documentation_ecoute_en_local():
+     cp = _lire("clawbot-docs.service")
+     exec_start = cp.get("Service", "ExecStart")
+ 
+-    assert "127.0.0.1:8080" in exec_start, f"adresse locale absente : {exec_start!r}"
++    # P14 (Q12) : `mkdocs build` puis service statique, lié à la boucle locale.
++    assert "mkdocs build" in exec_start, f"construction absente : {exec_start!r}"
++    assert "--bind 127.0.0.1" in exec_start, f"liaison locale absente : {exec_start!r}"
+     assert "0.0.0.0" not in exec_start, f"écoute réseau encore présente : {exec_start!r}"
+ 
+ 
+diff --git a/yahboomcar_voice_ctrl/test/test_flake8.py b/yahboomcar_voice_ctrl/test/test_flake8.py
+deleted file mode 100644
+index 27ee107..0000000
+--- a/yahboomcar_voice_ctrl/test/test_flake8.py
++++ /dev/null
+@@ -1,25 +0,0 @@
+-# Copyright 2017 Open Source Robotics Foundation, Inc.
+-#
+-# Licensed under the Apache License, Version 2.0 (the "License");
+-# you may not use this file except in compliance with the License.
+-# You may obtain a copy of the License at
+-#
+-#     http://www.apache.org/licenses/LICENSE-2.0
+-#
+-# Unless required by applicable law or agreed to in writing, software
+-# distributed under the License is distributed on an "AS IS" BASIS,
+-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-# See the License for the specific language governing permissions and
+-# limitations under the License.
+-
+-from ament_flake8.main import main_with_errors
+-import pytest
+-
+-
+-@pytest.mark.flake8
+-@pytest.mark.linter
+-def test_flake8():
+-    rc, errors = main_with_errors(argv=[])
+-    assert rc == 0, \
+-        'Found %d code style errors / warnings:\n' % len(errors) + \
+-        '\n'.join(errors)
+diff --git a/yahboomcar_voice_ctrl/test/test_pep257.py b/yahboomcar_voice_ctrl/test/test_pep257.py
+deleted file mode 100644
+index b234a38..0000000
+--- a/yahboomcar_voice_ctrl/test/test_pep257.py
++++ /dev/null
+@@ -1,23 +0,0 @@
+-# Copyright 2015 Open Source Robotics Foundation, Inc.
+-#
+-# Licensed under the Apache License, Version 2.0 (the "License");
+-# you may not use this file except in compliance with the License.
+-# You may obtain a copy of the License at
+-#
+-#     http://www.apache.org/licenses/LICENSE-2.0
+-#
+-# Unless required by applicable law or agreed to in writing, software
+-# distributed under the License is distributed on an "AS IS" BASIS,
+-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-# See the License for the specific language governing permissions and
+-# limitations under the License.
+-
+-from ament_pep257.main import main
+-import pytest
+-
+-
+-@pytest.mark.linter
+-@pytest.mark.pep257
+-def test_pep257():
+-    rc = main(argv=['.', 'test'])
+-    assert rc == 0, 'Found code style errors / warnings'

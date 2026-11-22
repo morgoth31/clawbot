@@ -1,0 +1,25 @@
+# 2026-11-22T21:14:51+01:00
+# $ ros2 node list
+/camera/camera
+/capability_manager
+/director
+/driver_node
+/ekf_filter_node
+/hardware_service_node
+/health_monitor
+/joint_state_publisher
+/launch_ros_1308
+/llm_bridge_node
+/robot_state_publisher
+/rosapi
+/rosapi_params
+/rosbridge_websocket
+/safety_arbitrator
+/sentinel
+/skill_server
+/slam_toolbox
+/transform_listener_impl_aaaae6a7e1e0
+/transform_listener_impl_aaaaea81dfa0
+/wrist_camera/camera
+/ydlidar_ros2_driver_node
+/yolo_node

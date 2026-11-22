@@ -1,0 +1,304 @@
+2026-11-22T21:07:16+01:00
+cmd: uptime -s ; journalctl -b --no-pager -p warning | tail -300
+ROS_DOMAIN_ID=(non utilisé)
+demarrage: 2026-11-15 12:02:56
+Nov 21 20:19:42 yahboom systemd-xdg-autostart-generator[1722552]: /etc/xdg/autostart/nvl4t-readme.sh:31: Assignment outside of section. Ignoring.
+Nov 21 20:19:42 yahboom systemd-xdg-autostart-generator[1722552]: /etc/xdg/autostart/nvl4t-readme.sh:32: Assignment outside of section. Ignoring.
+Nov 21 20:19:42 yahboom systemd-xdg-autostart-generator[1722552]: /etc/xdg/autostart/nvl4t-readme.sh:33: Assignment outside of section. Ignoring.
+Nov 21 22:38:36 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 21 22:38:36 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 00:00:06 yahboom systemd[1]: logrotate.service: Failed with result 'exit-code'.
+Nov 22 00:00:06 yahboom systemd[1]: Failed to start Rotate log files.
+Nov 22 01:38:49 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 01:38:49 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 04:39:03 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 04:39:03 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 06:08:16 yahboom update-notifier.desktop[3182348]: WARNING:root:can not import unity GI Namespace Dbusmenu not available
+Nov 22 06:08:16 yahboom update-notifier.desktop[3182348]: WARNING:root:estimate_kernel_initrd_size_in_boot() returned '0' for kernel?
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: Configuration file /etc/xdg/autostart/nvbackground.sh is marked executable. Please remove executable permission bits. Proceeding anyway.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:31: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:33: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:35: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:36: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:37: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:39: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:40: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:41: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:43: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:44: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:45: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:47: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:48: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:49: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:50: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:51: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:52: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvbackground.sh:54: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: Configuration file /etc/xdg/autostart/nvl4t-readme.sh is marked executable. Please remove executable permission bits. Proceeding anyway.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvl4t-readme.sh:24: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvl4t-readme.sh:25: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvl4t-readme.sh:27: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvl4t-readme.sh:28: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvl4t-readme.sh:29: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvl4t-readme.sh:31: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvl4t-readme.sh:32: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom systemd-xdg-autostart-generator[3404748]: /etc/xdg/autostart/nvl4t-readme.sh:33: Assignment outside of section. Ignoring.
+Nov 22 07:38:04 yahboom pipewire[3404753]: mod.rt: RTKit error: org.freedesktop.DBus.Error.AccessDenied
+Nov 22 07:38:04 yahboom pipewire[3404753]: mod.rt: could not set nice-level to -11: Permission denied
+Nov 22 07:38:04 yahboom pipewire-media-session[3404754]: mod.rt: RTKit error: org.freedesktop.DBus.Error.AccessDenied
+Nov 22 07:38:04 yahboom pipewire-media-session[3404754]: mod.rt: could not make thread 3404759 realtime using RTKit: Permission denied
+Nov 22 07:38:04 yahboom pipewire[3404753]: mod.rt: RTKit error: org.freedesktop.DBus.Error.AccessDenied
+Nov 22 07:38:04 yahboom pipewire[3404753]: mod.rt: could not make thread 3404772 realtime using RTKit: Permission denied
+Nov 22 07:38:04 yahboom pulseaudio[3404755]: Failed to create secure directory (/nonexistent/.config/pulse): No such file or directory
+Nov 22 07:38:04 yahboom systemd[3404739]: pulseaudio.service: Failed with result 'exit-code'.
+Nov 22 07:38:04 yahboom systemd[3404739]: Failed to start Sound Service.
+Nov 22 07:38:05 yahboom pulseaudio[3404791]: Failed to create secure directory (/nonexistent/.config/pulse): No such file or directory
+Nov 22 07:38:05 yahboom systemd[3404739]: pulseaudio.service: Failed with result 'exit-code'.
+Nov 22 07:38:05 yahboom systemd[3404739]: Failed to start Sound Service.
+Nov 22 07:38:05 yahboom pulseaudio[3404796]: Failed to create secure directory (/nonexistent/.config/pulse): No such file or directory
+Nov 22 07:38:05 yahboom systemd[3404739]: pulseaudio.service: Failed with result 'exit-code'.
+Nov 22 07:38:05 yahboom systemd[3404739]: Failed to start Sound Service.
+Nov 22 07:38:05 yahboom pulseaudio[3404803]: Failed to create secure directory (/nonexistent/.config/pulse): No such file or directory
+Nov 22 07:38:05 yahboom systemd[3404739]: pulseaudio.service: Failed with result 'exit-code'.
+Nov 22 07:38:05 yahboom systemd[3404739]: Failed to start Sound Service.
+Nov 22 07:38:05 yahboom pulseaudio[3404822]: Failed to create secure directory (/nonexistent/.config/pulse): No such file or directory
+Nov 22 07:38:05 yahboom systemd[3404739]: pulseaudio.service: Failed with result 'exit-code'.
+Nov 22 07:38:05 yahboom systemd[3404739]: Failed to start Sound Service.
+Nov 22 07:38:05 yahboom systemd[3404739]: pulseaudio.service: Start request repeated too quickly.
+Nov 22 07:38:05 yahboom systemd[3404739]: pulseaudio.service: Failed with result 'exit-code'.
+Nov 22 07:38:05 yahboom systemd[3404739]: Failed to start Sound Service.
+Nov 22 07:38:05 yahboom systemd[3404739]: pulseaudio.socket: Failed with result 'service-start-limit-hit'.
+Nov 22 07:38:19 yahboom kernel: tegra-xusb 3610000.usb: ERROR unknown event type 37
+Nov 22 07:39:04 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 07:39:04 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 09:58:35 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 09:58:35 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 10:02:36 yahboom kernel: tegra-xusb 3610000.usb: ERROR unknown event type 37
+Nov 22 10:14:06 yahboom systemd[1]: clawbot-sentinel.service: Failed with result 'exit-code'.
+Nov 22 10:14:09 yahboom systemd[1]: clawbot-director.service: Failed with result 'exit-code'.
+Nov 22 10:14:10 yahboom systemd[1]: clawbot-safety-arbitrator.service: Failed with result 'exit-code'.
+Nov 22 10:39:11 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 10:39:11 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 11:07:03 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 11:07:03 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 11:55:22 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 11:55:22 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 12:09:05 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 12:09:05 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 12:12:43 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 12:59:15 yahboom systemd-fstab-generator[43451]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 12:59:15 yahboom systemd-fstab-generator[43451]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 12:59:15 yahboom systemd[43444]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 12:59:15 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 12:59:15 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 12:59:15 yahboom systemd[1]: clawbot-docs.service: Current command vanished from the unit file, execution of the command list won't be resumed.
+Nov 22 12:59:46 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 12:59:46 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 13:26:19 yahboom systemd[119351]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 13:26:19 yahboom systemd-fstab-generator[119360]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 13:26:19 yahboom systemd-fstab-generator[119360]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 13:26:19 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 13:26:19 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 13:26:19 yahboom systemd[1]: ros2-driver-node.service: Current command vanished from the unit file, execution of the command list won't be resumed.
+Nov 22 13:26:19 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 13:26:19 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 13:33:55 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 13:33:55 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 14:01:17 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 14:01:17 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 14:01:28 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 14:01:28 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 14:06:29 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 14:14:06 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 14:14:07 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 14:34:19 yahboom systemd-fstab-generator[319088]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 14:34:19 yahboom systemd-fstab-generator[319088]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 14:34:19 yahboom systemd[319080]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 14:34:19 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 14:34:19 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 14:34:19 yahboom systemd[1]: clawbot-safety-arbitrator.service: Current command vanished from the unit file, execution of the command list won't be resumed.
+Nov 22 15:11:02 yahboom systemd-fstab-generator[421399]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 15:11:02 yahboom systemd-fstab-generator[421399]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 15:11:02 yahboom systemd[421388]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 15:11:02 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 15:11:02 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 15:11:03 yahboom systemd-fstab-generator[421447]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 15:11:03 yahboom systemd-fstab-generator[421447]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 15:11:03 yahboom systemd[421438]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 15:11:03 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 15:11:03 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 15:43:35 yahboom systemd-fstab-generator[509871]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 15:43:35 yahboom systemd-fstab-generator[509871]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 15:43:35 yahboom systemd[509862]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 15:43:35 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 15:43:35 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 15:43:35 yahboom systemd[1]: clawbot-health-monitor.service: Current command vanished from the unit file, execution of the command list won't be resumed.
+Nov 22 15:43:37 yahboom systemd[1]: clawbot-health-monitor.service: Main process exited, code=dumped, status=6/ABRT
+Nov 22 15:43:37 yahboom systemd[1]: clawbot-health-monitor.service: Failed with result 'core-dump'.
+Nov 22 15:43:40 yahboom systemd[1]: clawbot-health-monitor.service: Main process exited, code=dumped, status=6/ABRT
+Nov 22 15:43:40 yahboom systemd[1]: clawbot-health-monitor.service: Failed with result 'core-dump'.
+Nov 22 15:43:44 yahboom systemd[1]: clawbot-health-monitor.service: Main process exited, code=dumped, status=6/ABRT
+Nov 22 15:43:44 yahboom systemd[1]: clawbot-health-monitor.service: Failed with result 'core-dump'.
+Nov 22 15:43:47 yahboom systemd[1]: clawbot-health-monitor.service: Main process exited, code=dumped, status=6/ABRT
+Nov 22 15:43:47 yahboom systemd[1]: clawbot-health-monitor.service: Failed with result 'core-dump'.
+Nov 22 15:43:51 yahboom systemd[1]: clawbot-health-monitor.service: Main process exited, code=dumped, status=6/ABRT
+Nov 22 15:43:51 yahboom systemd[1]: clawbot-health-monitor.service: Failed with result 'core-dump'.
+Nov 22 15:43:53 yahboom systemd[1]: clawbot-health-monitor.service: Start request repeated too quickly.
+Nov 22 15:43:53 yahboom systemd[1]: clawbot-health-monitor.service: Failed with result 'core-dump'.
+Nov 22 15:43:53 yahboom systemd[1]: Failed to start Moniteur de sante des flux - Clawbot X3 Plus.
+Nov 22 16:31:47 yahboom systemd-fstab-generator[646741]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:31:47 yahboom systemd-fstab-generator[646741]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:31:47 yahboom systemd[646732]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 16:31:47 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 16:31:47 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 16:31:48 yahboom systemd-fstab-generator[646793]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:31:48 yahboom systemd-fstab-generator[646793]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:31:48 yahboom systemd[646784]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 16:31:48 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 16:31:48 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 16:54:14 yahboom systemd-fstab-generator[713598]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:54:14 yahboom systemd-fstab-generator[713598]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:54:14 yahboom systemd[713589]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 16:54:14 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 16:54:14 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 16:54:14 yahboom systemd-fstab-generator[713652]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:54:14 yahboom systemd-fstab-generator[713652]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:54:14 yahboom systemd[713643]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 16:54:14 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 16:54:14 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 16:54:15 yahboom systemd[713668]: clawbot-skill-server.service: Failed to set up mount namespacing: /run/systemd/unit-root/var/lib/clawbot: No such file or directory
+Nov 22 16:54:15 yahboom systemd[713668]: clawbot-skill-server.service: Failed at step NAMESPACE spawning /bin/bash: No such file or directory
+Nov 22 16:54:15 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 16:54:18 yahboom systemd[713819]: clawbot-skill-server.service: Failed to set up mount namespacing: /run/systemd/unit-root/var/lib/clawbot: No such file or directory
+Nov 22 16:54:18 yahboom systemd[713819]: clawbot-skill-server.service: Failed at step NAMESPACE spawning /bin/bash: No such file or directory
+Nov 22 16:54:18 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 16:54:21 yahboom systemd[713958]: clawbot-skill-server.service: Failed to set up mount namespacing: /run/systemd/unit-root/var/lib/clawbot: No such file or directory
+Nov 22 16:54:21 yahboom systemd[713958]: clawbot-skill-server.service: Failed at step NAMESPACE spawning /bin/bash: No such file or directory
+Nov 22 16:54:21 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 16:54:24 yahboom systemd[714115]: clawbot-skill-server.service: Failed to set up mount namespacing: /run/systemd/unit-root/var/lib/clawbot: No such file or directory
+Nov 22 16:54:24 yahboom systemd[714115]: clawbot-skill-server.service: Failed at step NAMESPACE spawning /bin/bash: No such file or directory
+Nov 22 16:54:24 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 16:54:28 yahboom systemd[714254]: clawbot-skill-server.service: Failed to set up mount namespacing: /run/systemd/unit-root/var/lib/clawbot: No such file or directory
+Nov 22 16:54:28 yahboom systemd[714254]: clawbot-skill-server.service: Failed at step NAMESPACE spawning /bin/bash: No such file or directory
+Nov 22 16:54:28 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 16:54:28 yahboom systemd-fstab-generator[714299]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:54:28 yahboom systemd-fstab-generator[714299]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:54:28 yahboom systemd[714290]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 16:54:28 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 16:54:28 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 16:54:30 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 16:54:35 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 16:54:41 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 16:54:46 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 16:54:51 yahboom systemd-fstab-generator[715497]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:54:51 yahboom systemd-fstab-generator[715497]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 16:54:51 yahboom systemd[715489]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 16:54:51 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 16:54:51 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 16:54:51 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 17:01:32 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 17:01:32 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.
+Nov 22 17:37:35 yahboom systemd-fstab-generator[832498]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 17:37:35 yahboom systemd-fstab-generator[832498]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 17:37:35 yahboom systemd[832486]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 17:37:35 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 17:37:35 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 17:37:35 yahboom systemd-fstab-generator[832540]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 17:37:35 yahboom systemd-fstab-generator[832540]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 17:37:35 yahboom systemd[832531]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 17:37:35 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 17:37:35 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 18:20:18 yahboom update-notifier.desktop[953073]: WARNING:root:can not import unity GI Namespace Dbusmenu not available
+Nov 22 18:20:18 yahboom update-notifier.desktop[953073]: WARNING:root:estimate_kernel_initrd_size_in_boot() returned '0' for kernel?
+Nov 22 18:26:54 yahboom systemd-fstab-generator[970397]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:26:54 yahboom systemd-fstab-generator[970397]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:26:54 yahboom systemd[970388]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 18:26:54 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 18:26:54 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 18:26:54 yahboom systemd[1]: orbbec-camera.service: Current command vanished from the unit file, execution of the command list won't be resumed.
+Nov 22 18:26:54 yahboom systemd[1]: /dev/bus/usb is not a device.
+Nov 22 18:26:54 yahboom systemd-fstab-generator[970449]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:26:54 yahboom systemd-fstab-generator[970449]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:26:54 yahboom systemd[970440]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 18:26:54 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 18:26:54 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 18:26:59 yahboom systemd-fstab-generator[970677]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:26:59 yahboom systemd-fstab-generator[970677]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:26:59 yahboom systemd[970670]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 18:26:59 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 18:26:59 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 18:26:59 yahboom systemd[1]: /dev/bus/usb is not a device.
+Nov 22 18:27:37 yahboom systemd[1]: /dev/bus/usb is not a device.
+Nov 22 18:28:52 yahboom systemd-fstab-generator[976533]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:28:52 yahboom systemd-fstab-generator[976533]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:28:52 yahboom systemd[976522]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 18:28:52 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 18:28:52 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 18:48:29 yahboom kernel: tegra-xusb 3610000.usb: ERROR unknown event type 37
+Nov 22 18:48:39 yahboom systemd-fstab-generator[1034380]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:48:39 yahboom systemd-fstab-generator[1034380]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:48:39 yahboom systemd[1034372]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 18:48:39 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 18:48:39 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 18:48:40 yahboom systemd-fstab-generator[1034450]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:48:40 yahboom systemd-fstab-generator[1034450]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:48:40 yahboom systemd[1034442]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 18:48:40 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 18:48:40 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 18:48:40 yahboom systemd[1]: yolo-inference.service: Current command vanished from the unit file, execution of the command list won't be resumed.
+Nov 22 18:49:01 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:49:10 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:49:16 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:49:19 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:49:23 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:49:28 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:49:34 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:49:38 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:49:38 yahboom systemd[1]: clawbot-skill-server.service: Start request repeated too quickly.
+Nov 22 18:49:38 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:49:38 yahboom systemd[1]: Failed to start Serveur de skills (action /clawbot/execute_skill) - Clawbot X3 Plus.
+Nov 22 18:49:38 yahboom systemd[1]: Dependency failed for Executif de mission (action /clawbot/execute_mission) - Clawbot X3 Plus.
+Nov 22 18:49:55 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:50:13 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:50:16 yahboom systemd-fstab-generator[1039850]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:50:16 yahboom systemd-fstab-generator[1039850]: Failed to create unit file /run/systemd/generator/var-8GB.swap.swap, as it already exists. Duplicate entry in /etc/fstab?
+Nov 22 18:50:17 yahboom systemd[1039841]: /usr/lib/systemd/system-generators/systemd-fstab-generator failed with exit status 1.
+Nov 22 18:50:17 yahboom systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+Nov 22 18:50:17 yahboom systemd[1]: /etc/systemd/system/jupyterlab.service:7: Unknown key name 'config' in section 'Service', ignoring.
+Nov 22 18:50:33 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:50:49 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:51:06 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:51:22 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:51:39 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:51:55 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:52:11 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:52:28 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:52:45 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:53:02 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:53:19 yahboom systemd[1]: clawbot-yolo.service: Failed with result 'exit-code'.
+Nov 22 18:57:10 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:57:15 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:57:21 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:57:27 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:57:32 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:57:36 yahboom systemd[1]: clawbot-skill-server.service: Start request repeated too quickly.
+Nov 22 18:57:36 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:57:36 yahboom systemd[1]: Failed to start Serveur de skills (action /clawbot/execute_skill) - Clawbot X3 Plus.
+Nov 22 18:57:43 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:57:49 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:57:56 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:58:02 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:58:08 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:58:11 yahboom systemd[1]: clawbot-skill-server.service: Start request repeated too quickly.
+Nov 22 18:58:11 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:58:11 yahboom systemd[1]: Failed to start Serveur de skills (action /clawbot/execute_skill) - Clawbot X3 Plus.
+Nov 22 18:59:23 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:59:28 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 18:59:35 yahboom systemd[1]: clawbot-skill-server.service: Failed with result 'exit-code'.
+Nov 22 19:30:06 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 19:30:07 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 19:32:40 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 19:33:27 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 19:33:27 yahboom gnome-software[3909]: Failed to reload changed app filter: App filtering is globally disabled
+Nov 22 20:01:34 yahboom systemd[1]: apport-autoreport.service: Failed with result 'exit-code'.
+Nov 22 20:01:34 yahboom systemd[1]: Failed to start Process error reports when automatic reporting is enabled.

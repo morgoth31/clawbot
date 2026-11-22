@@ -1,0 +1,17 @@
+# 2026-11-22T21:14:56+01:00
+# $ timeout 5 ros2 topic echo /clawbot/health --once
+stamp:
+  sec: 1795378498
+  nanosec: 319295236
+level: 1
+active_capabilities:
+- base
+- lidar
+- wrist_vision
+- detection
+stale_flows: []
+safety_state: OK
+estop_latched: false
+voltage: 11.899999618530273
+detail_json: '{"capabilities_from_topic":true,"flows":[{"age_s":0.0984187126159668,"critical":true,"hz":10.128402569326795,"state":"OK","topic...'
+---

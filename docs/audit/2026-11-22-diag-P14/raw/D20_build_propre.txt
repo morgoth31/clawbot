@@ -1,0 +1,65 @@
+2026-11-22T21:09:09+01:00
+cmd: unset VIRTUAL_ENV PYTHONPATH PYTHONHOME; colcon build --build-base /tmp/diag_build --install-base /tmp/diag_install
+ROS_DOMAIN_ID=(non utilisé)
+Starting >>> clawbot_interfaces
+Starting >>> clawbot_common
+Starting >>> clawbot_arm_controller
+Starting >>> clawbot_base_driver
+Starting >>> clawbot_moveit_config
+Starting >>> clawbot_safety
+Starting >>> clawbot_sim
+Starting >>> ros2_llm_bridge_cpp
+/home/jetson/.local/lib/python3.10/site-packages/setuptools/_distutils/dist.py:287: UserWarning: Unknown distribution option: 'tests_require'
+  warnings.warn(msg)
+[3.845s] colcon.colcon_ros.task.ament_python.build WARNING Package 'clawbot_base_driver' doesn't explicitly install a marker in the package index (colcon-ros currently does it implicitly but that fallback will be removed in the future)
+[3.846s] colcon.colcon_ros.task.ament_python.build WARNING Package 'clawbot_base_driver' doesn't explicitly install the 'package.xml' file (colcon-ros currently does it implicitly but that fallback will be removed in the future)
+--- stderr: clawbot_moveit_config
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    OpenCV_DIR
+
+
+---
+Finished <<< clawbot_moveit_config [5.21s]
+Starting >>> yahboomcar_description
+Finished <<< clawbot_base_driver [8.18s]
+Starting >>> yolo_node
+Finished <<< clawbot_common [8.27s]
+Finished <<< clawbot_sim [8.21s]
+Finished <<< clawbot_safety [8.25s]
+--- stderr: clawbot_arm_controller
+/home/jetson/.local/lib/python3.10/site-packages/setuptools/_distutils/dist.py:287: UserWarning: Unknown distribution option: 'tests_require'
+  warnings.warn(msg)
+---
+Finished <<< clawbot_arm_controller [8.93s]
+--- stderr: ros2_llm_bridge_cpp
+CMake Error at CMakeLists.txt:18 (find_package):
+  By not providing "Findclawbot_interfaces.cmake" in CMAKE_MODULE_PATH this
+  project has asked CMake to find a package configuration file provided by
+  "clawbot_interfaces", but CMake did not find one.
+
+  Could not find a package configuration file provided by
+  "clawbot_interfaces" with any of the following names:
+
+    clawbot_interfacesConfig.cmake
+    clawbot_interfaces-config.cmake
+
+  Add the installation prefix of "clawbot_interfaces" to CMAKE_PREFIX_PATH or
+  set "clawbot_interfaces_DIR" to a directory containing one of the above
+  files.  If "clawbot_interfaces" provides a separate development package or
+  SDK, be sure it has been installed.
+
+
+---
+Failed   <<< ros2_llm_bridge_cpp [10.3s, exited with code 1]
+Aborted  <<< yahboomcar_description [5.44s]
+Aborted  <<< yolo_node [2.73s]
+Aborted  <<< clawbot_interfaces [12.6s]
+
+Summary: 6 packages finished [14.1s]
+  1 package failed: ros2_llm_bridge_cpp
+  3 packages aborted: clawbot_interfaces yahboomcar_description yolo_node
+  4 packages had stderr output: clawbot_arm_controller clawbot_interfaces clawbot_moveit_config ros2_llm_bridge_cpp
+  7 packages not processed
+EXIT=0

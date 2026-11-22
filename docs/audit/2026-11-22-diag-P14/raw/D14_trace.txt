@@ -1,0 +1,65 @@
+2026-11-22T21:11:35+01:00
+cmd: python3 scripts/trace_check.py --repo . --report ; --json
+ROS_DOMAIN_ID=(non utilisé)
+  REQ-PERC-012         3 test(s)
+  REQ-PERC-013         2 test(s)
+  REQ-PERC-014         4 test(s)
+  REQ-PERC-015         2 test(s)
+  REQ-PERC-016         0 test(s)
+  REQ-SAFETY-001       2 test(s)
+  REQ-SAFETY-010       3 test(s)
+  REQ-SAFETY-011       2 test(s)
+  REQ-SAFETY-012       3 test(s)
+  REQ-SAFETY-013       3 test(s)
+  REQ-SAFETY-014       20 test(s)
+  REQ-SAFETY-015       1 test(s)
+  REQ-SAFETY-016       2 test(s)
+  REQ-SAFETY-017       0 test(s)
+  REQ-TEST-001         1 test(s)
+  REQ-TEST-002         2 test(s)
+  REQ-TEST-003         1 test(s)
+  REQ-TEST-004         1 test(s)
+  REQ-TEST-005         1 test(s)
+Traçabilité conforme.
+EXIT_REPORT=0
+{
+  "requirements": 92,
+  "tests": 635,
+  "untraced_tests": 352,
+  "coverage": {
+    "REQ-ARCH-001": [
+      "tests/test_cadre.py::test_referentiel_present"
+    ],
+    "REQ-ARCH-010": [
+      "tests/test_interfaces_p06.py::test_action_champs",
+      "tests/test_interfaces_p06.py::test_service_champs",
+      "tests/test_interfaces_p06.py::test_message_champs",
+      "tests/test_interfaces_p06.py::test_constantes_d_outcome",
+      "tests/test_interfaces_p06.py::test_constantes_d_outcome"
+    ],
+    "REQ-ARCH-011": [
+      "clawbot_common/test/test_errors.py::test_codes_uniques_et_immuables",
+      "clawbot_common/test/test_errors.py::test_errors_json_egale_le_module",
+      "clawbot_common/test/test_errors.py::test_code_inconnu_leve",
+      "clawbot_common/test/test_failure_report.py::test_l_exemple_du_referentiel_est_valide",
+      "clawbot_common/test/test_failure_report.py::test_un_rapport_sans_error_code_est_refuse",
+      "clawbot_common/test/test_failure_report.py::test_une_decision_hors_table_est_refusee",
+      "clawbot_common/test/test_failure_report.py::test_le_schema_est_du_draft_2020_12"
+    ],
+    "REQ-ARCH-012": [
+      "clawbot_common/test/test_errors.py::test_la_table_couvre_exactement_le_referentiel",
+      "clawbot_common/test/test_errors.py::test_categorie_relance_et_decisions",
+      "clawbot_common/test/test_errors.py::test_categorie_dans_l_ensemble",
+      "clawbot_common/test/test_errors.py::test_decisions_non_vides_et_bornees"
+    ],
+    "REQ-ARCH-013": [
+      "clawbot_director/test/test_director_schema.py::test_corpus_valide",
+      "clawbot_director/test/test_director_schema.py::test_requetes_invalides_refusees",
+      "clawbot_director/test/test_director_schema.py::test_le_corpus_couvre_les_cinq_operations",
+      "clawbot_director/test/test_director_schema.py::test_le_corpus_vient_des_appelants_reels"
+    ],
+    "REQ-ARCH-014": [
+      "clawbot_director/test/test_director_schema.py::test_mode_enforce_refuse",
+      "clawbot_director/test/test_director_schema.py::test_mode_warn_laisse_passer",
+      "clawbot_director/test/test_director_schema.py::test_requete_valide_ne_produit_rien"
+EXIT_JSON=0

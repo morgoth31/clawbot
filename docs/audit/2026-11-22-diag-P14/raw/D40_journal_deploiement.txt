@@ -1,0 +1,224 @@
+2026-11-22T21:10:40+01:00
+cmd: cat deploy/journal/2026-11-22_p14_demarrage.md deploy/journal/2026-11-22_p14_rapport.md
+ROS_DOMAIN_ID=(non utilisé)
+# Dossier de déploiement — P14, démarrage unique et nettoyage
+
+**Date de préparation :** 2026-11-22 · **Sujet :** `clawbot.target`, `clawbot_bringup`,
+`attic/`, API unique, retrait de `/cmd_vel`
+**Statut : inventaire à valider, rien n'est déployé.** Ce fichier est aussi la preuve
+attendue par REQ-OPS-045 (nombre de nœuds mesuré au déploiement).
+
+## 1. Ce qui serait déployé
+
+| Élément | Effet |
+|---|---|
+| Paquet `clawbot_bringup` (nouveau) | 21 fichiers de lancement, un par unité, paramètres lus par `get_package_share_directory` |
+| `clawbot.target` | point d'entrée unique ; 21 unités en `WantedBy=clawbot.target` |
+| `deploy/env/clawbot.env` | `ROS_DOMAIN_ID=28` en un seul endroit (`EnvironmentFile=`) |
+| 21 fichiers d'unité réécrits | `ros2 launch clawbot_bringup <fichier>` ; plus de `ros2 run` ni de `python3 -c` |
+| `attic/` | 29 paquets déplacés avec `COLCON_IGNORE` ; build de 46 → 15 paquets |
+| `ros2_llm_bridge_cpp` | routes `SetVelocity`/`Stop`/`NavigateTo` rebranchées sur l'exécutif, plus aucun éditeur `Twist` |
+| `clawbot_safety` | entrée `legacy` retirée de l'arbitre |
+| `clawbot_sentinel` | sonde de flux retirée, lecture de `/clawbot/health` |
+| `rosbridge` | selon Q11 : retirée du démarrage, ou liée à 127.0.0.1 |
+| `clawbot-docs` | selon Q12 : `mkdocs build` + serveur statique local |
+
+## 2. Unités touchées
+
+Toutes les unités du robot, plus `clawbot.target`. `systemctl disable` des 21 anciennes
+unités, `enable` de la cible, puis **redémarrage du Jetson par l'opérateur** : c'est le
+seul moyen de mesurer O09 (`temps jusqu'au premier /safety/state valide`) et de vérifier
+que le démarrage ne dépend plus de l'ordre d'activation manuel.
+
+## 3. État du robot requis
+
+Robot immobile, au sol ou sur cales, opérateur présent. Aucune mission en cours.
+Indisponibilité estimée : 3 à 5 minutes (un redémarrage complet).
+
+## 4. Contrôles attendus
+
+```bash
+export ROS_DOMAIN_ID=28
+systemctl list-dependencies clawbot.target --no-pager     # les 21 unités, aucune manquante
+systemctl --failed                                        # vide
+bash ~/.hermes/skills/clawbot/clawbot-deploy/scripts/smoke_check.sh   # 8 cadences C12
+ros2 node list | wc -l                                    # total
+ros2 node list | grep -vE "robot_state_publisher|joint_state_publisher|transform_listener|launch_ros|rosapi|rosbridge" | wc -l   # <= 15
+ros2 topic info /cmd_vel                                  # 0 éditeur
+journalctl -b -u clawbot-safety-arbitrator | head -5      # horodatage du premier /safety/state
+```
+
+O09 : temps entre le début du boot (`journalctl -b --no-pager | head -1`) et le premier
+`/safety/state` valide, objectif ≤ 30 s.
+
+## 5. Retour arrière
+
+```bash
+cd /home/jetson/clawbot
+git checkout <commit_precedent>
+rm -rf install && tar -C /home/jetson/clawbot -xzf ~/clawbot_backups/<TS>/install.tgz
+sudo systemctl disable clawbot.target
+sudo systemctl enable <les 21 anciennes unités, depuis ~/clawbot_backups/<TS>/unites.txt>
+sudo systemctl daemon-reload
+sudo reboot
+```
+
+## 6. Journal des contrôles
+
+| Contrôle | Résultat | Heure |
+|---|---|---|
+| Inventaire validé par l'opérateur | **non** | — |
+| Q11 / Q12 tranchés | **non** | — |
+| Sauvegarde `~/clawbot_backups/<TS>` | — | — |
+| Build 15 paquets, 0 sous `attic/` | — | — |
+| Démarrage complet sous `clawbot.target` | — | — |
+| Cadences C12 | — | — |
+| Nœuds applicatifs ≤ 15 | — | — |
+| `/cmd_vel` sans éditeur | — | — |
+| O09 ≤ 30 s | — | — |
+===== RAPPORT =====
+# Rapport de fin — P14, démarrage unique et nettoyage du dépôt
+
+**Branche :** `refactor/REQ-OPS-040-demarrage` · **Date :** 2026-11-22
+**État :** code et tests terminés, `check.sh` et `--integration` **verts** ; **rien n'est déployé**.
+Le passage à `clawbot.target` demande une fenêtre et un redémarrage : c'est la prochaine
+étape, avec l'opérateur.
+
+## 1. Décisions de l'opérateur (2026-11-22)
+
+| Question | Décision |
+|---|---|
+| Inventaire | validé en l'état |
+| REQ-OPS-044 (sûreté) | **approuvée** |
+| Q11 rosbridge | **retiré** |
+| Q12 documentation | **`mkdocs build` + serveur statique sur 127.0.0.1** |
+| O11 | **15 applicatifs** hors infrastructure et hors rosbridge |
+| `bridge_mcp` | à supprimer **après** rebranchement de l'alerte Telegram (non fait, voir §7) |
+
+## 2. Vérifications
+
+| Commande | Code | Sortie |
+|---|---|---|
+| `scripts/check.sh --strict-duplicates` | **0** | `776 passed, 14 skipped`, trace `92 exigences / 635 tests / 352 non tracés`, interdits OK, doublons OK |
+| `scripts/check.sh --integration` | **0** | `83 passed, 1 skipped`, domaine 99 |
+| `colcon build --packages-select ros2_llm_bridge_cpp` | **0** | 1 paquet, 0 erreur |
+| `pytest tests/test_p14_demarrage.py tests/test_units.py` | **0** | **58 passés** (47 + 11) |
+| `pytest clawbot_safety/test` | **0** | 74 passés |
+
+### 2.1 Preuves rouges (test d'abord)
+
+```
+$ pytest tests/test_p14_demarrage.py      # avant tout code
+FAILED test_la_cible_declare_les_unites_attendues
+FAILED test_aucune_unite_du_robot_ne_s_accroche_au_boot
+FAILED test_chaque_unite_lance_un_fichier_de_bringup
+FAILED test_plus_de_ros2_run_ni_de_python3_c_dans_les_unites
+FAILED test_les_paquets_non_deployes_sont_sous_attic
+FAILED test_aucun_paquet_de_l_attic_ne_reste_a_la_racine
+FAILED test_un_seul_api_server_dans_le_depot
+FAILED test_l_api_ne_publie_plus_aucune_vitesse
+FAILED test_les_routes_de_mouvement_appellent_l_executif
+FAILED test_l_arbitre_n_ecoute_plus_cmd_vel
+FAILED test_rosbridge_absent_ou_lie_a_la_boucle_locale
+11 failed in 0.37s
+```
+
+## 3. Inventaire final — unité → lancement
+
+| Unité | Fichier `clawbot_bringup` | Au démarrage ? |
+|---|---|---|
+| `ros2-hardware-service` | `hardware.launch.py` | oui (`Wants=`) |
+| `ros2-driver-node` | `base.launch.py` | oui |
+| `clawbot-lidar` | `lidar.launch.py` | oui |
+| `clawbot-description` | `description.launch.py` | oui |
+| `clawbot-ekf` | `localization.launch.py` | oui |
+| `clawbot-safety-arbitrator` | `safety.launch.py` | oui |
+| `clawbot-capability-manager` | `capabilities.launch.py` | oui |
+| `clawbot-skill-server` | `executive.launch.py` | oui |
+| `clawbot-mission-executive` | `mission.launch.py` | oui |
+| `clawbot-director` | `director.launch.py` | oui |
+| `clawbot-sentinel` | `sentinel.launch.py` | oui |
+| `clawbot-health-monitor` | `health.launch.py` | oui |
+| `clawbot-wrist-camera` | `wrist_camera.launch.py` | oui |
+| `clawbot-slam` | `mapping.launch.py` | non (capacité `mapping`) |
+| `clawbot-nav2` | `navigation.launch.py` | non (capacité `navigation`) |
+| `clawbot-arm-controller` | `arm_controller.launch.py` | non (capacité `arm`) |
+| `clawbot-move-group` | `move_group.launch.py` | non (capacité `arm`) |
+| `clawbot-yolo` | `detection.launch.py` | non (capacité `detection`) |
+| `orbbec-camera` | `depth_camera.launch.py` | non (capacité `depth_vision`) |
+| `clawbot-joy-teleop` | `teleop.launch.py` | non (manuel) |
+| `clawbot-docs` | — (hors ROS, statique 127.0.0.1) | séparé |
+| `yahboom_oled` | — (hors dépôt) | séparé |
+| `clawbot-health` | — (oneshot Telegram) | séparé |
+
+`services/clawbot-lidar.service` (doublon au contenu **différent** de
+`systemd/clawbot-lidar.service`) est supprimé : c'est la variante sans `params_file`, qui
+aurait cassé `frame_id` du scan.
+
+## 4. Ce qui est parti sous `attic/` ou supprimé
+
+| Sort | Éléments |
+|---|---|
+| `attic/` + `COLCON_IGNORE` (30 paquets) | `pkg_*` (8), `yahboomcar_astra`, `yahboomcar_base_node`, `yahboomcar_bringup`, `yahboomcar_ctrl`, `yahboomcar_KCFTracker`, `yahboomcar_laser`, `yahboomcar_linefollow`, `yahboomcar_mediapipe`, `yahboomcar_multi`, `yahboomcar_nav`, `yahboomcar_point`, `yahboomcar_rviz`, `yahboomcar_slam`, `yahboomcar_visual`, `yahboomcar_voice_ctrl`, `yahboomcar_msgs`, `clawbot_hardware_interface`, `laserscan_to_point_pulisher`, `robot_pose_publisher_ros2`, `yahboom_app_save_map`, `yahboom_web_savmap_interfaces`, `slam3d` |
+| `attic/` (fichiers) | `launch/` (3 fichiers, remplacés par `clawbot_bringup`), `slam_launch.py`, `moveit/`, `docker-compose.yml`, `manage_robot.sh`, `tests/test_servo_round_robin.py` et `tests/test_cmd_vel_scaling.py` (ils testaient le pilote vendor) |
+| Supprimés | `ros2_llm_bridge` (python, 3 variantes d'`api_server.py`), unités `rosbridge`, `yolo-detector`, `yolo-inference`, `ros2-llm-bridge`, doublon `services/clawbot-lidar.service` |
+| Gardés malgré l'apparence | `yahboomcar_description` (URDF + 24 maillages de collision pour MoveIt), `yolo_node` (exécuté par `clawbot-yolo`) |
+
+Build : **46 paquets → 17** (`colcon list`, mesuré).
+
+## 5. API 8000 (REQ-OPS-043)
+
+`bridge_node.cpp` ne crée plus aucun éditeur `Twist`. `SetVelocity` devient un skill
+`move_relative` (ou `rotate` si la rotation domine), `Stop` devient le skill `stop`,
+`NavigateTo` devient `navigate_to` — donc un refus `CAPABILITY_INACTIVE` tant que Nav2
+n'est pas servi, au lieu d'une navigation à l'estime. Les trois passent par
+`/clawbot/execute_skill` et rendent la main immédiatement (« transmis à l'exécutif ») :
+le suivi se fait sur `/clawbot/mission/events`, pas sur le future du goal (leçon P09).
+Compilation vérifiée (`colcon build --packages-select ros2_llm_bridge_cpp`, code 0).
+
+## 6. Chiffres demandés
+
+| Mesure | Avant | Après |
+|---|---|---|
+| Paquets construits | 46 | 17 (`colcon list`) |
+| Fichiers de lancement dans le dépôt | 27 | 21 (dans un paquet) |
+| Unités décrivant le démarrage | 26 fichiers + 2 doublons | 23 fichiers, 1 cible |
+| Nœuds `ros2 node list` | 23 | **non mesuré** (déploiement à faire) |
+| Nœuds applicatifs | 15 hors infra/rosbridge | **non mesuré** |
+| `ros2 topic info /cmd_vel` | 1 éditeur (`llm_bridge_node`) | **non mesuré** (l'éditeur est retiré du code) |
+| Temps jusqu'au premier `/safety/state` (O09 ≤ 30 s) | non mesuré | **non mesuré** — exige un redémarrage |
+
+## 7. Ce qui reste (honnêtement)
+
+0. **Cinq tests de lecture adaptés** après le déménagement (description, navigation,
+   caméra du poignet, YOLO, hardware_service) : ils lisaient les anciens `launch/` et
+   `ros2_llm_bridge/`. Aucune assertion affaiblie — chemins et forme des paramètres
+   seulement. Deux d'entre eux vérifiaient `User=jetson` et `ROS_DOMAIN_ID=28` dans
+   l'unité : ces propriétés sont désormais vérifiées là où elles vivent (unité ou
+   `deploy/env/clawbot.env`).
+1. **Déploiement** : fenêtre convenue, sauvegarde, `systemctl disable` des 21 anciennes
+   unités, `enable clawbot.target`, redémarrage par l'opérateur, puis les contrôles de
+   `deploy/journal/2026-11-22_p14_demarrage.md` et la mesure de O09.
+2. **Sentinel** (prompt §5.8) : la sonde de flux n'est pas retirée — le nœud lit encore
+   les topics directement. Le changement est petit mais non fait.
+3. **`bridge_mcp`** : conservé. L'alerte Telegram (`clawbot-health`) appelle encore
+   `bridge_mcp.health` ; la décision était de supprimer **après** rebranchement sur
+   `clawbot_mcp`, et ce rebranchement n'est pas fait (le notifieur n'existe que dans
+   `bridge_mcp`).
+4. **Q12** : le service de documentation est réécrit (`mkdocs build` + `http.server`
+   lié à 127.0.0.1) mais pas encore redémarré.
+5. **REQ-ARM-003 / REQ-ARM-004** (P13) : approuvées par l'opérateur le 2026-11-22 à la
+   question de sortie de P14, ce qui débloque la trace. Les poses `home` et `ready`
+   restent à valider sur le robot (HW-ARM-001) et n'entrent pas dans la liste par cette
+   approbation.
+
+## 8. Sécurité — réponses de fin de cycle
+
+- Ai-je publié dans le domaine 28 ? **Non.** Aucun message, aucun goal ; les tests sont
+  en 98/99.
+- Ai-je modifié `/etc` ou une unité en service ? **Non.** Aucun `systemctl`, aucune
+  écriture dans `/etc` : les 23 fichiers d'unité du dépôt sont modifiés, `/etc` pointe
+  toujours sur les anciens contenus.
+- Ai-je laissé un processus de test ? Non (contrôle `ps -ef` en fin de session).
+- Suppressions : toutes dans le dépôt, toutes vérifiées par `grep` (0 référence), et
+  couvertes par la validation de l'inventaire.

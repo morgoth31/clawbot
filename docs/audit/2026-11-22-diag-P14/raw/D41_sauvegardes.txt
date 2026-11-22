@@ -1,0 +1,36 @@
+2026-11-22T21:10:40+01:00
+cmd: ls -la ~/clawbot_backups/ ; cat ~/clawbot_backups/*/commit_precedent.txt
+ROS_DOMAIN_ID=(non utilisé)
+total 60
+drwxrwxr-x 11 jetson jetson 4096 Nov 22 18:48 .
+drwxr-x--- 71 jetson jetson 4096 Nov 22 18:48 ..
+drwxrwxr-x  2 jetson jetson 4096 Nov 22 13:06 20261122-125828
+drwxrwxr-x  2 jetson jetson 4096 Nov 22 13:26 20261122-132536
+drwxrwxr-x  2 jetson jetson 4096 Nov 22 14:33 20261122-143324
+drwxrwxr-x  2 jetson jetson 4096 Nov 22 15:10 20261122-151031
+drwxrwxr-x  2 jetson jetson 4096 Nov 22 16:02 20261122-160225
+drwxrwxr-x  2 jetson jetson 4096 Nov 22 16:30 20261122-163013
+drwxrwxr-x  2 jetson jetson 4096 Nov 22 16:53 20261122-165346
+drwxrwxr-x  2 jetson jetson 4096 Nov 22 17:37 20261122-173706
+drwxrwxr-x  2 jetson jetson 4096 Nov 22 18:26 20261122-182609
+-rw-rw-r--  1 jetson jetson   19 Nov 22 16:30 DERNIER_TS.txt
+-rw-rw-r--  1 jetson jetson   71 Nov 22 18:48 pyvenv.cfg.avant
+-rw-rw-r--  1 jetson jetson 7534 Nov 22 18:48 venv_yolov5_freeze_avant.txt
+--- /home/jetson/clawbot_backups/20261122-125828/
+972b7cc
+--- /home/jetson/clawbot_backups/20261122-132536/
+e416bcd
+--- /home/jetson/clawbot_backups/20261122-143324/
+0ba8d3e3a0c1c1973f197b6f9bdd95c657ba4b69
+--- /home/jetson/clawbot_backups/20261122-151031/
+68edaf616fcd5d4388dacb1705c6318254fc5462
+--- /home/jetson/clawbot_backups/20261122-160225/
+4d64858e0b2fe5ceaf7c7711af769fabad954f25
+--- /home/jetson/clawbot_backups/20261122-163013/
+67d7edbb54b360243c5c5620773bc3782125cbc3
+--- /home/jetson/clawbot_backups/20261122-165346/
+9b0e6102ab8f23d4104463b10889abdf3aa71d03
+--- /home/jetson/clawbot_backups/20261122-173706/
+0afa5e68b1fdedadb167f832384c1929302e9311
+--- /home/jetson/clawbot_backups/20261122-182609/
+dce4f200d0e087c0b6a50ccf20fb8d893fe7e610

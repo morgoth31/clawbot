@@ -1,0 +1,21 @@
+2026-11-22T21:09:10+01:00
+cmd: bash ~/.hermes/skills/clawbot/clawbot-deploy/scripts/smoke_check.sh
+ROS_DOMAIN_ID=28 (lu par le script)
+OK     aucune unité du robot en échec
+OK     nœud /driver_node présent
+OK     nœud /safety_arbitrator présent
+OK     nœud /director présent
+OK     nœud /ydlidar_ros2_driver_node présent
+OK     nœud /ekf_filter_node présent
+OK     /scan : 10.123 Hz (réf. 10.125 Hz)
+OK     /imu/data_raw : 10.004 Hz (réf. 10.019 Hz)
+OK     /joint_states : 20.001 Hz (réf. 20.000 Hz)
+OK     /director/state : 5.000 Hz (réf. 4.999 Hz)
+OK     /cmd_vel_safe : 19.999 Hz (réf. 20.001 Hz)
+OK     /safety/state : 19.999 Hz (réf. 20.000 Hz)
+OK     /voltage : 9.997 Hz (réf. 10.015 Hz)
+OK     /odom : 9.999 Hz (réf. 10.001 Hz)
+OK     /cmd_vel_safe : 1 éditeur
+----
+Contrôle de fumée : conforme
+EXIT=0

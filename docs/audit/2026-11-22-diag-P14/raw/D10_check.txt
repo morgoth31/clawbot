@@ -1,0 +1,136 @@
+2026-11-22T21:06:48+01:00
+cmd: unset ROS_DOMAIN_ID; scripts/check.sh
+ROS_DOMAIN_ID=98 (imposé par check.sh)
+ROS_DOMAIN_ID=98 (variable absente : domaine de test unitaire imposé)
+── lint ────────────────────────────────────────────────────────────
+AVERTISSEMENT : ruff absent, étape lint ignorée (rien n'a été installé).
+── unit ────────────────────────────────────────────────────────────
+/home/jetson/.local/lib/python3.10/site-packages/pytest_asyncio/plugin.py:247: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+........................................................................ [  9%]
+........................................................................ [ 18%]
+........................................................................ [ 27%]
+........................................................................ [ 37%]
+........................................................................ [ 46%]
+........................................................................ [ 55%]
+........................................................................ [ 64%]
+........................................................................ [ 74%]
+............................................................s........... [ 83%]
+........................................................................ [ 92%]
+.........................................................                [100%]
+=============================== warnings summary ===============================
+tests/mcp_bridge/contract/test_auth_transport.py:17
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_auth_transport.py:17: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_catalogue.py:13
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_catalogue.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_diagnostics.py:7
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_diagnostics.py:7: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_director_tools.py:16
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_director_tools.py:16: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_error_envelope.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_error_envelope.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_incident_context.py:9
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_incident_context.py:9: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_initialize.py:13
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_initialize.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_resources.py:12
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_resources.py:12: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_inventory.py:10
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_inventory.py:10: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_notify.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_notify.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_probes.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_probes.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_report.py:12
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_report.py:12: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_context.py:13
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_context.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_trigger_firing.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_trigger_firing.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_trigger_invariants.py:11
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_trigger_invariants.py:11: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_trigger_latency.py:11
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_trigger_latency.py:11: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_auth_transport.py::test_request_without_token_is_rejected
+  /home/jetson/.local/lib/python3.10/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/mcp_bridge/contract/test_auth_transport.py::test_request_without_token_is_rejected
+  /home/jetson/.local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+tests/test_p07_delegation.py::test_delegue_au_gestionnaire
+  /home/jetson/clawbot/clawbot_bringup/clawbot_bringup/hardware_service.py:236: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+tests/test_p07_delegation.py::test_delegue_au_gestionnaire
+  /home/jetson/.local/lib/python3.10/site-packages/fastapi/applications.py:4573: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+yolo_node/test_camera.py::test_camera
+  /home/jetson/.local/lib/python3.10/site-packages/_pytest/python.py:191: PytestReturnNotNoneWarning: Test functions should return None, but yolo_node/test_camera.py::test_camera returned <class 'bool'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+776 passed, 14 skipped, 21 warnings in 94.15s (0:01:34)
+── cpp ─────────────────────────────────────────────────────────────
+OK     test_abonnements
+OK     test_estimateur
+OK     test_niveau
+── trace ───────────────────────────────────────────────────────────
+Exigences : 92 | tests : 635 | tests non tracés : 352
+Traçabilité conforme.
+── interdits ───────────────────────────────────────────────────────
+OK     aucun pkill/killall/pgrep hors exceptions nommées
+── doublons ────────────────────────────────────────────────────────
+  toléré (allowlist) : clawbot_safety/clawbot_safety/thresholds.py == docs/ros2_audit/raw/20261122-105910/sources/thresholds.py
+  toléré (allowlist) : clawbot_arm_controller/clawbot_arm_controller/__init__.py == clawbot_base_driver/clawbot_base_driver/__init__.py == clawbot_bringup/clawbot_bringup/__init__.py == clawbot_director/clawbot_director/__init__.py == clawbot_safety/clawbot_safety/__init__.py == clawbot_sim/clawbot_sim/__init__.py == yahboomcar_description/yahboomcar_description/__init__.py
+  2 groupe(s) de doublons — avertissement, code 0 sans --strict-duplicates
+Vérification terminée : code 0
+EXIT=0

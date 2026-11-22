@@ -1,0 +1,63 @@
+2026-11-22T21:06:42+01:00
+cmd: git log --oneline --graph -60 --all
+ROS_DOMAIN_ID=(non utilisé)
+* 2c2d1d7 docs(ops): chiffre exact des paquets construits apres nettoyage [REQ-OPS-042]
+* a6756f1 refactor(ops): supprime les sources deplacees sous attic [REQ-OPS-042]
+* 790a609 test(p14): adapte les tests de lecture aux fichiers demenages [REQ-OPS-041]
+* 5499e01 feat(api,docs): routes de mouvement vers l'executif, documentation statique [REQ-OPS-043, Q12]
+* f07ee87 refactor(ops): demarrage unique sous clawbot.target, depot reduit [REQ-OPS-040..044, REQ-NET-001]
+* b1f0881 feat(bringup): paquet clawbot_bringup, cible et decisions operateur [REQ-OPS-040..044]
+* 3cb7daa docs(ops): inventaire du demarrage, exigences et tests rouges P14 [REQ-OPS-040..045, REQ-NET-001]
+* 1111bee docs(arm): chiffres de verification apres bascule MoveIt [REQ-ARM-002]
+* b92ea9a feat(arm): poses executees par MoveIt, pince par le controleur [REQ-ARM-002..006]
+* 847fedc feat(clawbot_moveit_config): poses nommees du SRDF issues de la liste validee [REQ-ARM-003]
+* 7002fc7 fix(yahboomcar_description): installe les maillages de collision [REQ-ARM-003]
+* 86765bd docs(arm): porte operateur non franchie, point bloquant en tete [REQ-ARM-003]
+* 1324716 docs(arm): chiffres de verification et paquets a reconstruire [REQ-ARM-002]
+* 2826d0c test(exec): detruit l'editeur d'angles avant les noeuds de banc [REQ-ARM-004]
+* c68fdfd docs(arm): exigences ARM, procedure materielle et dossier P13 [REQ-ARM-001..006]
+* a51e102 feat(clawbot_executive): bras activable par la capacite arm [REQ-ARM-002..006]
+* 4022810 fix(clawbot_arm_controller): demarre sur la pose de repos validee [REQ-ARM-006]
+* 36ae23d fix(clawbot_base_driver): retire l'editeur /joint_states jamais publie [REQ-ARM-001]
+* db0bcc6 refactor(clawbot_common): preconditions partagees entre S1 et S2 [REQ-ARM-004]
+* 9168970 feat(perc): backend TensorRT 10 charge le moteur ; FP16 ecarte sur ecart de score [REQ-PERC-011]
+* b99fb36 feat(perc): moteur TensorRT FP16 exporte par copie patchee, chargement bloque [REQ-PERC-011]
+* 1a97167 fix(perc): Detection2DArray -> Pose2D.position dans le serveur de skills [REQ-PERC-010]
+* 545627f docs(perc): voie ultralytics ecartee, substitution silencieuse du modele [REQ-PERC-011]
+* d09f8dc docs(perc): chiffres exacts du noeud (RSS, CPU, echantillonnage GR3D)
+* 3a38258 fix(perc): conversion yuv422 de la camera du poignet, publication effective [REQ-PERC-010]
+* ba1dfc9 docs(perc): consigne l'echec d'export TensorRT (API TRT 10) [REQ-PERC-011]
+* 271b5d3 feat(perc): bascule vers clawbot-yolo, seuil poignet corrige [REQ-PERC-010, REQ-PERC-016]
+* 7a87234 docs(perc): consigne l'integration verte de P12
+* 24236ab docs(perc): rapport P12 et mesures de reference [REQ-PERC-010 a 016]
+* d0b71f7 feat(perc): noeud yolo_node dans le graphe, detection sur GPU a la demande [REQ-PERC-010 a 016]
+* e12b5d5 fix(perc): retire DeviceAllow qui bloquait l'usbfs, deploie l'unite geree [REQ-PERC-003]
+* dce4f20 docs(perc): consigne la porte non franchie du deploiement P11
+* 7e69795 docs(perc): mesure de dix minutes de la profondeur et rapport P11 [REQ-PERC-001]
+* 01e1a45 feat(perc): garde la profondeur Astra, durtit et pilote l'unite par capacite [REQ-PERC-001, REQ-PERC-003, REQ-PERC-004, REQ-PERC-005]
+* 1fe7275 docs(mcp): relachement e-stop trace et trou de specification consigne [REQ-MCP-004]
+* 180a2aa feat(mcp): approuve, deploye et essaye le profil pilote [REQ-MCP-002, REQ-MCP-004]
+* 44190f3 feat(mcp): serveur clawbot_mcp, douze outils et inspection des interdits (REQ-MCP-001 a 007)
+* f32bb22 fix(exec): serialise decisions et execution, QoS capteur, deploiement P09 [REQ-EXEC-012]
+* 0afa5e6 feat(exec): executif de mission, journal JSONL et facade du directeur (REQ-EXEC-010 a 018)
+* 8df50a9 feat(exec): serveur de skills, registre borne et base simulee (REQ-EXEC-001 a 008)
+* 9b0e610 docs(exec): porte P08 fermee, bornes en attente de validation [REQ-EXEC-003]
+* 851e51d docs(capacites): deploiement, incident et rapport de fin P07 [REQ-CAPA-005]
+* f9aa22e fix(capacites): sonde qui reessaie, callback present, detection non pilotable [REQ-CAPA-002]
+* 67d7edb feat(capacites): approuve REQ-CAPA-005 et consigne l'ecart joy_teleop [REQ-CAPA-005]
+* 109fd37 docs(capacites): deploiement suspendu et rapport de fin P07 [REQ-CAPA-005]
+* 0df2d85 feat(health): capacites lues du topic, liste supposee retiree (REQ-CAPA-006)
+* 6792d63 feat(capacites): autorisation sudo generee et unite de service (REQ-CAPA-001)
+* 925196c feat(ops): interdiction du pilotage par motif et delegation du SLAM aux capacites (REQ-OPS-030)
+* 0c465c3 feat(capacites): manifeste, controleur et gestionnaire (REQ-CAPA-001 a 006)
+* 57f55a7 docs(interfaces): deploiement warn et rapport de fin P06 [REQ-ARCH-014]
+* 4d64858 feat(director): validation du contrat en mode warn par defaut [REQ-ARCH-014]
+* 841418d feat(common): table d'erreurs unique, export JSON et validation des schemas [REQ-ARCH-011]
+* 61a78f7 feat(interfaces): huit types du referentiel §3 et schema du directeur [REQ-ARCH-010]
+* 994ec45 docs(health): cloture P05, REQ-HEALTH-005 declaree non tenue [REQ-HEALTH-005]
+* 09f2145 feat(health): moniteur en C++ (souscriptions generiques) et trace_check au gtest [REQ-HEALTH-004]
+* cba9784 docs(health): campagne CPU, arbitrage (a)/(b) et quatrieme voie [REQ-HEALTH-005]
+* ff773c0 docs(health): deploiement P05, controles et mesure CPU [REQ-HEALTH-005]
+* 8b5ad7b fix(health): type ROS reel par flux, raw=True ne dispense pas du type [REQ-HEALTH-004]
+* 68edaf6 docs(health): dossier et rapport de fin P05 [REQ-HEALTH-005]
+* 0740590 fix(health): un seul abonnement par topic, /voltage typé [REQ-HEALTH-004]

@@ -1,0 +1,101 @@
+2026-11-22T21:13:14+01:00
+cmd: unset ROS_DOMAIN_ID; scripts/check.sh --integration
+ROS_DOMAIN_ID=99 (imposé par check.sh)
+ROS_DOMAIN_ID=98 (variable absente : domaine de test unitaire imposé)
+ROS_DOMAIN_ID=99 (intégration)
+── integration ─────────────────────────────────────────────────────
+/home/jetson/.local/lib/python3.10/site-packages/pytest_asyncio/plugin.py:247: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+............[WARN] [1795378422.152226712] [director]: safety_stale — flux muet, derniere valeur OK : tache t-f8aa326e9b -> CANCELLED_SAFETY
+............................................................ [ 86%]
+...........                                                              [100%]
+=============================== warnings summary ===============================
+tests/mcp_bridge/contract/test_auth_transport.py:17
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_auth_transport.py:17: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_catalogue.py:13
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_catalogue.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_diagnostics.py:7
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_diagnostics.py:7: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_director_tools.py:16
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_director_tools.py:16: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_error_envelope.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_error_envelope.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_incident_context.py:9
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_incident_context.py:9: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_initialize.py:13
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_initialize.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/contract/test_resources.py:12
+  /home/jetson/clawbot/tests/mcp_bridge/contract/test_resources.py:12: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_inventory.py:10
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_inventory.py:10: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_notify.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_notify.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_probes.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_probes.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/health/test_report.py:12
+  /home/jetson/clawbot/tests/mcp_bridge/health/test_report.py:12: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_context.py:13
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_context.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_trigger_firing.py:14
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_trigger_firing.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_trigger_invariants.py:11
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_trigger_invariants.py:11: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+tests/mcp_bridge/triggers/test_trigger_latency.py:11
+  /home/jetson/clawbot/tests/mcp_bridge/triggers/test_trigger_latency.py:11: PytestUnknownMarkWarning: Unknown pytest.mark.contract - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.contract
+
+clawbot_director/test/test_preconditions.py::test_navigation_refusee_si_les_angles_sont_perimes
+  /home/jetson/.local/lib/python3.10/site-packages/_pytest/threadexception.py:54: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-75 (_publier_bras)
+  
+  Traceback (most recent call last):
+    File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+      self.run()
+    File "/usr/lib/python3.10/threading.py", line 953, in run
+      self._target(*self._args, **self._kwargs)
+    File "/home/jetson/clawbot/clawbot_director/test/test_preconditions.py", line 208, in _publier_bras
+      monde.pub_bras.publish(message)
+    File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/publisher.py", line 68, in publish
+      with self.handle:
+  rclpy._rclpy_pybind11.InvalidHandle: cannot use Destroyable because destruction was requested
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+83 passed, 1 skipped, 770 deselected, 17 warnings in 106.77s (0:01:46)
+The following exception was never retrieved: cannot use Destroyable because destruction was requested
+Vérification d'intégration terminée : code 0
+EXIT=0
