@@ -15,7 +15,7 @@ Environment=HOME=/home/jetson
 WorkingDirectory=/home/jetson/clawbot
 # N'utilise pas clawbot-health.service : celle-ci est un oneshot Telegram
 # (bridge_mcp.health), sans rapport avec la surveillance des flux.
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec python3 -c 'from clawbot_health.health_monitor import main; main()'"
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec /home/jetson/clawbot/install/clawbot_health/lib/clawbot_health/health_monitor"
 Restart=on-failure
 RestartSec=2
 TimeoutStopSec=10

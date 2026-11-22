@@ -118,6 +118,32 @@ run_unit() {
     fi
 }
 
+run_cpp() {
+    echo "── cpp ─────────────────────────────────────────────────────────────"
+    # Les paquets C++ (clawbot_health) livrent leurs tests en gtest : trace_check les
+    # compte, mais pytest ne les exécute pas. On lance les binaires présents dans
+    # build/. Absents (clone neuf, pas encore construit) : avertissement seulement.
+    local binaires=() b
+    while IFS= read -r b; do
+        [[ -n "$b" ]] && binaires+=("$b")
+    done < <(find build -maxdepth 2 -type f -perm -u+x -name 'test_*' 2>/dev/null | sort)
+    if [[ ${#binaires[@]} -eq 0 ]]; then
+        echo "AVERTISSEMENT : aucun binaire de test C++ (build absent) — colcon build d'abord."
+        return 0
+    fi
+    local echec=0
+    for b in "${binaires[@]}"; do
+        if ! "$b" --gtest_brief=1 >/tmp/cpp_$(basename "$b").log 2>&1; then
+            echo "ECHEC : $b (journal /tmp/cpp_$(basename "$b").log)" >&2
+            tail -20 /tmp/cpp_$(basename "$b").log >&2 || true
+            echec=1
+        else
+            echo "OK     $(basename "$b")"
+        fi
+    done
+    return $echec
+}
+
 run_trace() {
     echo "── trace ───────────────────────────────────────────────────────────"
     local plafond
@@ -198,6 +224,7 @@ fi
 
 run_lint
 run_unit
+run_cpp
 run_trace
 run_duplicates
 

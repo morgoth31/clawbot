@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Contrôle de traçabilité exigences <-> tests pour le dépôt Clawbot.
 
-Lit requirements/*.yaml et les tests pytest (analyse AST, sans import ni exécution),
-puis vérifie :
+Lit requirements/*.yaml et les tests — pytest (analyse AST, sans import ni exécution) et
+gtest C++ (analyse de texte, un fichier `test_*.cpp` par suite), puis vérifie :
   1. format des exigences (identifiant, champs obligatoires, unicité) ;
   2. chaque exigence de méthode `test` est couverte par au moins un test marqué
-     @pytest.mark.req("REQ-...") ;
+     @pytest.mark.req("REQ-...") en pytest, ou `// REQ-...` juste avant un `TEST(...)`
+     en gtest ;
   3. chaque marqueur `req` vise une exigence existante ;
   4. une exigence d'une autre méthode cite une preuve (`evidence`) qui existe ;
   5. une exigence `safety: true` déjà couverte par un test n'est plus en `draft`
@@ -41,6 +42,13 @@ EXCLUDED_DIRS = {
     ".venv", "venv", ".pytest_cache",
 }
 EXCLUDED_SUBPATHS = ("tests/manual",)
+
+# Convention gtest : un commentaire `// REQ-DOMAINE-NNN` juste avant la macro TEST
+# (ou sur la même ligne) rattache l'exigence au test suivant. Le même identifiant
+# peut apparaître plusieurs fois ; un test sans marqueur compte comme non tracé,
+# exactement comme un test pytest sans décorateur.
+GTEST_MACRO = re.compile(r"^\s*(?:TEST|TEST_F|TEST_P)\s*\(\s*([A-Za-z_]\w*)\s*,\s*([A-Za-z_]\w*)\s*\)")
+REQ_COMMENT = re.compile(r"//\s*(REQ-[A-Z]+-\d{3})")
 
 
 @dataclass
@@ -167,6 +175,37 @@ def collect_tests(repo: Path, errors: list[str]) -> list[TestCase]:
     return tests
 
 
+def collect_gtest(repo: Path, errors: list[str]) -> list[TestCase]:
+    """Tests gtest et leurs marqueurs `// REQ-...` (analyse de texte, sans compiler)."""
+    tests: list[TestCase] = []
+    fichiers: set[Path] = set()
+    for motif in ("test_*.cpp", "*_test.cpp", "test_*.cc", "*_test.cc"):
+        fichiers |= set(repo.rglob(motif))
+    for path in sorted(fichiers):
+        if _is_excluded(path, repo):
+            continue
+        try:
+            lignes = path.read_text(encoding="utf-8").splitlines()
+        except UnicodeDecodeError as exc:
+            errors.append(f"{path.relative_to(repo)}: lecture impossible ({exc})")
+            continue
+        rel = path.relative_to(repo).as_posix()
+        en_attente: list[str] = []
+        for ligne in lignes:
+            macro = GTEST_MACRO.match(ligne)
+            if macro:
+                ids = en_attente + REQ_COMMENT.findall(ligne)
+                tests.append(TestCase(f"{rel}::{macro.group(1)}.{macro.group(2)}", ids))
+                en_attente = []
+                continue
+            marques = REQ_COMMENT.findall(ligne)
+            if marques:
+                en_attente.extend(marques)
+            elif ligne.strip() and not ligne.lstrip().startswith("//"):
+                en_attente = []      # du code entre le commentaire et le TEST casse le lien
+    return tests
+
+
 # --------------------------------------------------------------------------- contrôle
 
 def check(repo: Path, max_untraced: int | None) -> dict:
@@ -174,6 +213,7 @@ def check(repo: Path, max_untraced: int | None) -> dict:
     warnings: list[str] = []
     reqs = load_requirements(repo, errors)
     tests = collect_tests(repo, errors)
+    tests.extend(collect_gtest(repo, errors))
 
     coverage: dict[str, list[str]] = {rid: [] for rid in reqs}
     untraced = 0

@@ -5,13 +5,19 @@
   <description>Moniteur de santé des flux du Clawbot X3 Plus (/clawbot/health, /diagnostics)</description>
   <maintainer email="jetson@clawbot.local">jetson</maintainer>
   <license>Proprietary</license>
-  <depend>rclpy</depend>
-  <depend>std_msgs</depend>
-  <depend>diagnostic_msgs</depend>
-  <depend>rcl_interfaces</depend>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_gtest</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>ament_index_cpp</depend>
   <depend>clawbot_interfaces</depend>
-  <depend>python3-yaml</depend>
-  <exec_depend>ament_index_python</exec_depend>
-  <test_depend>pytest</test_depend>
-  <export><build_type>ament_python</build_type></export>
+  <depend>diagnostic_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>yaml-cpp</depend>
+  <depend>nlohmann-json-dev</depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
+
+  <export><build_type>ament_cmake</build_type></export>
 </package>
