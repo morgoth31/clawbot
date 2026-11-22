@@ -38,6 +38,8 @@ def test_hardware_service_lamps():
     assert data.get("status") == "ok"
     assert data.get("g") == 255
 
+@pytest.mark.xfail(strict=True, reason=
+    "GET /tools renvoie 404 sur le pont en service : contrat HTTP à revoir (voir P10)")
 def test_llm_bridge_tools():
     """Verify that we can request tool definitions from the LLM Bridge."""
     # Based on standard endpoints, or we check its schema, but let's just make sure

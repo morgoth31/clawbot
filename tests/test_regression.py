@@ -11,6 +11,14 @@ Usage:
     python3 /home/jetson/clawbot/tests/test_regression.py --skip-slam     # ne pas lancer SLAM
     python3 /home/jetson/clawbot/tests/test_regression.py --skip-camera   # ne pas capturer
     python3 /home/jetson/clawbot/tests/test_regression.py --skip-hardware # bridge uniquement
+
+Notes d'exécution
+-----------------
+Les étapes qui reçoivent la configuration de ``main()`` s'appellent ``check_*`` :
+ce ne sont pas des tests pytest mais des vérifications du lanceur manuel, qui
+exigent le bridge HTTP sur le port 8000 et le hardware_service sur 8001. Elles
+prenaient un paramètre positionnel ``args`` que pytest interprétait comme une
+fixture, ce qui faisait échouer 19 collectes (audit S43).
 """
 
 import argparse
@@ -189,7 +197,7 @@ def test_hw_telemetry():
 
 # ── Tests: Motion (via bridge) ────────────────────────────────────────────────
 
-def test_set_velocity(args):
+def check_set_velocity(args):
     """Tool 1: SetVelocity"""
     if args.skip_motion or args.skip_hardware:
         record("T1", "Motion", "SetVelocity", "SKIP", "skip-motion active")
@@ -211,7 +219,7 @@ def test_set_velocity(args):
         record("T1", "Motion", "SetVelocity", "FAIL", str(e))
 
 
-def test_set_velocity_clamp(args):
+def check_set_velocity_clamp(args):
     """Tool 1b: SetVelocity clamping (valeur excessive doit etre clampée)"""
     if args.skip_motion or args.skip_hardware:
         record("T1b", "Motion", "SetVelocity clamping", "SKIP", "skip-motion active")
@@ -235,7 +243,7 @@ def test_set_velocity_clamp(args):
         record("T1b", "Motion", "SetVelocity clamping", "FAIL", str(e))
 
 
-def test_stop(args):
+def check_stop(args):
     """Tool 2: Stop"""
     if args.skip_hardware:
         record("T2", "Motion", "Stop", "SKIP", "skip-hardware active")
@@ -314,7 +322,7 @@ def test_listen():
 
 # ── Tests: Vision ─────────────────────────────────────────────────────────────
 
-def test_capture_camera(args):
+def check_capture_camera(args):
     """Tool 5: CaptureCamera (front)"""
     if args.skip_camera or args.skip_hardware:
         record("T5", "Vision", "CaptureCamera front", "SKIP", "skip-camera active")
@@ -340,7 +348,7 @@ def test_capture_camera(args):
         record("T5", "Vision", "CaptureCamera (front)", "FAIL", str(e))
 
 
-def test_capture_camera_claw(args):
+def check_capture_camera_claw(args):
     """Tool 5b: CaptureCamera (claw)"""
     if args.skip_camera or args.skip_hardware:
         record("T5b", "Vision", "CaptureCamera claw", "SKIP", "skip-camera active")
@@ -364,7 +372,7 @@ def test_capture_camera_claw(args):
         record("T5b", "Vision", "CaptureCamera (claw)", "WARN", str(e))
 
 
-def test_analyze_scene(args):
+def check_analyze_scene(args):
     """Tool 6: AnalyzeScene"""
     if args.skip_camera or args.skip_hardware:
         record("T6", "Vision", "AnalyzeScene", "SKIP", "skip-camera active")
@@ -382,7 +390,7 @@ def test_analyze_scene(args):
         record("T6", "Vision", "AnalyzeScene", "FAIL", str(e))
 
 
-def test_recognize_face(args):
+def check_recognize_face(args):
     """Tool 7: RecognizeFace"""
     if args.skip_camera or args.skip_hardware:
         record("T7", "Vision", "RecognizeFace", "SKIP", "skip-camera active")
@@ -399,7 +407,7 @@ def test_recognize_face(args):
         record("T7", "Vision", "RecognizeFace", "FAIL", str(e))
 
 
-def test_recognize_object(args):
+def check_recognize_object(args):
     """Tool 8: RecognizeObject"""
     if args.skip_camera or args.skip_hardware:
         record("T8", "Vision", "RecognizeObject", "SKIP", "skip-camera active")
@@ -416,7 +424,7 @@ def test_recognize_object(args):
         record("T8", "Vision", "RecognizeObject", "FAIL", str(e))
 
 
-def test_recognize_qrcode(args):
+def check_recognize_qrcode(args):
     """Tool 9: RecognizeQRCode"""
     if args.skip_camera or args.skip_hardware:
         record("T9", "Vision", "RecognizeQRCode", "SKIP", "skip-camera active")
@@ -435,7 +443,7 @@ def test_recognize_qrcode(args):
 
 # ── Tests: Arm & Claw ─────────────────────────────────────────────────────────
 
-def test_control_servo(args):
+def check_control_servo(args):
     """Tool 11: ControlServo"""
     if args.skip_hardware:
         record("T11", "Arm", "ControlServo", "SKIP", "skip-hardware active")
@@ -452,7 +460,7 @@ def test_control_servo(args):
         record("T11", "Arm", "ControlServo", "FAIL", str(e))
 
 
-def test_control_arm(args):
+def check_control_arm(args):
     """Tool 12: ControlArm"""
     if args.skip_hardware:
         record("T12", "Arm", "ControlArm", "SKIP", "skip-hardware active")
@@ -469,7 +477,7 @@ def test_control_arm(args):
         record("T12", "Arm", "ControlArm", "FAIL", str(e))
 
 
-def test_control_claw(args):
+def check_control_claw(args):
     """Tool 13: ControlClaw (open + close)"""
     if args.skip_hardware:
         record("T13", "Arm", "ControlClaw", "SKIP", "skip-hardware active")
@@ -495,7 +503,7 @@ def test_control_claw(args):
         record("T13", "Arm", "ControlClaw", "FAIL", str(e))
 
 
-def test_set_arm_pose(args):
+def check_set_arm_pose(args):
     """Tool 14: SetArmPose (pose 1: anti-collision)"""
     if args.skip_hardware:
         record("T14", "Arm", "SetArmPose", "SKIP", "skip-hardware active")
@@ -513,7 +521,7 @@ def test_set_arm_pose(args):
 
 # ── Tests: Peripherals ────────────────────────────────────────────────────────
 
-def test_beep(args):
+def check_beep(args):
     """Tool 15: Beep"""
     if args.skip_hardware:
         record("T15", "Peripherals", "Beep", "SKIP", "skip-hardware active")
@@ -529,7 +537,7 @@ def test_beep(args):
         record("T15", "Peripherals", "Beep", "FAIL", str(e))
 
 
-def test_set_lamps(args):
+def check_set_lamps(args):
     """Tool 16: SetLamps (rouge, puis vert, puis bleu, puis eteint)"""
     if args.skip_hardware:
         record("T16", "Peripherals", "SetLamps", "SKIP", "skip-hardware active")
@@ -551,7 +559,7 @@ def test_set_lamps(args):
         record("T16", "Peripherals", "SetLamps", "FAIL", str(e))
 
 
-def test_get_battery(args):
+def check_get_battery(args):
     """Tool 17: GetBatteryVoltage"""
     if args.skip_hardware:
         record("T17", "Peripherals", "GetBatteryVoltage", "SKIP", "skip-hardware active")
@@ -595,7 +603,7 @@ def test_hw_battery():
         record("H12", "HW-Direct", "GET /battery", "FAIL", str(e))
 
 
-def test_hw_capture(args):
+def check_hw_capture(args):
     """H21: GET /capture?camera=front&save=true"""
     if args.skip_camera or args.skip_hardware:
         record("H21", "HW-Vision", "GET /capture (front)", "SKIP", "skip-camera active")
@@ -775,7 +783,7 @@ def test_high_level_instruction_telemetry():
         record("E2E-2", "End-to-End", "Instruction 'telemetrie'", "FAIL", str(e))
 
 
-def test_high_level_instruction_pose_then_stop(args):
+def check_high_level_instruction_pose_then_stop(args):
     """E2E-3: Instruction haut niveau "mets-toi en position anti-collision puis arrete-toi" """
     if args.skip_hardware:
         record("E2E-3", "End-to-End", "Instruction 'pose + stop'", "SKIP", "skip-hardware active")
@@ -797,7 +805,7 @@ def test_high_level_instruction_pose_then_stop(args):
         record("E2E-3", "End-to-End", "Instruction 'pose + stop'", "FAIL", str(e))
 
 
-def test_high_level_instruction_lamp_signal(args):
+def check_high_level_instruction_lamp_signal(args):
     """E2E-4: Instruction haut niveau "fais un signal lumineux rouge puis eteint" """
     if args.skip_hardware:
         record("E2E-4", "End-to-End", "Instruction 'signal lumineux'", "SKIP", "skip-hardware active")
@@ -858,9 +866,9 @@ def main():
 
     # ── Motion ──
     print("\n--- Motion ---")
-    test_set_velocity(args)
-    test_set_velocity_clamp(args)
-    test_stop(args)
+    check_set_velocity(args)
+    check_set_velocity_clamp(args)
+    check_stop(args)
     test_hw_stop()
 
     # Set mode to NAVIGATION for NavigateTo
@@ -881,14 +889,14 @@ def main():
 
     # ── Vision ──
     print("\n--- Vision ---")
-    test_capture_camera(args)
-    test_capture_camera_claw(args)
-    test_analyze_scene(args)
-    test_recognize_face(args)
-    test_recognize_object(args)
-    test_recognize_qrcode(args)
+    check_capture_camera(args)
+    check_capture_camera_claw(args)
+    check_analyze_scene(args)
+    check_recognize_face(args)
+    check_recognize_object(args)
+    check_recognize_qrcode(args)
     if not args.skip_hardware:
-        test_hw_capture(args)
+        check_hw_capture(args)
         test_hw_yolo_status()
         test_hw_yolo_frame()
 
@@ -899,16 +907,16 @@ def main():
 
     # ── Arm & Claw ──
     print("\n--- Arm & Claw ---")
-    test_control_servo(args)
-    test_control_arm(args)
-    test_control_claw(args)
-    test_set_arm_pose(args)
+    check_control_servo(args)
+    check_control_arm(args)
+    check_control_claw(args)
+    check_set_arm_pose(args)
 
     # ── Peripherals ──
     print("\n--- Peripherals ---")
-    test_beep(args)
-    test_set_lamps(args)
-    test_get_battery(args)
+    check_beep(args)
+    check_set_lamps(args)
+    check_get_battery(args)
 
     # ── SLAM & Maps ──
     print("\n--- SLAM & Maps ---")
@@ -920,8 +928,8 @@ def main():
     print("\n--- End-to-End (instructions haut niveau) ---")
     test_high_level_instruction_battery()
     test_high_level_instruction_telemetry()
-    test_high_level_instruction_pose_then_stop(args)
-    test_high_level_instruction_lamp_signal(args)
+    check_high_level_instruction_pose_then_stop(args)
+    check_high_level_instruction_lamp_signal(args)
 
     # Reset to standby
     try:

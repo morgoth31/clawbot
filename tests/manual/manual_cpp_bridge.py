@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
-"""Test the C++ bridge on port 8002. Sets mode to manipulation first so all tools are testable."""
+# SCRIPT MANUEL — pas un test pytest (REQ-TEST-004).
+#
+# Attend un service : le pont C++ doit écouter sur http://localhost:8002.
+# Sans service, l'import échoue en httpx.ConnectError et toute la collecte
+# pytest tomberait (constat S42).
+#
+# Lancement :
+#     python3 tests/manual/manual_cpp_bridge.py
+#
+# Hors collecte : pytest.ini contient norecursedirs = tests/manual, et le
+# fichier n'a plus le préfixe test_.
+
+"""Vérification manuelle du pont C++ (port 8002), mode manipulation."""
 import httpx, json, sys
 
 BRIDGE_URL = "http://localhost:8002"

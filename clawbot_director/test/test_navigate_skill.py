@@ -79,9 +79,12 @@ def test_les_autres_skills_restent_indisponibles():
 
 
 # ── domaine 99 : le directeur exécute vraiment les trois waypoints ─────────
+# Domaine 99 exigé. Sous pytest en domaine 98 (suite unitaire), le module
+# est ignoré au lieu de faire échouer la collecte de tout le dépôt.
+pytestmark = pytest.mark.integration
 if os.environ.get("ROS_DOMAIN_ID") not in (None, "", "99"):
-    raise RuntimeError(
-        f"tests du directeur : ROS_DOMAIN_ID={os.environ['ROS_DOMAIN_ID']} interdit, 99 exigé")
+    pytest.skip(
+        f"tests du directeur : ROS_DOMAIN_ID={os.environ['ROS_DOMAIN_ID']} interdit, 99 exigé", allow_module_level=True)
 os.environ["ROS_DOMAIN_ID"] = "99"
 
 rclpy = pytest.importorskip("rclpy")
