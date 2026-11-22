@@ -39,10 +39,11 @@ def _liste_detections(message) -> list:
         {"class": (d.results[0].hypothesis.class_id if d.results else ""),
          "class_id": 0,
          "confidence": round(d.results[0].hypothesis.score, 3) if d.results else 0.0,
-         "bbox": {"x1": int(d.bbox.center.x - d.bbox.size_x / 2),
-                  "y1": int(d.bbox.center.y - d.bbox.size_y / 2),
-                  "x2": int(d.bbox.center.x + d.bbox.size_x / 2),
-                  "y2": int(d.bbox.center.y + d.bbox.size_y / 2)}}
+         # vision_msgs/Pose2D : `position` (Point2D) + `theta`, pas `x`/`y` directs
+         "bbox": {"x1": int(d.bbox.center.position.x - d.bbox.size_x / 2),
+                  "y1": int(d.bbox.center.position.y - d.bbox.size_y / 2),
+                  "x2": int(d.bbox.center.position.x + d.bbox.size_x / 2),
+                  "y2": int(d.bbox.center.position.y + d.bbox.size_y / 2)}}
         for d in message.detections]
 
 
