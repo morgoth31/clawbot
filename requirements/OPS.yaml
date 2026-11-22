@@ -226,3 +226,24 @@ requirements:
     status: implemented
     approved_by: "opérateur 2026-11-22"
     prompt: C01
+
+  - id: REQ-OPS-053
+    title: Tout source d'un script d'unite est encadre par set +u / set -u
+    statement: >
+      Tout script lance par une unite doit encadrer chaque `source` par `set +u` et
+      `set -u` lorsqu'il active `set -u`, et l'unite doit atteindre l'etat actif.
+    rationale: >
+      Les setup.bash de ROS lisent des variables non definies : sous `set -u`,
+      clawbot-joy-teleop.service est mort en status=1/FAILURE et a boucle en redemarrage
+      le 2026-11-23 a 00:31, sans jamais publier /joy.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      Pour chaque script de joy_teleop/, scripts/ et clawbot_*/*.sh : aucun `source` ne
+      suit un `set -u` sans `set +u` interpose. Test : tests/test_scripts_source.py.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05
