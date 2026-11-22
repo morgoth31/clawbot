@@ -1,0 +1,60 @@
+2026-11-22T12:39:18+01:00
+# mesure    : unite du pilote
+# horodatage: 2026-11-22T12:39:18+01:00
+# commande  : bash -c systemctl cat ros2-driver-node
+# --- sortie ---
+# /etc/systemd/system/ros2-driver-node.service
+[Unit]
+Description=Clawbot ROS2 Driver Node (Mcnamu_driver_X3 — cmd_vel → serial)
+After=network.target ros2-hardware-service.service
+Requires=ros2-hardware-service.service
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+WorkingDirectory=/home/jetson/yahboomcar_ros2_ws/yahboomcar_ws
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
+  source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash && \
+  ros2 run yahboomcar_bringup Mcnamu_driver_X3"
+Restart=on-failure
+RestartSec=5
+Environment=ROS_DOMAIN_ID=28
+
+[Install]
+WantedBy=multi-user.target
+[code=0]
+
+# mesure    : chemin du paquet deploye
+# horodatage: 2026-11-22T12:39:18+01:00
+# commande  : bash -c systemctl show ros2-driver-node -p Environment -p ExecStart
+# --- sortie ---
+ExecStart={ path=/bin/bash ; argv[]=/bin/bash -c source /opt/ros/humble/setup.bash &&    source /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/install/setup.bash &&    ros2 run yahboomcar_bringup Mcnamu_driver_X3 ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Environment=ROS_DOMAIN_ID=28
+[code=0]
+
+# mesure    : fichier source de Rosmaster_Lib
+# horodatage: 2026-11-22T12:39:18+01:00
+# commande  : bash -c python3 -c "import Rosmaster_Lib, inspect; print(inspect.getsourcefile(Rosmaster_Lib))" 2>&1
+# --- sortie ---
+/usr/local/lib/python3.10/dist-packages/Rosmaster_Lib-3.3.9-py3.10.egg/Rosmaster_Lib/__init__.py
+[code=0]
+
+# mesure    : callbacks et timers du pilote (copie vendor deployee)
+# horodatage: 2026-11-22T12:39:18+01:00
+# commande  : bash -c grep -n "cmd_vel\|create_subscription\|create_timer\|Timer\|stop\|Stop\|velocity" /home/jetson/yahboomcar_ros2_ws/yahboomcar_ws/src/yahboomcar_bringup/yahboomcar_bringup/Mcnamu_driver_X3.py | head -60
+# --- sortie ---
+22:	from .cmd_scaling import RAMP_STEP, feedback, kick_boost, ramp_cmd, scale_cmd_vel
+24:	from cmd_scaling import RAMP_STEP, feedback, kick_boost, ramp_cmd, scale_cmd_vel
+80:		self.sub_cmd_vel = self.create_subscription(Twist,"cmd_vel_safe",self.cmd_vel_callback,1)
+81:		self.sub_RGBLight = self.create_subscription(Int32,"RGBLight",self.RGBLightcallback,100)
+82:		self.sub_BUzzer = self.create_subscription(Bool,"Buzzer",self.Buzzercallback,100)
+83:		self.sub_Servo = self.create_subscription(Int32MultiArray,"servo_ctrl",self.Servocallback,10)
+95:		self.timer = self.create_timer(0.1, self.pub_data)
+104:	def cmd_vel_callback(self,msg):
+121:		vx, vy, angular = scale_cmd_vel(*r)
+204:		imu.angular_velocity.x = gx*1.0
+205:		imu.angular_velocity.y = gy*1.0
+206:		imu.angular_velocity.z = gz*1.0
+[code=0]
+

@@ -1,0 +1,77 @@
+2026-11-22T12:38:24+01:00
+# mesure    : arbre USB
+# horodatage: 2026-11-22T12:38:24+01:00
+# commande  : bash -c lsusb -t; echo; lsusb
+# --- sortie ---
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 10000M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 10000M
+        |__ Port 2: Dev 3, If 0, Class=Hub, Driver=hub/4p, 5000M
+        |__ Port 4: Dev 4, If 0, Class=Hub, Driver=hub/4p, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 480M
+    |__ Port 2: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M
+        |__ Port 4: Dev 5, If 0, Class=Hub, Driver=hub/5p, 480M
+            |__ Port 1: Dev 8, If 0, Class=Vendor Specific Class, Driver=cp210x, 12M
+            |__ Port 4: Dev 10, If 0, Class=Hub, Driver=hub/4p, 480M
+                |__ Port 1: Dev 13, If 1, Class=Audio, Driver=snd-usb-audio, 480M
+                |__ Port 1: Dev 13, If 2, Class=Audio, Driver=snd-usb-audio, 480M
+                |__ Port 1: Dev 13, If 0, Class=Vendor Specific Class, Driver=usbfs, 480M
+                |__ Port 2: Dev 14, If 1, Class=Video, Driver=usbfs, 480M
+                |__ Port 2: Dev 14, If 0, Class=Video, Driver=usbfs, 480M
+            |__ Port 5: Dev 12, If 0, Class=, Driver=, 480M
+        |__ Port 2: Dev 4, If 0, Class=Hub, Driver=hub/5p, 480M
+            |__ Port 4: Dev 9, If 0, Class=Vendor Specific Class, Driver=, 12M
+            |__ Port 2: Dev 7, If 0, Class=Vendor Specific Class, Driver=ch34x, 12M
+            |__ Port 5: Dev 11, If 0, Class=, Driver=, 480M
+            |__ Port 1: Dev 6, If 3, Class=Audio, Driver=snd-usb-audio, 480M
+            |__ Port 1: Dev 6, If 1, Class=Video, Driver=uvcvideo, 480M
+            |__ Port 1: Dev 6, If 2, Class=Audio, Driver=snd-usb-audio, 480M
+            |__ Port 1: Dev 6, If 0, Class=Video, Driver=uvcvideo, 480M
+    |__ Port 3: Dev 3, If 0, Class=Wireless, Driver=btusb, 12M
+    |__ Port 3: Dev 3, If 1, Class=Wireless, Driver=btusb, 12M
+
+Bus 002 Device 004: ID 2109:0817 VIA Labs, Inc. USB3.0 Hub             
+Bus 002 Device 003: ID 2109:0817 VIA Labs, Inc. USB3.0 Hub             
+Bus 002 Device 002: ID 2109:0822 VIA Labs, Inc. USB3.1 Hub             
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 003: ID 0bda:c822 Realtek Semiconductor Corp. Bluetooth Radio 
+Bus 001 Device 012: ID 2109:8817 VIA Labs, Inc. USB Billboard Device   
+Bus 001 Device 014: ID 2bc5:050f Orbbec 3D Technology International, Inc USB 2.0 Camera
+Bus 001 Device 013: ID 2bc5:060f Orbbec 3D Technology International, Inc ORBBEC Depth Sensor
+Bus 001 Device 010: ID 05e3:0608 Genesys Logic, Inc. Hub
+Bus 001 Device 008: ID 10c4:ea60 Silicon Labs CP210x UART Bridge
+Bus 001 Device 005: ID 2109:2817 VIA Labs, Inc. USB2.0 Hub             
+Bus 001 Device 011: ID 2109:8817 VIA Labs, Inc. USB Billboard Device   
+Bus 001 Device 009: ID 1a86:7522 QinHeng Electronics USB Serial
+Bus 001 Device 007: ID 1a86:7523 QinHeng Electronics CH340 serial converter
+Bus 001 Device 006: ID 0c45:6340 Microdia Camera
+Bus 001 Device 004: ID 2109:2817 VIA Labs, Inc. USB2.0 Hub             
+Bus 001 Device 002: ID 2109:2822 VIA Labs, Inc. USB2.0 Hub             
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+[code=0]
+
+# mesure    : identite des cameras video
+# horodatage: 2026-11-22T12:38:24+01:00
+# commande  : bash -c for d in /dev/video*; do echo "== $d"; udevadm info -q property -n "$d" 2>&1 | grep -E "ID_(VENDOR|MODEL|PATH|SERIAL)"; done
+# --- sortie ---
+== /dev/video0
+ID_VENDOR=Sonix_Technology_Co.__Ltd.
+ID_VENDOR_ENC=Sonix\x20Technology\x20Co.\x2c\x20Ltd.
+ID_VENDOR_ID=0c45
+ID_MODEL=USB_2.0_Camera
+ID_MODEL_ENC=USB\x202.0\x20Camera
+ID_MODEL_ID=6340
+ID_SERIAL=Sonix_Technology_Co.__Ltd._USB_2.0_Camera
+ID_PATH=platform-3610000.usb-usb-0:2.2.1:1.0
+ID_PATH_TAG=platform-3610000_usb-usb-0_2_2_1_1_0
+== /dev/video1
+ID_VENDOR=Sonix_Technology_Co.__Ltd.
+ID_VENDOR_ENC=Sonix\x20Technology\x20Co.\x2c\x20Ltd.
+ID_VENDOR_ID=0c45
+ID_MODEL=USB_2.0_Camera
+ID_MODEL_ENC=USB\x202.0\x20Camera
+ID_MODEL_ID=6340
+ID_SERIAL=Sonix_Technology_Co.__Ltd._USB_2.0_Camera
+ID_PATH=platform-3610000.usb-usb-0:2.2.1:1.0
+ID_PATH_TAG=platform-3610000_usb-usb-0_2_2_1_1_0
+[code=0]
+

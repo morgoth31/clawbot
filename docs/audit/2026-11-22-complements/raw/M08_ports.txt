@@ -1,0 +1,44 @@
+2026-11-22T12:38:24+01:00
+# mesure    : ports TCP en ecoute
+# horodatage: 2026-11-22T12:38:24+01:00
+# commande  : bash -c ss -ltnp
+# --- sortie ---
+State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                    
+LISTEN 0      4096       127.0.0.1:11434      0.0.0.0:*                                              
+LISTEN 0      2048       127.0.0.1:60589      0.0.0.0:*    users:(("hermes",pid=1722636,fd=21))      
+LISTEN 0      5          127.0.0.1:11539      0.0.0.0:*    users:(("python3",pid=3792886,fd=6))      
+LISTEN 0      128          0.0.0.0:8644       0.0.0.0:*    users:(("hermes",pid=1722636,fd=36))      
+LISTEN 0      128          0.0.0.0:22         0.0.0.0:*                                              
+LISTEN 0      4096         0.0.0.0:111        0.0.0.0:*                                              
+LISTEN 0      128          0.0.0.0:9090       0.0.0.0:*    users:(("python3",pid=3526,fd=26))        
+LISTEN 0      4096         0.0.0.0:631        0.0.0.0:*                                              
+LISTEN 0      128          0.0.0.0:8888       0.0.0.0:*                                              
+LISTEN 0      4096         0.0.0.0:8889       0.0.0.0:*                                              
+LISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*                                              
+LISTEN 0      16           0.0.0.0:8000       0.0.0.0:*    users:(("api_server",pid=3805272,fd=29))  
+LISTEN 0      2048         0.0.0.0:8001       0.0.0.0:*    users:(("python3",pid=1331,fd=36))        
+LISTEN 0      2048         0.0.0.0:8003       0.0.0.0:*    users:(("pt_main_thread",pid=1394,fd=43)) 
+LISTEN 0      5            0.0.0.0:8080       0.0.0.0:*    users:(("mkdocs",pid=3883819,fd=6))       
+LISTEN 0      2048         0.0.0.0:8081       0.0.0.0:*                                              
+LISTEN 0      10                 *:3389             *:*    users:(("gnome-remote-de",pid=2381,fd=22))
+LISTEN 0      128             [::]:8644          [::]:*    users:(("hermes",pid=1722636,fd=35))      
+LISTEN 0      128             [::]:22            [::]:*                                              
+LISTEN 0      4096            [::]:111           [::]:*                                              
+LISTEN 0      128             [::]:9090          [::]:*    users:(("python3",pid=3526,fd=27))        
+LISTEN 0      4096            [::]:631           [::]:*                                              
+LISTEN 0      4096            [::]:8889          [::]:*                                              
+LISTEN 0      10                 *:5900             *:*    users:(("gnome-remote-de",pid=2381,fd=23))
+[code=0]
+
+# mesure    : ports UDP 74xx
+# horodatage: 2026-11-22T12:38:24+01:00
+# commande  : bash -c ss -uanp | grep -E ":74[0-9][0-9]"
+# --- sortie ---
+UNCONN 0      0                         0.0.0.0:7400       0.0.0.0:*                                                                      
+UNCONN 0      0                         0.0.0.0:7400       0.0.0.0:*                                                                      
+UNCONN 0      0                         0.0.0.0:7412       0.0.0.0:*                                                                      
+UNCONN 0      0                         0.0.0.0:7413       0.0.0.0:*                                                                      
+UNCONN 0      0                         0.0.0.0:7414       0.0.0.0:*                                                                      
+UNCONN 0      0                         0.0.0.0:7415       0.0.0.0:*                                                                      
+[code=0]
+

@@ -1,0 +1,113 @@
+2026-11-22T12:39:01+01:00
+# mesure    : instantane top sur les processus S12 (PIDS=1309,1331,1332,1333,1345,1364,1394,2816,2817,3115,3470,3526,3614,3678,4039,4078,3805273,3805276,3805281)
+# horodatage: 2026-11-22T12:39:01+01:00
+# commande  : bash -c top -b -n 3 -d 2 -p 1309,1331,1332,1333,1345,1364,1394,2816,2817,3115,3470,3526,3614,3678,4039,4078,3805273,3805276,3805281
+# --- sortie ---
+top - 12:39:02 up 7 days, 36 min,  4 users,  load average: 2.21, 2.39, 2.39
+Tasks:  19 total,   0 running,  19 sleeping,   0 stopped,   0 zombie
+%Cpu(s): 16.1 us,  5.1 sy,  0.0 ni, 75.4 id,  0.8 wa,  1.7 hi,  0.8 si,  0.0 st
+MiB Mem :  15655.6 total,   2526.4 free,   5959.8 used,   7169.3 buff/cache
+MiB Swap:  16019.7 total,  16009.5 free,     10.2 used.   9099.4 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+   3678 jetson    20   0 1696688 137184  42664 S  33.3   0.9   5776:34 astra_c+
+   1394 jetson    20   0   20.9g   1.4g 200556 S  13.3   9.3   1054:34 pt_main+
+   3115 jetson    20   0 1119384  58016  21972 S  13.3   0.4   1387:24 Mcnamu_+
+   3526 jetson    20   0 1056200  66208  22516 S  13.3   0.4   1001:26 python3
+3805273 jetson    20   0 1042164  62572  27020 S  13.3   0.4  20:17.50 python3
+   1331 jetson    20   0 1770448  97504  28184 S   6.7   0.6 596:39.12 python3
+   3470 jetson    20   0 1043924  53556  20516 S   6.7   0.3 450:48.93 joint_s+
+   4078 jetson    20   0   37992  18840   9860 S   6.7   0.1 914:32.15 python3
+3805276 jetson    20   0 1044404  61880  26700 S   6.7   0.4   9:24.85 python3
+   1309 jetson    20   0   45336  24392   9308 S   0.0   0.2   0:00.37 ros2
+   1332 jetson    20   0   45360  23324   9292 S   0.0   0.1   0:00.45 ros2
+   1333 jetson    20   0  524336  29852  17844 S   0.0   0.2 312:07.25 ekf_node
+   1345 jetson    20   0   45340  23256   9308 S   0.0   0.1   0:00.41 ros2
+   1364 jetson    20   0  209924  39440  12620 S   0.0   0.2   0:01.18 ros2
+   2816 jetson    20   0  997664  66060  37964 S   0.0   0.4 213:53.15 v4l2_ca+
+   2817 jetson    20   0 1127076  39904  21588 S   0.0   0.2 226:06.90 async_s+
+   3614 jetson    20   0  655728  23400  14616 S   0.0   0.1 590:16.70 ydlidar+
+   4039 jetson    20   0    2328    828    748 S   0.0   0.0   0:00.00 sh
+3805281 jetson    20   0 1121896  67628  27244 S   0.0   0.4   3:24.33 python3
+
+top - 12:39:04 up 7 days, 36 min,  4 users,  load average: 2.21, 2.39, 2.39
+Tasks:  19 total,   0 running,  19 sleeping,   0 stopped,   0 zombie
+%Cpu(s): 18.5 us,  3.4 sy,  0.0 ni, 76.1 id,  0.0 wa,  1.1 hi,  0.9 si,  0.0 st
+MiB Mem :  15655.6 total,   2526.4 free,   5959.8 used,   7169.3 buff/cache
+MiB Swap:  16019.7 total,  16009.5 free,     10.2 used.   9099.4 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+   3678 jetson    20   0 1696688 137184  42664 S  34.3   0.9   5776:35 astra_c+
+   1394 jetson    20   0   20.9g   1.4g 200556 S  19.4   9.3   1054:34 pt_main+
+3805273 jetson    20   0 1042164  62572  27020 S  14.9   0.4  20:17.80 python3
+   3115 jetson    20   0 1119384  58016  21972 S  13.9   0.4   1387:24 Mcnamu_+
+   3526 jetson    20   0 1056200  66208  22516 S   9.0   0.4   1001:26 python3
+   4078 jetson    20   0   37992  18840   9860 S   9.0   0.1 914:32.33 python3
+3805276 jetson    20   0 1044404  61880  26700 S   7.0   0.4   9:24.99 python3
+   3614 jetson    20   0  655728  23400  14616 S   6.0   0.1 590:16.82 ydlidar+
+   1331 jetson    20   0 1770396  97504  28184 S   5.5   0.6 596:39.23 python3
+   2816 jetson    20   0  997664  66060  37964 S   5.5   0.4 213:53.26 v4l2_ca+
+   3470 jetson    20   0 1043924  53556  20516 S   4.5   0.3 450:49.02 joint_s+
+   1333 jetson    20   0  524336  29852  17844 S   3.0   0.2 312:07.31 ekf_node
+   2817 jetson    20   0 1127076  39904  21588 S   2.5   0.2 226:06.95 async_s+
+3805281 jetson    20   0 1121896  67628  27244 S   1.5   0.4   3:24.36 python3
+   1309 jetson    20   0   45336  24392   9308 S   0.0   0.2   0:00.37 ros2
+   1332 jetson    20   0   45360  23324   9292 S   0.0   0.1   0:00.45 ros2
+   1345 jetson    20   0   45340  23256   9308 S   0.0   0.1   0:00.41 ros2
+   1364 jetson    20   0  209924  39440  12620 S   0.0   0.2   0:01.18 ros2
+   4039 jetson    20   0    2328    828    748 S   0.0   0.0   0:00.00 sh
+
+top - 12:39:06 up 7 days, 36 min,  4 users,  load average: 2.11, 2.37, 2.38
+Tasks:  19 total,   1 running,  18 sleeping,   0 stopped,   0 zombie
+%Cpu(s): 17.8 us,  3.8 sy,  0.0 ni, 76.2 id,  0.0 wa,  1.1 hi,  1.0 si,  0.0 st
+MiB Mem :  15655.6 total,   2524.5 free,   5961.7 used,   7169.4 buff/cache
+MiB Swap:  16019.7 total,  16009.5 free,     10.2 used.   9097.6 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+   3678 jetson    20   0 1696688 137184  42664 S  35.5   0.9   5776:35 astra_c+
+   1394 jetson    20   0   20.9g   1.4g 200556 S  19.5   9.3   1054:34 pt_main+
+3805273 jetson    20   0 1041624  62508  26956 S  14.5   0.4  20:18.09 python3
+   3115 jetson    20   0 1118844  58016  21972 S  13.0   0.4   1387:25 Mcnamu_+
+   3526 jetson    20   0 1056148  66208  22516 R  10.0   0.4   1001:26 python3
+   4078 jetson    20   0   37992  18840   9860 S   9.5   0.1 914:32.52 python3
+3805276 jetson    20   0 1044404  61880  26700 S   7.0   0.4   9:25.13 python3
+   1331 jetson    20   0 1770396  97504  28184 S   6.0   0.6 596:39.35 python3
+   3614 jetson    20   0  655188  23400  14616 S   5.5   0.1 590:16.93 ydlidar+
+   2816 jetson    20   0  997664  66060  37964 S   4.5   0.4 213:53.35 v4l2_ca+
+   3470 jetson    20   0 1043924  53556  20516 S   4.5   0.3 450:49.11 joint_s+
+   1333 jetson    20   0  524336  29852  17844 S   3.0   0.2 312:07.37 ekf_node
+   2817 jetson    20   0 1127076  39904  21588 S   2.0   0.2 226:06.99 async_s+
+3805281 jetson    20   0 1121356  67564  27180 S   2.0   0.4   3:24.40 python3
+   1309 jetson    20   0   45336  24392   9308 S   0.0   0.2   0:00.37 ros2
+   1332 jetson    20   0   45360  23324   9292 S   0.0   0.1   0:00.45 ros2
+   1345 jetson    20   0   45340  23256   9308 S   0.0   0.1   0:00.41 ros2
+   1364 jetson    20   0  209924  39440  12620 S   0.0   0.2   0:01.18 ros2
+   4039 jetson    20   0    2328    828    748 S   0.0   0.0   0:00.00 sh
+[code=0]
+
+# mesure    : charge par coeur (delta /proc/stat sur 3 s)
+# horodatage: 2026-11-22T12:42:30+01:00
+# commande  : bash -c python3 - <<PY
+import time
+def lire():
+    d={}
+    for l in open("/proc/stat"):
+        if l.startswith("cpu") and l[3].isdigit():
+            p=l.split(); d[p[0]]=list(map(int,p[1:]))
+    return d
+a=lire(); time.sleep(3); b=lire()
+for c in sorted(a, key=lambda x:int(x[3:])):
+    dt=sum(b[c])-sum(a[c]); di=(b[c][3]+b[c][4])-(a[c][3]+a[c][4])
+    print(f"{c:6} occupe {100*(dt-di)/dt:5.1f} %")
+PY
+# --- sortie ---
+cpu0   occupe  27.4 %
+cpu1   occupe  24.1 %
+cpu2   occupe  23.7 %
+cpu3   occupe  23.1 %
+cpu4   occupe  22.1 %
+cpu5   occupe  24.1 %
+cpu6   occupe  23.4 %
+cpu7   occupe  24.0 %
+[code=0]
+

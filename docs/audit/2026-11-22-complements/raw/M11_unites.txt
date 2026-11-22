@@ -1,0 +1,285 @@
+2026-11-22T12:41:32+01:00
+# mesure    : statut et activation de clawbot-arm-controller
+# horodatage: 2026-11-22T12:41:32+01:00
+# commande  : bash -c systemctl status clawbot-arm-controller --no-pager; echo; systemctl is-enabled clawbot-arm-controller; echo; systemctl cat clawbot-arm-controller
+# --- sortie ---
+○ clawbot-arm-controller.service - Clawbot arm trajectory controller (FollowJointTrajectory -> /servo_ctrl)
+     Loaded: loaded (/etc/systemd/system/clawbot-arm-controller.service; linked; vendor preset: enabled)
+     Active: inactive (dead)
+       Docs: file:///home/jetson/clawbot/clawbot_arm_controller
+
+linked
+
+# /etc/systemd/system/clawbot-arm-controller.service
+[Unit]
+Description=Clawbot arm trajectory controller (FollowJointTrajectory -> /servo_ctrl)
+Documentation=file:///home/jetson/clawbot/clawbot_arm_controller
+After=network.target ros2-driver-node.service
+# Ne demarre rien tout seul : les trajectoires viennent de MoveIt (move_group).
+# Le pilote du bras (ros2-driver-node) doit tourner pour que /servo_ctrl ait un abonne.
+Requires=ros2-driver-node.service
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+WorkingDirectory=/home/jetson/clawbot
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
+  source /home/jetson/clawbot/install/setup.bash && \
+  ros2 launch clawbot_arm_controller arm_controller.launch.py \
+    params_file:=/home/jetson/clawbot/clawbot_arm_controller/config/arm_controller.yaml"
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+Environment=ROS_DOMAIN_ID=28
+
+[Install]
+WantedBy=multi-user.target
+[code=0]
+
+# mesure    : journal de clawbot-arm-controller (80 dernieres lignes)
+# horodatage: 2026-11-22T12:41:33+01:00
+# commande  : bash -c journalctl -u clawbot-arm-controller -n 80 --no-pager
+# --- sortie ---
+-- No entries --
+[code=0]
+
+# mesure    : statut et activation de clawbot-move-group
+# horodatage: 2026-11-22T12:41:33+01:00
+# commande  : bash -c systemctl status clawbot-move-group --no-pager; echo; systemctl is-enabled clawbot-move-group; echo; systemctl cat clawbot-move-group
+# --- sortie ---
+○ clawbot-move-group.service - Clawbot MoveIt 2 move_group (planification du bras, domaine 28)
+     Loaded: loaded (/etc/systemd/system/clawbot-move-group.service; linked; vendor preset: enabled)
+     Active: inactive (dead)
+       Docs: file:///home/jetson/clawbot/clawbot_moveit_config
+
+linked
+
+# /etc/systemd/system/clawbot-move-group.service
+[Unit]
+Description=Clawbot MoveIt 2 move_group (planification du bras, domaine 28)
+Documentation=file:///home/jetson/clawbot/clawbot_moveit_config
+# Unite optionnelle : elle ne demarre pas au boot. La lancer pour manipuler :
+#   sudo systemctl start clawbot-move-group
+# Planifier est sans effet sur le materiel ; seule l'execution d'une trajectoire bouge
+# les servos, via clawbot-arm-controller.service.
+After=network.target clawbot-description.service ros2-driver-node.service
+Requires=clawbot-arm-controller.service
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+WorkingDirectory=/home/jetson/clawbot
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
+  source /home/jetson/clawbot/install/setup.bash && \
+  ros2 launch clawbot_moveit_config move_group.launch.py"
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+Environment=ROS_DOMAIN_ID=28
+
+[Install]
+WantedBy=multi-user.target
+[code=0]
+
+# mesure    : journal de clawbot-move-group (80 dernieres lignes)
+# horodatage: 2026-11-22T12:41:33+01:00
+# commande  : bash -c journalctl -u clawbot-move-group -n 80 --no-pager
+# --- sortie ---
+-- No entries --
+[code=0]
+
+# mesure    : statut et activation de clawbot-nav2
+# horodatage: 2026-11-22T12:41:33+01:00
+# commande  : bash -c systemctl status clawbot-nav2 --no-pager; echo; systemctl is-enabled clawbot-nav2; echo; systemctl cat clawbot-nav2
+# --- sortie ---
+○ clawbot-nav2.service - Nav2 - navigation sur la carte du catalogue de waypoints
+     Loaded: loaded (/etc/systemd/system/clawbot-nav2.service; enabled; vendor preset: enabled)
+     Active: inactive (dead)
+
+enabled
+
+# /etc/systemd/system/clawbot-nav2.service
+[Unit]
+Description=Nav2 - navigation sur la carte du catalogue de waypoints
+After=network.target ros2-driver-node.service clawbot-ekf.service clawbot-safety-arbitrator.service
+Requires=ros2-driver-node.service clawbot-ekf.service
+Wants=clawbot-safety-arbitrator.service
+# AMCL et SLAM Toolbox en cartographie publient tous deux map -> odom.
+Conflicts=clawbot-slam.service
+
+[Service]
+Type=simple
+User=jetson
+Environment=ROS_DOMAIN_ID=28
+Environment=HOME=/home/jetson
+# La carte n'est pas passee en argument : navigation.launch.py la lit dans
+# config/waypoints.yaml, pour que le catalogue et la carte chargee ne puissent pas diverger.
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec ros2 launch /home/jetson/clawbot/launch/navigation.launch.py"
+Restart=on-failure
+RestartSec=10
+# Un arret doit laisser le robot sans consigne : Nav2 coupe ses noeuds, l'arbitre remet
+# /cmd_vel_safe a zero par son chien de garde de 0,5 s.
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
+[code=0]
+
+# mesure    : journal de clawbot-nav2 (80 dernieres lignes)
+# horodatage: 2026-11-22T12:41:33+01:00
+# commande  : bash -c journalctl -u clawbot-nav2 -n 80 --no-pager
+# --- sortie ---
+-- No entries --
+[code=0]
+
+# mesure    : etat d'activation detaille (jamais demarrees ?)
+# horodatage: 2026-11-22T12:42:00+01:00
+# commande  : bash -c journalctl --list-boots --no-pager | tail -3; for u in clawbot-arm-controller clawbot-move-group clawbot-nav2; do echo "== $u"; systemctl show $u -p ActiveState -p SubState -p UnitFileState -p ActiveEnterTimestamp -p InactiveEnterTimestamp -p ExecMainStatus -p Result -p ConditionResult; done; echo "== journal sur 30 jours"; for u in clawbot-arm-controller clawbot-move-group clawbot-nav2; do echo -n "$u: "; journalctl -u $u --since "-30d" --no-pager | wc -l; done
+# --- sortie ---
+ 0 85dd0b69fe774f2bacdf32c78edd3215 Thu 2026-11-19 23:40:36 CET—Sun 2026-11-22 12:41:59 CET
+== clawbot-arm-controller
+Result=success
+ExecMainStatus=0
+ActiveState=inactive
+SubState=dead
+UnitFileState=linked
+ActiveEnterTimestamp=n/a
+InactiveEnterTimestamp=n/a
+ConditionResult=no
+== clawbot-move-group
+Result=success
+ExecMainStatus=0
+ActiveState=inactive
+SubState=dead
+UnitFileState=linked
+ActiveEnterTimestamp=n/a
+InactiveEnterTimestamp=n/a
+ConditionResult=no
+== clawbot-nav2
+Result=success
+ExecMainStatus=0
+ActiveState=inactive
+SubState=dead
+UnitFileState=enabled
+ActiveEnterTimestamp=n/a
+InactiveEnterTimestamp=n/a
+ConditionResult=no
+== journal sur 30 jours
+clawbot-arm-controller: 1
+clawbot-move-group: 1
+clawbot-nav2: 1
+[code=0]
+
+# mesure    : conditions et dependances des trois unites
+# horodatage: 2026-11-22T12:42:11+01:00
+# commande  : bash -c for u in clawbot-arm-controller clawbot-move-group clawbot-nav2; do echo "===== $u"; systemctl cat $u; echo "--- show"; systemctl show $u -p ConditionTimestamp -p Requires -p Wants -p After -p ConditionResult -p LoadState -p FragmentPath; done
+# --- sortie ---
+===== clawbot-arm-controller
+# /etc/systemd/system/clawbot-arm-controller.service
+[Unit]
+Description=Clawbot arm trajectory controller (FollowJointTrajectory -> /servo_ctrl)
+Documentation=file:///home/jetson/clawbot/clawbot_arm_controller
+After=network.target ros2-driver-node.service
+# Ne demarre rien tout seul : les trajectoires viennent de MoveIt (move_group).
+# Le pilote du bras (ros2-driver-node) doit tourner pour que /servo_ctrl ait un abonne.
+Requires=ros2-driver-node.service
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+WorkingDirectory=/home/jetson/clawbot
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
+  source /home/jetson/clawbot/install/setup.bash && \
+  ros2 launch clawbot_arm_controller arm_controller.launch.py \
+    params_file:=/home/jetson/clawbot/clawbot_arm_controller/config/arm_controller.yaml"
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+Environment=ROS_DOMAIN_ID=28
+
+[Install]
+WantedBy=multi-user.target
+--- show
+Requires=system.slice sysinit.target -.mount ros2-driver-node.service
+Wants=
+After=network.target ros2-driver-node.service systemd-journald.socket basic.target system.slice -.mount sysinit.target
+LoadState=loaded
+FragmentPath=/etc/systemd/system/clawbot-arm-controller.service
+ConditionResult=no
+ConditionTimestamp=n/a
+===== clawbot-move-group
+# /etc/systemd/system/clawbot-move-group.service
+[Unit]
+Description=Clawbot MoveIt 2 move_group (planification du bras, domaine 28)
+Documentation=file:///home/jetson/clawbot/clawbot_moveit_config
+# Unite optionnelle : elle ne demarre pas au boot. La lancer pour manipuler :
+#   sudo systemctl start clawbot-move-group
+# Planifier est sans effet sur le materiel ; seule l'execution d'une trajectoire bouge
+# les servos, via clawbot-arm-controller.service.
+After=network.target clawbot-description.service ros2-driver-node.service
+Requires=clawbot-arm-controller.service
+
+[Service]
+Type=simple
+User=jetson
+Group=jetson
+WorkingDirectory=/home/jetson/clawbot
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && \
+  source /home/jetson/clawbot/install/setup.bash && \
+  ros2 launch clawbot_moveit_config move_group.launch.py"
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+Environment=ROS_DOMAIN_ID=28
+
+[Install]
+WantedBy=multi-user.target
+--- show
+Requires=system.slice sysinit.target clawbot-arm-controller.service -.mount
+Wants=
+After=basic.target clawbot-description.service network.target system.slice sysinit.target ros2-driver-node.service systemd-journald.socket -.mount
+LoadState=loaded
+FragmentPath=/etc/systemd/system/clawbot-move-group.service
+ConditionResult=no
+ConditionTimestamp=n/a
+===== clawbot-nav2
+# /etc/systemd/system/clawbot-nav2.service
+[Unit]
+Description=Nav2 - navigation sur la carte du catalogue de waypoints
+After=network.target ros2-driver-node.service clawbot-ekf.service clawbot-safety-arbitrator.service
+Requires=ros2-driver-node.service clawbot-ekf.service
+Wants=clawbot-safety-arbitrator.service
+# AMCL et SLAM Toolbox en cartographie publient tous deux map -> odom.
+Conflicts=clawbot-slam.service
+
+[Service]
+Type=simple
+User=jetson
+Environment=ROS_DOMAIN_ID=28
+Environment=HOME=/home/jetson
+# La carte n'est pas passee en argument : navigation.launch.py la lit dans
+# config/waypoints.yaml, pour que le catalogue et la carte chargee ne puissent pas diverger.
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec ros2 launch /home/jetson/clawbot/launch/navigation.launch.py"
+Restart=on-failure
+RestartSec=10
+# Un arret doit laisser le robot sans consigne : Nav2 coupe ses noeuds, l'arbitre remet
+# /cmd_vel_safe a zero par son chien de garde de 0,5 s.
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
+--- show
+Requires=sysinit.target ros2-driver-node.service clawbot-ekf.service system.slice
+Wants=clawbot-safety-arbitrator.service
+After=ros2-driver-node.service system.slice sysinit.target network.target basic.target clawbot-safety-arbitrator.service clawbot-ekf.service systemd-journald.socket
+LoadState=loaded
+FragmentPath=/etc/systemd/system/clawbot-nav2.service
+ConditionResult=no
+ConditionTimestamp=n/a
+[code=0]
+

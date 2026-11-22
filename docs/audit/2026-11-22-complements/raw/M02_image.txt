@@ -1,0 +1,39 @@
+2026-11-22T12:38:32+01:00
+# mesure    : compteurs reseau avant/apres 10 s
+# horodatage: 2026-11-22T12:38:32+01:00
+# commande  : bash -c for i in wlP1p1s0 lo; do echo "== $i t0"; cat /sys/class/net/$i/statistics/tx_bytes /sys/class/net/$i/statistics/rx_bytes; done; sleep 10; for i in wlP1p1s0 lo; do echo "== $i t1"; cat /sys/class/net/$i/statistics/tx_bytes /sys/class/net/$i/statistics/rx_bytes; done
+# --- sortie ---
+== wlP1p1s0 t0
+2506118340
+4421098786
+== lo t0
+14966837919792
+14966837919792
+== wlP1p1s0 t1
+2506158986
+4421119105
+== lo t1
+14967211639080
+14967211639080
+[code=0]
+
+# mesure    : format de l'image du poignet
+# horodatage: 2026-11-22T12:38:42+01:00
+# commande  : bash -c for f in width height encoding step; do echo -n "$f="; timeout 20 ros2 topic echo /wrist_camera/image_raw --once --field $f 2>&1 | head -1; done
+# --- sortie ---
+width=640
+height=480
+encoding=yuv422_yuy2
+step=1280
+[code=0]
+
+# mesure    : cadence declaree de l'image du poignet
+# horodatage: 2026-11-22T12:38:49+01:00
+# commande  : bash -c timeout 12 ros2 topic hz /wrist_camera/image_raw 2>&1 | tail -4
+# --- sortie ---
+average rate: 30.002
+	min: 0.030s max: 0.038s std dev: 0.00208s window: 274
+average rate: 29.993
+	min: 0.030s max: 0.038s std dev: 0.00209s window: 305
+[code=0]
+

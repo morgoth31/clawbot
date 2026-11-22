@@ -1,0 +1,29 @@
+# Exigences d'exploitation — mesures, topologie, décisions d'exploitation.
+# Format et règles : requirements/README.md
+
+domain: OPS
+requirements:
+  - id: REQ-OPS-001
+    title: Mesures complémentaires consignées avec commande et artefact
+    statement: >
+      Les mesures M01 à M12 doivent être consignées avec commande, horodatage et
+      artefact.
+    rationale: >
+      Quatre conclusions de l'audit du 2026-11-22 (trafic image par le Wi-Fi,
+      absence de mémoire partagée, arrêt du pilote sur silence, propriétaire du
+      port série) ne reposaient pas sur une mesure directe et changeaient la
+      suite des travaux (P03, P10, P11, P13, P16).
+    sources: [S07, S12, S13, S15, P01]
+    safety: false
+    method: inspection
+    level: unit
+    criterion: >
+      docs/audit/2026-11-22-complements/rapport.md contient, pour chaque mesure
+      M01 à M12, la commande exacte, l'horodatage ISO 8601, le résultat et la
+      conclusion ; chaque sortie brute existe dans raw/Mxx_<nom>.txt et commence
+      par une date ISO. Une mesure non réalisable porte la mention NON MESURÉ et
+      sa raison.
+    evidence: docs/audit/2026-11-22-complements/rapport.md
+    status: implemented
+    approved_by: null
+    prompt: P01
