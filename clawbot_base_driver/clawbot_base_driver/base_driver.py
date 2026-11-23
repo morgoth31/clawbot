@@ -38,6 +38,12 @@ except ImportError:  # execution directe du fichier
 
 #from dynamic_reconfigure.server import Server
 # Chemin stable du MCU, releve en P01-M05 (REQ-DRV-003).
+#: Duree d'arret reel exigee avant d'autoriser le coup de demarrage. Sans elle, chaque
+#: passage par la zone morte relancait un boost de 1,8x : avec un gain de 0,20 m/s, un bond
+#: a 0,35 m/s suivi d'une retombee, donc une secousse a chaque hesitation du stick
+#: (mesure du 2026-11-23).
+SEUIL_ARRET_S = 0.5
+
 MCU_PAR_DEFAUT = "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0"
 car_type_dic={
     'R2':5,
@@ -196,12 +202,19 @@ class yahboomcar_driver(Node):
             r = ramp_cmd(getattr(self, "_ramp", (0.0, 0.0, 0.0)),
                          (msg.linear.x, msg.linear.y, msg.angular.z), RAMP_STEP)
             self._ramp = r
-        if r[0] != 0.0 and getattr(self, "_moving", False) is False:
-            self._kick_start = _time.monotonic()
+        maintenant = _time.monotonic()
+        if r[0] == 0.0:
+            if getattr(self, "_moving", False):
+                self._moving = False
+                self._arret_depuis = maintenant
+        elif not getattr(self, "_moving", False):
+            # Coup de demarrage seulement apres un arret franc : franchir la zone morte en
+            # roulant ne doit pas relancer un boost (REQ-DRV-017).
+            depuis = maintenant - getattr(self, "_arret_depuis", maintenant - 1.0e3)
+            if depuis >= SEUIL_ARRET_S:
+                self._kick_start = maintenant
             self._moving = True
-        elif r[0] == 0.0:
-            self._moving = False
-        r = (kick_boost(r[0], _time.monotonic() - getattr(self, "_kick_start", 0.0)), r[1], r[2])
+        r = (kick_boost(r[0], maintenant - getattr(self, "_kick_start", -1.0e3)), r[1], r[2])
         vx, vy, angular = scale_cmd_vel(*r)
         self._last_cmd_t = self.now_s()
         self._derniere_consigne_nulle = (vx == 0.0 and vy == 0.0 and angular == 0.0)

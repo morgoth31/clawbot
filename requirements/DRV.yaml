@@ -255,3 +255,26 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-DRV-017
+    title: Le coup de demarrage exige un arret franc
+    statement: >
+      Le pilote ne doit appliquer le boost de demarrage (facteur 1,8 pendant 0,25 s) qu'apres
+      un arret reel d'au moins 0,5 s ; un passage par la zone morte en roulant ne doit pas le
+      relancer.
+    rationale: >
+      `_moving` retombait a False des la premiere consigne nulle, or la rampe et la zone morte
+      en produisent en permanence. Chaque passage relancait un boost de 1,8x : avec le gain
+      porte a 0,20 m/s, un bond a 0,35 m/s (butee) puis une retombee a 0,20, ressenti comme
+      une secousse a chaque hesitation. Invisible a 0,06 m/s.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_kick_demarrage.py : seuil defini, comparaison de la duree d'arret dans le
+      code, et quatre cas dont le passage par zero en roulant qui ne doit rien declencher.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05
