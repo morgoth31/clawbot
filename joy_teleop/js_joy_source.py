@@ -30,12 +30,26 @@ Sortie : code 1 si le périphérique disparaît, pour que systemd relance l'unit
 
 import os
 import sys
+import time
 
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
 
 from js_lecteur import LecteurJs, lister_manettes
+
+
+def choisir_pad(entrees: list[tuple[str, str]]) -> tuple[str, str] | None:
+    """Rend (chemin, nom) de la premiere manette non inertielle, ou None.
+
+    Une reconnexion Bluetooth recree le peripherique, et son numero peut changer : js0
+    devient js1. La manette expose deux interfaces, dont une inertielle (IMU) qu'il faut
+    ecarter. Pure, donc testable sans materiel.
+    """
+    for chemin, nom in entrees:
+        if "IMU" not in nom.upper():
+            return (chemin, nom)
+    return None
 
 
 class JsJoySource(Node):
@@ -65,6 +79,7 @@ class JsJoySource(Node):
             nom = "chemin forcé"
 
         self.chemin = chemin
+        self.nom = nom
         try:
             self.lecteur = LecteurJs(chemin)
         except OSError as e:
@@ -111,8 +126,30 @@ def main(args=None):
     try:
         while rclpy.ok():
             if not node.lecteur.lire(0.01):
-                node.get_logger().error(f"{node.chemin} ne rend plus de données")
-                return 1
+                # La manette s'endort : on ferme, on attend son retour et on reprend la
+                # publication sans redemarrer l'unite (REQ-OPS-057).
+                node.lecteur.fermer()
+                node.get_logger().warn(
+                    f"manette perdue sur {node.chemin} — attente de reconnexion")
+                repris = False
+                while rclpy.ok() and not repris:
+                    time.sleep(1.0)
+                    choix = choisir_pad(lister_manettes())
+                    if choix is None:
+                        continue
+                    chemin, nom = choix
+                    try:
+                        node.lecteur = LecteurJs(chemin)
+                    except OSError as erreur:
+                        node.get_logger().warn(f"réouverture de {chemin} impossible : {erreur}")
+                        continue
+                    node.chemin = chemin
+                    node.nom = nom
+                    node.get_logger().info(f"manette retrouvée sur {chemin} ({nom}) — reprise")
+                    repris = True
+                if not repris:
+                    return 0
+                continue
             maintenant = node.get_clock().now().nanoseconds / 1e9
             if maintenant - dernier >= periode:
                 node._publier()

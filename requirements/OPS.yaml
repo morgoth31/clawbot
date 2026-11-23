@@ -314,3 +314,26 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-OPS-057
+    title: La manette se reconnecte sans redemarrer l'unite
+    statement: >
+      Apres une perte du peripherique d'entree, `js_joy_source` doit fermer le descripteur,
+      attendre le retour de la manette en rescannant `/dev/input/js*` (sans supposer le
+      numero), et reprendre la publication de `/joy` sans redemarrage de l'unite.
+    rationale: >
+      Le noeud sortait en code 1 des que le peripherique ne rendait plus de donnees. Or
+      `ros2 launch` survit a la mort d'un de ses noeuds : l'unite restait active sans
+      publier `/joy`, et il fallait un `systemctl restart` a la main. La manette s'endort
+      regulierement — reconnexions observees a 09:47, 10:14 et 10:21.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_joy_reconnexion.py : selection de l'interface non inertielle, numero de
+      peripherique non suppose, et la perte ne termine plus le noeud.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05
