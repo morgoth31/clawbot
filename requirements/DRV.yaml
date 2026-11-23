@@ -137,3 +137,26 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-DRV-011
+    title: Une seule source par grandeur dans l'EKF, densite SLAM connue
+    statement: >
+      Aucune grandeur ne doit etre fusionnee depuis deux sources dans l'EKF ; le taux de
+      lacet vient de l'IMU seule, les translations des roues. L'unite SLAM et
+      `config/slam_toolbox_mapping.yaml` doivent porter les memes valeurs.
+    rationale: >
+      `vyaw` etait fusionne depuis `/odom_raw` ET `/imu/data_raw` : deux mesures
+      contradictoires, la moins fiable venant des roues d'une base mecanum. Par ailleurs les
+      parametres du SLAM vivaient en ligne de commande alors que le YAML dormait sans etre
+      charge, avec des valeurs differentes — carte morcelee a 0,2 m de densite de noeuds.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_fusion_ekf.py : aucune grandeur en double, vyaw depuis l'IMU seule, vx/vy
+      depuis les roues, unite et YAML concordants, densite a 0,1 m.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05
