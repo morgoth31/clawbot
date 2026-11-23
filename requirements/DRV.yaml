@@ -231,3 +231,27 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-DRV-015
+    title: Le pilote ne bloque plus l'arrivee des consignes
+    statement: >
+      Le pilote doit limiter le travail serie par tick (version lue une fois, tension et
+      magnetometre a 1 Hz) et placer l'abonnement aux consignes et le garde-fou de silence
+      dans un groupe de callbacks distinct de celui de la publication.
+    rationale: >
+      120 arrets « consigne absente depuis 0,35 s » mesures en 40 minutes, avec des temps de
+      montee passes de 0,19 s a 0,70 s et une vitesse max de 0,201 a 0,170 m/s : le pilote
+      bloquait son propre executeur avec six transactions serie par tick, dont une lecture
+      de servo de 15 a 20 ms. Le garde-fou voyait des horodatages perimes alors que les
+      consignes arrivaient.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_imu_covariances.py : plus d'appel a get_version() ni a la tension dans
+      pub_data, groupe de callbacks distinct et verrou sur la rampe.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05

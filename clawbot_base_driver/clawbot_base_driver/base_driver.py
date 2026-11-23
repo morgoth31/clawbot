@@ -12,7 +12,10 @@ from time import sleep
 from Rosmaster_Lib import Rosmaster
 
 #ros lib
+import threading
+
 import rclpy
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.node import Node
 from std_msgs.msg import String,Float32,Int32,Bool,Int32MultiArray
 from geometry_msgs.msg import Twist
@@ -114,7 +117,11 @@ class yahboomcar_driver(Node):
         print (self.angular_limit)
 
         #create subcriber
-        self.sub_cmd_vel = self.create_subscription(Twist,"cmd_vel_safe",self.cmd_vel_callback,1)
+        # Groupe separe : une lecture de capteur dans pub_data ne doit plus retarder
+        # l'arrivee d'une consigne ni le garde-fou de silence (REQ-DRV-015).
+        self.groupe_commande = MutuallyExclusiveCallbackGroup()
+        self._verrou_consigne = threading.Lock()
+        self.sub_cmd_vel = self.create_subscription(Twist,"cmd_vel_safe",self.cmd_vel_callback,1, callback_group=self.groupe_commande)
         self.sub_RGBLight = self.create_subscription(Int32,"RGBLight",self.RGBLightcallback,100)
         self.sub_BUzzer = self.create_subscription(Bool,"Buzzer",self.Buzzercallback,100)
         self.sub_Servo = self.create_subscription(Int32MultiArray,"servo_ctrl",self.Servocallback,10)
@@ -142,7 +149,8 @@ class yahboomcar_driver(Node):
         # Enable UART Servo Torque (Required for Arm)
         self.car.set_uart_servo_torque(True)
         # Garde de silence a 20 Hz (REQ-DRV-002).
-        self.timer_silence = self.create_timer(0.05, self._surveiller_silence)
+        self.timer_silence = self.create_timer(
+            0.05, self._surveiller_silence, callback_group=self.groupe_commande)
     def _periode(self):
         try:
             cadence = float(self.get_parameter('imu_rate_hz').value)
@@ -183,9 +191,10 @@ class yahboomcar_driver(Node):
         # Issue linear vel and angular vel
         # ERR-009 : bande morte et butées appliquées avant le MCU
         # rampe : un echelon brutal fait winduper l'integrateur du MCU (pic 4,9x mesuré)
-        r = ramp_cmd(getattr(self, "_ramp", (0.0, 0.0, 0.0)),
-                      (msg.linear.x, msg.linear.y, msg.angular.z), RAMP_STEP)
-        self._ramp = r
+        with self._verrou_consigne:
+            r = ramp_cmd(getattr(self, "_ramp", (0.0, 0.0, 0.0)),
+                         (msg.linear.x, msg.linear.y, msg.angular.z), RAMP_STEP)
+            self._ramp = r
         if r[0] != 0.0 and getattr(self, "_moving", False) is False:
             self._kick_start = _time.monotonic()
             self._moving = True
@@ -251,11 +260,24 @@ class yahboomcar_driver(Node):
         # avec l'editeur mort, pour qu'aucun code ne laisse croire a une seconde source.
         
         #print ("mag: ",self.car.get_magnetometer_data())		
-        edition.data = self.car.get_version()*1.0
-        battery.data = self.car.get_battery_voltage()*1.0
+        # get_version(), la tension et le magnetometre coutent chacun une transaction
+        # serie : a 10 Hz ils occupaient le lien pour rien. La version est lue une
+        # fois, les deux autres une fois par seconde (REQ-DRV-015).
+        if not hasattr(self, '_edition_lue'):
+            self._edition_lue = True
+            self._version = self.car.get_version()*1.0
+            self._tension = self.car.get_battery_voltage()*1.0
+            self._mag = self.car.get_magnetometer_data()
+            self._t_lente = self.now_s()
+        elif self.now_s() - self._t_lente >= 1.0:
+            self._tension = self.car.get_battery_voltage()*1.0
+            self._mag = self.car.get_magnetometer_data()
+            self._t_lente = self.now_s()
+        edition.data = self._version
+        battery.data = self._tension
         ax, ay, az = self.car.get_accelerometer_data()
         gx, gy, gz = self.car.get_gyroscope_data()
-        mx, my, mz = self.car.get_magnetometer_data()
+        mx, my, mz = self._mag
         mx = mx * 1.0
         my = my * 1.0
         mz = mz * 1.0
@@ -367,6 +389,11 @@ class yahboomcar_driver(Node):
 def main():
     rclpy.init()
     driver = yahboomcar_driver('driver_node')
+    # Executeur mono-thread conserve : les groupes de callbacks sont en place, mais
+    # Rosmaster_Lib n'est pas documente thread-safe et la bibliotheque partage le meme port
+    # serie pour les lectures et l'envoi des consignes. Deux fils pourraient entrelacer des
+    # trames sur le chemin d'actionnement — risque non pris. Le gain vient de la reduction
+    # du travail serie par tick, pas du parallelisme (REQ-DRV-015).
     try:
         rclpy.spin(driver)
     except (KeyboardInterrupt, ExternalShutdownException):

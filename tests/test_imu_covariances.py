@@ -73,3 +73,25 @@ def test_la_cadence_par_defaut_correspond_au_mcu():
               "base_driver.py").read_text(encoding="utf-8")
     assert "declare_parameter('imu_rate_hz', 25.0)" in source, (
         "la cadence par defaut doit valoir 25 Hz, cadence mesuree du MCU")
+
+
+@pytest.mark.req("REQ-DRV-015")
+def test_le_pilote_ne_sonde_pas_la_version_a_chaque_tick():
+    """Six transactions serie par tick saturaient l'executeur : consignes en retard."""
+    source = (RACINE / "clawbot_base_driver" / "clawbot_base_driver" /
+              "base_driver.py").read_text(encoding="utf-8")
+    assert "self._version = self.car.get_version()" in source
+    assert "edition.data = self.car.get_version()" not in source, (
+        "get_version() ne doit plus etre appele a chaque tick")
+    assert "battery.data = self.car.get_battery_voltage()" not in source, (
+        "la tension est lue une fois par seconde")
+    assert "self.car.get_magnetometer_data()" in source
+
+
+@pytest.mark.req("REQ-DRV-015")
+def test_la_consigne_et_le_garde_fou_sont_dans_un_groupe_separe():
+    source = (RACINE / "clawbot_base_driver" / "clawbot_base_driver" /
+              "base_driver.py").read_text(encoding="utf-8")
+    assert "MutuallyExclusiveCallbackGroup()" in source
+    assert "callback_group=self.groupe_commande" in source
+    assert "with self._verrou_consigne:" in source
