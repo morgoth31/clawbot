@@ -26,6 +26,24 @@ Version : 1.0 — 2026-11-22. Toute modification de ce fichier passe par le cycl
 
 ---
 
+### Invariants de l'addendum A (F00)
+
+- **INV-11** : un seul écrivain de la transformée `map → odom` à la fois. Les capacités
+  `mapping`, `localization` et `mapping_3d` forment le groupe exclusif `map_tf_writer` ;
+  `capability_manager` refuse d'en activer deux (`CAPABILITY_CONFLICT`).
+- **INV-12** : le bras est en enveloppe de repos (C10) avant tout déplacement de la base,
+  y compris pendant l'exploration et l'approche d'un objet.
+- **INV-13** : toute saisie se fait à vitesse réduite (facteur de vitesse et d'accélération
+  MoveIt ≤ 0,3), avec une scène de planification contenant au moins le sol et le châssis.
+- **INV-14** : aucune capacité qui écrit des données volumineuses (`mapping_3d`, `record_3d`)
+  ne démarre s'il reste moins de 10 Go libres sur `/`.
+- **INV-15** : un skill dont la validation physique n'est pas conforme est déclaré
+  `experimental: true` ; le serveur de skills le refuse (`SKILL_NOT_VALIDATED`), sauf en
+  domaine 99 ou pendant le mode validation, que seul l'opérateur active depuis le tableau de
+  bord (8001) pour 30 min au plus.
+
+Capacités, skills et codes des trois fonctions : `docs/architecture/addendum_A_fonctions.md`.
+
 ## 2. Couches et paquets
 
 | Couche | Nœud / processus | Paquet | Statut |

@@ -1,0 +1,55 @@
+# Inventaire des jeux de reference enregistres sur le robot (F00, REQ-TEST-020).
+# Les donnees vivent dans /var/lib/clawbot/test_data/ : elles ne sont pas dans le depot.
+# `enregistre: false` = jeu declare mais pas encore capture (F00 attend l'operateur).
+dossier: /var/lib/clawbot/test_data
+jeux:
+  slam2d_piece:
+    enregistre: true
+    duree_s: 298.83
+    topics: [/scan, /odom, /odom_raw, /imu/data_raw, /tf, /tf_static]
+    scenario: "tour complet d'une piece, retour au point de depart marque au sol"
+    conduite: "operateur, manette en mode vehicule, 2026-11-23 entre 01:35 et 01:40"
+    fichiers:
+      - nom: slam2d_piece/slam2d_piece_0.db3.zstd
+        taille_octets: 8767132
+        sha256: 22de7bbdebc673b318a5867997f8f4f03ccb64951ffc5750f49fc077c9ef4eef
+        duree_s: 298.83
+        messages: 21611
+    comptes: {"/scan": 3014, "/odom": 2982, "/odom_raw": 2981, "/imu/data_raw": 2981,
+              "/tf": 9652, "/tf_static": 1}
+    verites_terrain:
+      retour_au_point_de_depart: "repere marque au sol, juge a l'oeil par l'operateur"
+      remarque: "aucune distance au metre ruban : ce jeu sert la boucle fermee et la derive odometrique"
+      slam_pendant_le_parcours: "AUCUNE carte produite : le scan est horodate 'laser' alors que TF ne connait que 'laser_link'" 
+  rgbd_statique:
+    enregistre: false
+    duree_s: null
+    topics: [/scan, /odom, /odom_raw, /imu/data_raw, /tf, /tf_static,
+             /camera/color/image_raw, /camera/depth/image_raw,
+             /camera/color/camera_info, /camera/depth/camera_info]
+    scenario: "robot immobile face a un meuble et un mur a distances mesurees"
+    verites_terrain: {}
+  objets_table:
+    enregistre: false
+    duree_s: null
+    topics: [/wrist_camera/image_raw, /camera/color/image_raw,
+             /camera/depth/image_raw, /tf, /arm/joint_states]
+    scenario: "trois objets de classes connues du modele YOLO"
+    verites_terrain: {}
+  imu_odom_2min:
+    enregistre: true
+    duree_s: 119.19
+    topics: [/imu/data_raw, /odom_raw, /odom, /tf, /tf_static]
+    scenario: "conduite manuelle 2 min : rotations sur place, lignes droites, virages serres"
+    conduite: "operateur, manette en mode vehicule, 2026-11-23 09:49"
+    fichiers:
+      - nom: imu_odom_2min/imu_odom_2min_0.db3.zstd
+        taille_octets: 2037090
+        sha256: a3b50ea6c3cdf5fc81e7e3e12106553137a8cfa90f780f897b7738e457ab6afb
+        duree_s: 119.19
+        messages: 16791
+    comptes: {"/imu/data_raw": 2910, "/odom_raw": 2910, "/odom": 2952, "/tf": 8018,
+              "/tf_static": 1}
+    verites_terrain:
+      usage: "analyse du filtrage IMU/odometrie, rejeu EKF hors robot"
+      constat_majeur: "wz(IMU) et wz(roues) correlation -0,983, pente -0,985 : un des deux est inverse"
