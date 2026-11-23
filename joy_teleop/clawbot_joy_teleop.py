@@ -35,6 +35,7 @@ PARAMÈTRES ROS 2
 import sys
 
 import rclpy
+from rcl_interfaces.msg import SetParametersResult
 from rclpy.node import Node
 
 from geometry_msgs.msg import Twist
@@ -52,6 +53,45 @@ MAX_ANGULAR_RS = 1.5
 
 def _clamp(valeur: float, mini: float, maxi: float) -> float:
     return max(mini, min(maxi, valeur))
+
+
+#: Bornes des gains reglables a chaud. Un gain hors bornes est refuse, pas borne en
+#: silence : l'operateur doit voir son reglage rejete (REQ-OPS-055).
+GAINS_BORNES = {"linear_scale": (0.0, MAX_LINEAR_MS),
+                "angular_scale": (0.0, MAX_ANGULAR_RS),
+                "arm_step": (0.0, 30.0)}
+
+
+def valider_gain(nom: str, valeur) -> tuple[bool, float | str]:
+    """Rend (accepte, valeur ou raison du refus). Pure, donc testable sans ROS."""
+    if nom not in GAINS_BORNES:
+        return (True, valeur)
+    try:
+        nombre = float(valeur)
+    except (TypeError, ValueError):
+        return (False, f"{nom} : {valeur!r} n'est pas un nombre")
+    if nombre != nombre or nombre in (float("inf"), float("-inf")):
+        return (False, f"{nom} : valeur non finie")
+    mini, maxi = GAINS_BORNES[nom]
+    if not mini < nombre <= maxi:
+        return (False, f"{nom} : {nombre} hors de ]{mini}, {maxi}]")
+    return (True, nombre)
+
+
+def consigne_vehicule(avant: float, droite: float, rotation: float,
+                      lin_scale: float, ang_scale: float) -> tuple[float, float, float]:
+    """Consigne (x, y, z) du mode vehicule, conventions REP-103.
+
+    * `avant` > 0 avance ; `droite` > 0 va a droite ; `rotation` > 0 est un stick pousse
+      a droite.
+    * REP-103 : y positif = gauche, donc la translation laterale est inversee.
+    * Le sens trigonometrique (anti-horaire) est un z positif : un stick de rotation pousse
+      a gauche doit donc donner un z positif, d'ou l'inversion.
+    """
+    x = _clamp(avant * lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
+    y = _clamp(-droite * lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
+    z = _clamp(-rotation * ang_scale, -MAX_ANGULAR_RS, MAX_ANGULAR_RS)
+    return (x, y, z)
 
 
 class ClawbotJoyTeleop(Node):
@@ -79,6 +119,9 @@ class ClawbotJoyTeleop(Node):
         self.arm_step = float(self.get_parameter("arm_step").value)
         self.deadman = int(self.get_parameter("deadman_button").value)
         self.deadband = float(self.get_parameter("deadband").value)
+        # Sans ce rappel, `ros2 param set` afficherait la nouvelle valeur alors que le noeud
+        # continuerait d'utiliser celle lue a la construction (REQ-OPS-055).
+        self.add_on_set_parameters_callback(self._sur_parametre)
 
         self.arm_angles = {i: 90 for i in range(1, 6)}
         self.claw_angle = 90
@@ -120,6 +163,23 @@ class ClawbotJoyTeleop(Node):
         actuel = bool(boutons[i]) if i < len(boutons) else False
         precedent = bool(self._btn_prev[i]) if i < len(self._btn_prev) else False
         return actuel and not precedent
+
+    def _sur_parametre(self, parametres):
+        """Applique a chaud les gains reglables ; refuse une valeur hors bornes."""
+        resultat = SetParametersResult(successful=True)
+        for parametre in parametres:
+            accepte, valeur = valider_gain(parametre.name, parametre.value)
+            if not accepte:
+                resultat.successful = False
+                resultat.reason = str(valeur)
+                return resultat
+            if parametre.name == "linear_scale":
+                self.lin_scale = float(valeur)
+            elif parametre.name == "angular_scale":
+                self.ang_scale = float(valeur)
+            elif parametre.name == "arm_step":
+                self.arm_step = float(valeur)
+        return resultat
 
     def _axe(self, axes: list[float], nom: str) -> float:
         """Valeur normalisée : positif = droite pour X, haut pour Y (sens du YAML)."""
@@ -222,15 +282,13 @@ class ClawbotJoyTeleop(Node):
             self.cmd_vel_pub.publish(twist)
 
         else:
-            avant = self._axe(axes, "stick_droit_y")
-            droite = self._axe(axes, "stick_droit_x")
-            rotation = self._axe(axes, "stick_gauche_x")
+            # Stick gauche = deplacement, stick droit = rotation (REQ-OPS-056).
+            avant = self._axe(axes, "stick_gauche_y")
+            droite = self._axe(axes, "stick_gauche_x")
+            rotation = self._axe(axes, "stick_droit_x")
 
-            twist.linear.x = _clamp(avant * self.lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
-            # REP-103 : y positif = gauche, donc on inverse
-            twist.linear.y = _clamp(-droite * self.lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
-            # z positif = antihoraire, donc on inverse pour tourner à droite
-            twist.angular.z = _clamp(-rotation * self.ang_scale, -MAX_ANGULAR_RS, MAX_ANGULAR_RS)
+            twist.linear.x, twist.linear.y, twist.angular.z = consigne_vehicule(
+                avant, droite, rotation, self.lin_scale, self.ang_scale)
             self.cmd_vel_pub.publish(twist)
 
             if self._vient_d_etre_presse(boutons, "Y"):

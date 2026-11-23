@@ -11,17 +11,20 @@ slam_toolbox:
 
     odom_frame: odom
     map_frame: map
-    base_frame: base_footprint
+    base_frame: base_link
     scan_topic: /scan
     mode: mapping
 
     debug_logging: false
     throttle_scans: 1
     transform_publish_period: 0.05
-    map_update_interval: 1.0
+    map_update_interval: 2.0
     resolution: 0.05
-    max_laser_range: 12.0
-    minimum_time_interval: 0.2
+    # Le lidar voit sa propre structure jusqu'a 0,039 m (15 points de -139 a +108 deg)
+    # et la piece ne depasse pas 5,6 m : 7-8 m suffisent (REQ-DRV-013).
+    min_laser_range: 0.15
+    max_laser_range: 8.0
+    minimum_time_interval: 0.1
     transform_timeout: 0.2
     tf_buffer_duration: 30.0
     stack_size_to_use: 40000000
@@ -29,8 +32,8 @@ slam_toolbox:
 
     use_scan_matching: true
     use_scan_barycenter: true
-    minimum_travel_distance: 0.10
-    minimum_travel_heading: 0.10
+    minimum_travel_distance: 0.05
+    minimum_travel_heading: 0.05
     scan_buffer_size: 10
     scan_buffer_maximum_scan_distance: 10.0
     link_match_minimum_response_fine: 0.1
@@ -42,7 +45,7 @@ slam_toolbox:
     loop_match_minimum_response_coarse: 0.35
     loop_match_minimum_response_fine: 0.45
 
-    correlation_search_space_dimension: 0.5
+    correlation_search_space_dimension: 0.8
     correlation_search_space_resolution: 0.01
     correlation_search_space_smear_deviation: 0.1
 
