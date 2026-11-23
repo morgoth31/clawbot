@@ -278,3 +278,31 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-DRV-018
+    title: Le lacet publie respecte REP-103
+    statement: >
+      Le pilote doit publier `angular_velocity.z` dans `/imu/data_raw` et
+      `twist.angular.z` dans `/odom_raw` avec le signe de REP-103 : une rotation
+      anti-horaire vue de dessus vaut une valeur positive pour les deux. Le signe se
+      verifie sur le robot par une rotation d'un quart de tour dans un sens connu,
+      jamais par la comparaison des deux capteurs entre eux.
+    rationale: >
+      `wz(IMU)` et `wz(roues)` correlent a -0,983 sur le bag du 2026-11-23 : meme signal,
+      signe inverse, et aucun essai n'a jamais dit lequel etait faux. La correction
+      REQ-DRV-011 n'a fait que retirer `vyaw` des roues de l'EKF : si c'est l'IMU qui est
+      inverse, la cap derive toujours et la carte se dedouble en rotation. Comparer deux
+      capteurs ne peut pas trancher ; il faut une reference physique.
+    sources: [F00, P01-M13]
+    safety: false
+    method: demonstration
+    level: hardware
+    criterion: >
+      tests/hardware/HW-DRV-002.md remplie : sur chaque rotation anti-horaire annoncee,
+      wz(IMU) > 0, wz(roues) > 0, |integrale de wz(IMU) - 90 deg| <= 15 deg et
+      |delta yaw de /odom - 90 deg| <= 15 deg, sur quatre rotations (deux par sens).
+      Un essai sans rotation detectee est non concluant, jamais conforme.
+    evidence: tests/hardware/HW-DRV-002.md
+    status: draft
+    approved_by: null
+    prompt: C06
