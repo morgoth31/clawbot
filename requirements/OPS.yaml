@@ -291,3 +291,26 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-OPS-056
+    title: Stick gauche = deplacement, stick droit = rotation trigonometrique
+    statement: >
+      En mode vehicule, le stick gauche doit commander la translation (avant/arriere et
+      lateral) et le stick droit la rotation : pousse a gauche, il tourne dans le sens
+      trigonometrique (z positif) ; pousse a droite, dans le sens horaire (z negatif).
+    rationale: >
+      L'operateur a demande cette disposition apres essai : translation au pouce gauche,
+      rotation au pouce droit. Les deux sticks ayant la meme convention d'axe (X non
+      inverse, Y inverse), la permutation est sure et n'exige aucun recalibrage.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_joy_vehicule.py : stick gauche vertical -> x, horizontal -> y (REP-103),
+      stick droit -> z avec le bon signe, butees respectees, et le code lit bien les axes
+      gauches pour la translation.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05

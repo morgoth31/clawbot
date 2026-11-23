@@ -78,6 +78,22 @@ def valider_gain(nom: str, valeur) -> tuple[bool, float | str]:
     return (True, nombre)
 
 
+def consigne_vehicule(avant: float, droite: float, rotation: float,
+                      lin_scale: float, ang_scale: float) -> tuple[float, float, float]:
+    """Consigne (x, y, z) du mode vehicule, conventions REP-103.
+
+    * `avant` > 0 avance ; `droite` > 0 va a droite ; `rotation` > 0 est un stick pousse
+      a droite.
+    * REP-103 : y positif = gauche, donc la translation laterale est inversee.
+    * Le sens trigonometrique (anti-horaire) est un z positif : un stick de rotation pousse
+      a gauche doit donc donner un z positif, d'ou l'inversion.
+    """
+    x = _clamp(avant * lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
+    y = _clamp(-droite * lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
+    z = _clamp(-rotation * ang_scale, -MAX_ANGULAR_RS, MAX_ANGULAR_RS)
+    return (x, y, z)
+
+
 class ClawbotJoyTeleop(Node):
 
     def __init__(self, config=None):
@@ -266,15 +282,13 @@ class ClawbotJoyTeleop(Node):
             self.cmd_vel_pub.publish(twist)
 
         else:
-            avant = self._axe(axes, "stick_droit_y")
-            droite = self._axe(axes, "stick_droit_x")
-            rotation = self._axe(axes, "stick_gauche_x")
+            # Stick gauche = deplacement, stick droit = rotation (REQ-OPS-056).
+            avant = self._axe(axes, "stick_gauche_y")
+            droite = self._axe(axes, "stick_gauche_x")
+            rotation = self._axe(axes, "stick_droit_x")
 
-            twist.linear.x = _clamp(avant * self.lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
-            # REP-103 : y positif = gauche, donc on inverse
-            twist.linear.y = _clamp(-droite * self.lin_scale, -MAX_LINEAR_MS, MAX_LINEAR_MS)
-            # z positif = antihoraire, donc on inverse pour tourner à droite
-            twist.angular.z = _clamp(-rotation * self.ang_scale, -MAX_ANGULAR_RS, MAX_ANGULAR_RS)
+            twist.linear.x, twist.linear.y, twist.angular.z = consigne_vehicule(
+                avant, droite, rotation, self.lin_scale, self.ang_scale)
             self.cmd_vel_pub.publish(twist)
 
             if self._vient_d_etre_presse(boutons, "Y"):
