@@ -268,3 +268,26 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-OPS-055
+    title: Les gains de la manette se reglent a chaud et sont bornes
+    statement: >
+      Le noeud de teleoperation doit appliquer immediatement une modification de
+      `linear_scale`, `angular_scale` ou `arm_step`, refuser une valeur hors bornes avec une
+      raison, et ne jamais accepter un gain nul ou non fini.
+    rationale: >
+      Le gain etait lu une seule fois a la construction : `ros2 param set linear_scale 0.20`
+      affichait 0.20 pendant que le noeud continuait a 0.06. Le reglage semblait pris et ne
+      changeait rien, ce qui fait chercher une panne ailleurs. Une valeur nulle rendrait le
+      robot sourd a la manette sans le dire.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_joy_gains.py : gains acceptes dans ]0, MAX] et refuses au-dela avec raison,
+      valeurs non finies refusees, et l'appel `add_on_set_parameters_callback` present.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05
