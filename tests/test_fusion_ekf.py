@@ -74,8 +74,23 @@ def test_l_unite_slam_et_le_yaml_ne_divergent_pas():
             f"{cle} : unite={valeur_cli} / yaml={valeur_yaml} — une des deux est morte")
 
 
-@pytest.mark.req("REQ-DRV-011")
-def test_la_densite_des_noeuds_slam_est_de_dix_centimetres():
+@pytest.mark.req("REQ-DRV-012")
+def test_le_slam_ne_jette_pas_quatre_scans_sur_cinq():
+    """Le lidar publie a 10 Hz : un intervalle de 0,5 s n'integere qu'un scan sur cinq."""
     unite = (RACINE / "services" / "clawbot-slam.service").read_text(encoding="utf-8")
-    assert "minimum_travel_distance:=0.1" in unite
-    assert "minimum_travel_heading:=0.1" in unite
+    assert "minimum_time_interval:=0.1" in unite, (
+        "minimum_time_interval doit valoir 0,1 s pour exploiter les 10 Hz du lidar")
+
+
+@pytest.mark.req("REQ-DRV-012")
+def test_le_graphe_est_densifie_en_translation_et_en_rotation():
+    unite = (RACINE / "services" / "clawbot-slam.service").read_text(encoding="utf-8")
+    assert "minimum_travel_distance:=0.05" in unite
+    assert "minimum_travel_heading:=0.05" in unite
+
+
+@pytest.mark.req("REQ-DRV-012")
+def test_la_recherche_du_scan_matching_est_elargie():
+    unite = (RACINE / "services" / "clawbot-slam.service").read_text(encoding="utf-8")
+    assert "correlation_search_space_dimension:=0.8" in unite, (
+        "0,5 m est trop court pour rattraper une erreur de lacet en virage")

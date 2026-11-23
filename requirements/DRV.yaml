@@ -160,3 +160,28 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-DRV-012
+    title: Le SLAM exploite les scans a leur cadence et densifie le graphe
+    statement: >
+      slam_toolbox doit integrer les scans au moins toutes les 0,1 s
+      (`minimum_time_interval`), creer un noeud tous les 0,05 m ou 0,05 rad, et elargir la
+      recherche du scan matching a 0,8 m (`correlation_search_space_dimension`) pour
+      rattraper une erreur de lacet venant de l'odometrie.
+    rationale: >
+      `minimum_time_interval` valait 0,5 s alors que le lidar publie a 10 Hz : quatre scans
+      sur cinq n'entraient jamais dans le graphe, et la pose derivait entre deux mises a
+      jour. Carte du 2026-11-23 : dedoublements de murs et eventail de rayons, signatures
+      d'une derive de pose pendant le parcours.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      L'unite porte minimum_time_interval 0,1, minimum_travel_distance 0,05,
+      minimum_travel_heading 0,05, correlation_search_space_dimension 0,8 ; le YAML dormant
+      porte les memes valeurs ; test_fusion_ekf.py refuse toute divergence.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05
