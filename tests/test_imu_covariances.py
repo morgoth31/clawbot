@@ -66,13 +66,13 @@ def test_le_pilote_utilise_le_module_et_le_parametre_de_cadence():
 
 
 @pytest.mark.req("REQ-DRV-014")
-def test_la_cadence_par_defaut_correspond_au_mcu():
-    """Mesure du 2026-11-23 : 25 Hz demandes donnent 25,0 Hz et 12 % de redondance ;
-    50 Hz en donnent 82 %. Le defaut doit rester au point mesure."""
+def test_la_cadence_par_defaut_reste_celle_d_origine():
+    """25 Hz est la cadence du MCU, mais elle n'est pas validee en conduite : le defaut
+    reste a 10 Hz, et le parametre permet de l'elever sans redeployer."""
     source = (RACINE / "clawbot_base_driver" / "clawbot_base_driver" /
               "base_driver.py").read_text(encoding="utf-8")
-    assert "declare_parameter('imu_rate_hz', 25.0)" in source, (
-        "la cadence par defaut doit valoir 25 Hz, cadence mesuree du MCU")
+    assert "declare_parameter('imu_rate_hz', 10.0)" in source, (
+        "defaut attendu a 10 Hz tant que la saccade n'est pas elucidee")
 
 
 @pytest.mark.req("REQ-DRV-015")

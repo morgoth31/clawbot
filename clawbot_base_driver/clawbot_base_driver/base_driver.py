@@ -108,11 +108,12 @@ class yahboomcar_driver(Node):
         self.ylinear_limit = self.get_parameter('ylinear_limit').get_parameter_value().double_value
         print (self.ylinear_limit)
         self.declare_parameter('angular_limit', 5.0)
-        # Cadence de publication. Le timer valait 0,1 s en dur, ce qui plafonnait
-        # l'IMU a 10 Hz. Mesure du 2026-11-23 : a 50 Hz demandes, 82 % des messages
-        # repetent la valeur precedente ; a 25 Hz, 12 % seulement, soit ~22 Hz
-        # d'information fraiche. Le MCU rafraichit donc vers 25 Hz (REQ-DRV-014).
-        self.declare_parameter('imu_rate_hz', 25.0)
+        # Cadence de publication. Le timer valait 0,1 s en dur. Mesure du 2026-11-23 : le
+        # MCU rafraichit vers 25 Hz (a 50 Hz demandes, 82 % des messages repetent la valeur
+        # precedente ; a 25 Hz, 12 % seulement). Mais la cadence elevee n'a pas ete validee
+        # en conduite : le defaut reste donc a 10 Hz, comportement d'origine, et le
+        # parametre permet de l'elever quand la saccade sera elucidee (REQ-DRV-014).
+        self.declare_parameter('imu_rate_hz', 10.0)
         self.angular_limit = self.get_parameter('angular_limit').get_parameter_value().double_value
         print (self.angular_limit)
 
@@ -155,9 +156,9 @@ class yahboomcar_driver(Node):
         try:
             cadence = float(self.get_parameter('imu_rate_hz').value)
         except (TypeError, ValueError):
-            cadence = 25.0
+            cadence = 10.0
         if not 1.0 <= cadence <= 200.0:
-            cadence = 25.0
+            cadence = 10.0
         return 1.0 / cadence
 
     def _sur_parametre(self, parametres):
