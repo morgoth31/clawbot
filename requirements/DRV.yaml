@@ -207,3 +207,27 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-DRV-014
+    title: L'IMU publie des covariances vraies et une cadence reglable
+    statement: >
+      Le pilote doit publier `orientation_covariance[0] = -1` (orientation non fournie),
+      des variances de gyroscope et d'acceleration strictement positives et coherentes avec
+      la mesure, et une cadence de publication lue du parametre `imu_rate_hz` au lieu d'un
+      timer de 0,1 s en dur.
+    rationale: >
+      Covariances nulles = confiance infinie pour l'EKF, qui faisait une confiance absolue a
+      un gyrometre a 10 Hz sans rien pour contrebalancer sa derive. Orientation declaree
+      valide alors que le MCU ne la calcule pas. Cadence figee a 10 Hz par un timer en dur.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_imu_covariances.py : orientation a -1, variances diagonales positives,
+      ecart-type accel couvrant le biais mesure 0,26 m/s2, variance nulle refusee, pilote
+      utilisant le module et le parametre.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05

@@ -139,6 +139,10 @@ class MoveRelative(Skill):
         boucle = Deplacement(cible_m=math.hypot(dx, dy), max_speed=max_speed)
         # cap : on avance dans la direction demandée, sans réorientation
         cap = math.atan2(dy, dx) if (dx or dy) else 0.0
+        # Initialisée avant la boucle : la branche d'expiration la cite dans son detail, et
+        # si le délai expirait au premier tour le skill levait NameError au lieu de rendre
+        # un TIMEOUT propre (F821 relevé par le lint, 2026-11-23).
+        avance = 0.0
         while True:
             if ctx.annule():
                 ctx.publier(0.0, 0.0, 0.0)
