@@ -1,6 +1,10 @@
 [Unit]
 Description=Clawbot Lidar YDLIDAR TG30 (/scan) - frame_id alignee sur l URDF (laser_link)
 After=network.target
+# Politique de redemarrage de REQ-OPS-010, identique aux autres unites du robot : la variante
+# obsolete de services/ ne la portait pas non plus (ecart mesure le 2026-11-23).
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -10,7 +14,7 @@ WorkingDirectory=/home/jetson/yahboomcar_ros2_ws/software/library_ws
 Environment=ROS_DOMAIN_ID=28
 ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && exec ros2 launch ydlidar_ros2_driver ydlidar_raw_launch.py params_file:=/home/jetson/clawbot/config/ydlidar_x3plus.yaml"
 Restart=on-failure
-RestartSec=5
+RestartSec=2
 TimeoutStopSec=10
 
 [Install]

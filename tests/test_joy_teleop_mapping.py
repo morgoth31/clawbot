@@ -169,41 +169,61 @@ def _passer_mode_vehicule(banc):
     banc.envoyer(boutons=[0] * 14, duree=0.1)
 
 
-def test_stick_droit_haut_avance(banc):
+def test_stick_gauche_haut_avance(banc):
     _passer_mode_vehicule(banc)
     banc.vider()
     axes = [0.0] * 6
-    axes[3] = -1.0                       # mesuré : haut = -1 sur jsdev
+    axes[1] = -1.0                       # mesuré : haut = -1 sur jsdev
     banc.envoyer(axes=axes)
     assert banc.twists, "aucun /cmd_vel publié"
     assert banc.twists[-1].linear.x > 0.0
 
 
-def test_stick_droit_bas_recule(banc):
+def test_stick_gauche_bas_recule(banc):
     _passer_mode_vehicule(banc)
     banc.vider()
     axes = [0.0] * 6
-    axes[3] = 1.0
+    axes[1] = 1.0
     banc.envoyer(axes=axes)
     assert banc.twists[-1].linear.x < 0.0
 
 
-def test_stick_droit_droite_strafe_a_droite(banc):
+def test_stick_gauche_droite_strafe_a_droite(banc):
     _passer_mode_vehicule(banc)
     banc.vider()
     axes = [0.0] * 6
-    axes[2] = 1.0                        # mesuré : droite = +1
+    axes[0] = 1.0                        # mesuré : droite = +1
     banc.envoyer(axes=axes)
     assert banc.twists[-1].linear.y < 0.0    # REP-103 : y négatif = droite
 
 
-def test_stick_gauche_droite_tourne_a_droite(banc):
+def test_stick_droit_gauche_tourne_dans_le_sens_trigonometrique(banc):
+    """Stick de rotation poussé à gauche : anti-horaire, donc z positif (REQ-OPS-056)."""
     _passer_mode_vehicule(banc)
     banc.vider()
     axes = [0.0] * 6
-    axes[0] = 1.0
+    axes[2] = -1.0
+    banc.envoyer(axes=axes)
+    assert banc.twists[-1].angular.z > 0.0
+
+
+def test_stick_droit_droite_tourne_a_droite(banc):
+    _passer_mode_vehicule(banc)
+    banc.vider()
+    axes = [0.0] * 6
+    axes[2] = 1.0
     banc.envoyer(axes=axes)
     assert banc.twists[-1].angular.z < 0.0   # z négatif = horaire = droite
+
+
+def test_l_ancien_mapping_ne_deplace_plus(banc):
+    """Le stick droit vertical ne commande plus l'avance : c'est la régression à éviter."""
+    _passer_mode_vehicule(banc)
+    banc.vider()
+    axes = [0.0] * 6
+    axes[3] = -1.0                       # ancien axe d'avance
+    banc.envoyer(axes=axes)
+    assert banc.twists[-1].linear.x == 0.0, "le stick droit vertical déplace encore le robot"
 
 
 # ── Mode bras ───────────────────────────────────────────────────────────────
