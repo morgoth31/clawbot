@@ -80,6 +80,20 @@ Après redémarrage : `✅ ClawbotJoyTeleop prêt — 13 boutons, 6 axes, deadma
 initial=bras`. Le téléop démarre **en mode bras** ; le bouton `home` bascule en mode
 véhicule ; le bouton `plus` publie un `Twist` nul (arrêt d'urgence du téléop).
 
+## Complément 01:24 — gains gravés, disposition des sticks
+
+| Réglage | Avant | Après | Motif |
+|---|---|---|---|
+| `linear_scale` | 0,06 m/s | **0,20 m/s** | 0,06 était sous le frottement statique : `/cmd_vel` portait bien ±0,06 mais le robot ne bougeait pas |
+| `angular_scale` | 0,25 rad/s | **0,80 rad/s** | trop lent au jugé de l'opérateur |
+| stick gauche | rotation | **translation** (avant/arrière + latéral) | demande de l'opérateur |
+| stick droit | translation | **rotation** (gauche = trigonométrique) | demande de l'opérateur |
+
+Les gains passent de réglages à chaud à des valeurs gravées dans `joy_teleop_launch.py` :
+vérifié après redémarrage de l'unité, sans aucun `ros2 param set`, `linear_scale` = 0,2 et
+`angular_scale` = 0,8. Commits `0768076` (gains à chaud), `258d130` (sticks), `d923e64`
+(gains gravés). Tag **`prod-20261123-c05a-gains2`**. `smoke_check.sh` : conforme.
+
 ## Retour arrière
 
 ```bash
