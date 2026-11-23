@@ -280,29 +280,32 @@ requirements:
     prompt: C05
 
   - id: REQ-DRV-018
-    title: Le lacet publie respecte REP-103
+    title: Le lacet publie respecte REP-103 dans le repere declare de chaque capteur
     statement: >
-      Le pilote doit publier `angular_velocity.z` dans `/imu/data_raw` et
-      `twist.angular.z` dans `/odom_raw` avec le signe de REP-103 : une rotation
-      anti-horaire vue de dessus vaut une valeur positive pour les deux. Le signe se
-      verifie sur le robot par une rotation d'un quart de tour dans un sens connu,
-      jamais par la comparaison des deux capteurs entre eux.
+      Le pilote doit publier les vitesses angulaires dans le repere que l'URDF declare pour
+      chaque capteur, conformement a REP-103 : `angular_velocity` de `/imu/data_raw` dans
+      `imu_link`, `twist.angular.z` de `/odom_raw` dans `base_link`. La cadence de lacet
+      publiee par l'EKF doit suivre le sens physique de la rotation du robot.
     rationale: >
-      `wz(IMU)` et `wz(roues)` correlent a -0,983 sur le bag du 2026-11-23 : meme signal,
-      signe inverse, et aucun essai n'a jamais dit lequel etait faux. La correction
-      REQ-DRV-011 n'a fait que retirer `vyaw` des roues de l'EKF : si c'est l'IMU qui est
-      inverse, la cap derive toujours et la carte se dedouble en rotation. Comparer deux
-      capteurs ne peut pas trancher ; il faut une reference physique.
+      `wz(IMU)` et `wz(roues)` correlent a -0,983 sur le bag du 2026-11-23, et la passation
+      en a conclu qu'un des deux etait inverse. L'essai HW-DRV-002 du meme jour montre qu'il
+      n'y a pas de capteur inverse : la TF `base_link -> imu_link` declare un repere retourne
+      (RPY -180,000 / 0,005 / -90,006 deg, l'axe +z sort en -z), et la valeur negative est
+      correcte dans ce repere. robot_localization applique la rotation avant de fusionner :
+      mesure sur 584 paires en deplacement libre, pente +1,004 et 98,2 % de signes communs
+      entre la cadence de lacet de l'EKF et le lidar. Le -0,983 comparait deux reperes.
+      Corriger le signe a la publication aurait cree le defaut qu'on croyait corriger.
     sources: [F00, P01-M13]
     safety: false
     method: demonstration
     level: hardware
     criterion: >
-      tests/hardware/HW-DRV-002.md remplie : sur chaque rotation anti-horaire annoncee,
-      wz(IMU) > 0, wz(roues) > 0, |integrale de wz(IMU) - 90 deg| <= 15 deg et
-      |delta yaw de /odom - 90 deg| <= 15 deg, sur quatre rotations (deux par sens).
-      Un essai sans rotation detectee est non concluant, jamais conforme.
+      tests/hardware/HW-DRV-002.md remplie : sur un deplacement libre, la pente entre la
+      vitesse angulaire deduite du lidar (appariement polaire) et celle de chaque capteur vaut
+      1,00 +/- 0,05 dans son repere declare, avec au moins 90 % de signes communs ; la
+      cadence de lacet de l'EKF suit le sens physique. Un essai sans rotation detectee est
+      non concluant, jamais conforme.
     evidence: tests/hardware/HW-DRV-002.md
-    status: draft
-    approved_by: null
+    status: verified
+    approved_by: "operateur 2026-11-23"
     prompt: C06

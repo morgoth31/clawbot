@@ -5,7 +5,7 @@
 | Question | `wz(IMU)` et `wz(roues)` corrèlent à −0,983 : lequel est inversé par rapport à REP-103 ? |
 | Exigence | REQ-DRV-018 (procédure `tests/hardware/HW-DRV-002.md`) |
 | Mesures | hors robot, domaine 98/99, bag `slam2d_piece` du 2026-11-23, lecture seule |
-| Statut | **arbitrage non clos** : la mesure désigne l'IMU sous une hypothèse qui n'est pas encore prouvée |
+| Statut | **clos le 2026-11-23 à 11:52** par l'essai `HW-DRV-002` : aucun capteur n'est inversé (voir §7) |
 
 ## 1. Ce qui est établi par la mesure
 
@@ -105,3 +105,37 @@ BAG=/var/lib/clawbot/test_data/slam2d_piece/slam2d_piece_0.db3
 /usr/bin/python3 scripts/arbitrage_lacet.py "$BAG" /tmp/lacet.csv
 /usr/bin/python3 scripts/polarite_scan.py "$BAG"
 ```
+
+## 7. Résultat de l'essai physique — 2026-11-23 11:52
+
+Deux passes, robot au sol, `clawbot-slam` arrêtée : deux rotations annoncées (anti-horaire puis
+horaire), puis un **déplacement libre de 60 s** à la demande de l'opérateur, analysé contre le
+lidar (584 paires de scans, 165 en rotation franche).
+
+| Série | corrélation au lidar | pente | signes communs | intégrale |
+|---|---|---|---|---|
+| `wz(IMU)` | −0,980 | **−1,004** | 3,0 % | −152,0° |
+| `wz(roues)` | +0,985 | +1,005 | 95,2 % | +158,1° |
+| `wz` EKF (`/odom`) | +0,981 | **+1,004** | **98,2 %** | +152,2° |
+| lidar | — | — | — | +143,0° |
+
+**Conclusion : il n'y a pas de capteur inversé, et l'EKF a raison.** L'explication tient dans
+la TF déployée `base_link → imu_link` : translation `[0.001, 0.017, 0.032]`, rotation
+`RPY(-180.000°, 0.005°, -90.006°)`, dont la colonne z vaut `-1`. L'axe `+z` de `base_link`
+sort en `-z` dans `imu_link` : une rotation anti-horaire **doit** y produire un `wz` négatif.
+L'accéléromètre le confirme au repos (`z = −9,979 m/s²`).
+
+`robot_localization` applique cette rotation avant de fusionner : la vitesse angulaire arrive
+en `base_link` avec le bon signe, et la sortie le prouve (pente +1,004, 98,2 % de signes
+communs, +95,3° intégrés pour un quart de tour physique).
+
+Le **−0,983 de la passation comparait donc deux repères différents**. Le contournement de
+REQ-DRV-011 ne masquait aucun défaut vivant, et corriger le signe à la publication aurait
+fabriqué le défaut qu'on croyait corriger.
+
+**Conséquence pour la carte :** la dérive de pose du 23/11 n'a pas cette cause. Elle reste à
+trouver — glissement des roues en rotation, covariances, appariement — et l'A/B de
+`docs/audit/2026-11-23-ab-slam/` a seulement montré que densifier le graphe divise par deux le
+bruit d'appariement. Le prochain pas utile est de comparer, en rejeu, la cap de l'EKF à la cap
+déduite du lidar sur tout le parcours : un écart qui se creuse en virage désignerait la
+prédiction, un écart constant désignerait l'appariement.
