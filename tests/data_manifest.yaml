@@ -36,3 +36,20 @@ jeux:
              /camera/depth/image_raw, /tf, /arm/joint_states]
     scenario: "trois objets de classes connues du modele YOLO"
     verites_terrain: {}
+  imu_odom_2min:
+    enregistre: true
+    duree_s: 119.19
+    topics: [/imu/data_raw, /odom_raw, /odom, /tf, /tf_static]
+    scenario: "conduite manuelle 2 min : rotations sur place, lignes droites, virages serres"
+    conduite: "operateur, manette en mode vehicule, 2026-11-23 09:49"
+    fichiers:
+      - nom: imu_odom_2min/imu_odom_2min_0.db3.zstd
+        taille_octets: 2037090
+        sha256: a3b50ea6c3cdf5fc81e7e3e12106553137a8cfa90f780f897b7738e457ab6afb
+        duree_s: 119.19
+        messages: 16791
+    comptes: {"/imu/data_raw": 2910, "/odom_raw": 2910, "/odom": 2952, "/tf": 8018,
+              "/tf_static": 1}
+    verites_terrain:
+      usage: "analyse du filtrage IMU/odometrie, rejeu EKF hors robot"
+      constat_majeur: "wz(IMU) et wz(roues) correlation -0,983, pente -0,985 : un des deux est inverse"

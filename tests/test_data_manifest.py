@@ -33,7 +33,10 @@ def _sha256(chemin: Path) -> str:
 def test_l_inventaire_declare_les_trois_jeux():
     document = _manifeste()
     assert document["dossier"] == "/var/lib/clawbot/test_data"
-    assert set(document["jeux"]) == {"slam2d_piece", "rgbd_statique", "objets_table"}
+    # Les trois jeux de REQ-TEST-020 sont obligatoires ; d'autres peuvent s'ajouter.
+    obligatoires = {"slam2d_piece", "rgbd_statique", "objets_table"}
+    assert obligatoires <= set(document["jeux"]), (
+        f"jeux obligatoires absents : {obligatoires - set(document['jeux'])}")
     for nom, jeu in document["jeux"].items():
         assert jeu["topics"], f"{nom} : aucun topic declare"
 
