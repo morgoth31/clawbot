@@ -62,6 +62,24 @@ Cadences C12 conformes (`/scan` 10,099 Hz, `/cmd_vel_safe` 19,999 Hz, 1 éditeur
 
 Tag de production : **`prod-20261123-c05a`** = `96337a3`.
 
+## Complément 01:07 — calibration de `stick_droit_x`
+
+`clawbot-joy-teleop` refusait ensuite la configuration : `axe 'stick_droit_x' : débattement
+0.00 (min 0.0, max 0.0) — axe jamais balayé`. La valeur nulle datait du commit d'origine
+`94eb3ba` (2026-11-15) : le fichier n'a jamais été chargeable.
+
+Bornes **mesurées** sur `/joy` (375 messages, 20 s, stick poussé à fond) : axe 2 =
+`-1.0000 / +1.0000`, comme les cinq autres axes du même boîtier. Le fichier produit par
+l'outil de calibration a été **refusé** : `boutons: {}`, `nb_boutons: 0`, `inverser: true`
+sur le stick gauche sans conduite — il aurait supprimé les 13 boutons.
+
+Modification limitée à `min`/`max` de `stick_droit_x`. Commit `bef8455`, tag de production
+**`prod-20261123-c05a-calib`**.
+
+Après redémarrage : `✅ ClawbotJoyTeleop prêt — 13 boutons, 6 axes, deadman=-1, mode
+initial=bras`. Le téléop démarre **en mode bras** ; le bouton `home` bascule en mode
+véhicule ; le bouton `plus` publie un `Twist` nul (arrêt d'urgence du téléop).
+
 ## Retour arrière
 
 ```bash
