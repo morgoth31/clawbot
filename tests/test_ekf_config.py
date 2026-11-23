@@ -34,8 +34,8 @@ def test_velocities_are_fused_not_absolute_pose():
     odom = node["odom0_config"]
     assert odom[6] is True      # vx
     assert odom[7] is True      # vy : le mecanum se déplace latéralement
-    assert odom[11] is False    # vyaw : depuis REQ-DRV-011 il vient de l'IMU seule,
-                                # deux sources contradictoires se neutralisaient
+    # vyaw : depuis REQ-DRV-011 il vient de l'IMU seule, deux sources se neutralisaient
+    assert odom[11] is False
     assert odom[0] is False     # x absolu : le driver n'en fournit pas
     imu = node["imu0_config"]
     assert imu[11] is True      # vitesse de lacet : compense le glissement Mecanum
