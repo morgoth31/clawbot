@@ -43,9 +43,14 @@ possible sous 1 %, **avec une explication du mécanisme**. La configuration actu
 | Signe du lacet (IMU vs roues) | **hors de cause**, prouvé (§4.1) |
 | Bras dans le champ du lidar | **hors de cause**, mesuré (§4.2) |
 | Prédiction de l'EKF (glissement mécanum) | **rien ne la désigne comme fautive** à l'échelle mesurable (§4.3) |
-| Causes restantes | côté `slam_toolbox` : graphe de poses **et rastérisation** (§5) |
+| Causes restantes | **distorsion du scan en rotation** (piste principale) ; rastérisation **écartée** (§5) |
 | Reproductibilité des mesures | **mauvaise** : 2,5× d'écart entre deux rejeux identiques (§6) |
 | Configuration en production | `rel-C05a` : `minimum_time_interval 0.1`, `minimum_travel_distance/heading 0.05`, `correlation_search_space_dimension 0.8` |
+
+**Résultat de la campagne de rejeux (9 configurations, 4 passes de contrôle) : aucune ne bat la
+configuration en production.** Le meilleur jeu est donc celui qui est déjà en service, et il n'y a
+**aucun patch à appliquer**. Le problème n'est pas un réglage manquant : il est dans la
+reproductibilité (§6) et, très probablement, dans la distorsion du scan en rotation (§5, H5).
 
 ---
 
@@ -132,11 +137,21 @@ Faits de source (slam_toolbox 2.6.10, `SMapper::getOccupancyGrid` / `Mapper.cpp`
    `slam_toolbox` décide ce qui est occupé *dans son OccupancyGrid*, `map_server` décide ce
    qu'il fait des probabilités quand il relit un `.pgm`.
 
-**Hypothèse de travail** : une part importante des cellules isolées et de la moucheture vient
-de ce seuil très permissif, pas d'une dérive de pose. C'est testable en une passe : monter
-`occupancy_threshold` (0,25 → 0,4) et `min_pass_through`, sans toucher au reste, et regarder
-les cellules isolées et le cadre. **Ce test est en cours au moment d'écrire ces lignes** — ne
-pas le refaire sans lire `slam_debug/2026-11-23/outils/resultats.md`.
+**Verdict après essai — l'hypothèse est réfutée.** Quatre variantes testées sur le bag :
+
+| Réglage | Occupées | Isolées | Effet |
+|---|---|---|---|
+| `occupancy_threshold 0.65` | **0** | 0 | carte vidée (ratio plafonné à 0,5) |
+| `occupancy_threshold 0.40` | 551 (−84 %) | 18 | détruit les murs |
+| `occupancy_threshold 0.20` | 1 596 (−54 %) | 41 | détruit la moitié des murs pour −6 isolées |
+| `min_pass_through 4` | 3 365 (−3,2 %) | 60 (1,78 %) | fait **monter** la part d'isolées |
+
+Le seuil ne sépare rien : la moucheture a des **ratios d'impact comparables à ceux des murs**.
+Ce ne sont donc pas des impacts parasites faibles, mais des **placements systématiques** — ce que
+produit un scan étalé pendant la rotation (§10, H5). Et comme la carte est re-rasterisée depuis
+tous les scans aux poses optimisées, aucun filtre de rastérisation ne peut les retirer sans
+emporter les murs. Corollaire : la convention `nav2` de 0,65 est **inapplicable aux grilles
+karto**.
 
 Contre-hypothèse à ne pas perdre : si la carte est re-rastérisée depuis le graphe, un graphe
 mal optimisé produit exactement les mêmes symptômes. Le départage se fait en regardant si les
@@ -295,10 +310,11 @@ ls -l /var/lib/clawbot/test_data/carte_<date>.*     # vérifier que les fichiers
 
 | Question | Test qui tranche | Coût |
 |---|---|---|
-| La moucheture vient-elle du seuil de rastérisation ? | `occupancy_threshold` 0,1 → 0,25/0,4 et `min_pass_through`, deux passes | 2 × 5 min, hors robot |
-| Les murs doublés sont-ils locaux (boucle mal fermée) ou partout ? | cartographier la localisation des doublons sur la carte réelle, comparer à la trajectoire | 30 min d'analyse |
-| La prédiction dérive-t-elle en translation ? | appariement conjoint (déjà fait, instrument limité en x) ; il faut un parcours avec de vraies translations vers des surfaces | 1 passe avec un parcours dédié |
-| Pourquoi deux rejeux identiques divergent-ils ? | instrumentation du rejeu : ordre et horodatage des messages reçus par le SLAM | 1 h |
+| **Pourquoi une passe sur deux diverge-t-elle ?** | journaliser `map → odom` à chaque `map_update` sur 3–4 rejeux | 1 h |
+| La moucheture vient-elle de la rotation ? | cartographier sans rotation rapide (< 0,2 rad/s) et comparer | 2 rejeux |
+| La moucheture se joue-t-elle dans l'appariement ? | `link_match_minimum_response_fine` 0,1 → 0,3, deux passes | 2 × 5 min |
+| Les murs doublés sont-ils locaux (boucle mal fermée) ou partout ? | cartographier la localisation des doublons sur la carte réelle, comparer à la trajectoire | 30 min |
+| ~~La moucheture vient-elle du seuil de rastérisation ?~~ | ~~`occupancy_threshold`, `min_pass_through`~~ | **répondu : non** (§5) |
 
 **Ce qui n'est pas le sujet** : `REQ-HEALTH-010` (moniteur C++) et l'échec de test nav2 sur le
 chemin absolu (P14b). Aucun des deux n'affecte la qualité de la carte.
