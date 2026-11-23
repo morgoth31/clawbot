@@ -114,3 +114,26 @@ requirements:
     status: implemented
     approved_by: null
     prompt: P03
+
+  - id: REQ-DRV-010
+    title: Une unite n'existe qu'une fois et le lidar charge son YAML
+    statement: >
+      Aucune unite ne doit exister a la fois dans `services/` et `systemd/`, et
+      `clawbot-lidar.service` doit passer `params_file` avec `config/ydlidar_x3plus.yaml`,
+      dont le `frame_id` doit egaler celui que l'ARBRE TF publie.
+    rationale: >
+      `clawbot-lidar.service` a existe en double : `/etc` pointait sur la variante sans
+      `params_file`, le pilote prenait `frame_id: laser` au lieu de `laser_link`, et
+      slam_toolbox jetait chaque scan (« queue is full »). Aucune carte n'a ete produite
+      pendant le parcours du 2026-11-23.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_unites_uniques.py : aucun doublon entre les deux dossiers, l'unite lidar
+      passe params_file, le frame_id declare vaut laser_link, et un doublon serait detecte.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05
