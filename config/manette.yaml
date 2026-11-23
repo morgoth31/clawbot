@@ -49,8 +49,8 @@ axes:
   stick_droit_x:
     index: 2
     centre: 0.0
-    min: 0.0
-    max: 0.0
+    min: -1.0
+    max: 1.0
     zone_morte: 0.08
     inverser: false
   stick_droit_y:

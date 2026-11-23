@@ -247,3 +247,24 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-OPS-054
+    title: Aucune configuration de manette livree ne declare un axe mort
+    statement: >
+      La configuration de manette livree avec le depot ne doit declarer aucun axe dont le
+      debattement (max - min) est inferieur a 0,5, ni perdre ses boutons.
+    rationale: >
+      `stick_droit_x` est reste a min = max = 0.0 du 2026-11-15 au 2026-11-23 : le controle
+      structurel de manette_config refusait alors le fichier entier, donc le fichier etait
+      inchargeable et aucun teleop ne pouvait demarrer.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      tests/test_manette_config.py : tous les axes ont un debattement >= 0,5, les boutons
+      sont presents, et le controle lui-meme sait refuser un axe mort (cas negatif).
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05
