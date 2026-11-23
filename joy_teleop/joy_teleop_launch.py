@@ -33,10 +33,13 @@ def generate_launch_description():
                               description="Cadence de publication de /joy (Hz)"),
         DeclareLaunchArgument("deadzone",       default_value="0.05",
                               description="Zone morte appliquée aux axes"),
-        DeclareLaunchArgument("linear_scale",   default_value="0.06",
-                              description="Vitesse max m/s (plafond matériel 0.5)"),
-        DeclareLaunchArgument("angular_scale",  default_value="0.25",
-                              description="Rotation max rad/s (plafond matériel 1.5)"),
+        # Valeurs validees par l'operateur le 2026-11-23 (C05) : 0,06 m/s etait sous le
+        # frottement statique, et 0,25 rad/s trop lent au jugé. Elles survivent desormais a
+        # un redemarrage de l'unite, contrairement a un reglage a chaud (REQ-OPS-055).
+        DeclareLaunchArgument("linear_scale",   default_value="0.20",
+                              description="Vitesse max m/s (plafond materiel 0.5)"),
+        DeclareLaunchArgument("angular_scale",  default_value="0.80",
+                              description="Rotation max rad/s (plafond materiel 1.5)"),
         DeclareLaunchArgument("arm_step",       default_value="3.0",
                               description="Degrés par tick bras"),
         DeclareLaunchArgument("deadman_button", default_value="-1",

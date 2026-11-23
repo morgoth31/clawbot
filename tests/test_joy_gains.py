@@ -54,3 +54,29 @@ def test_le_noeud_installe_bien_le_rappel_de_parametre():
     """Le code porte l'appel : sans lui, tout le reste est decoratif."""
     source = (RACINE / "joy_teleop" / "clawbot_joy_teleop.py").read_text(encoding="utf-8")
     assert "add_on_set_parameters_callback(self._sur_parametre)" in source
+
+
+@pytest.mark.req("REQ-OPS-055")
+def test_les_gains_graves_dans_le_lanceur_sont_dans_les_bornes():
+    """Les valeurs par defaut vivent dans joy_teleop_launch.py : elles doivent etre valides."""
+    import re
+
+    source = (RACINE / "joy_teleop" / "joy_teleop_launch.py").read_text(encoding="utf-8")
+    trouves = dict(re.findall(r'DeclareLaunchArgument\("(linear_scale|angular_scale)",\s*'
+                              r'default_value="([0-9.]+)"', source))
+    assert set(trouves) == {"linear_scale", "angular_scale"}, trouves
+    for nom, brut in trouves.items():
+        ok, resultat = teleop.valider_gain(nom, float(brut))
+        assert ok, f"{nom}={brut} grave dans le lanceur est hors bornes : {resultat}"
+
+
+@pytest.mark.req("REQ-OPS-055")
+def test_les_gains_graves_sont_ceux_valides_par_l_operateur():
+    """0,06 m/s etait sous le frottement statique ; 0,25 rad/s trop lent (essai du 2026-11-23)."""
+    import re
+
+    source = (RACINE / "joy_teleop" / "joy_teleop_launch.py").read_text(encoding="utf-8")
+    trouves = dict(re.findall(r'DeclareLaunchArgument\("(linear_scale|angular_scale)",\s*'
+                              r'default_value="([0-9.]+)"', source))
+    assert float(trouves["linear_scale"]) == pytest.approx(0.20)
+    assert float(trouves["angular_scale"]) == pytest.approx(0.80)
