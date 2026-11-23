@@ -7,6 +7,9 @@
 | Mesures | hors robot, domaine 98/99, bag `slam2d_piece` du 2026-11-23, lecture seule |
 | Statut | **clos le 2026-11-23 à 11:52** par l'essai `HW-DRV-002` : aucun capteur n'est inversé (voir §7) |
 
+> Pour la suite du chantier SLAM (mesures, artefacts, pièges, piste ouverte), lire
+> `docs/debug/slam-2d/README.md`.
+
 ## 1. Ce qui est établi par la mesure
 
 Séries appariées sur l'horodatage le plus proche, 3 009 paires sur 298 s :
