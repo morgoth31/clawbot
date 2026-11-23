@@ -4,11 +4,23 @@
 dossier: /var/lib/clawbot/test_data
 jeux:
   slam2d_piece:
-    enregistre: false
-    duree_s: null
+    enregistre: true
+    duree_s: 298.83
     topics: [/scan, /odom, /odom_raw, /imu/data_raw, /tf, /tf_static]
     scenario: "tour complet d'une piece, retour au point de depart marque au sol"
-    verites_terrain: {}
+    conduite: "operateur, manette en mode vehicule, 2026-11-23 entre 01:35 et 01:40"
+    fichiers:
+      - nom: slam2d_piece/slam2d_piece_0.db3.zstd
+        taille_octets: 8767132
+        sha256: 22de7bbdebc673b318a5867997f8f4f03ccb64951ffc5750f49fc077c9ef4eef
+        duree_s: 298.83
+        messages: 21611
+    comptes: {"/scan": 3014, "/odom": 2982, "/odom_raw": 2981, "/imu/data_raw": 2981,
+              "/tf": 9652, "/tf_static": 1}
+    verites_terrain:
+      retour_au_point_de_depart: "repere marque au sol, juge a l'oeil par l'operateur"
+      remarque: "aucune distance au metre ruban : ce jeu sert la boucle fermee et la derive odometrique"
+      slam_pendant_le_parcours: "AUCUNE carte produite : le scan est horodate 'laser' alors que TF ne connait que 'laser_link'" 
   rgbd_statique:
     enregistre: false
     duree_s: null
