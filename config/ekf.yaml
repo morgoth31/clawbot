@@ -34,6 +34,9 @@ ekf_filter_node:
     odom0_differential: false
     odom0_relative: false
     odom0_queue_size: 10
+    # Sans seuil, un glissement de roue mecanum est fusionne tel quel : c'est ce qui
+    # dedouble les murs dans la carte. 3,0 = rejet au-dela de 3 ecarts-types (REQ-DRV-013).
+    odom0_twist_rejection_threshold: 3.0
 
     imu0: /imu/data_raw
     imu0_config: [false, false, false,

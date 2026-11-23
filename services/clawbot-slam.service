@@ -15,7 +15,7 @@ Type=simple
 User=jetson
 Environment=ROS_DOMAIN_ID=28
 Environment=HOME=/home/jetson
-ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec ros2 run slam_toolbox async_slam_toolbox_node --ros-args -p base_frame:=base_link -p odom_frame:=odom -p map_frame:=map -p scan_topic:=/scan -p mode:=mapping -p use_sim_time:=false -p resolution:=0.05 -p minimum_travel_distance:=0.05 -p minimum_travel_heading:=0.05 -p minimum_time_interval:=0.1 -p correlation_search_space_dimension:=0.8 -p map_update_interval:=2.0"
+ExecStart=/bin/bash -c "source /opt/ros/humble/setup.bash && exec ros2 run slam_toolbox async_slam_toolbox_node --ros-args -p base_frame:=base_link -p odom_frame:=odom -p map_frame:=map -p scan_topic:=/scan -p mode:=mapping -p use_sim_time:=false -p resolution:=0.05 -p minimum_travel_distance:=0.05 -p minimum_travel_heading:=0.05 -p minimum_time_interval:=0.1 -p correlation_search_space_dimension:=0.8 -p min_laser_range:=0.15 -p max_laser_range:=8.0 -p map_update_interval:=2.0"
 Restart=on-failure
 RestartSec=2
 TimeoutStopSec=10

@@ -20,7 +20,10 @@ slam_toolbox:
     transform_publish_period: 0.05
     map_update_interval: 2.0
     resolution: 0.05
-    max_laser_range: 12.0
+    # Le lidar voit sa propre structure jusqu'a 0,039 m (15 points de -139 a +108 deg)
+    # et la piece ne depasse pas 5,6 m : 7-8 m suffisent (REQ-DRV-013).
+    min_laser_range: 0.15
+    max_laser_range: 8.0
     minimum_time_interval: 0.1
     transform_timeout: 0.2
     tf_buffer_duration: 30.0

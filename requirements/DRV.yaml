@@ -185,3 +185,25 @@ requirements:
     status: implemented
     approved_by: null
     prompt: C05
+
+  - id: REQ-DRV-013
+    title: Le SLAM ignore sa propre structure, l'EKF rejette les vitesses aberrantes
+    statement: >
+      slam_toolbox doit ignorer les echos plus proches que 0,15 m et au-dela de 8 m, et
+      ekf_filter_node doit rejeter une mesure de vitesse de /odom_raw au-dela de 3 ecarts-types.
+    rationale: >
+      Mesure du 2026-11-23 : le lidar voit sa propre structure jusqu'a 0,039 m (15 points de
+      -139 a +108 deg), et la piece ne depasse pas 5,6 m. Aucun seuil Mahalanobis n'etait
+      configure : un glissement de roue mecanum etait fusionne tel quel, ce qui dedouble les
+      murs dans la carte.
+    sources: [F00]
+    safety: false
+    method: test
+    level: unit
+    criterion: >
+      L'unite porte min_laser_range 0,15 et max_laser_range 8,0 ; ekf.yaml porte
+      odom0_twist_rejection_threshold entre 1 et 5.
+    evidence: null
+    status: implemented
+    approved_by: null
+    prompt: C05

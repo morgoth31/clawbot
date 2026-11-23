@@ -94,3 +94,33 @@ def test_la_recherche_du_scan_matching_est_elargie():
     unite = (RACINE / "services" / "clawbot-slam.service").read_text(encoding="utf-8")
     assert "correlation_search_space_dimension:=0.8" in unite, (
         "0,5 m est trop court pour rattraper une erreur de lacet en virage")
+
+
+@pytest.mark.req("REQ-DRV-013")
+def test_le_slam_ignore_les_echos_de_sa_propre_structure():
+    """15 points mesures entre 0,039 et 0,184 m, de -139 a +108 deg : le robot se voit."""
+    unite = (RACINE / "services" / "clawbot-slam.service").read_text(encoding="utf-8")
+    assert "min_laser_range:=0.15" in unite, (
+        "sans portee minimale, le lidar cartographie sa propre structure")
+
+
+@pytest.mark.req("REQ-DRV-013")
+def test_la_portee_maximale_est_bornee_au_reel():
+    unite = (RACINE / "services" / "clawbot-slam.service").read_text(encoding="utf-8")
+    assert "max_laser_range:=8.0" in unite, "portee mesuree 5,6 m : 25 m n'apporte que du bruit"
+
+
+@pytest.mark.req("REQ-DRV-013")
+def test_l_ekf_rejette_une_mesure_de_vitesse_aberrante():
+    params = _ekf()
+    seuil = params.get("odom0_twist_rejection_threshold")
+    assert seuil is not None, (
+        "aucun seuil Mahalanobis : un glissement de roue mecanum est fusionne tel quel")
+    assert 1.0 <= float(seuil) <= 5.0, f"seuil {seuil} hors de la plage utile 1-5"
+
+
+@pytest.mark.req("REQ-DRV-013")
+def test_un_seuil_absent_serait_detecte():
+    """Cas negatif : un YAML sans seuil doit echouer, pas passer par defaut."""
+    params = {"odom0_config": [False] * 15, "imu0_config": [False] * 15}
+    assert params.get("odom0_twist_rejection_threshold") is None
